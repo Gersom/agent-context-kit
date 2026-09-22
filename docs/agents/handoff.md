@@ -21,4 +21,4 @@ Ninguna.
 
 ## Próximo paso concreto
 
-El catálogo completo de `template/` ya está redactado (agents/, project/, external/, plans/, y la guía README.md de la raíz). Revisar [`./backlog.md`](./backlog.md) para el siguiente item: "Versionar el skill y generar releases" o "Flujo de migración desde otro sistema de documentación".
+Versionado resuelto (`package.json` + tag `v0.1.0`). Queda pendiente en el backlog: "Generar GitHub Releases" (notas por versión) y "Flujo de migración desde otro sistema de documentación".
