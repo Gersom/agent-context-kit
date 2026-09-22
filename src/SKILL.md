@@ -9,6 +9,8 @@ description: Genera o actualiza la documentación de contexto de un proyecto (re
 
 Al empezar a trabajar sobre un repositorio, antes de tocar código: para saber si ya existe documentación de contexto de este skill y, si no existe, decidir cuánta generar según el alcance de la tarea pedida.
 
+También se puede invocar explícitamente — ver "Cómo usar" en el `README.md` raíz. En particular, pedir explícitamente migrar (ej. *"...y migra mi proyecto"*) fuerza el chequeo de `docs/migration-flow.md` aunque la heurística automática por sí sola no encuentre suficientes coincidencias como para dispararse.
+
 ## Qué hace (alto nivel)
 
 1. **Detecta** si el repo destino ya tiene `docs/agents/` y/o `docs/project/` (o sus equivalentes bajo `agent-context/`, si `docs/` está ocupado por otra documentación no relacionada).

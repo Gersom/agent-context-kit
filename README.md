@@ -12,6 +12,13 @@ Al ejecutarse sobre un repositorio, el skill:
 2. Genera (o completa) una carpeta de documentación con una estructura predecible: reglas del proyecto, estado "en caliente" del trabajo, backlog, changelog, arquitectura, stack, integraciones externas, etc.
 3. Asegura un puntero explícito en `CLAUDE.md` / `AGENTS.md` en la raíz del repo para que cualquier agente sepa dónde está la documentación, sin adivinar ni duplicar contenido.
 
+## Cómo usar
+
+Invocar el skill explícitamente, pidiéndoselo al agente:
+
+- **"Usa la skill agent-context-kit"** — dispara la detección automática normal: si el repo ya tiene documentación de este skill, sigue el flujo de proyecto existente; si no, evalúa si hay contenido de otro sistema para migrar, o dispara el scaffolding normal según el alcance de la tarea.
+- **"Usa la skill agent-context-kit y migra mi proyecto"** — misma detección, pero fuerza el chequeo de migración aunque la heurística de nombres de archivo no encuentre por sí sola suficientes coincidencias como para dispararse (ver "Intención explícita del operador" en [`src/docs/migration-flow.md`](./src/docs/migration-flow.md)).
+
 ## Estructura del repositorio
 
 ```
@@ -29,4 +36,4 @@ agent-context-kit/
 
 ## Estado
 
-Proyecto en diseño. Ver [`agent-context-kit-diseno.md`](./agent-context-kit-diseno.md) para el documento de diseño completo (estructura, lógica de detección, flujo de preguntas) y los pendientes actuales.
+Proyecto en diseño. Ver [`docs/desing.md`](./docs/desing.md) para el documento de diseño completo (estructura, lógica de detección, flujo de preguntas) y los pendientes actuales.

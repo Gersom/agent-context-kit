@@ -10,6 +10,14 @@ No es una cola de pendientes (eso vive en [`./backlog.md`](./backlog.md)): acá 
 
 ---
 
+## 2026-09-22 — Invocación explícita del skill ("usa agent-context-kit...")
+
+- Se agregó la sección "Cómo usar" al `README.md` raíz: dos frases de invocación explícita — "usa la skill agent-context-kit" (detección automática normal) y "...y migra mi proyecto" (fuerza el chequeo de migración).
+- Se enganchó de verdad en `migration-flow.md` (nueva sección "Intención explícita del operador"): la intención explícita reemplaza el umbral de "proporción significativa" de la heurística de nombres — si el operador pide migrar, el flujo se dispara igual aunque haya pocas o ninguna coincidencia automática, y en ese caso se le pregunta a mano qué migrar en vez de asumir que no hay nada.
+- Se agregó una mención breve en `SKILL.md` ("Cuándo se dispara") apuntando a esta sección del README, sin duplicar el detalle.
+- De paso, se corrigió un link roto en `README.md` que todavía apuntaba a `agent-context-kit-diseno.md` (renombrado hace varios commits a `docs/desing.md`).
+- Por qué: sin esto, la frase "migra mi proyecto" hubiera quedado documentada mostrando una funcionalidad que en la práctica no existía en el flujo — la heurística automática podía no alcanzar el umbral y simplemente no dispararse, sin forma de que el operador la forzara.
+
 ## 2026-09-22 — Firma opcional en `handoff.md` para `migration-flow.md`
 
 - Se agregó un comentario HTML de firma (`agent-context-kit:signature`) al inicio de `template/agents/handoff.md`, marcado explícitamente como "ignorar al leer/actualizar, no es contenido".
