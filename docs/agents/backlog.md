@@ -20,15 +20,6 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Detalles:** ver [`../../src/docs/template-architecture.md`](../../src/docs/template-architecture.md) para la descripción de cada archivo.
 - **Agregada:** 2026-09-22
 
-## Redactar el contenido de `src/template/plans/*.md`
-
-- **Descripción:** 4 archivos vacíos: `README.md`, `costs.md`, `limits.md`, `payments.md`.
-- **Decisiones/temas a definir antes de empezar:** ninguno.
-- **Bloqueos:** ninguno.
-- **Disparador:** cuando el operador pida continuar con las plantillas de `template/`.
-- **Detalles:** ver [`../../src/docs/template-architecture.md`](../../src/docs/template-architecture.md).
-- **Agregada:** 2026-09-22
-
 ## Redactar `src/template/external/_example-service.md`
 
 - **Descripción:** plantilla base para documentar integraciones externas, actualmente vacía.

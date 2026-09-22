@@ -21,4 +21,4 @@ Ninguna.
 
 ## Próximo paso concreto
 
-`src/template/agents/` ya está completo (rules, handoff, backlog, changelog, known-issues, roadmap). Queda pendiente todo `template/project/*`, `template/plans/*`, `external/_example-service.md` y `template/README.md` — ver [`./backlog.md`](./backlog.md).
+`src/template/plans/` ya está completo. Queda pendiente `template/project/*` (8 archivos), `external/_example-service.md` y `template/README.md` — ver [`./backlog.md`](./backlog.md).
