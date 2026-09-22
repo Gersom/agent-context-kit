@@ -14,6 +14,15 @@ Inmediatamente después del chequeo de "¿Existe `docs/agents/` y/o `docs/projec
 - **No existen, pero `docs/` (o la carpeta que cumpla ese rol) tiene archivos cuyo nombre matchea el catálogo de este skill** (ver heurística abajo) en una proporción significativa → se dispara **este** flujo, en vez de continuar directo con `ALCANCE`.
 - **No existen y tampoco hay coincidencias** → sigue el flujo normal de `questions-flow.md` sin cambios (crear `docs/` nuevo, o usar `agent-context/` si hay conflicto real con contenido no relacionado — ver `docs/desing.md` 4.1).
 
+## Prioridad: firma de este skill sobre la heurística
+
+Antes de aplicar la tabla de heurística, revisar si alguno de los archivos candidatos a `handoff.md` (cualquiera que matchee el patrón `handoff` en el nombre) contiene el comentario de firma `agent-context-kit:signature` en sus primeras líneas (ver `template/agents/handoff.md`).
+
+- **Si la firma está presente** → este `docs/` ya fue generado por este mismo skill, no es un sistema distinto. No se dispara la migración: se trata como el flujo de proyecto existente de `questions-flow.md` (leer `rules.md`/`handoff.md`/`backlog.md`, ejecutar la tarea, actualizar al final), aunque la estructura de carpetas no calce exactamente con `docs/agents/`+`docs/project/` (por ejemplo, si se movió o renombró algo a mano después de generarla).
+- **Si no está presente** → no descarta nada por sí solo — la firma es opcional (un `handoff.md` de este skill generado antes de que existiera esta firma, o editado a mano, puede no tenerla). Se sigue con la heurística de nombre normalmente.
+
+La firma es una señal de alta confianza cuando aparece, pero su ausencia es neutral, no una señal de "es de otro sistema".
+
 ## Heurística de detección y mapeo
 
 Por cada archivo dentro del `docs/` existente (recursivo, sin importar en qué subcarpeta esté), comparar su nombre (normalizado: minúsculas, sin guiones/underscores) contra este catálogo — coincidencia por nombre exacto o por contener el término:

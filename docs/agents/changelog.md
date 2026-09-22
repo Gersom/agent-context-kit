@@ -10,6 +10,13 @@ No es una cola de pendientes (eso vive en [`./backlog.md`](./backlog.md)): acá 
 
 ---
 
+## 2026-09-22 — Firma opcional en `handoff.md` para `migration-flow.md`
+
+- Se agregó un comentario HTML de firma (`agent-context-kit:signature`) al inicio de `template/agents/handoff.md`, marcado explícitamente como "ignorar al leer/actualizar, no es contenido".
+- Se integró en `migration-flow.md` como señal de alta prioridad: si un archivo candidato a `handoff.md` durante la migración ya tiene esta firma, no se trata como sistema distinto a migrar — se asume que ya es de este skill (aunque la estructura de carpetas no calce exactamente) y se va directo al flujo de proyecto existente.
+- Decisión explícita con el operador: **opcional, no obligatoria**. Su ausencia no descarta nada (un `handoff.md` de este skill sin la firma sigue siendo válido, solo se sigue con la heurística de nombre normal) — evita tener que retrofitear archivos ya generados (incluidos los de este mismo repo, que no la tienen).
+- Por qué: la heurística de nombre de `migration-flow.md` puede confundir un `handoff.md` ya generado por este skill con uno de un sistema distinto que casualmente usa el mismo nombre; la firma resuelve esa ambigüedad cuando está presente.
+
 ## 2026-09-22 — Flujo de migración desde otro sistema de documentación
 
 - Se creó `src/docs/migration-flow.md`: se dispara cuando `docs/agents/`+`docs/project/` no existen pero el `docs/` del repo destino tiene archivos cuyo nombre matchea el catálogo de este skill (tabla de heurística por patrón de nombre — `backlog`, `handoff`, `stack`, `entities`, etc. — construida sobre la estructura de referencia real de la sección 6 de `docs/desing.md`).

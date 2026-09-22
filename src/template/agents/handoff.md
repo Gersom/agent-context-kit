@@ -1,3 +1,5 @@
+<!-- agent-context-kit:signature — ignorar al leer/actualizar este archivo, no es contenido. Existe solo para identificar que fue generado por https://github.com/Gersom/agent-context-kit, útil para el flujo de migración (ver src/docs/migration-flow.md) cuando hay que distinguir este skill de un sistema de documentación parecido pero distinto. Opcional: su ausencia no significa que el archivo no sea de este skill. -->
+
 # Handoff
 
 Estado "en caliente" del trabajo: en qué se está ahora mismo. **Este archivo se sobrescribe completo cada vez que se actualiza** — no se agregan entradas nuevas debajo de las viejas, es una foto del presente, no un historial.
