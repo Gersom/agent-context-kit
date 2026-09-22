@@ -10,6 +10,12 @@ No es una cola de pendientes (eso vive en [`./backlog.md`](./backlog.md)): acá 
 
 ---
 
+## 2026-09-22 — Generar GitHub Release de `v0.1.0`
+
+- Se decidió el proceso: manual (`gh release create` al cortar un tag), con notas redactadas a mano resumiendo `docs/agents/changelog.md` — no se automatiza con GitHub Actions por ahora, porque los releases van a ser poco frecuentes y esto es un repo de documentación, no software que se despliegue por CI.
+- Se creó el release [`v0.1.0`](https://github.com/Gersom/agent-context-kit/releases/tag/v0.1.0) sobre el tag ya pusheado.
+- Por qué: para que un repo destino pueda ver de un vistazo qué cambió entre versiones sin tener que leer `git log`.
+
 ## 2026-09-22 — Versionar el proyecto: `package.json` + SemVer + tags de git
 
 - Se creó `package.json` en la raíz (`name`, `version: 0.1.0`, `description`, `private: true`, `repository`) como número de versión visible dentro del repo.

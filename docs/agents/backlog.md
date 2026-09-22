@@ -20,12 +20,3 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Detalles:** ver sección 4.1 y sección 6 (estructura de referencia) de [`../../docs/desing.md`](../../docs/desing.md).
 - **Agregada:** 2026-09-22
 
-## Generar GitHub Releases
-
-- **Descripción:** con el esquema de versionado ya resuelto (SemVer vía `package.json` + tags de git, ver `changelog.md`), falta el proceso para cortar un GitHub Release por cada tag — con notas, para que un repo destino pueda ver de un vistazo qué cambió entre versiones sin leer `git log`.
-- **Decisiones/temas a definir antes de empezar:** notas generadas automáticamente desde los commits (ej. `gh release create --generate-notes`) vs. redactadas a mano resumiendo desde `docs/agents/changelog.md`; si se automatiza con un workflow de GitHub Actions al pushear un tag `v*`, o se corre manualmente cada vez.
-- **Bloqueos:** ninguno.
-- **Disparador:** cuando el operador pida continuar con esto — natural candidato para cuando se corte la primera versión "estable" (post `0.x`) o cuando se acumulen varios tags sin release.
-- **Detalles:** ninguno todavía.
-- **Agregada:** 2026-09-22
-

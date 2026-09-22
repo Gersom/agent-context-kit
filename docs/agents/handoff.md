@@ -21,4 +21,4 @@ Ninguna.
 
 ## Próximo paso concreto
 
-Versionado resuelto (`package.json` + tag `v0.1.0`). Queda pendiente en el backlog: "Generar GitHub Releases" (notas por versión) y "Flujo de migración desde otro sistema de documentación".
+Backlog: "Flujo de migración desde otro sistema de documentación" — con el contexto agregado de que el operador tiene otros proyectos con sistemas de documentación propios/parecidos que querrá migrar a la estructura de este skill, reusando lo ya definido acá.
