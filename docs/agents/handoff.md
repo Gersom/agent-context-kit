@@ -21,4 +21,4 @@ Ninguna.
 
 ## Próximo paso concreto
 
-`src/template/plans/` ya está completo. Queda pendiente `template/project/*` (8 archivos), `external/_example-service.md` y `template/README.md` — ver [`./backlog.md`](./backlog.md).
+`src/template/project/` ya está completo. Solo queda `external/_example-service.md` y `template/README.md` para terminar todo el catálogo de `template/` — ver [`./backlog.md`](./backlog.md).

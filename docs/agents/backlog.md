@@ -11,15 +11,6 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 
 ---
 
-## Redactar el contenido de `src/template/project/*.md`
-
-- **Descripción:** 8 archivos vacíos: `architecture.md`, `stack.md`, `entities.md`, `infrastructure.md`, `decisions.md`, `glossary.md`, `testing.md`, `setup.md`. Cada uno necesita su plantilla con placeholders, siguiendo el mismo estilo que ya tienen `template/agents/*.md` (rules, handoff, backlog, changelog, known-issues).
-- **Decisiones/temas a definir antes de empezar:** ninguno — el propósito de cada archivo ya está descrito en [`../../src/docs/template-architecture.md`](../../src/docs/template-architecture.md).
-- **Bloqueos:** ninguno.
-- **Disparador:** cuando el operador pida continuar con las plantillas de `template/`.
-- **Detalles:** ver [`../../src/docs/template-architecture.md`](../../src/docs/template-architecture.md) para la descripción de cada archivo.
-- **Agregada:** 2026-09-22
-
 ## Redactar `src/template/external/_example-service.md`
 
 - **Descripción:** plantilla base para documentar integraciones externas, actualmente vacía.
