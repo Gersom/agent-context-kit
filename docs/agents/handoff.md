@@ -21,4 +21,4 @@ Ninguna.
 
 ## Próximo paso concreto
 
-Backlog: "Flujo de migración desde otro sistema de documentación" — con el contexto agregado de que el operador tiene otros proyectos con sistemas de documentación propios/parecidos que querrá migrar a la estructura de este skill, reusando lo ya definido acá.
+`docs/agents/backlog.md` está vacío — todos los items se cerraron en esta sesión (catálogo de `template/` completo, versionado, releases, flujo de migración). El siguiente paso natural es probar el skill end-to-end sobre un repo real del operador (varios de sus otros proyectos tienen sistemas de documentación propios que calzan como caso de uso del flujo de migración recién escrito).

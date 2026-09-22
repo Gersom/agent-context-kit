@@ -61,3 +61,9 @@ Antes de tocar código, leer en este orden:
 - [`payments.md`](./plans/payments.md) — pasarelas de pago y facturación.
 
 *(solo si el proyecto tiene costos, límites de uso o pagos)*
+
+## Otros (`others/`)
+
+<!-- Listar cada archivo real que haya terminado ahí, tal como está (sin plantilla propia). -->
+
+*(solo si esta documentación se generó migrando un sistema previo y quedó contenido sin equivalente claro en la estructura de este skill — ver `src/docs/migration-flow.md`)*

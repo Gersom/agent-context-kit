@@ -10,6 +10,18 @@ No es una cola de pendientes (eso vive en [`./backlog.md`](./backlog.md)): acá 
 
 ---
 
+## 2026-09-22 — Flujo de migración desde otro sistema de documentación
+
+- Se creó `src/docs/migration-flow.md`: se dispara cuando `docs/agents/`+`docs/project/` no existen pero el `docs/` del repo destino tiene archivos cuyo nombre matchea el catálogo de este skill (tabla de heurística por patrón de nombre — `backlog`, `handoff`, `stack`, `entities`, etc. — construida sobre la estructura de referencia real de la sección 6 de `docs/desing.md`).
+- Decisiones tomadas (con el operador, antes de escribir el flujo):
+  - Archivos sin equivalente claro en la skill (ej. `idempotency.md`, `production-watch.md`) van a una carpeta nueva `docs/others/`, sin transformar, tal cual estaban — no se fuerzan a encajar en un template que no les corresponde.
+  - El `docs/` viejo se resguarda completo en `docs-legacy/` antes de tocar nada, y **no se borra automáticamente** — queda como respaldo hasta que el operador lo borre a mano.
+  - Los archivos que sí mapean se transforman (no solo se renombran) para encajar en la plantilla correspondiente de `template/`, conservando toda la información original.
+  - Antes de mover o escribir nada, se muestra al operador la tabla de mapeo propuesta (incluyendo fusiones, ej. `stack-backend.md` + `stack-frontend.md` → `stack.md`) para confirmar.
+- Se enganchó el flujo desde `questions-flow.md` (nueva rama en la detección automática, antes del chequeo de `ALCANCE`), `SKILL.md` (punto 1 y sección de enlaces) y `docs/architecture.md` (árbol + descripción). Se agregó la sección condicional "Otros (`others/`)" a `template/README.md` para cuando la migración genera esa carpeta.
+- Por qué: el operador tiene otros proyectos con sistemas de documentación propios o parecidos al de este skill; sin este flujo, esa documentación se hubiera perdido o quedado duplicada sin usar en `agent-context/` en vez de reusarse.
+- Con esto, `docs/agents/backlog.md` queda vacío — no hay más items pendientes identificados por ahora.
+
 ## 2026-09-22 — Generar GitHub Release de `v0.1.0`
 
 - Se decidió el proceso: manual (`gh release create` al cortar un tag), con notas redactadas a mano resumiendo `docs/agents/changelog.md` — no se automatiza con GitHub Actions por ahora, porque los releases van a ser poco frecuentes y esto es un repo de documentación, no software que se despliegue por CI.

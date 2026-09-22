@@ -1,6 +1,6 @@
 {
   "name": "agent-context-kit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Skill reutilizable que genera documentación de contexto de proyecto para que cualquier agente de IA entienda en qué momento está un proyecto, qué falta, qué se hizo y por qué.",
   "private": true,
   "repository": {

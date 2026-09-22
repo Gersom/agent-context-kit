@@ -35,7 +35,9 @@ El agente revisa el repo destino:
   5. Al terminar, actualizar `docs/agents/handoff.md` (siempre se sobrescribe con el estado actual) y agregar la entrada correspondiente a `docs/agents/changelog.md`.
   6. **Fin del flujo.** No continuar con las rondas siguientes.
 
-- **NO** → no hay documentación previa de este skill. Continuar según `ALCANCE`:
+- **NO, pero `docs/` (o carpeta equivalente) tiene archivos cuyo nombre matchea el catálogo de este skill en una proporción significativa** → hay documentación de contexto previa, pero de otro formato/convención. No se trata como conflicto genuino (eso sería `agent-context/`, ver `docs/desing.md` 4.1): se dispara el **flujo de migración** — ver [`./migration-flow.md`](./migration-flow.md). `ALCANCE` deja de ser relevante hasta que ese flujo termine (internamente se comporta como `ALCANCE = d`).
+
+- **NO** → no hay documentación previa de este skill ni nada reconocible para migrar. Continuar según `ALCANCE`:
 
   | ALCANCE | Set | Continúa a |
   |---|---|---|
