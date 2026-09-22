@@ -46,3 +46,4 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Disparador:** cuando el operador pida continuar con esto.
 - **Detalles:** ver sección 4.1 y sección 6 (estructura de referencia) de [`../../docs/desing.md`](../../docs/desing.md).
 - **Agregada:** 2026-09-22
+

@@ -1,14 +1,8 @@
 # Pagos
 
-Cómo funciona el cobro/facturación del proyecto y qué pasarelas de pago están involucradas. El detalle técnico de cómo se integra cada pasarela (SDK, webhooks, credenciales) va en `external/<pasarela>.md`; acá va el modelo de negocio: qué se cobra, cuándo, y con qué pasarela.
+Cómo se procesa el cobro/facturación del proyecto y qué pasarelas de pago están involucradas. El catálogo de planes y su modelo de cobro (suscripción, pago único, etc.) vive en [`./tiers.md`](./tiers.md) — acá va el detalle operativo de cómo se cobra, no qué se cobra. El detalle técnico de cómo se integra cada pasarela (SDK, webhooks, credenciales) va en `external/<pasarela>.md`.
 
 ---
-
-## Modelo de facturación
-
-<!-- Cómo se cobra a nivel general: suscripción recurrente, por uso (metered), pago único, freemium con upsell, etc. Si hay varios planes, mencionarlos acá o linkear a donde estén definidos (ej. un archivo de configuración de planes). -->
-
-[Placeholder]
 
 ## Pasarelas de pago
 

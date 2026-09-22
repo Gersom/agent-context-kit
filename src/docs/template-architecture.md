@@ -31,6 +31,7 @@ template/
 │
 └── plans/
     ├── README.md
+    ├── tiers.md
     ├── costs.md
     ├── limits.md
     └── payments.md
@@ -73,6 +74,7 @@ Documentación técnica y de dominio sobre el proyecto en sí (no sobre el proce
 Documentación de negocio, relevante solo cuando el proyecto tiene un componente comercial (costos, límites de uso, pagos).
 
 - **`README.md`** — Índice de la carpeta `plans/`.
+- **`tiers.md`** — Catálogo de planes: cuáles existen, a quién apunta cada uno y su modelo de cobro (suscripción, pago único, freemium, etc.).
 - **`costs.md`** — Estructura de costos del proyecto (de operarlo, no de desarrollarlo).
 - **`limits.md`** — Límites de uso: cuotas, rate limits, topes por plan.
 - **`payments.md`** — Cómo funciona el cobro/facturación, pasarelas de pago involucradas.

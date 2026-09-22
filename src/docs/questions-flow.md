@@ -100,7 +100,7 @@ Preguntar todas juntas, en una sola interacción (todas son independientes entre
   → Sí: copiar `template/project/glossary.md` → `docs/project/glossary.md`
 
 - "¿El proyecto tiene componente de costos, límites de uso o pagos?"
-  → Sí: copiar toda la carpeta `template/plans/` → `docs/plans/` (`README.md`, `costs.md`, `limits.md`, `payments.md`)
+  → Sí: copiar toda la carpeta `template/plans/` → `docs/plans/` (`README.md`, `tiers.md`, `costs.md`, `limits.md`, `payments.md`)
 
 - "¿El proyecto integra servicios externos (APIs de terceros, IA, pasarelas de pago, etc.)?"
   → Sí: pasa a la **Ronda 4**. No: omitir carpeta `external/`.

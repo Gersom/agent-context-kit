@@ -6,6 +6,7 @@ Es documentación de negocio, no técnica: describe cómo se cobra, cuánto cues
 
 ## Contenido
 
+- [`tiers.md`](./tiers.md) — catálogo de planes: cuáles existen, a quién apunta cada uno y su modelo de cobro (suscripción, pago único, freemium, etc.).
 - [`costs.md`](./costs.md) — estructura de costos de operar el proyecto (infraestructura, servicios de terceros, etc.), no de desarrollarlo.
 - [`limits.md`](./limits.md) — límites de uso: cuotas, rate limits, topes por plan.
-- [`payments.md`](./payments.md) — cómo funciona el cobro/facturación y qué pasarelas de pago están involucradas.
+- [`payments.md`](./payments.md) — cómo se procesa el cobro/facturación y qué pasarelas de pago están involucradas.

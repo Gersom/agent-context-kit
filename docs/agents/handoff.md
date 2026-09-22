@@ -21,4 +21,4 @@ Ninguna.
 
 ## Próximo paso concreto
 
-`src/template/project/` ya está completo. Solo queda `external/_example-service.md` y `template/README.md` para terminar todo el catálogo de `template/` — ver [`./backlog.md`](./backlog.md).
+`src/template/plans/` tiene ahora `tiers.md` (catálogo de planes) además de `README.md`, `costs.md`, `limits.md`, `payments.md`. Queda pendiente `external/_example-service.md` y `template/README.md` para terminar todo el catálogo de `template/` — ver [`./backlog.md`](./backlog.md).
