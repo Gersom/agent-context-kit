@@ -63,7 +63,7 @@ Documentación técnica y de dominio sobre el proyecto en sí (no sobre el proce
 - **`decisions.md`** — ADRs (Architecture Decision Records): el "por qué" detrás de decisiones técnicas ya tomadas, para no repetir debates ya cerrados ni revertir algo sin saber por qué se hizo así.
 - **`glossary.md`** — Términos de negocio/dominio propios del proyecto que un agente externo no entendería a simple vista.
 - **`testing.md`** — Estrategia y convenciones de testing: qué se testea, cómo, con qué herramientas.
-- **`setup.md`** — Cómo levantar el proyecto en local, cuando el setup no es trivial (variables de entorno, seeds, servicios externos corriendo, etc.).
+- **`setup.md`** — Comandos exactos que un agente necesita (dev, build, lint, typecheck) y cómo levantar el proyecto en local, cuando el setup no es trivial (variables de entorno, seeds, servicios externos corriendo, etc.).
 
 ## `external/`
 

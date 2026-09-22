@@ -1,8 +1,21 @@
 # Setup local
 
-Cómo levantar el proyecto en local, para los casos en que no es trivial: variables de entorno necesarias, seeds de datos, servicios externos que tienen que estar corriendo, etc. Si `bun install && bun run dev` (o equivalente) alcanza sin nada más, este archivo no hace falta.
+Cómo levantar el proyecto en local, para los casos en que no es trivial: variables de entorno necesarias, seeds de datos, servicios externos que tienen que estar corriendo, etc. — y los comandos exactos que un agente va a necesitar mientras trabaja (build, lint, typecheck), no solo para arrancar el servidor de desarrollo.
+
+Si `bun install && bun run dev` alcanza para levantar el proyecto y no hay comandos de build/lint relevantes más allá de eso, este archivo no hace falta.
 
 ---
+
+## Comandos
+
+<!-- Comandos exactos para las operaciones que un agente va a necesitar mientras trabaja — no solo "cómo levantar el proyecto" (eso va en la sección de Pasos, más abajo). Los comandos de test van en `testing.md`, no acá, para no duplicar — solo linkear desde ahí si hace falta. Incluir flags no obvios si hace falta pasarlos siempre. -->
+
+| Comando | Para qué sirve |
+|---|---|
+| `[Placeholder]` | dev — levantar el servidor de desarrollo |
+| `[Placeholder]` | build — compilar para producción |
+| `[Placeholder]` | lint |
+| `[Placeholder]` | typecheck (si aplica) |
 
 ## Prerrequisitos
 

@@ -10,6 +10,13 @@ No es una cola de pendientes (eso vive en [`./backlog.md`](./backlog.md)): acá 
 
 ---
 
+## 2026-09-22 — Sección "Comandos" en `template/project/setup.md`
+
+- Se investigaron proyectos parecidos (Cline Memory Bank, `agent-markdown-memory-bank-protocol`, la spec de AGENTS.md, y el template `agentic-repository-engineering-template`) para comparar nuestro catálogo de `template/`. Conclusión: la estructura actual (backlog/handoff/changelog separados, puntero `CLAUDE.md`/`AGENTS.md`) es más granular que Cline y más proporcionada que templates tipo SDLC completo — no ameritaba una reestructuración grande.
+- Se detectó un hueco real: la spec de AGENTS.md marca explícitamente "build commands with exact flags, test procedures" como contenido esperado de primera línea, y ningún archivo nuestro cubría comandos de build/lint/typecheck (solo `testing.md` cubre tests, y `setup.md` solo cubría "cómo levantar el proyecto").
+- Se agregó la sección "Comandos" al inicio de `template/project/setup.md` (dev, build, lint, typecheck), sin crear un archivo nuevo — mantiene la proporción del catálogo actual. Se actualizó la descripción de `setup.md` en `src/docs/template-architecture.md` en consecuencia.
+- Por qué: un agente necesita estos comandos durante la tarea, no solo al levantar el proyecto por primera vez — dejarlos implícitos en un `README.md` del proyecto (si existe) obliga a adivinar o buscar.
+
 ## 2026-09-22 — Invocación explícita del skill ("usa agent-context-kit...")
 
 - Se agregó la sección "Cómo usar" al `README.md` raíz: dos frases de invocación explícita — "usa la skill agent-context-kit" (detección automática normal) y "...y migra mi proyecto" (fuerza el chequeo de migración).
