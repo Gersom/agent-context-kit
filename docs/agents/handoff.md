@@ -21,4 +21,4 @@ Ninguna.
 
 ## Próximo paso concreto
 
-Revisar [`./backlog.md`](./backlog.md). Queda pendiente el catálogo de `template/` (project/*, plans/*, external/_example-service.md, agents/roadmap.md, template/README.md) y, más adelante, versionar el skill y generar releases.
+`src/template/agents/` ya está completo (rules, handoff, backlog, changelog, known-issues, roadmap). Queda pendiente todo `template/project/*`, `template/plans/*`, `external/_example-service.md` y `template/README.md` — ver [`./backlog.md`](./backlog.md).
