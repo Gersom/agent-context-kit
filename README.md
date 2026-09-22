@@ -18,7 +18,7 @@ Al ejecutarse sobre un repositorio, el skill:
 agent-context-kit/
 ├── SKILL.md              # Trigger + instrucciones de alto nivel del skill
 ├── questions-flow.md     # Árbol completo de preguntas y ramas de decisión
-└── example/               # Catálogo maestro de plantillas
+└── template/              # Catálogo maestro de plantillas
     ├── README.md
     ├── agents/            # rules, handoff, backlog, changelog, roadmap
     ├── project/           # architecture, stack, entities, infrastructure, decisions, glossary, testing, setup
