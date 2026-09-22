@@ -21,4 +21,4 @@ Ninguna.
 
 ## Próximo paso concreto
 
-`src/template/plans/` tiene ahora `tiers.md` (catálogo de planes) además de `README.md`, `costs.md`, `limits.md`, `payments.md`. Queda pendiente `external/_example-service.md` y `template/README.md` para terminar todo el catálogo de `template/` — ver [`./backlog.md`](./backlog.md).
+El catálogo completo de `template/` ya está redactado (agents/, project/, external/, plans/, y la guía README.md de la raíz). Revisar [`./backlog.md`](./backlog.md) para el siguiente item: "Versionar el skill y generar releases" o "Flujo de migración desde otro sistema de documentación".

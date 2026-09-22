@@ -11,24 +11,6 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 
 ---
 
-## Redactar `src/template/external/_example-service.md`
-
-- **Descripción:** plantilla base para documentar integraciones externas, actualmente vacía.
-- **Decisiones/temas a definir antes de empezar:** ninguno.
-- **Bloqueos:** ninguno.
-- **Disparador:** cuando el operador pida continuar con las plantillas de `template/`.
-- **Detalles:** ver [`../../src/docs/template-architecture.md`](../../src/docs/template-architecture.md).
-- **Agregada:** 2026-09-22
-
-## Redactar `src/template/README.md`
-
-- **Descripción:** guía de estructura/formato que el agente usa como referencia para generar el `docs/README.md` del proyecto destino (no se copia literal). Actualmente vacío.
-- **Decisiones/temas a definir antes de empezar:** ninguno.
-- **Bloqueos:** ninguno.
-- **Disparador:** cuando el operador pida continuar con las plantillas de `template/`.
-- **Detalles:** ver sección "`README.md` (raíz de `template/`)" en [`../../src/docs/template-architecture.md`](../../src/docs/template-architecture.md).
-- **Agregada:** 2026-09-22
-
 ## Versionar el skill y generar releases
 
 - **Descripción:** definir un esquema de versionado para `agent-context-kit` (ej. SemVer) y el proceso para cortar releases en GitHub, de forma que un repo destino pueda fijar/actualizar a una versión concreta del skill en vez de seguir `main` a ciegas.
