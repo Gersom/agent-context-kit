@@ -10,6 +10,12 @@ No es una cola de pendientes (eso vive en [`./backlog.md`](./backlog.md)): acá 
 
 ---
 
+## 2026-09-22 — Redactar `src/SKILL.md`
+
+- Se redactó el punto de entrada del skill: frontmatter (`name`/`description`) + trigger, flujo de alto nivel (detección automática → proyecto existente vs. scaffolding condicionado por alcance) y enlaces a `docs/questions-flow.md`, `docs/template-architecture.md` y `../docs/desing.md`, sin duplicar su contenido.
+- Por qué: era el archivo más urgente del backlog — sin él el skill no tenía un punto de entrada real, solo la lógica de decisión (`questions-flow.md`) sin nada que la dispare.
+- Se agregó además un nuevo item al backlog: "Versionar el skill y generar releases", para más adelante (una vez que `template/` esté completo).
+
 ## 2026-09-22 — Scaffolding de `docs/agents/` en la raíz del propio repo
 
 - Se crearon `docs/agents/handoff.md`, `backlog.md` y `changelog.md` en la raíz de `agent-context-kit`, siguiendo el formato definido en `src/template/agents/`.

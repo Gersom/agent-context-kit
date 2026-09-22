@@ -17,8 +17,8 @@ No aplica — no hay tarea abierta.
 
 ## Decisiones a medio camino
 
-Ninguna pendiente de cerrar en este momento.
+Ninguna.
 
 ## Próximo paso concreto
 
-Revisar [`./backlog.md`](./backlog.md) y elegir el siguiente item a trabajar. Candidato más urgente: redactar `src/SKILL.md`, que está vacío y es el punto de entrada del skill.
+Revisar [`./backlog.md`](./backlog.md). Queda pendiente el catálogo de `template/` (project/*, plans/*, external/_example-service.md, agents/roadmap.md, template/README.md) y, más adelante, versionar el skill y generar releases.
