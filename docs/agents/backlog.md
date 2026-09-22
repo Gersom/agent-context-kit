@@ -14,10 +14,10 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 ## Redactar `src/SKILL.md`
 
 - **Descripción:** el archivo está vacío. Debe definir el trigger y las instrucciones de alto nivel del skill: cuándo se dispara, qué hace a grandes rasgos, y que remite a `questions-flow.md` para la lógica de decisión detallada.
-- **Decisiones/temas a definir antes de empezar:** ninguno — el diseño y el flujo de preguntas ya están completos en `docs/desing.md` y `src/questions-flow.md`.
+- **Decisiones/temas a definir antes de empezar:** ninguno — el diseño y el flujo de preguntas ya están completos en `docs/desing.md` y `src/docs/questions-flow.md`.
 - **Bloqueos:** ninguno.
 - **Disparador:** cuando el operador pida continuar con el skill. Es el archivo más urgente porque es el punto de entrada.
-- **Detalles:** ver [`../../docs/desing.md`](../../docs/desing.md) y [`../../src/questions-flow.md`](../../src/questions-flow.md).
+- **Detalles:** ver [`../../docs/desing.md`](../../docs/desing.md) y [`../../src/docs/questions-flow.md`](../../src/docs/questions-flow.md).
 - **Agregada:** 2026-09-22
 
 ## Redactar el contenido de `src/template/project/*.md`

@@ -1,6 +1,6 @@
 # Arquitectura de `template/`
 
-Este documento describe la estructura de `src/template/` — el catálogo maestro de plantillas de este skill — y para qué sirve cada archivo. Es documentación de este repo (`agent-context-kit`), no de un proyecto destino: acá no se decide si un archivo se copiará o no en un caso concreto (eso lo define [`questions-flow.md`](../questions-flow.md)), solo se explica qué es y para qué existe cada plantilla.
+Este documento describe la estructura de `src/template/` — el catálogo maestro de plantillas de este skill — y para qué sirve cada archivo. Es documentación de este repo (`agent-context-kit`), no de un proyecto destino: acá no se decide si un archivo se copiará o no en un caso concreto (eso lo define [`questions-flow.md`](./questions-flow.md)), solo se explica qué es y para qué existe cada plantilla.
 
 ## Estructura
 
