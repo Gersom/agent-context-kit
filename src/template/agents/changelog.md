@@ -8,6 +8,8 @@ No es una cola de pendientes (eso vive en [`./backlog.md`](./backlog.md)): acá 
 
 Si un archivo de `project/` (`decisions.md`, `architecture.md`, etc.) ya explica el porqué de algo con más detalle, no lo repitas acá: linkealo desde la entrada correspondiente.
 
+Si la tarea cerrada tenía número asignado en `backlog.md` (ver su sección "Numeración"), ese número viaja con ella a la entrada correspondiente acá — nunca se reasigna a otra tarea. Entradas de antes de adoptar ese mecanismo (o de tareas que nunca pasaron por `backlog.md`, ej. pedidas directamente por el operador) quedan sin número — no se numeran retroactivamente.
+
 ---
 
 <!--
@@ -15,7 +17,9 @@ Si este skill se está agregando de forma retroactiva a un proyecto ya existente
 
 Formato por entrada:
 
-## [Fecha] — [Título breve de la tarea]
+## [Fecha] — Tarea [N] — [Título breve de la tarea]
+
+(el segmento "Tarea [N] —" solo va si la tarea tenía número asignado en `backlog.md`; si no lo tenía, se omite y queda "## [Fecha] — [Título breve de la tarea]".)
 
 - Qué se hizo
 - Por qué (el motivo, no solo la descripción técnica)

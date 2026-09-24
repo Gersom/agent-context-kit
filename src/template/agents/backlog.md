@@ -9,12 +9,22 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron — sería duplicar lo que corresponde a `handoff.md`/`changelog.md`.
 
+**Numeración:** cada tarea tiene un número correlativo fijo, asignado una sola vez al crearse. El número **nunca se reutiliza**, ni siquiera cuando la tarea se cierra y pasa a `changelog.md` — sirve para referenciar una tarea sin ambigüedad (ej. "la tarea 3") de forma estable en el tiempo, independientemente de en qué archivo esté viviendo hoy. No es un orden de cola: el número se asigna al crear la tarea, no cuando se ejecuta (se puede tomar tareas fuera de orden).
+
+Para agregar una tarea nueva: leer **"Próximo número de tarea"** más abajo, usar ese valor, y actualizar la línea a N+1. Si una tarea en curso (documentada en `handoff.md`) hace surgir tareas nuevas, también se les asigna número acá siguiendo el mismo mecanismo, aunque no se vayan a ejecutar pronto.
+
+<!--
+Backfill (solo la primera vez que se adopta este mecanismo en un proyecto con tareas ya existentes sin número): numerar los items de este archivo en el orden en que aparecen (de arriba hacia abajo), dejar "Próximo número de tarea" en max+1, y agregar una nota explícita (acá mismo, debajo de esta línea, o en `handoff.md`) del tipo: "Numeración iniciada el [fecha]; tareas ya cerradas antes de esa fecha (en `changelog.md`) no tienen número asignado retroactivamente." No se renumera `changelog.md` hacia atrás.
+-->
+
+**Próximo número de tarea:** 1
+
 ---
 
 <!--
 Un bloque por tarea, con este formato:
 
-## [Título corto de la tarea]
+## Tarea [N] — [Título corto de la tarea]
 
 - **Descripción:** de qué trata la tarea.
 - **Decisiones/temas a definir antes de empezar:** qué hay que resolver o preguntarle al operador antes de poder arrancarla. "Ninguno" si ya está todo definido.
@@ -24,7 +34,7 @@ Un bloque por tarea, con este formato:
 - **Agregada:** fecha en que se sumó al backlog.
 -->
 
-## [Placeholder — título corto de la tarea]
+## Tarea [N] — [Placeholder — título corto de la tarea]
 
 - **Descripción:** [Placeholder]
 - **Decisiones/temas a definir antes de empezar:** [Placeholder]

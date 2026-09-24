@@ -8,6 +8,8 @@ No es una cola de pendientes (eso vive en [`./backlog.md`](./backlog.md)): acá 
 
 > Carga inicial reconstruida retroactivamente desde `git log`, ya que este skill se está aplicando sobre su propio repo después de tener historial previo.
 
+> Numeración de tareas (ver `backlog.md`) iniciada el 2026-09-24. Las entradas de este changelog son todas anteriores a esa fecha, por lo que ninguna tiene número asignado — no se renumeran retroactivamente.
+
 ---
 
 ## 2026-09-22 — Sección "Comandos" en `template/project/setup.md`
