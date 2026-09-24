@@ -13,6 +13,7 @@ También se puede invocar explícitamente — ver "Cómo usar" en el `README.md`
 
 ## Qué hace (alto nivel)
 
+0. **Determina el idioma** en el que va a redactar todo el contenido — corre siempre, antes que cualquier otra cosa, y se persiste en `agents/rules.md` para no volver a preguntarlo en sesiones futuras. Ver [`docs/questions-flow.md`](./docs/questions-flow.md), sección "Idioma de la documentación".
 1. **Detecta** si el repo destino ya tiene `docs/agents/` y/o `docs/project/` (o sus equivalentes bajo `agent-context/`, si `docs/` está ocupado por otra documentación no relacionada).
    - **Si ya existen** → el skill ya fue inicializado antes en este repo. No se repite el scaffolding: se lee `agents/rules.md` + `agents/handoff.md` + lo relevante de `agents/backlog.md`, se ejecuta la tarea pedida, y al terminar se actualiza `agents/handoff.md` (se sobrescribe) y se agrega la entrada correspondiente a `agents/changelog.md`.
    - **Si no existen pero hay documentación de contexto previa en otro formato** (ej. un `docs/claude/` con su propio `backlog.md`/`handoff.md`) → se dispara el flujo de migración en vez de un scaffolding vacío, para reusar ese contenido en vez de perderlo. Ver [`docs/migration-flow.md`](./docs/migration-flow.md).

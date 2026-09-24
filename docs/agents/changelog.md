@@ -8,9 +8,17 @@ No es una cola de pendientes (eso vive en [`./backlog.md`](./backlog.md)): acá 
 
 > Carga inicial reconstruida retroactivamente desde `git log`, ya que este skill se está aplicando sobre su propio repo después de tener historial previo.
 
-> Numeración de tareas (ver `backlog.md`) iniciada el 2026-09-24. Las entradas de este changelog son todas anteriores a esa fecha, por lo que ninguna tiene número asignado — no se renumeran retroactivamente.
+> Numeración de tareas (ver `backlog.md`) iniciada el 2026-09-24. Las entradas anteriores a esa fecha no tienen número asignado — no se renumeran retroactivamente.
 
 ---
+
+## 2026-09-24 — Tarea 2 — Soporte multi-idioma
+
+- Se agregó un paso nuevo en `questions-flow.md` ("Idioma de la documentación"), que corre siempre antes que cualquier otra cosa: detecta `IDIOMA` a partir del texto disponible del operador en la conversación actual (puede ser solo la frase de invocación, si es un chat nuevo sin más historial), y si es ambiguo, pregunta explícitamente en inglés.
+- Todo el contenido redactado por el agente (prosa y headers de sección) va en `IDIOMA`, con excepción de los nombres de archivo del catálogo (siempre en inglés) y términos propios del kit o jerga técnica sin traducción natural asentada (ej. "Handoff", "Backlog", "Placeholder", "linter", "commit", "deploy"), que se mantienen en inglés.
+- `IDIOMA` se persiste en `agents/rules.md` (nueva regla fija #3 + campo) la primera vez que se detecta, para que sesiones futuras no lo vuelvan a preguntar. Se actualizó la descripción de `rules.md` en `src/docs/template-architecture.md` en consecuencia.
+- Se descartaron las alternativas de mantener plantillas duplicadas por idioma (carpetas `template/es/`+`template/en/`, o archivos `doc.en.md` al estilo Docusaurus): el catálogo ya no se copia literal, el agente redacta el contenido real por proyecto, así que duplicar la estructura por idioma solo agregaba riesgo de desincronización sin beneficio real.
+- Por qué: el catálogo estaba escrito enteramente en español, lo que no encaja si el operador (u otro que use el skill) trabaja en otro idioma — la documentación de contexto debe ser legible para quien la usa, no solo para quien construyó la plantilla.
 
 ## 2026-09-22 — Sección "Comandos" en `template/project/setup.md`
 

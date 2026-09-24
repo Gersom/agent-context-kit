@@ -26,15 +26,6 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-## Tarea 2 — Soporte multi-idioma
-
-- **Descripción:** hoy todas las plantillas de `src/template/` y el flujo de preguntas están escritos en español. Agregar soporte para que el skill pueda generar la documentación de contexto en otros idiomas (al menos inglés), ya sea detectando el idioma del repo destino o preguntándolo explícitamente.
-- **Decisiones/temas a definir antes de empezar:** ¿se traducen las plantillas a idiomas fijos (ej. `template/es/`, `template/en/`) o se genera dinámicamente vía instrucción al agente? ¿Se pregunta el idioma en el flujo de preguntas (`questions-flow.md`) o se detecta automáticamente (idioma del repo, README, commits)?
-- **Bloqueos:** ninguno.
-- **Disparador:** cuando el operador pida soportar un proyecto en otro idioma, o priorice esta tarea explícitamente.
-- **Detalles:** ninguno.
-- **Agregada:** 2026-09-24.
-
 ## Tarea 3 — Exportar como skill utilizable por Claude
 
 - **Descripción:** empaquetar `agent-context-kit` en el formato de skill que Claude (Claude Code / claude.ai) pueda invocar directamente — con su `SKILL.md` como punto de entrada y las plantillas accesibles — en vez de ser solo un repo de referencia que hay que copiar manualmente.

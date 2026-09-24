@@ -45,7 +45,7 @@ Guía de estructura/formato para generar el índice raíz de la documentación d
 
 Documentación pensada para que un agente de IA sepa cómo trabajar en el proyecto: qué no tocar, en qué está el trabajo ahora mismo, qué falta, qué se hizo y por qué.
 
-- **`rules.md`** — Reglas fijas del proyecto: convenciones de código, qué no tocar, decisiones de estilo no negociables. Es lo primero que un agente debería leer antes de tocar código.
+- **`rules.md`** — Reglas fijas del proyecto: convenciones de código, qué no tocar, decisiones de estilo no negociables, y el idioma en que se redacta toda esta documentación (detectado una sola vez y persistido acá). Es lo primero que un agente debería leer antes de tocar código.
 - **`handoff.md`** — Estado "en caliente" del trabajo: en qué tarea se está, qué falta, decisiones a medio camino. Se sobrescribe siempre con el estado actual — no es un historial, es una foto del presente.
 - **`backlog.md`** — Cola de tareas pendientes. Responde "qué falta por hacer".
 - **`changelog.md`** — Historial de tareas ya cerradas, con el motivo detrás de cada una. Responde "qué se hizo y por qué".

@@ -14,6 +14,10 @@ Estas reglas vienen con el skill y aplican sin importar el proyecto. No se borra
      a. si los pasos están bien o hay que ajustarlos, y
      b. si prefiere que se ejecuten todos los pasos seguidos sin pausas, o uno a la vez — esperando su confirmación después de cada paso para recién ahí seguir al siguiente, debatir el paso actual, o modificarlo.
 
+3. **Idioma de la documentación:** todo el contenido que un agente redacte en esta documentación (prosa y headers de sección) va en el idioma registrado abajo — detectado una sola vez, la primera vez que se generó esta documentación (ver `questions-flow.md`, sección "Idioma de la documentación"). No se vuelve a preguntar en sesiones futuras. Excepción, siempre en inglés: nombres de archivo/carpeta del catálogo, y términos propios de este kit o jerga técnica sin traducción natural asentada (ej. "Handoff", "Backlog", "Placeholder", "linter", "commit", "deploy").
+
+   **Idioma de la documentación:** [Placeholder — se completa la primera vez que se genera esta documentación]
+
 ## Enlaces (evitar duplicar contexto)
 
 - Estructura de carpetas y por qué está organizado así → [`../project/architecture.md`](../project/architecture.md)

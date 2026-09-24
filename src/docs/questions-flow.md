@@ -8,6 +8,23 @@ Convención de rutas: `template/X` se refiere a la plantilla en este skill; `doc
 
 ---
 
+## Idioma de la documentación (siempre, antes que cualquier otra cosa)
+
+Corre primero, antes de la Ronda 1 — aplica tanto si se dispara scaffolding nuevo como el flujo de proyecto existente, porque determina en qué idioma se redacta todo lo que sigue.
+
+1. **¿`docs/agents/rules.md` ya existe y tiene el idioma registrado?** (ver la regla "Idioma de la documentación" en sus Reglas por defecto — `template/agents/rules.md`).
+   - **Sí** → usar ese valor como `IDIOMA`. No volver a preguntar. Fin de este paso.
+   - **No** → seguir con el paso 2.
+2. **Detectar `IDIOMA` a partir del texto del operador disponible en la conversación actual.** Es común que sea un chat nuevo sin más historial que la frase de invocación misma (ej. *"usa la skill agent-context-kit"*) — no asumir que hay más contexto disponible del que realmente hay.
+   - Si ese texto tiene suficientes marcas de idioma natural → usar ese idioma como `IDIOMA`.
+   - Si es ambiguo o insuficiente (ej. el operador solo escribió *"skill agent-context-kit"*, sin palabras de idioma natural que lo identifiquen) → preguntar explícitamente, **en inglés** (idioma universal, para no asumir uno): *"Which language should I use for this project's documentation?"*
+3. **De acá en adelante, redactar todo contenido nuevo (prosa y headers de sección) en `IDIOMA`**, con estas excepciones que se mantienen siempre en inglés:
+   - Nombres de archivo y carpetas del catálogo (`backlog.md`, `handoff.md`, `stack.md`, etc.).
+   - Términos propios de este kit (ej. "Handoff", "Backlog", "Changelog", "Roadmap", "Placeholder") y jerga técnica sin traducción natural asentada (ej. "linter", "commit", "deploy", "merge").
+4. **Si en esta ejecución se genera o se toca `docs/agents/rules.md`, registrar `IDIOMA`** en la regla correspondiente, para que sesiones futuras no vuelvan a preguntarlo.
+
+---
+
 ## Ronda 1 — Gate de alcance (siempre, sola)
 
 **Preguntar:** "¿Qué deseas hacer?"

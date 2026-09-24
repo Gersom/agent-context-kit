@@ -21,4 +21,4 @@ Ninguna.
 
 ## Próximo paso concreto
 
-`docs/agents/backlog.md` tiene 5 items pendientes (con numeración correlativa fija, ver sección "Numeración" ahí) — ver ese archivo para el detalle de cada uno. El más antiguo, Tarea 1 (probar el flujo end-to-end sobre un repo real del operador), es el siguiente paso natural sugerido, pero no hay orden de prioridad forzado.
+`docs/agents/backlog.md` tiene 4 items pendientes (Tareas 1, 3, 4 y 5 — la Tarea 2, soporte multi-idioma, se cerró y quedó en `changelog.md`). El más antiguo, Tarea 1 (probar el flujo end-to-end sobre un repo real del operador), es el siguiente paso natural sugerido, pero no hay orden de prioridad forzado.
