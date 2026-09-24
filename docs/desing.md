@@ -175,8 +175,8 @@ docs/
 - [x] Lógica de detección de conflicto `docs/` vs `agent-context/` definida
 - [x] Lógica de archivos puntero `CLAUDE.md` / `AGENTS.md` definida
 - [x] Flujo completo de preguntas definido (Paso -1 a Paso 5)
-- [ ] Redactar el contenido real de `questions-flow.md` en formato que un agente pueda seguir paso a paso
-- [ ] Redactar el contenido real de `SKILL.md`
-- [ ] Redactar el contenido/plantilla de cada archivo dentro de `example/`
-- [ ] Decidir si se agrega `known-issues.md` al catálogo (quedó mencionado pero no confirmado)
-- [ ] Crear el repositorio en GitHub (`https://github.com/Gersom/agent-context-kit` ya existe vacío) y subir esta estructura de archivos
+- [x] Redactar el contenido real de `questions-flow.md` en formato que un agente pueda seguir paso a paso
+- [x] Redactar el contenido real de `SKILL.md`
+- [x] Redactar el contenido/plantilla de cada archivo dentro de `example/` (ahora vive en `src/template/`)
+- [x] Decidir si se agrega `known-issues.md` al catálogo — sí, se agregó (`src/template/agents/known-issues.md`)
+- [x] Crear el repositorio en GitHub y subir esta estructura de archivos — versionado con releases `v0.1.0` a `v0.3.1`
