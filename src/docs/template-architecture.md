@@ -47,7 +47,7 @@ Documentación pensada para que un agente de IA sepa cómo trabajar en el proyec
 
 - **`rules.md`** — Reglas fijas del proyecto: convenciones de código, qué no tocar, decisiones de estilo no negociables, y el idioma en que se redacta toda esta documentación (detectado una sola vez y persistido acá). Es lo primero que un agente debería leer antes de tocar código.
 - **`handoff.md`** — Estado "en caliente" del trabajo: la tarea en progreso (una sola) más las tareas pausadas (si hay), qué falta, decisiones a medio camino. Se sobrescribe siempre con el estado actual — no es un historial, es una foto del presente.
-- **`backlog.md`** — Cola de tareas pendientes, dividida en libres y bloqueadas/pospuestas. Responde "qué falta por hacer".
+- **`backlog.md`** — Cola de tareas pendientes, dividida en libres y bloqueadas/pospuestas. Responde "qué falta por hacer". Si "Tareas libres" crece mucho (más de 15), las que comparten un objetivo real se agrupan en una línea corta, con el detalle movido a "Tareas agrupadas" para no tener que leerlo salvo que haga falta.
 - **`history.md`** — Historial de tareas ya resueltas (hechas ✅ o descartadas ❌), con el motivo detrás de cada una. Responde "qué pasó y por qué".
 - **`roadmap.md`** — Visión a mediano/largo plazo del proyecto. Da contexto de hacia dónde va el proyecto más allá de la tarea inmediata.
 - **`known-issues.md`** — Bugs conocidos y zonas frágiles del código, con su workaround temporal si existe. Evita que un agente "arregle" o refactorice algo sin saber que ese comportamiento raro es intencional o ya está siendo mitigado.

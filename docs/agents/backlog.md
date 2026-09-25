@@ -11,6 +11,8 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 
 **Dos secciones:** las tareas viven en "Tareas libres" (listas para tomar) o "Tareas bloqueadas / pospuestas" (no se toman todavía). Cuando el motivo de una tarea bloqueada deja de aplicar, se mueve a "Tareas libres" — ver Regla 7 de `rules.md` (no se borra el campo `Bloqueos`, se marca como resuelto).
 
+**Agrupamiento (solo en "Tareas libres"):** si esta sección supera las 15 tareas (Regla 7 de `rules.md`), se evalúa agrupar 2 o más que compartan un objetivo real. El criterio no es un tope de cantidad — es que el grupo entero quepa en una sola frase de objetivo compartido, sin usar "y" para forzar una tarea que en realidad no pertenece. Un grupo aparece en "Tareas libres" como una sola línea corta; el detalle completo de cada tarea que lo compone se mueve a la sección "Tareas agrupadas" (más abajo), que no hace falta leer salvo que el operador pida el detalle de una tarea puntual o se vaya a tomar una. Si un grupo queda con una sola tarea (las demás se tomaron o cerraron), se desarma: esa tarea vuelve a ser una entrada individual normal en "Tareas libres". Hoy "Tareas libres" tiene 2 tareas — muy por debajo del umbral, no hay grupos formados.
+
 **Numeración:** cada tarea tiene un número correlativo fijo, asignado una sola vez al crearse. El número **nunca se reutiliza**, ni siquiera cuando la tarea se cierra (hecha o descartada) y pasa a `history.md`. No es un orden de cola: se puede tomar tareas fuera de orden.
 
 > Numeración iniciada el 2026-09-24. Tareas ya cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
@@ -40,15 +42,6 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Detalles:** ver pendientes relacionados en [`../desing.md`](../desing.md).
 - **Agregada:** 2026-09-24.
 
-## Tarea 7 — Resolver el caso de un backlog muy grande
-
-- **Descripción:** contemplar qué pasa cuando `backlog.md` acumula muchas tareas (libres, bloqueadas, pospuestas) y el archivo único deja de ser cómodo de leer o navegar — ¿hace falta paginar, archivar tareas viejas, subdividir por categoría, o cambiar el formato (ej. tabla resumen en vez de un bloque largo por tarea)?
-- **Decisiones/temas a definir antes de empezar:** ¿cuál es el umbral que se considera "muy grande" (cantidad de tareas, tamaño del archivo)? ¿la solución pasa por dividir en más archivos, archivar lo viejo aparte, o solo cambiar el formato de cada entrada para que sea más compacto?
-- **Bloqueos:** `[Resuelto el 2026-09-24]` — era `[postergada]` conviene resolver primero la Tarea 5 (secciones nuevas de estado dentro de `backlog.md`). La Tarea 5 se cerró.
-- **Disparador:** cuando el operador priorice esta tarea explícitamente, o cuando el backlog de un proyecto real (ver Tarea 1) empiece a mostrar este problema en la práctica.
-- **Detalles:** surgió durante el diseño de la Tarea 5, al agregar secciones nuevas al backlog — señal de que el formato actual (un bloque largo de texto por tarea) puede no escalar bien.
-- **Agregada:** 2026-09-24.
-
 ## Tareas bloqueadas / pospuestas
 
 ## Tarea 4 — Deploy en skills.sh
@@ -59,3 +52,7 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Disparador:** cuando el operador quiera hacer pública la skill, o priorice esta tarea explícitamente.
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
+
+## Tareas agrupadas
+
+No aplica todavía — ningún grupo formado ("Tareas libres" tiene 2 tareas, bien por debajo del umbral de 15).

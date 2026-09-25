@@ -14,6 +14,15 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-09-25 — ✅ Tarea 7 — Resolver el caso de un backlog muy grande
+
+- Se agregó un mecanismo de agrupamiento a "Tareas libres" de `backlog.md` (Regla 7 de `rules.md` extendida): si esa sección supera las 15 tareas, se evalúan agrupar 2 o más que compartan un objetivo real. El criterio no es un tope de cantidad — es que el grupo entero quepa en una sola frase de objetivo compartido, sin usar "y" para forzar una tarea que en realidad no pertenece.
+- Un grupo aparece en "Tareas libres" como una sola línea corta (resumen + tareas que lo componen); el detalle completo se mueve a una sección nueva, "Tareas agrupadas", que no hace falta leer salvo que el operador pida el detalle de una tarea puntual o se vaya a tomar una — el objetivo es reducir lo que hay que leer para ver qué está disponible, sin perder ningún dato.
+- Si un grupo queda con una sola tarea (las demás se tomaron o cerraron), se desarma y esa tarea vuelve a ser una entrada individual normal.
+- Se descartó la alternativa de mover tareas concretas a `roadmap.md` agrupadas — invertía la definición ya establecida de `roadmap.md` (visión sin desglosar que "gradúa" hacia `backlog.md`, no al revés) y, además, no resolvía el problema real: agrupar por sí solo no reduce el tamaño del archivo si el detalle sigue estando ahí completo.
+- Cambios aplicados al catálogo maestro (`src/template/agents/rules.md`, `backlog.md`) y propagados a `src/docs/template-architecture.md` y al dogfooding de este repo (`docs/agents/rules.md`, `backlog.md`) — sin formar ningún grupo todavía, porque "Tareas libres" tiene solo 2 tareas, bien por debajo del umbral.
+- Por qué: el disparador fue notar que `backlog.md` podía volverse largo e incómodo de leer/navegar a medida que crece. Agrupar por objetivo compartido, con el detalle diferido, resuelve eso sin perder información ni forzar una reestructuración más grande (varios archivos, paginado) que el proyecto no necesita todavía.
+
 ## 2026-09-24 — ✅ Tarea 6 — Definir el término "operador" en la documentación
 
 - Se agregó una definición corta de "operador" (blockquote, justo después del título) a `template/agents/rules.md` y a `docs/agents/rules.md` (dogfooding de este repo): "la persona humana dueña de este proyecto — quien pide las tareas, aprueba decisiones y a quien se le pregunta cuando algo no está definido".
