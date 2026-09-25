@@ -14,6 +14,12 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-09-24 — ✅ Tarea 6 — Definir el término "operador" en la documentación
+
+- Se agregó una definición corta de "operador" (blockquote, justo después del título) a `template/agents/rules.md` y a `docs/agents/rules.md` (dogfooding de este repo): "la persona humana dueña de este proyecto — quien pide las tareas, aprueba decisiones y a quien se le pregunta cuando algo no está definido".
+- Decisión sobre dónde vivir: no se creó un glosario nuevo del kit — se puso en `rules.md` porque es el único archivo garantizado en cualquier alcance (Mínimo/Intermedio/Completo, según `questions-flow.md`), así que la definición siempre está presente sin fragmentar el catálogo por un solo término.
+- Por qué: "operador" se usa extensamente en todo el catálogo (`rules.md`, `backlog.md`, `handoff.md`, etc.) sin definirse en ningún lado — detectado al debatir la Tarea 5, cuyo propio texto lo daba por sentado.
+
 ## 2026-09-24 — ✅ Bump a `v1.0.0`
 
 - Se bumpeó `package.json` de `0.3.1` a `1.0.0`, aplicando el criterio de bump **major** ya fijado en `rules.md` (esta tarea renombró `template/agents/changelog.md` → `history.md`, referenciado desde `questions-flow.md`, y cambió la estructura generada en `docs/agents`).

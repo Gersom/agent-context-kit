@@ -40,15 +40,6 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Detalles:** ver pendientes relacionados en [`../desing.md`](../desing.md).
 - **Agregada:** 2026-09-24.
 
-## Tarea 6 — Definir el término "operador" en la documentación
-
-- **Descripción:** el término "operador" (la persona humana que usa el skill / dueña del proyecto destino) se usa extensamente en `template/agents/rules.md` y otros archivos del catálogo, pero nunca se define explícitamente en ningún lado. Un agente que lea el catálogo por primera vez debería poder entender sin ambigüedad a quién se refiere.
-- **Decisiones/temas a definir antes de empezar:** dónde vive la definición — ¿un glosario propio del kit (distinto del `glossary.md` de plantilla, que es para el dominio del proyecto destino, no para la jerga del kit), una nota al pie en `SKILL.md`/`rules.md`, o ambos?
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador priorice esta tarea explícitamente.
-- **Detalles:** detectado al debatir la Tarea 5 (estados de tareas) — el propio texto de esa discusión usaba "operador" dando por sentado que ya estaba definido en algún lado, y no era el caso.
-- **Agregada:** 2026-09-24.
-
 ## Tarea 7 — Resolver el caso de un backlog muy grande
 
 - **Descripción:** contemplar qué pasa cuando `backlog.md` acumula muchas tareas (libres, bloqueadas, pospuestas) y el archivo único deja de ser cómodo de leer o navegar — ¿hace falta paginar, archivar tareas viejas, subdividir por categoría, o cambiar el formato (ej. tabla resumen en vez de un bloque largo por tarea)?

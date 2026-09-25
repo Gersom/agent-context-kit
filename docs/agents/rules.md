@@ -2,6 +2,8 @@
 
 Lo primero que cualquier agente debe leer antes de tocar código en este proyecto.
 
+> **Operador:** la persona humana dueña de este proyecto — quien pide las tareas, aprueba decisiones y a quien se le pregunta cuando algo no está definido. El término aparece así en todo este catálogo (`docs/agents/`, `docs/project/`), sin importar el idioma de la documentación (ver Regla 3).
+
 ## Reglas por defecto (fijas — no se editan por proyecto)
 
 Estas reglas vienen con el skill y aplican sin importar el proyecto. No se borran ni se reescriben al completar este archivo; si hace falta una regla de proceso adicional, se agrega debajo de estas, no en su reemplazo.
