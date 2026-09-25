@@ -19,6 +19,7 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 - Se bumpeó `package.json` de `0.3.1` a `1.0.0`, aplicando el criterio de bump **major** ya fijado en `rules.md` (esta tarea renombró `template/agents/changelog.md` → `history.md`, referenciado desde `questions-flow.md`, y cambió la estructura generada en `docs/agents`).
 - Decisión explícita del operador: saltar directo a `1.0.0` en vez de `0.4.0`, aunque la Tarea 1 (probar el flujo end-to-end sobre un repo real) sigue sin resolverse — la razón original para arrancar en `0.1.0` y no en `1.0.0` (ver entrada del 2026-09-22 "Versionar el proyecto") quedó superada por esta decisión puntual, no derogada como criterio general.
 - Por qué: el operador priorizó reflejar en el número de versión que el catálogo tuvo un cambio estructural real (bump major), en vez de seguir la lectura convencional de SemVer 0.x de tratar todo como pre-estable hasta validar end-to-end.
+- Se creó el tag `v1.0.0` y el [GitHub Release](https://github.com/Gersom/agent-context-kit/releases/tag/v1.0.0) correspondiente, con notas que resumen todos los cambios desde `v0.3.1` (última versión con release publicado).
 
 ## 2026-09-24 — ✅ Tarea 5 — Contemplación de nuevos flujos y estados de tareas
 
