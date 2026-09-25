@@ -7,9 +7,9 @@ Skill reutilizable que genera documentación de contexto de proyecto para que **
 Al ejecutarse sobre un repositorio, el skill:
 
 1. Detecta si ya existe documentación de contexto (`docs/` o `agent-context/`) generada por este skill.
-   - Si existe, lee `rules.md`, `handoff.md` y lo relevante de `backlog.md`, ejecuta la tarea pedida y al terminar actualiza `handoff.md`/`changelog.md`.
+   - Si existe, lee `rules.md`, `handoff.md` y lo relevante de `backlog.md`, ejecuta la tarea pedida y al terminar actualiza `handoff.md`/`history.md`.
    - Si no existe, dispara un flujo de preguntas para decidir qué documentación generar, según el alcance de la tarea (puntual, feature, desarrollo prolongado) y la etapa del proyecto.
-2. Genera (o completa) una carpeta de documentación con una estructura predecible: reglas del proyecto, estado "en caliente" del trabajo, backlog, changelog, arquitectura, stack, integraciones externas, etc.
+2. Genera (o completa) una carpeta de documentación con una estructura predecible: reglas del proyecto, estado "en caliente" del trabajo, backlog, historial, arquitectura, stack, integraciones externas, etc.
 3. Asegura un puntero explícito en `CLAUDE.md` / `AGENTS.md` en la raíz del repo para que cualquier agente sepa dónde está la documentación, sin adivinar ni duplicar contenido.
 
 ## Cómo usar
@@ -28,7 +28,7 @@ agent-context-kit/
 │   └── questions-flow.md # Árbol completo de preguntas y ramas de decisión
 └── template/              # Catálogo maestro de plantillas
     ├── README.md
-    ├── agents/            # rules, handoff, backlog, changelog, roadmap
+    ├── agents/            # rules, handoff, backlog, history, roadmap
     ├── project/           # architecture, stack, entities, infrastructure, decisions, glossary, testing, setup
     ├── external/           # plantilla por cada servicio externo integrado
     └── plans/              # documentación de negocio (costos, límites, pagos)

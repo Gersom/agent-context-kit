@@ -32,7 +32,7 @@ Antes de tocar código, leer en este orden:
 - [`rules.md`](./agents/rules.md) — reglas fijas del proyecto.
 - [`handoff.md`](./agents/handoff.md) — estado "en caliente" del trabajo.
 - [`backlog.md`](./agents/backlog.md) — qué falta por hacer. *(set intermedio/completo)*
-- [`changelog.md`](./agents/changelog.md) — qué se hizo y por qué. *(set intermedio/completo)*
+- [`history.md`](./agents/history.md) — qué se hizo o descartó, y por qué. *(set intermedio/completo)*
 - [`roadmap.md`](./agents/roadmap.md) — visión a mediano/largo plazo. *(solo set completo, etapa ≠ idea/setup)*
 - [`known-issues.md`](./agents/known-issues.md) — bugs conocidos y zonas frágiles. *(solo si hay alguno documentado)*
 

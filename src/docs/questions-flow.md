@@ -20,7 +20,7 @@ Corre primero, antes de la Ronda 1 — aplica tanto si se dispara scaffolding nu
    - Si es ambiguo o insuficiente (ej. el operador solo escribió *"skill agent-context-kit"*, sin palabras de idioma natural que lo identifiquen) → preguntar explícitamente, **en inglés** (idioma universal, para no asumir uno): *"Which language should I use for this project's documentation?"*
 3. **De acá en adelante, redactar todo contenido nuevo (prosa y headers de sección) en `IDIOMA`**, con estas excepciones que se mantienen siempre en inglés:
    - Nombres de archivo y carpetas del catálogo (`backlog.md`, `handoff.md`, `stack.md`, etc.).
-   - Términos propios de este kit (ej. "Handoff", "Backlog", "Changelog", "Roadmap", "Placeholder") y jerga técnica sin traducción natural asentada (ej. "linter", "commit", "deploy", "merge").
+   - Términos propios de este kit (ej. "Handoff", "Backlog", "History", "Roadmap", "Placeholder") y jerga técnica sin traducción natural asentada (ej. "linter", "commit", "deploy", "merge").
 4. **Si en esta ejecución se genera o se toca `docs/agents/rules.md`, registrar `IDIOMA`** en la regla correspondiente, para que sesiones futuras no vuelvan a preguntarlo.
 
 ---
@@ -49,7 +49,7 @@ El agente revisa el repo destino:
   2. Leer `docs/agents/handoff.md`.
   3. Leer las líneas relevantes de `docs/agents/backlog.md` (relacionadas a la tarea pedida).
   4. Ejecutar la tarea que pidió el operador.
-  5. Al terminar, actualizar `docs/agents/handoff.md` (siempre se sobrescribe con el estado actual) y agregar la entrada correspondiente a `docs/agents/changelog.md`.
+  5. Al terminar, actualizar `docs/agents/handoff.md` (siempre se sobrescribe con el estado actual, en cada paso del plan si lo hubo — ver Regla 6) y agregar la entrada correspondiente a `docs/agents/history.md` (hecha o descartada — ver Regla 7).
   6. **Fin del flujo.** No continuar con las rondas siguientes.
 
 - **NO, pero `docs/` (o carpeta equivalente) tiene archivos cuyo nombre matchea el catálogo de este skill en una proporción significativa** → hay documentación de contexto previa, pero de otro formato/convención. No se trata como conflicto genuino (eso sería `agent-context/`, ver `docs/desing.md` 4.1): se dispara el **flujo de migración** — ver [`./migration-flow.md`](./migration-flow.md). `ALCANCE` deja de ser relevante hasta que ese flujo termine (internamente se comporta como `ALCANCE = d`).
@@ -70,8 +70,8 @@ El agente revisa el repo destino:
 Preguntar las 3 juntas, en una sola interacción:
 
 1. **¿Es un proyecto nuevo o uno existente al que se le agrega documentación retroactiva?**
-   - Si es **existente** → revisar el historial de git (`git log`) para reconstruir un `agents/changelog.md` inicial en vez de dejarlo vacío. Extraer hitos relevantes de los commits, no un volcado literal del log.
-   - Si es **nuevo** → `agents/changelog.md` se copia vacío/con la plantilla base.
+   - Si es **existente** → revisar el historial de git (`git log`) para reconstruir un `agents/history.md` inicial en vez de dejarlo vacío. Extraer hitos relevantes de los commits, no un volcado literal del log (todas las entradas reconstruidas así van como ✅ Hecha).
+   - Si es **nuevo** → `agents/history.md` se copia vacío/con la plantilla base.
 
 2. **¿En qué etapa está el proyecto?** → guardar como `ETAPA`:
    - `idea/setup`
@@ -94,7 +94,7 @@ Cuando `ALCANCE = d`, copiar siempre:
 - `template/agents/rules.md` → `docs/agents/rules.md`
 - `template/agents/handoff.md` → `docs/agents/handoff.md`
 - `template/agents/backlog.md` → `docs/agents/backlog.md`
-- `template/agents/changelog.md` → `docs/agents/changelog.md`
+- `template/agents/history.md` → `docs/agents/history.md`
 - `template/project/architecture.md` → `docs/project/architecture.md`
 - `template/project/stack.md` → `docs/project/stack.md`
 
@@ -171,8 +171,8 @@ Solo si en la Ronda 3 la respuesta fue "sí" a integraciones externas.
 
 | Set | Se dispara con | Archivos incluidos | Por qué |
 |---|---|---|---|
-| **Mínimo** | a) Tarea puntual / c) Testear algo puntual | `agents/rules.md`, `agents/handoff.md` | Solo necesita no romper nada (reglas) y saber en qué está el proyecto ahora (handoff). No amerita backlog/changelog: es de un solo uso, sin ciclo de vida que registrar. |
-| **Intermedio** | b) Agregar una feature a un proyecto existente | Todo el mínimo + `agents/backlog.md`, `agents/changelog.md`, `project/architecture.md`, `project/stack.md`, `README.md` (generado) | Una feature sí tiene ciclo de vida (se agenda, se trabaja, se cierra) → backlog/changelog. Para encajarla bien hace falta entender la estructura (architecture) y qué tecnologías ya están en uso (stack). `README.md` como índice porque ya son 6 archivos; se genera y no se copia porque su contenido depende de qué se haya creado. |
+| **Mínimo** | a) Tarea puntual / c) Testear algo puntual | `agents/rules.md`, `agents/handoff.md` | Solo necesita no romper nada (reglas) y saber en qué está el proyecto ahora (handoff). No amerita backlog/history: es de un solo uso, sin ciclo de vida que registrar. |
+| **Intermedio** | b) Agregar una feature a un proyecto existente | Todo el mínimo + `agents/backlog.md`, `agents/history.md`, `project/architecture.md`, `project/stack.md`, `README.md` (generado) | Una feature sí tiene ciclo de vida (se agenda, se trabaja, se cierra o se descarta) → backlog/history. Para encajarla bien hace falta entender la estructura (architecture) y qué tecnologías ya están en uso (stack). `README.md` como índice porque ya son 6 archivos; se genera y no se copia porque su contenido depende de qué se haya creado. |
 | **Completo** | d) Desarrollo prolongado / proyecto nuevo | Todo el intermedio + los condicionales de Ronda 2-4 (`roadmap`, `decisions`, `known-issues`, `glossary`, `entities`, `infrastructure`, `testing`, `setup`, `external/*`, `plans/*`) | Proyecto de largo aliento necesita cobertura completa: visión a futuro, decisiones técnicas, dominio de negocio, integraciones, testing. |
 
 ## Resumen — condición de disparo por archivo
@@ -183,7 +183,7 @@ Solo si en la Ronda 3 la respuesta fue "sí" a integraciones externas.
 | `agents/rules.md` | Siempre |
 | `agents/handoff.md` | Siempre |
 | `agents/backlog.md` | Set intermedio y completo |
-| `agents/changelog.md` | Set intermedio y completo |
+| `agents/history.md` | Set intermedio y completo |
 | `agents/roadmap.md` | Set completo y `ETAPA` ≠ `idea/setup` |
 | `agents/known-issues.md` | Set completo, `ETAPA` = `producción/mantenimiento` y hay bugs/zonas frágiles conocidas |
 | `project/architecture.md` | Set intermedio y completo |

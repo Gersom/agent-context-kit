@@ -15,4 +15,4 @@ Se usa sobre todo en proyectos en etapa de producción/mantenimiento, donde ya e
 - **Detectado:** fecha
 - **Riesgo de tocarlo sin cuidado:** qué se puede romper si un agente modifica esta zona sin leer esto primero
 
-<!-- Duplicar el bloque de arriba por cada issue conocido. Eliminar issues de esta lista cuando se resuelvan de raíz (no dejarlos "por las dudas"); si se resuelven, esa resolución va a `changelog.md`. -->
+<!-- Duplicar el bloque de arriba por cada issue conocido. Eliminar issues de esta lista cuando se resuelvan de raíz (no dejarlos "por las dudas"); si se resuelven, esa resolución va a `history.md`. -->

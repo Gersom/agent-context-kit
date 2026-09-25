@@ -12,7 +12,7 @@ template/
 │   ├── rules.md
 │   ├── handoff.md
 │   ├── backlog.md
-│   ├── changelog.md
+│   ├── history.md
 │   ├── roadmap.md
 │   └── known-issues.md
 │
@@ -46,9 +46,9 @@ Guía de estructura/formato para generar el índice raíz de la documentación d
 Documentación pensada para que un agente de IA sepa cómo trabajar en el proyecto: qué no tocar, en qué está el trabajo ahora mismo, qué falta, qué se hizo y por qué.
 
 - **`rules.md`** — Reglas fijas del proyecto: convenciones de código, qué no tocar, decisiones de estilo no negociables, y el idioma en que se redacta toda esta documentación (detectado una sola vez y persistido acá). Es lo primero que un agente debería leer antes de tocar código.
-- **`handoff.md`** — Estado "en caliente" del trabajo: en qué tarea se está, qué falta, decisiones a medio camino. Se sobrescribe siempre con el estado actual — no es un historial, es una foto del presente.
-- **`backlog.md`** — Cola de tareas pendientes. Responde "qué falta por hacer".
-- **`changelog.md`** — Historial de tareas ya cerradas, con el motivo detrás de cada una. Responde "qué se hizo y por qué".
+- **`handoff.md`** — Estado "en caliente" del trabajo: la tarea en progreso (una sola) más las tareas pausadas (si hay), qué falta, decisiones a medio camino. Se sobrescribe siempre con el estado actual — no es un historial, es una foto del presente.
+- **`backlog.md`** — Cola de tareas pendientes, dividida en libres y bloqueadas/pospuestas. Responde "qué falta por hacer".
+- **`history.md`** — Historial de tareas ya resueltas (hechas ✅ o descartadas ❌), con el motivo detrás de cada una. Responde "qué pasó y por qué".
 - **`roadmap.md`** — Visión a mediano/largo plazo del proyecto. Da contexto de hacia dónde va el proyecto más allá de la tarea inmediata.
 - **`known-issues.md`** — Bugs conocidos y zonas frágiles del código, con su workaround temporal si existe. Evita que un agente "arregle" o refactorice algo sin saber que ese comportamiento raro es intencional o ya está siendo mitigado.
 

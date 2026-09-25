@@ -38,7 +38,7 @@ Por cada archivo dentro del `docs/` existente (recursivo, sin importar en qué s
 | Patrón en el nombre | Destino en este skill |
 |---|---|
 | `backlog` | `agents/backlog.md` |
-| `changelog` | `agents/changelog.md` |
+| `changelog` / `history` | `agents/history.md` |
 | `handoff` | `agents/handoff.md` |
 | `roadmap` | `agents/roadmap.md` |
 | `known-issues` / `issues` | `agents/known-issues.md` |
@@ -78,7 +78,7 @@ Solo después de la confirmación se ejecuta la migración — nunca se mueve o 
 3. **Copiar el contenido sin mapeo, tal cual.** Por cada archivo sin match, copiarlo sin transformar a `docs/others/`, preservando su nombre original. `docs/others/` no tiene plantilla propia en `template/` — es una carpeta de resguardo para no perder contenido, no un catálogo curado como el resto de `docs/`.
 4. **Completar lo que falte.** Seguir con el resto de `questions-flow.md` como si `ALCANCE = d` (desarrollo prolongado): lo que el `docs/` viejo no tenía (ej. si nunca existió un `rules.md`) se genera vacío/con placeholders igual que en cualquier scaffolding nuevo, y las Rondas 2-4 se preguntan igual para lo que no se pudo inferir del contenido migrado.
 5. **Ronda final.** Igual que en `questions-flow.md`: generar `docs/README.md` (listando `others/` en el índice si terminó existiendo), asegurar el puntero en `CLAUDE.md`/`AGENTS.md`.
-6. **Dejar registro de la migración.** La primera entrada de `docs/agents/changelog.md` no queda vacía ni es un volcado de `git log`: se registra la migración en sí — qué se migró, desde qué archivos de `docs-legacy/`, y qué quedó en `others/` sin mapear.
+6. **Dejar registro de la migración.** La primera entrada de `docs/agents/history.md` no queda vacía ni es un volcado de `git log`: se registra la migración en sí (como ✅ Hecha) — qué se migró, desde qué archivos de `docs-legacy/`, y qué quedó en `others/` sin mapear.
 
 ## Qué NO hace este flujo
 

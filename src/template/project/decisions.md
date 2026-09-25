@@ -16,7 +16,7 @@ Un bloque por decisión, con este formato (estilo ADR simplificado):
 - **Alternativas consideradas:** qué otras opciones se evaluaron y por qué se descartaron (si no se evaluó ninguna alternativa seriamente, decirlo)
 - **Consecuencias:** qué implica esta decisión hacia adelante — incluyendo trade-offs aceptados a propósito, no solo lo positivo
 
-Entradas nuevas van arriba (orden cronológico inverso, igual que `changelog.md`). No se edita una decisión ya tomada para "corregirla": si cambia, se agrega una entrada nueva que la reemplaza y se referencia la anterior.
+Entradas nuevas van arriba (orden cronológico inverso, igual que `history.md`). No se edita una decisión ya tomada para "corregirla": si cambia, se agrega una entrada nueva que la reemplaza y se referencia la anterior.
 -->
 
 ## [Placeholder fecha] — [Placeholder título de la decisión]

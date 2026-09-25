@@ -1,6 +1,6 @@
 ---
 name: agent-context-kit
-description: Genera o actualiza la documentación de contexto de un proyecto (reglas, estado en caliente, backlog, changelog, arquitectura, stack, integraciones externas) para que cualquier agente de IA sepa en qué momento está el proyecto sin depender de la memoria de una conversación. Úsalo al empezar a trabajar en un repositorio — para inicializar esta documentación si no existe, o para leerla y mantenerla al día si ya existe.
+description: Genera o actualiza la documentación de contexto de un proyecto (reglas, estado en caliente, backlog, historial, arquitectura, stack, integraciones externas) para que cualquier agente de IA sepa en qué momento está el proyecto sin depender de la memoria de una conversación. Úsalo al empezar a trabajar en un repositorio — para inicializar esta documentación si no existe, o para leerla y mantenerla al día si ya existe.
 ---
 
 # agent-context-kit
@@ -15,7 +15,7 @@ También se puede invocar explícitamente — ver "Cómo usar" en el `README.md`
 
 0. **Determina el idioma** en el que va a redactar todo el contenido — corre siempre, antes que cualquier otra cosa, y se persiste en `agents/rules.md` para no volver a preguntarlo en sesiones futuras. Ver [`docs/questions-flow.md`](./docs/questions-flow.md), sección "Idioma de la documentación".
 1. **Detecta** si el repo destino ya tiene `docs/agents/` y/o `docs/project/` (o sus equivalentes bajo `agent-context/`, si `docs/` está ocupado por otra documentación no relacionada).
-   - **Si ya existen** → el skill ya fue inicializado antes en este repo. No se repite el scaffolding: se lee `agents/rules.md` + `agents/handoff.md` + lo relevante de `agents/backlog.md`, se ejecuta la tarea pedida, y al terminar se actualiza `agents/handoff.md` (se sobrescribe) y se agrega la entrada correspondiente a `agents/changelog.md`.
+   - **Si ya existen** → el skill ya fue inicializado antes en este repo. No se repite el scaffolding: se lee `agents/rules.md` + `agents/handoff.md` + lo relevante de `agents/backlog.md`, se ejecuta la tarea pedida, y al terminar se actualiza `agents/handoff.md` (se sobrescribe) y se agrega la entrada correspondiente a `agents/history.md`.
    - **Si no existen pero hay documentación de contexto previa en otro formato** (ej. un `docs/claude/` con su propio `backlog.md`/`handoff.md`) → se dispara el flujo de migración en vez de un scaffolding vacío, para reusar ese contenido en vez de perderlo. Ver [`docs/migration-flow.md`](./docs/migration-flow.md).
    - **Si no existen y no hay nada reconocible para migrar** → se dispara el árbol de preguntas para decidir qué generar, según el alcance de la tarea (puntual, feature, testear, desarrollo prolongado) y, si aplica, la etapa del proyecto.
 2. **Genera o completa** la carpeta de documentación copiando desde `template/` solo lo que corresponda según las respuestas — nunca el catálogo completo por defecto.

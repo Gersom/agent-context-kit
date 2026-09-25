@@ -15,8 +15,8 @@ agent-context-kit/
 │   └── agents/               # Dogfooding: este repo usa el skill sobre sí mismo
 │       ├── rules.md            # Reglas fijas de este repo
 │       ├── handoff.md          # Estado "en caliente" del trabajo
-│       ├── backlog.md          # Cola de tareas pendientes
-│       └── changelog.md        # Historial de tareas cerradas
+│       ├── backlog.md          # Cola de tareas pendientes (libres / bloqueadas-pospuestas)
+│       └── history.md          # Historial de tareas resueltas (hechas ✅ / descartadas ❌)
 │
 └── src/
     ├── SKILL.md              # Trigger + instrucciones de alto nivel del skill
@@ -38,7 +38,7 @@ agent-context-kit/
 
 - **`docs/desing.md`** — registro histórico de la conversación de diseño: por qué se tomaron las decisiones de estructura, nombre y flujo. No se actualiza en cada cambio; es el punto de partida, no el estado actual.
 - **`docs/architecture.md`** (este archivo) — foto actual de cómo está organizado el repo, para orientarse rápido sin tener que leer todo `desing.md`.
-- **`docs/agents/`** — este repo usa el skill sobre sí mismo (dogfooding): `rules.md`, `handoff.md`, `backlog.md` y `changelog.md` documentan el trabajo de este mismo repo, con la misma estructura que el skill genera en un repo destino.
+- **`docs/agents/`** — este repo usa el skill sobre sí mismo (dogfooding): `rules.md`, `handoff.md`, `backlog.md` y `history.md` documentan el trabajo de este mismo repo, con la misma estructura que el skill genera en un repo destino.
 - **`src/SKILL.md`** — punto de entrada del skill: qué dispara su ejecución y qué hace a alto nivel.
 - **`src/docs/questions-flow.md`** — la lógica de decisión propiamente dicha: qué preguntar, en qué orden/rondas, y qué archivos de `src/template/` copiar según las respuestas.
 - **`src/docs/migration-flow.md`** — qué hacer cuando el repo destino ya tiene documentación de contexto en otro formato: cómo detectarla, mapearla y transformarla a la estructura de este skill en vez de tratarla como contenido ajeno.
