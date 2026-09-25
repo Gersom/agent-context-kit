@@ -14,10 +14,16 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-09-24 — ✅ Bump a `v1.0.0`
+
+- Se bumpeó `package.json` de `0.3.1` a `1.0.0`, aplicando el criterio de bump **major** ya fijado en `rules.md` (esta tarea renombró `template/agents/changelog.md` → `history.md`, referenciado desde `questions-flow.md`, y cambió la estructura generada en `docs/agents`).
+- Decisión explícita del operador: saltar directo a `1.0.0` en vez de `0.4.0`, aunque la Tarea 1 (probar el flujo end-to-end sobre un repo real) sigue sin resolverse — la razón original para arrancar en `0.1.0` y no en `1.0.0` (ver entrada del 2026-09-22 "Versionar el proyecto") quedó superada por esta decisión puntual, no derogada como criterio general.
+- Por qué: el operador priorizó reflejar en el número de versión que el catálogo tuvo un cambio estructural real (bump major), en vez de seguir la lectura convencional de SemVer 0.x de tratar todo como pre-estable hasta validar end-to-end.
+
 ## 2026-09-24 — ✅ Tarea 5 — Contemplación de nuevos flujos y estados de tareas
 
 - Se rediseñó el ciclo de vida de las tareas de `agents/`, que antes solo contemplaba "pendiente" (en `backlog.md`) y "cerrada" (en `changelog.md`):
-  - **Descartada:** se renombró `changelog.md` → `history.md` (bump **major**, pendiente de aplicar en el próximo release — ver criterio de bump en `rules.md`) y se redefinió su alcance para cubrir tareas resueltas en general, marcando cada entrada como ✅ Hecha o ❌ Descartada. El número de tarea se conserva igual en ambos casos.
+  - **Descartada:** se renombró `changelog.md` → `history.md` (bump **major**, ver criterio en `rules.md`) y se redefinió su alcance para cubrir tareas resueltas en general, marcando cada entrada como ✅ Hecha o ❌ Descartada. El número de tarea se conserva igual en ambos casos.
   - **Pausada:** `handoff.md` pasó de tener una única sección ("Tarea actual") a dos: "Tarea en progreso" (una sola, activa) y "Tareas pausadas" (lista, cada una con motivo de pausa y qué espera para retomarse).
   - **Bloqueada / pospuesta:** `backlog.md` se dividió en "Tareas libres" y "Tareas bloqueadas / pospuestas", con el campo `Bloqueos` etiquetado `[dependencia]` (no se puede empezar) o `[postergada]` (se podría, pero conviene esperar), un campo nuevo `Desbloquea` para link bidireccional, y la convención de no borrar `Bloqueos` al resolverse sino marcarlo `[Resuelto el <fecha>]` conservando el motivo original.
 - Se agregaron tres reglas por defecto nuevas a `rules.md` (Reglas 6, 7 y 8): `handoff.md` se actualiza en cada paso de un plan (no solo al cerrar la tarea) para dar continuidad entre sesiones/chats; el último paso de todo plan mediano/grande es "documentar cierre de tarea", que incluye revisar todas las tareas bloqueadas del backlog por si alguna dejó de estarlo; y un formato fijo de reporte de cierre en el chat (resueltas / descartadas / desbloqueadas / nuevas).
