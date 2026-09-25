@@ -12,6 +12,15 @@ No es una cola de pendientes (eso vive en [`./backlog.md`](./backlog.md)): acá 
 
 ---
 
+## 2026-09-24 — Dos reglas por defecto nuevas + `docs/agents/rules.md` de este repo
+
+- Se agregaron dos reglas fijas nuevas a `template/agents/rules.md` (reglas 4 y 5, después de la de numeración/idioma agregadas antes):
+  - **Regla 4 — El código es la fuente de verdad:** ante un conflicto entre esta documentación y lo que el código realmente hace, gana el código, salvo que el operador diga explícitamente lo contrario.
+  - **Regla 5 — Mínimo al cerrar una tarea:** `handoff.md`, `backlog.md` y `changelog.md` se actualizan siempre como mínimo (sobrescribir handoff, agregar entrada a changelog, sacar/agregar items en backlog según corresponda), sin importar qué otro archivo también haya cambiado.
+- Se creó `docs/agents/rules.md` para este mismo repo (no existía todavía, aunque el resto de `docs/agents/` sí) — con las 5 reglas por defecto ya vigentes, `Idioma de la documentación: Español`, y reglas específicas del proyecto (versionado SemVer + criterio de bump, qué no tocar sin autorización, decisiones no negociables ya tomadas).
+- Se actualizaron los punteros raíz `CLAUDE.md`/`AGENTS.md` para que remitan también a `rules.md`, no solo a `handoff.md`. Se agregó `docs/agents/` (con sus 4 archivos) al árbol de `docs/architecture.md`, que no lo tenía listado.
+- Por qué: pedido directo del operador — formalizar dos convenciones que ya se venían aplicando implícitamente (seguir el código cuando la doc queda desactualizada; no dejar `handoff`/`backlog`/`changelog` sin tocar al cerrar algo) como reglas explícitas del catálogo, y completar el dogfooding de este repo con su propio `rules.md`.
+
 ## 2026-09-24 — Tarea 2 — Soporte multi-idioma
 
 - Se agregó un paso nuevo en `questions-flow.md` ("Idioma de la documentación"), que corre siempre antes que cualquier otra cosa: detecta `IDIOMA` a partir del texto disponible del operador en la conversación actual (puede ser solo la frase de invocación, si es un chat nuevo sin más historial), y si es ambiguo, pregunta explícitamente en inglés.

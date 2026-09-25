@@ -18,6 +18,15 @@ Estas reglas vienen con el skill y aplican sin importar el proyecto. No se borra
 
    **Idioma de la documentación:** [Placeholder — se completa la primera vez que se genera esta documentación]
 
+4. **El código es la fuente de verdad.** Esta documentación describe el proyecto, pero puede desactualizarse o entrar en conflicto con lo que el código realmente hace. Ante un conflicto entre lo que dice un archivo de acá (`architecture.md`, `stack.md`, `entities.md`, etc.) y lo que el código muestra, **el código gana siempre** — la documentación está equivocada o desactualizada, no al revés. Excepción: que el operador diga explícitamente lo contrario para ese caso puntual. Si se detecta un desvío así, además de seguir el código, conviene corregir el archivo de documentación afectado para que refleje la realidad (no dejar la discrepancia para la próxima vez).
+
+5. **Al cerrar una tarea, como mínimo se actualizan `handoff.md`, `backlog.md` y `changelog.md`:**
+   - `handoff.md` → se sobrescribe con el estado actual (o "sin tarea en curso" si no queda nada abierto).
+   - `changelog.md` → se agrega la entrada de la tarea cerrada.
+   - `backlog.md` → si la tarea venía de ahí, se saca de la lista; si en el camino surgieron tareas nuevas todavía no hechas, se agregan (ver su sección "Numeración").
+   
+   Esto es lo mínimo indispensable, independientemente de qué otro archivo (`architecture.md`, `decisions.md`, etc.) también haya cambiado por el contenido específico de la tarea.
+
 ## Enlaces (evitar duplicar contexto)
 
 - Estructura de carpetas y por qué está organizado así → [`../project/architecture.md`](../project/architecture.md)
