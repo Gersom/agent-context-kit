@@ -17,7 +17,7 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 
 > Numeración iniciada el 2026-09-24. Tareas ya cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 8
+**Próximo número de tarea:** 9
 
 ---
 

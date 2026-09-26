@@ -151,14 +151,16 @@ Solo si en la Ronda 3 la respuesta fue "sí" a integraciones externas.
 
 ---
 
-## Ronda final — Generar README + puntero en la raíz (siempre, en cualquier rama que haya copiado algo, excepto set mínimo)
+## Ronda final — Generar README + puntero en la raíz (siempre, en cualquier rama que haya copiado algo)
 
-1. **Generar `docs/README.md`** (no copiar `template/README.md` literal): usando ese archivo solo como guía de estructura/formato, armar un índice que enlace únicamente a los archivos que efectivamente existen en `docs/` tras esta ejecución (si no se copió `glossary.md`, no aparece en el índice; si se crearon 3 `external/*.md`, los 3 quedan listados; etc.). Este paso se omite en el set mínimo (no hay README en ese set).
+1. **Generar `docs/README.md`** (no copiar `template/README.md` literal): usando ese archivo solo como guía de estructura/formato, armar un índice que enlace únicamente a los archivos que efectivamente existen en `docs/` tras esta ejecución (si no se copió `glossary.md`, no aparece en el índice; si se crearon 3 `external/*.md`, los 3 quedan listados; etc.). Este paso se omite en el set mínimo (no hay README en ese set); en ese caso, el paso 3 tampoco enlaza a `docs/README.md`.
 2. Determinar si se usó `docs/` o `agent-context/` (según lógica de detección de conflicto, punto 4.1 del documento de diseño).
-3. **`CLAUDE.md`**:
-   - No existe → crear con el párrafo puntero mínimo.
-   - Existe con otro contenido → agregar sección delimitada `<!-- agent-docs-skill:start -->` ... `<!-- agent-docs-skill:end -->` al final, solo si el marcador no está ya presente.
-4. Repetir el mismo paso 3 para **`AGENTS.md`**.
+3. **`AGENTS.md` (fuente de verdad — se asegura siempre, en cualquier set, incluso el mínimo):**
+   - No existe → crear a partir de `template/AGENTS.md`, ajustando la ruta `docs/`/`agent-context/` y quitando la línea de `docs/README.md` si ese archivo no se generó (set mínimo).
+   - Existe con otro contenido del operador → no se sobrescribe: se agrega la sección delimitada `<!-- agent-docs-skill:start -->` ... `<!-- agent-docs-skill:end -->` de `template/AGENTS.md` al final, solo si el marcador no está ya presente.
+4. **`CLAUDE.md` (redirige a `AGENTS.md`, nunca duplica su contenido — se asegura siempre, en cualquier set):**
+   - No existe → crear a partir de `template/CLAUDE.md`, literal.
+   - Existe con otro contenido del operador → agregar la sección delimitada de `template/CLAUDE.md` al final, solo si el marcador no está ya presente.
 5. Si `ALCANCE` fue `a` o `c` (set mínimo) → preguntar opt-in de cierre:
 
    **"¿Quieres igual la documentación completa porque vas a seguir trabajando este proyecto?"**
@@ -171,7 +173,7 @@ Solo si en la Ronda 3 la respuesta fue "sí" a integraciones externas.
 
 | Set | Se dispara con | Archivos incluidos | Por qué |
 |---|---|---|---|
-| **Mínimo** | a) Tarea puntual / c) Testear algo puntual | `agents/rules.md`, `agents/handoff.md` | Solo necesita no romper nada (reglas) y saber en qué está el proyecto ahora (handoff). No amerita backlog/history: es de un solo uso, sin ciclo de vida que registrar. |
+| **Mínimo** | a) Tarea puntual / c) Testear algo puntual | `agents/rules.md`, `agents/handoff.md`, `AGENTS.md`/`CLAUDE.md` (raíz) | Solo necesita no romper nada (reglas) y saber en qué está el proyecto ahora (handoff). No amerita backlog/history: es de un solo uso, sin ciclo de vida que registrar. El puntero raíz sí se asegura igual, porque es lo único que le permite a un agente genérico (no solo este skill) encontrar esa documentación sin invocar el skill de nuevo. |
 | **Intermedio** | b) Agregar una feature a un proyecto existente | Todo el mínimo + `agents/backlog.md`, `agents/history.md`, `project/architecture.md`, `project/stack.md`, `README.md` (generado) | Una feature sí tiene ciclo de vida (se agenda, se trabaja, se cierra o se descarta) → backlog/history. Para encajarla bien hace falta entender la estructura (architecture) y qué tecnologías ya están en uso (stack). `README.md` como índice porque ya son 6 archivos; se genera y no se copia porque su contenido depende de qué se haya creado. |
 | **Completo** | d) Desarrollo prolongado / proyecto nuevo | Todo el intermedio + los condicionales de Ronda 2-4 (`roadmap`, `decisions`, `known-issues`, `glossary`, `entities`, `infrastructure`, `testing`, `setup`, `external/*`, `plans/*`) | Proyecto de largo aliento necesita cobertura completa: visión a futuro, decisiones técnicas, dominio de negocio, integraciones, testing. |
 
@@ -180,6 +182,8 @@ Solo si en la Ronda 3 la respuesta fue "sí" a integraciones externas.
 | Archivo | Se copia cuando |
 |---|---|
 | `README.md` | Se genera (no se copia) en set intermedio y completo, listando solo los archivos que existan (no en mínimo) |
+| `AGENTS.md` (raíz) | Siempre — fuente de verdad, desde `template/AGENTS.md` |
+| `CLAUDE.md` (raíz) | Siempre — redirige a `AGENTS.md`, desde `template/CLAUDE.md` |
 | `agents/rules.md` | Siempre |
 | `agents/handoff.md` | Siempre |
 | `agents/backlog.md` | Set intermedio y completo |

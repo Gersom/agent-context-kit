@@ -14,6 +14,14 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-09-26 — ✅ Tarea 8 — Agregar punto de partida AGENTS.md y CLAUDE.md
+
+- Se detectó el bug real: la "Ronda final" de `questions-flow.md` excluía explícitamente al set mínimo (tarea puntual/testear) del paso que asegura el puntero raíz. Como el set mínimo solo copia `agents/rules.md` y `agents/handoff.md`, un agente genérico que abriera el repo después no tenía forma de encontrar esa documentación sin invocar el skill de nuevo.
+- Se agregaron `template/AGENTS.md` y `template/CLAUDE.md` al catálogo (en vez de redactar el párrafo puntero ad-hoc que solo vivía como ejemplo en `docs/desing.md`). `AGENTS.md` es la fuente de verdad (dice qué leer primero); `CLAUDE.md` nunca duplica ese contenido, solo redirige a `AGENTS.md`. Ambos llevan la sección delimitada `<!-- agent-docs-skill:start/end -->` para agregarse sin sobrescribir si el archivo ya existe con contenido propio del operador.
+- Se actualizó `questions-flow.md` (Ronda final, pasos 3-4 y las dos tablas resumen) para que ambos punteros se aseguren siempre, en cualquier set incluido el mínimo — solo el `README.md` generado sigue exclusivo de los sets intermedio/completo.
+- Se documentó el nuevo par de plantillas en `template-architecture.md`.
+- Dogfooding: se actualizó el `CLAUDE.md` raíz de este mismo repo para que redirija a `AGENTS.md` en vez de duplicar su contenido.
+
 ## 2026-09-25 — ✅ Tarea 7 — Resolver el caso de un backlog muy grande
 
 - Se agregó un mecanismo de agrupamiento a "Tareas libres" de `backlog.md` (Regla 7 de `rules.md` extendida): si esa sección supera las 15 tareas, se evalúan agrupar 2 o más que compartan un objetivo real. El criterio no es un tope de cantidad — es que el grupo entero quepa en una sola frase de objetivo compartido, sin usar "y" para forzar una tarea que en realidad no pertenece.

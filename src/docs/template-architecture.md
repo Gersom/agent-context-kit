@@ -7,6 +7,8 @@ Este documento describe la estructura de `src/template/` — el catálogo maestr
 ```
 template/
 ├── README.md
+├── AGENTS.md
+├── CLAUDE.md
 │
 ├── agents/
 │   ├── rules.md
@@ -40,6 +42,10 @@ template/
 ## `README.md` (raíz de `template/`)
 
 Guía de estructura/formato para generar el índice raíz de la documentación del proyecto destino. No se copia tal cual: se usa como referencia de qué secciones y tono debe tener el `docs/README.md` que el agente genera al final del flujo, listando únicamente lo que efectivamente se creó.
+
+## `AGENTS.md` / `CLAUDE.md` (raíz de `template/`)
+
+Los punteros que se aseguran en la raíz del repo destino, en **cualquier** set (incluso el mínimo) — son lo único que le permite a un agente genérico (no solo este skill) encontrar la documentación de contexto sin invocarlo de nuevo. `AGENTS.md` es la fuente de verdad: dice qué leer primero. `CLAUDE.md` nunca duplica ese contenido, solo redirige a `AGENTS.md`. Ambos llevan la sección delimitada `<!-- agent-docs-skill:start/end -->` para poder agregarse al final de un archivo ya existente del operador sin sobrescribirlo ni duplicarse en corridas futuras. Ver el paso 3-4 de la "Ronda final" en [`questions-flow.md`](./questions-flow.md).
 
 ## `agents/`
 

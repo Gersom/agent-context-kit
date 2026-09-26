@@ -1,5 +1,5 @@
-# Claude
+<!-- agent-docs-skill:start -->
+## Documentación de contexto para agentes
 
-Antes de cualquier tarea, lee [`docs/agents/rules.md`](./docs/agents/rules.md) (reglas fijas) y [`docs/agents/handoff.md`](./docs/agents/handoff.md) (estado actual del trabajo).
-
-Para el diseño completo del proyecto, ver [`docs/desing.md`](./docs/desing.md).
+Antes de cualquier tarea, lee [`AGENTS.md`](./AGENTS.md).
+<!-- agent-docs-skill:end -->
