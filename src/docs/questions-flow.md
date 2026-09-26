@@ -154,6 +154,7 @@ Solo si en la Ronda 3 la respuesta fue "sí" a integraciones externas.
 ## Ronda final — Generar README + puntero en la raíz (siempre, en cualquier rama que haya copiado algo)
 
 1. **Generar `docs/README.md`** (no copiar `template/README.md` literal): usando ese archivo solo como guía de estructura/formato, armar un índice que enlace únicamente a los archivos que efectivamente existen en `docs/` tras esta ejecución (si no se copió `glossary.md`, no aparece en el índice; si se crearon 3 `external/*.md`, los 3 quedan listados; etc.). Este paso se omite en el set mínimo (no hay README en ese set); en ese caso, el paso 3 tampoco enlaza a `docs/README.md`.
+   - **Sección "Qué es este proyecto":** si `docs/README.md` no existe todavía, o existe pero no tiene esa sección, preguntar: *"¿Podés describir en 1-2 frases qué es este proyecto (qué hace, para quién)?"* y escribirla como primera sección del archivo. Si ya existe con esa sección, preservarla tal cual al regenerar el resto del índice — no se vuelve a preguntar.
 2. Determinar si se usó `docs/` o `agent-context/` (según lógica de detección de conflicto, punto 4.1 del documento de diseño).
 3. **`AGENTS.md` (fuente de verdad — se asegura siempre, en cualquier set, incluso el mínimo):**
    - No existe → crear a partir de `template/AGENTS.md`, ajustando la ruta `docs/`/`agent-context/` y quitando la línea de `docs/README.md` si ese archivo no se generó (set mínimo).

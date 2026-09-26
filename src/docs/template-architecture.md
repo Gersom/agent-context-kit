@@ -41,7 +41,7 @@ template/
 
 ## `README.md` (raíz de `template/`)
 
-Guía de estructura/formato para generar el índice raíz de la documentación del proyecto destino. No se copia tal cual: se usa como referencia de qué secciones y tono debe tener el `docs/README.md` que el agente genera al final del flujo, listando únicamente lo que efectivamente se creó.
+Guía de estructura/formato para generar el índice raíz de la documentación del proyecto destino. No se copia tal cual: se usa como referencia de qué secciones y tono debe tener el `docs/README.md` que el agente genera al final del flujo, listando únicamente lo que efectivamente se creó. Su primera sección ("Qué es este proyecto") es la única que no se recalcula del listado de archivos: se pregunta una sola vez y se preserva en corridas futuras — es el hueco que cubre "esto es un ecommerce", "esto es una API REST", etc., algo que no encaja en `project/architecture.md` (esa es estructura de carpetas y filosofía de organización, no qué es el proyecto).
 
 ## `AGENTS.md` / `CLAUDE.md` (raíz de `template/`)
 

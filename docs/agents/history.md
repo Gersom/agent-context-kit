@@ -14,6 +14,14 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-09-26 — ✅ Agregar sección "Qué es este proyecto" al README generado
+
+- Se identificó un hueco real en el catálogo: ningún archivo cubría "qué es este proyecto" (ej. ecommerce, API REST) — `project/architecture.md` es estructura de carpetas y filosofía de organización, no eso.
+- Se agregó esa sección como primer bloque de `template/README.md` (guía de generación del `docs/README.md` real). Se pregunta una sola vez, la primera vez que se genera el archivo (o si existe pero no tiene la sección), y se preserva tal cual en corridas futuras.
+- Se documentó el paso en `questions-flow.md` (Ronda final, paso 1) y en `template-architecture.md`.
+- Se reordenó `template/AGENTS.md` para que apunte primero a `docs/README.md` (qué es el proyecto + índice), antes de `agents/rules.md` y `agents/handoff.md`.
+- Se detectó redundancia: `template/README.md` tenía su propia sección "Empezar acá" con el mismo orden de lectura que ya dicta `AGENTS.md`. Se sacó esa sección — el README queda como índice puro (qué es el proyecto + qué archivo cubre qué tema), sin repetir instrucciones de orden.
+
 ## 2026-09-26 — ✅ Tarea 8 — Agregar punto de partida AGENTS.md y CLAUDE.md
 
 - Se detectó el bug real: la "Ronda final" de `questions-flow.md` excluía explícitamente al set mínimo (tarea puntual/testear) del paso que asegura el puntero raíz. Como el set mínimo solo copia `agents/rules.md` y `agents/handoff.md`, un agente genérico que abriera el repo después no tenía forma de encontrar esa documentación sin invocar el skill de nuevo.
