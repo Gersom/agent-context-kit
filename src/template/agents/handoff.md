@@ -11,8 +11,11 @@ Si no hay ninguna tarea en curso, la sección "Tarea en progreso" debe decir exp
 
 Regla 6 de `rules.md`: este archivo se actualiza en cada paso completado del plan, no solo al cerrar la tarea — el objetivo es que, si la conversación se corta a mitad de camino, un chat nuevo pueda retomar exactamente desde acá sin depender de la memoria de la sesión anterior.
 
+**Anclas de sección:** "Tarea en progreso" y "Tareas pausadas" van precedidas por un comentario `<!-- agent-context-kit:section=... -->` (`in-progress`, `paused`). Son comentarios de máquina — los usa el script de seguimiento de tareas (`scripts/task-tracker/` del repo de agent-context-kit) para ubicar las secciones sin depender del idioma de los headers. No se traducen ni se mueven, y como este archivo se sobrescribe completo, **hay que reescribirlas siempre** en cada actualización. La tarea en progreso se identifica por la primera `Tarea N — título` dentro de la sección `in-progress`; si no hay ninguna, no hay tarea en curso. Detalle completo en `src/docs/template-architecture.md` del repo de agent-context-kit, sección "Anclas de sección".
+
 ---
 
+<!-- agent-context-kit:section=in-progress -->
 ## Tarea en progreso
 
 <!-- La única tarea que se está trabajando activamente ahora mismo (a diferencia de las pausadas, puede haber como máximo una). Incluye su número de `backlog.md` si vino de ahí. -->
@@ -51,6 +54,7 @@ Regla 6 de `rules.md`: este archivo se actualiza en cada paso completado del pla
 
 [Placeholder]
 
+<!-- agent-context-kit:section=paused -->
 ## Tareas pausadas
 
 <!--

@@ -17,6 +17,8 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 
 Para agregar una tarea nueva: leer **"Próximo número de tarea"** más abajo, usar ese valor, y actualizar la línea a N+1. Si una tarea en curso (documentada en `handoff.md`) hace surgir tareas nuevas, también se les asigna número acá siguiendo el mismo mecanismo, aunque no se vayan a ejecutar pronto.
 
+**Anclas de sección:** cada sección de tareas va precedida por un comentario `<!-- agent-context-kit:section=... -->` (`free`, `blocked`, `grouped`). Son comentarios de máquina — los usa el script de seguimiento de tareas (`scripts/task-tracker/` del repo de agent-context-kit) para ubicar las secciones sin depender del idioma de los headers. No se traducen, no se borran ni se mueven al actualizar este archivo. Detalle completo en `src/docs/template-architecture.md` del repo de agent-context-kit, sección "Anclas de sección".
+
 <!--
 Backfill (solo la primera vez que se adopta este mecanismo en un proyecto con tareas ya existentes sin número): numerar los items de este archivo en el orden en que aparecen (de arriba hacia abajo), dejar "Próximo número de tarea" en max+1, y agregar una nota explícita (acá mismo, debajo de esta línea, o en `handoff.md`) del tipo: "Numeración iniciada el [fecha]; tareas ya cerradas antes de esa fecha (en `history.md`) no tienen número asignado retroactivamente." No se renumera `history.md` hacia atrás.
 -->
@@ -28,7 +30,7 @@ Backfill (solo la primera vez que se adopta este mecanismo en un proyecto con ta
 <!--
 Un bloque por tarea, con este formato:
 
-## Tarea [N] — [Título corto de la tarea]
+### Tarea [N] — [Título corto de la tarea]
 
 - **Descripción:** de qué trata la tarea.
 - **Decisiones/temas a definir antes de empezar:** qué hay que resolver o preguntarle al operador antes de poder arrancarla. "Ninguno" si ya está todo definido.
@@ -39,6 +41,7 @@ Un bloque por tarea, con este formato:
 - **Agregada:** fecha en que se sumó al backlog.
 -->
 
+<!-- agent-context-kit:section=free -->
 ## Tareas libres
 
 <!--
@@ -59,6 +62,7 @@ Cuando una tarea está agrupada (ver "Agrupamiento" más arriba), acá va una l�
 - **Detalles:** [Placeholder]
 - **Agregada:** [Placeholder]
 
+<!-- agent-context-kit:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
 ### Tarea [N] — [Placeholder — título corto de la tarea]
@@ -71,6 +75,7 @@ Cuando una tarea está agrupada (ver "Agrupamiento" más arriba), acá va una l�
 - **Detalles:** [Placeholder]
 - **Agregada:** [Placeholder]
 
+<!-- agent-context-kit:section=grouped -->
 ## Tareas agrupadas
 
 <!--

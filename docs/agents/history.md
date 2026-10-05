@@ -14,6 +14,15 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-10-05 — ✅ Tarea 9 — Preparación para el script de seguimiento de tareas
+
+- Se agregaron **anclas de sección** (`<!-- agent-context-kit:section=<id> -->`) antes de cada sección de tareas: `free`, `blocked`, `grouped` en `backlog.md` e `in-progress`, `paused` en `handoff.md`, tanto en las plantillas de `src/template/agents/` como en los `docs/agents/` de este repo. Cada archivo lleva una nota corta: son comentarios de máquina, no se traducen ni se borran, y en `handoff.md` se reescriben en cada sobrescritura.
+- La fuente de verdad del mecanismo quedó en `src/docs/template-architecture.md` (sección "Anclas de sección"); `questions-flow.md` (flujo de proyecto existente) y `migration-flow.md` (al migrar y con firma presente) solo lo mencionan y enlazan, e indican que el agente agrega las anclas si faltan (auto-curación).
+- Se normalizó `docs/agents/backlog.md` de este repo de `## Tarea N` a `### Tarea N`, como dice la plantilla. Se corrigió además el ejemplo comentado de `src/template/agents/backlog.md`, que decía `## Tarea [N]` mientras los placeholders reales usan `### Tarea [N]` — origen probable del desvío.
+- Por qué: el script de seguimiento de tareas (Tarea 10, `scripts/task-tracker/`) necesita ubicar las secciones sin depender del idioma — por la Regla 3 los headers se redactan en el idioma de cada proyecto, así que buscar "Tareas libres" literal no funciona en un repo en inglés. Se usó el mismo prefijo que la firma `agent-context-kit:signature`.
+- Decisiones del operador: sin ancla para la línea `**Tarea:**` (la tarea en progreso es la primera `Tarea N` dentro de `in-progress`); el bump minor (`1.1.0`) se hace al cerrar la Tarea 11; se trabaja en la rama `feat/task-tracker`.
+- Al revisar las bloqueadas (Regla 7): la Tarea 10 dependía de esta tarea → movida a "Tareas libres" con su bloqueo marcado como resuelto.
+
 ## 2026-09-26 — ✅ Agregar sección "Qué es este proyecto" al README generado
 
 - Se identificó un hueco real en el catálogo: ningún archivo cubría "qué es este proyecto" (ej. ecommerce, API REST) — `project/architecture.md` es estructura de carpetas y filosofía de organización, no eso.

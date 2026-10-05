@@ -58,6 +58,31 @@ Documentación pensada para que un agente de IA sepa cómo trabajar en el proyec
 - **`roadmap.md`** — Visión a mediano/largo plazo del proyecto. Da contexto de hacia dónde va el proyecto más allá de la tarea inmediata.
 - **`known-issues.md`** — Bugs conocidos y zonas frágiles del código, con su workaround temporal si existe. Evita que un agente "arregle" o refactorice algo sin saber que ese comportamiento raro es intencional o ya está siendo mitigado.
 
+### Anclas de sección (`handoff.md` y `backlog.md`)
+
+Fuente de verdad de este mecanismo — las plantillas y los flujos solo lo mencionan y enlazan acá.
+
+Las secciones de tareas de `handoff.md` y `backlog.md` van precedidas, en la línea inmediatamente anterior a su header `##`, por un comentario HTML de máquina:
+
+```md
+<!-- agent-context-kit:section=<id> -->
+## <header en el idioma de la documentación>
+```
+
+| Archivo | `id` | Sección |
+|---|---|---|
+| `handoff.md` | `in-progress` | Tarea en progreso |
+| `handoff.md` | `paused` | Tareas pausadas |
+| `backlog.md` | `free` | Tareas libres |
+| `backlog.md` | `blocked` | Tareas bloqueadas / pospuestas |
+| `backlog.md` | `grouped` | Tareas agrupadas |
+
+- **Por qué existen:** los headers se redactan en el idioma de la documentación del proyecto (Regla 3 de `rules.md`), así que una herramienta no puede buscar "Tareas libres" o "Tarea en progreso" literal. Las anclas dan un punto fijo, independiente del idioma, para el script de seguimiento de tareas de este repo (`scripts/task-tracker/`). Mismo prefijo que la firma `agent-context-kit:signature` de `handoff.md`.
+- **Se preservan siempre:** no se traducen, no se borran ni se mueven al actualizar el archivo. En `handoff.md`, que se sobrescribe completo en cada actualización, se reescriben cada vez. Los ejemplos dentro de comentarios de las plantillas no llevan anclas reales.
+- **Tarea en progreso:** se identifica por la primera `Tarea N — título` dentro de la sección `in-progress`; si no hay ninguna, no hay tarea en curso (no depende del texto traducido "Sin tarea en curso"). Las tareas de `backlog.md` y las pausadas son headers `### Tarea N — título` (`#### Tarea N — título` dentro de un grupo de "Tareas agrupadas").
+- **Si faltan** (docs generados antes de existir este mecanismo, o editados a mano): el agente las agrega al actualizar el archivo — en el flujo de proyecto existente de [`questions-flow.md`](./questions-flow.md) y al migrar con [`migration-flow.md`](./migration-flow.md). Mientras tanto, el script cae a un plan B: ubica las secciones `##` por su orden de aparición y avisa que está en ese modo.
+- **Set mínimo:** genera `handoff.md` pero no `backlog.md` (ver [`questions-flow.md`](./questions-flow.md)), así que solo existen las anclas `in-progress` y `paused`; las herramientas que las leen tienen que tolerar que falte `backlog.md`.
+
 ## `project/`
 
 Documentación técnica y de dominio sobre el proyecto en sí (no sobre el proceso de trabajo).
