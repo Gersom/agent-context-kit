@@ -14,6 +14,17 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-10-05 — ✅ Tarea 10 — Crear script funcional de seguimiento de tareas
+
+- Se creó `scripts/task-tracker/` (JavaScript, Bun): vigila el `docs/agents/` de un proyecto y redibuja en la terminal la tarea en progreso (con el avance del plan y el próximo paso), las pausadas, las libres (y sus grupos) y las bloqueadas (con su tag `[dependencia]`/`[postergada]`) cada vez que cambian `handoff.md` o `backlog.md`. Separado por responsabilidad: `index.js` (entrada), `src/reader.js` (ubicar la carpeta, leer, vigilar con debounce), `src/parser.js` (markdown → estructura, independiente del idioma), `src/model.js` (procesamiento) y `src/render.js` (pintado con `picocolors`).
+- Se lanza desde la raíz con `bun run tasks [ruta]`: sin ruta, la pregunta al arrancar; acepta la raíz del proyecto (busca `docs/agents/` o `agent-context/agents/`) o la carpeta directa; `--once` pinta una vez y sale. Cada instancia es independiente, así que se puede correr una por proyecto en paralelo; el título de la ventana muestra el nombre del proyecto.
+- Ubica las secciones por las anclas de la Tarea 9, con plan B por orden de `##` (avisado en pantalla) para docs que todavía no las tienen. `backlog.md` es opcional (set mínimo).
+- Dependencias en la raíz, no por script: `picocolors` en `devDependencies` del `package.json` raíz (que además pasó a `"type": "module"` y suma los scripts `tasks` y `test`), `bun.lock` commiteado y `node_modules/` en `.gitignore`. Por qué: `package.json` es `private` y lo que se distribuye es `src/`, así que las dependencias de las herramientas no viajan con el skill; un futuro script (ej. empaquetar `src/template` en `.zip`) suma su dependencia al mismo archivo.
+- Verificación: `bun test` → 41 tests en 4 archivos, todos pasan (fixtures en español con anclas, en inglés sin anclas, solo `handoff.md`, CRLF, resolución de rutas). Prueba manual contra este repo: detecta la tarea en curso y el plan real.
+- Se actualizaron `docs/agents/rules.md` (el skill en `src/` sigue siendo markdown puro; `scripts/` son herramientas del repo; dependencias solo en `devDependencies` raíz) y `docs/architecture.md` (carpeta `scripts/`). En `src/docs/template-architecture.md` se precisó cómo se detecta la tarea en progreso (solo antes de la primera subsección `###`), alineándolo con el código.
+- Hallazgo: `bun run` (Bun 1.4.2) cambia el cwd a la raíz del package y no define `INIT_CWD`; la carpeta de invocación queda en `npm_config_local_prefix`, que es la que se usa para resolver rutas relativas.
+- Al revisar las bloqueadas (Regla 7): la Tarea 11 dependía de esta tarea → movida a "Tareas libres" con su bloqueo marcado como resuelto.
+
 ## 2026-10-05 — ✅ Tarea 9 — Preparación para el script de seguimiento de tareas
 
 - Se agregaron **anclas de sección** (`<!-- agent-context-kit:section=<id> -->`) antes de cada sección de tareas: `free`, `blocked`, `grouped` en `backlog.md` e `in-progress`, `paused` en `handoff.md`, tanto en las plantillas de `src/template/agents/` como en los `docs/agents/` de este repo. Cada archivo lleva una nota corta: son comentarios de máquina, no se traducen ni se borran, y en `handoff.md` se reescriben en cada sobrescritura.

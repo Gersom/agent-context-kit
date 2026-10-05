@@ -45,22 +45,19 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Detalles:** ver pendientes relacionados en [`../desing.md`](../desing.md).
 - **Agregada:** 2026-09-24.
 
-### Tarea 10 — Crear script funcional de seguimiento de tareas
+### Tarea 11 — Refinar script de seguimiento de tareas
 
-- **Descripción:** programa en Bun que vigila la carpeta `docs/agents/` de un proyecto y muestra en la terminal la tarea en progreso, las tareas pausadas y las pendientes (libres, bloqueadas y agrupadas), redibujando cada vez que cambian `handoff.md` o `backlog.md`. La idea es tenerlo abierto en una terminal mientras en otra un agente de IA trabaja sobre el proyecto.
+- **Descripción:** pulir el script de la Tarea 10 para que la salida sea más detallada y robusta, y cerrar el circuito para los repos que ya adoptaron el skill.
 - **Decisiones/temas a definir antes de empezar:**
-  - Cómo se lanza desde la raíz del repo (ej. script `"tasks"` en el `package.json` raíz que llama al de `scripts/task-tracker/`, o `cd scripts/task-tracker && bun start`).
-  - Si además de preguntar el path al arrancar, también se acepta como argumento opcional (`bun start <path>`) para saltear la pregunta.
-- **Bloqueos:** `[Resuelto el 2026-10-05]` — era `[dependencia]` necesita las anclas de la Tarea 9 (Preparación para el script de seguimiento de tareas) para parsear las secciones sin depender del idioma. La Tarea 9 se cerró el 2026-10-05 (ver `history.md`).
-- **Desbloquea:** Tarea 11.
-- **Disparador:** cuando se cierre la Tarea 9.
+  - Qué nivel de detalle mostrar por tarea (ej. solo título vs. descripción, bloqueos, disparador, motivo de pausa, qué espera para retomarse).
+  - Si se agregan atajos de teclado (ej. `q` para salir, alternar vista compacta/detallada).
+- **Bloqueos:** `[Resuelto el 2026-10-05]` — era `[dependencia]` depende de que la Tarea 10 (Crear script funcional de seguimiento de tareas) esté resuelta. La Tarea 10 se cerró el 2026-10-05 (ver `history.md`).
+- **Disparador:** cuando se cierre la Tarea 10.
 - **Detalles:**
-  - Se ejecuta desde el repo `agent-context-kit` (no se copia a cada proyecto). Al arrancar **pregunta el path de la carpeta a vigilar** y valida que exista al menos `handoff.md` en ella — `backlog.md` es opcional, porque el set mínimo de `src/docs/questions-flow.md` no lo genera (en ese caso se muestran solo la tarea en progreso y las pausadas). Así se pueden correr varias instancias en paralelo, una por proyecto — sin estado compartido, lockfiles ni puertos fijos entre instancias.
-  - Proyecto Bun propio en `scripts/task-tracker/` — nombre confirmado por el operador el 2026-10-05 (con su `package.json`, `tsconfig.json` y dependencias), con la salida en terminal hecha con el paquete `picocolors`.
-  - Separado en varios archivos por responsabilidad, como mínimo: lectura y vigilancia de archivos (watch de la carpeta, no de cada archivo, con debounce para que un solo guardado no dispare varios redibujos), parseo/interpretación del markdown (quitar comentarios HTML antes de parsear para no tomar los ejemplos de las plantillas, ubicar secciones por ancla, detectar `Tarea N — título` aceptando `—`, `–` o `-`), procesamiento de los datos (modelo final: progreso del plan con los checkboxes `- [ ]`/`- [x]`, conteos, grupos, motivos de bloqueo) y pintado en la terminal; más el punto de entrada.
-  - Plan B si un archivo no tiene anclas (repos que adoptaron el skill antes de la Tarea 9): ubicar las secciones `##` por orden de aparición, y avisar en pantalla que se está usando ese modo.
-  - Tolerar archivos a medio escribir o momentáneamente inexistentes (el agente puede estar reescribiéndolos) sin cerrar el programa.
-  - Al agregar código ejecutable al repo, actualizar la regla específica de `rules.md` que dice que es "documentación markdown pura, sin código ejecutable", y `docs/architecture.md` con la nueva carpeta `scripts/`.
+  - Salida más detallada: encabezado con nombre/path del proyecto vigilado, hora de la última actualización y qué archivo cambió; estados vacíos claros ("Sin tarea en curso", "Ninguna"); errores de parseo visibles en pantalla en vez de silenciosos; ajuste al ancho de la terminal.
+  - Robustez: placeholders de plantilla sin completar, saltos de línea CRLF y paths de Windows.
+  - Documentar cómo usar el script (README del repo y/o de `scripts/task-tracker/`).
+  - Entregar al operador el **prompt de normalización** para los repos que ya adoptaron el skill: un prompt que le pida al agente de ese repo agregar las anclas de la Tarea 9 y ajustar `backlog.md`/`handoff.md` a la estructura que espera el script.
 - **Agregada:** 2026-10-05.
 
 <!-- agent-context-kit:section=blocked -->
@@ -74,21 +71,6 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Disparador:** cuando el operador quiera hacer pública la skill, o priorice esta tarea explícitamente.
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
-
-### Tarea 11 — Refinar script de seguimiento de tareas
-
-- **Descripción:** pulir el script de la Tarea 10 para que la salida sea más detallada y robusta, y cerrar el circuito para los repos que ya adoptaron el skill.
-- **Decisiones/temas a definir antes de empezar:**
-  - Qué nivel de detalle mostrar por tarea (ej. solo título vs. descripción, bloqueos, disparador, motivo de pausa, qué espera para retomarse).
-  - Si se agregan atajos de teclado (ej. `q` para salir, alternar vista compacta/detallada).
-- **Bloqueos:** `[dependencia]` depende de que la Tarea 10 (Crear script funcional de seguimiento de tareas) esté resuelta.
-- **Disparador:** cuando se cierre la Tarea 10.
-- **Detalles:**
-  - Salida más detallada: encabezado con nombre/path del proyecto vigilado, hora de la última actualización y qué archivo cambió; estados vacíos claros ("Sin tarea en curso", "Ninguna"); errores de parseo visibles en pantalla en vez de silenciosos; ajuste al ancho de la terminal.
-  - Robustez: placeholders de plantilla sin completar, saltos de línea CRLF y paths de Windows.
-  - Documentar cómo usar el script (README del repo y/o de `scripts/task-tracker/`).
-  - Entregar al operador el **prompt de normalización** para los repos que ya adoptaron el skill: un prompt que le pida al agente de ese repo agregar las anclas de la Tarea 9 y ajustar `backlog.md`/`handoff.md` a la estructura que espera el script.
-- **Agregada:** 2026-10-05.
 
 <!-- agent-context-kit:section=grouped -->
 ## Tareas agrupadas

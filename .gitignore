@@ -1,3 +1,6 @@
 dist/
 # Local Pi runtime state
 .atl/
+
+# Dependencias de los scripts (scripts/)
+node_modules/

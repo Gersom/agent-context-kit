@@ -3,8 +3,16 @@
   "version": "1.0.0",
   "description": "Skill reutilizable que genera documentación de contexto de proyecto para que cualquier agente de IA entienda en qué momento está un proyecto, qué falta, qué se hizo y por qué.",
   "private": true,
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Gersom/agent-context-kit.git"
+  },
+  "scripts": {
+    "tasks": "bun scripts/task-tracker/index.js",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "picocolors": "^1.1.1"
   }
 }

@@ -8,6 +8,13 @@ Este documento describe la estructura general del repo `agent-context-kit` y par
 agent-context-kit/
 ├── README.md              # Presentación del proyecto
 ├── CLAUDE.md               # Puntero para agentes: remite a docs/desing.md
+├── package.json            # Versión del skill (SemVer) + scripts y devDependencies de scripts/
+│
+├── scripts/                # Herramientas propias del repo (Bun); no forman parte del skill
+│   └── task-tracker/          # Seguimiento de tareas en la terminal (`bun run tasks [ruta]`)
+│       ├── index.js             # Punto de entrada: ruta a vigilar, watcher y redibujo
+│       ├── src/                 # reader (archivos/watch), parser (markdown), model, render (picocolors)
+│       └── test/                # Tests de `bun test` + fixtures de handoff/backlog
 │
 ├── docs/
 │   ├── desing.md            # Documento de diseño: historial de decisiones y pendientes
@@ -39,6 +46,7 @@ agent-context-kit/
 - **`docs/desing.md`** — registro histórico de la conversación de diseño: por qué se tomaron las decisiones de estructura, nombre y flujo. No se actualiza en cada cambio; es el punto de partida, no el estado actual.
 - **`docs/architecture.md`** (este archivo) — foto actual de cómo está organizado el repo, para orientarse rápido sin tener que leer todo `desing.md`.
 - **`docs/agents/`** — este repo usa el skill sobre sí mismo (dogfooding): `rules.md`, `handoff.md`, `backlog.md` y `history.md` documentan el trabajo de este mismo repo, con la misma estructura que el skill genera en un repo destino.
+- **`scripts/task-tracker/`** — herramienta de este repo (no del skill: no se copia a los repos destino) que vigila el `docs/agents/` de cualquier proyecto que use el skill y muestra en la terminal la tarea en progreso, las pausadas y las pendientes, redibujando cada vez que cambian `handoff.md` o `backlog.md`. Se lanza desde la raíz de este repo con `bun run tasks [ruta]` (sin ruta, la pregunta al arrancar); acepta la raíz del proyecto o su carpeta `docs/agents/`, y se pueden correr varias instancias en paralelo, una por proyecto. Ubica las secciones por las anclas descritas en [`src/docs/template-architecture.md`](../src/docs/template-architecture.md) ("Anclas de sección"), con un plan B por orden de secciones para docs que todavía no las tienen.
 - **`src/SKILL.md`** — punto de entrada del skill: qué dispara su ejecución y qué hace a alto nivel.
 - **`src/docs/questions-flow.md`** — la lógica de decisión propiamente dicha: qué preguntar, en qué orden/rondas, y qué archivos de `src/template/` copiar según las respuestas.
 - **`src/docs/migration-flow.md`** — qué hacer cuando el repo destino ya tiene documentación de contexto en otro formato: cómo detectarla, mapearla y transformarla a la estructura de este skill en vez de tratarla como contenido ajeno.
