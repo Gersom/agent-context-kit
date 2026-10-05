@@ -86,14 +86,15 @@ export function projectNameFor(agentsDir) {
 /**
  * Lee un archivo de texto sin cortar el programa. CRLF se normaliza a LF.
  * @param {string} path
- * @returns {{ text: string | null, error: string | null }} `text: null` si no existe
+ * @returns {{ text: string | null, error: string | null, code: string | null }} `text: null` si
+ *   no existe; `code` es el código del error de lectura (ej. `EBUSY`), si lo hubo
  */
 export function readFileSafe(path) {
   try {
-    return { text: readFileSync(path, "utf8").replace(/\r\n?/g, "\n"), error: null };
+    return { text: readFileSync(path, "utf8").replace(/\r\n?/g, "\n"), error: null, code: null };
   } catch (err) {
-    if (err?.code === "ENOENT") return { text: null, error: null };
-    return { text: null, error: `No se pudo leer ${basename(path)}: ${err?.message ?? err}` };
+    if (err?.code === "ENOENT") return { text: null, error: null, code: null };
+    return { text: null, error: `No se pudo leer ${basename(path)}: ${err?.message ?? err}`, code: err?.code ?? null };
   }
 }
 

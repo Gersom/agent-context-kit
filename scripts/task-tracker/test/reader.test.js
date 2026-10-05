@@ -50,7 +50,7 @@ describe("resolveAgentsDir", () => {
 describe("helpers del reader", () => {
   test("readFileSafe normaliza CRLF y devuelve null si no existe", () => {
     expect(readFileSafe(join(root, "mi-app", "docs", "agents", "handoff.md")).text).toBe("# Handoff\n\nx\n");
-    expect(readFileSafe(join(root, "nada.md"))).toEqual({ text: null, error: null });
+    expect(readFileSafe(join(root, "nada.md"))).toEqual({ text: null, error: null, code: null });
   });
 
   test("cleanPathInput quita comillas y espacios", () => {

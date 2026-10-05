@@ -11,10 +11,10 @@
 // Cada instancia es independiente (sin lockfiles, puertos ni estado compartido): se puede
 // correr una por proyecto en paralelo.
 
-import { join } from "node:path";
 import { buildModel } from "./src/model.js";
-import { readFileSafe, resolveAgentsDir, watchDir } from "./src/reader.js";
+import { resolveAgentsDir, watchDir } from "./src/reader.js";
 import { render } from "./src/render.js";
+import { createSnapshotReader, RETRY_MS } from "./src/snapshot.js";
 
 const args = process.argv.slice(2);
 const once = args.includes("--once");
@@ -24,24 +24,24 @@ const target = pathArg != null ? resolveFromArg(pathArg) : askForPath();
 const { agentsDir, projectName } = target;
 
 const watcherErrors = [];
-let retriedEmptyRead = false;
+const snapshot = createSnapshotReader(agentsDir);
 
-/** Lee los archivos, arma el modelo y redibuja la pantalla. */
-function draw(changedFile) {
-  const handoff = readFileSafe(join(agentsDir, "handoff.md"));
-  const backlog = readFileSafe(join(agentsDir, "backlog.md"));
-
-  // Un agente puede estar reescribiendo el archivo justo ahora: se reintenta una vez antes de
-  // mostrarlo como vacío o ausente.
-  if (!once && !retriedEmptyRead && !handoff.text?.trim()) {
-    retriedEmptyRead = true;
-    setTimeout(() => draw(changedFile), 300);
+/**
+ * Lee los archivos, arma el modelo y redibuja la pantalla. Si un archivo que se venía leyendo
+ * bien falla (un agente puede estar reescribiéndolo justo ahora), se reintenta una vez antes de
+ * pintar; si sigue fallando, se muestra su última versión buena con un aviso (ver snapshot.js).
+ * @param {string | null | undefined} changedFile
+ * @param {{ isRetry?: boolean }} [options]
+ */
+function draw(changedFile, { isRetry = false } = {}) {
+  const snap = snapshot.read({ allowRetry: !once && !isRetry });
+  if (snap.needsRetry) {
+    setTimeout(() => draw(changedFile, { isRetry: true }), RETRY_MS);
     return;
   }
-  retriedEmptyRead = false;
 
-  const readErrors = [handoff.error, backlog.error, ...watcherErrors].filter(Boolean);
-  const model = buildModel({ handoffText: handoff.text, backlogText: backlog.text, readErrors });
+  const readErrors = [...snap.warnings, ...watcherErrors];
+  const model = buildModel({ handoffText: snap.handoffText, backlogText: snap.backlogText, readErrors });
   const screen = render(model, { projectName, agentsDir, updatedAt: new Date(), changedFile });
 
   if (!once && process.stdout.isTTY) process.stdout.write("\x1b[2J\x1b[3J\x1b[H");

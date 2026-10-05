@@ -3,28 +3,40 @@
 
 import { parseBacklog, parseHandoff } from "./parser.js";
 
-// Primer tag `[...]` de un valor de campo: con backticks (`[dependencia]`) o sin ellos, sin
+// Tag `[...]` de un valor de campo: con backticks (`[dependencia]`) o sin ellos, sin
 // confundirlo con un link markdown `[texto](url)`.
-const TAG_RES = [/`\[([^\]\n]+)\]`/g, /\[([^\]\n]+)\](?!\()/g];
+const TAG_RE = /(`?)\[([^\]\n]+)\]\1(?!\()/g;
 const RESOLVED_TAG_RE = /^(resuelto|resolved)\b/i;
+const PLACEHOLDER_TAG_RE = /^placeholder/i;
 
 /**
- * Tag de bloqueo de una tarea (ej. `dependencia`, `postergada`) y el valor del campo donde
- * aparece. Se busca en cualquier campo porque las etiquetas están traducidas; se ignoran los
- * tags de bloqueos ya resueltos (`[Resuelto el <fecha>]`) y los placeholders.
+ * Tag de bloqueo vigente de una tarea (ej. `dependencia`, `postergada`) y su motivo. Se busca
+ * en cualquier campo porque las etiquetas están traducidas, mirando solo el **primer** tag de
+ * cada campo:
+ * - Si es `[Resuelto…]`, el campo entero es historial (Regla 7) y se salta.
+ * - Si no, es el bloqueo vigente. Por convención, cuando una tarea se vuelve a bloquear, el
+ *   bloqueo vigente va primero y el historial resuelto después (ver "Anclas de sección" en
+ *   src/docs/template-architecture.md), así que el motivo se corta donde empieza ese historial.
+ * Los placeholders de la plantilla no cuentan como tag.
  * @param {{ fields: { label: string, value: string }[] }} task
  * @returns {{ tag: string | null, reason: string | null }}
  */
 export function blockInfo(task) {
-  for (const re of TAG_RES) {
-    for (const field of task.fields) {
-      for (const match of field.value.matchAll(re)) {
-        const tag = match[1].trim();
-        if (RESOLVED_TAG_RE.test(tag) || /^placeholder/i.test(tag)) continue;
-        const reason = field.value.replace(match[0], "").replace(/^[\s—–-]+/, "").trim();
-        return { tag, reason: reason || null };
-      }
-    }
+  for (const field of task.fields) {
+    const tags = [...field.value.matchAll(TAG_RE)];
+    const first = tags[0];
+    if (!first) continue;
+    const tag = first[2].trim();
+    if (RESOLVED_TAG_RE.test(tag) || PLACEHOLDER_TAG_RE.test(tag)) continue;
+
+    const history = tags.slice(1).find((m) => RESOLVED_TAG_RE.test(m[2].trim()));
+    const reason = field.value
+      .slice(first.index + first[0].length, history ? history.index : undefined)
+      .replace(/^[\s—–-]+/, "")
+      // Si el historial viene precedido por una etiqueta tipo "Antes:", se descarta.
+      .replace(/\s*[^\s.]+:\s*$/, "")
+      .trim();
+    return { tag, reason: reason || null };
   }
   return { tag: null, reason: null };
 }
@@ -65,6 +77,11 @@ export function buildModel({ handoffText, backlogText, readErrors = [] }) {
   }));
   const freeTasks = backlog?.free.tasks ?? [];
   const blocked = (backlog?.blocked ?? []).map((task) => ({ ...task, block: blockInfo(task) }));
+  for (const task of blocked) {
+    if (!task.block.tag) {
+      warnings.push(`${task.label} ${task.number} está en "bloqueadas" sin bloqueo vigente: ¿moverla a libres? (Regla 7)`);
+    }
+  }
   const paused = handoff?.paused ?? [];
 
   return {

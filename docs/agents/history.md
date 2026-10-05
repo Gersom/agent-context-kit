@@ -14,6 +14,15 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-10-05 — ✅ Tarea 13 — Corregir observaciones de la revisión del script
+
+- **Tag de bloqueo viejo:** `blockInfo` (`scripts/task-tracker/src/model.js`) ahora mira solo el primer tag de cada campo; si es `[Resuelto…]`, el campo entero es historial y se salta. Nuevo aviso en pantalla para una tarea en "bloqueadas" sin bloqueo vigente (candidata a volver a libres, Regla 7). Convención nueva para una tarea que se vuelve a bloquear: el bloqueo vigente va primero y el historial resuelto después — documentada en `src/docs/template-architecture.md` (viñeta "Tag de bloqueo") y en el campo `Bloqueos` de `src/template/agents/backlog.md`, sin tocar las Reglas por defecto. Ya aplicada en este backlog a la Tarea 11.
+- **Lectura con memoria:** nuevo `src/snapshot.js`, que trata igual a `handoff.md` y `backlog.md`: si falla la lectura de un archivo que ya se leyó bien (no existe, vacío, EBUSY/EPERM), reintenta a los 300 ms y, si sigue fallando, muestra la última versión buena con un aviso que dice de qué hora es. La nota del set mínimo solo aparece si `backlog.md` nunca existió en la sesión. `index.js` dejó de tener su reintento propio.
+- **Tests faltantes:** `watchDir` (una ráfaga de escrituras da un solo aviso; otros archivos se ignoran), precedencia de `invocationDir`, el lector con memoria (con lecturas simuladas) y el script entero con `Bun.spawn` (`--once`, ruta inválida, sin argumento ni datos de entrada). `bun test`: 60 tests en 7 archivos, todos pasan; se corrió 6 veces seguidas sin fallos intermitentes.
+- Prueba manual: borrar `backlog.md` mientras el script vigilaba una copia de `docs/agents/` mostró la última versión con el aviso, y al restaurarlo volvió a la normalidad.
+- Incidente: para cortar esa prueba en segundo plano se usó `taskkill /F /IM bun.exe`, que cierra **todos** los procesos de Bun de la máquina, no solo el de la prueba. Avisado al operador; en adelante, cortar solo el proceso propio.
+- Al revisar las bloqueadas (Regla 7): la Tarea 14 dependía de esta tarea → movida a "Tareas libres" con su bloqueo marcado como resuelto. La Tarea 11 sigue bloqueada por la 14.
+
 ## 2026-10-05 — ✅ Tarea 12 — Revisión de código de la rama `feat/task-tracker`
 
 - Revisión de los commits de las Tareas 9 y 10 contra `main` (28 archivos, ~1450 líneas), pedida por el operador después de que `gentle-ai review assess` marcara la rama como riesgo medio con el presupuesto del slice superado. Se corrió la revisión nativa de `gentle-ai` (lente `review-reliability`) con consentimiento del operador.

@@ -50,6 +50,25 @@ describe("buildModel", () => {
     expect(buildModel({ handoffText: "  \n", backlogText: null }).warnings[0]).toContain("vacío");
   });
 
+  test("avisa una tarea en bloqueadas sin bloqueo vigente", () => {
+    const backlog = [
+      "<!-- agent-context-kit:section=free -->",
+      "## Libres",
+      "<!-- agent-context-kit:section=blocked -->",
+      "## Bloqueadas",
+      "",
+      "### Tarea 8 — Ya desbloqueada",
+      "",
+      "- **Bloqueos:** `[Resuelto el 2026-10-05]` — era `[dependencia]` esperaba la Tarea 7.",
+      "",
+      "<!-- agent-context-kit:section=grouped -->",
+      "## Agrupadas",
+    ].join("\n");
+    const model = buildModel({ handoffText: fixture("minimal", "handoff.md"), backlogText: backlog });
+    expect(model.blocked[0].block.tag).toBeNull();
+    expect(model.warnings).toEqual(['Tarea 8 está en "bloqueadas" sin bloqueo vigente: ¿moverla a libres? (Regla 7)']);
+  });
+
   test("avisa placeholders sin completar", () => {
     const handoff =
       "<!-- agent-context-kit:section=in-progress -->\n## X\n\n**Tarea:** [Placeholder]\n\n<!-- agent-context-kit:section=paused -->\n## Y\n";
@@ -60,10 +79,30 @@ describe("buildModel", () => {
 describe("blockInfo", () => {
   const task = (value) => ({ fields: [{ label: "Bloqueos", value }] });
 
-  test("ignora bloqueos resueltos, placeholders y links markdown", () => {
-    expect(blockInfo(task("`[Resuelto el 2026-01-01]` — era `[dependencia]` x")).tag).toBe("dependencia");
+  test("un campo que empieza con [Resuelto…] es historial: no devuelve el bloqueo viejo", () => {
+    expect(blockInfo(task("`[Resuelto el 2026-01-01]` — era `[dependencia]` x"))).toEqual({ tag: null, reason: null });
+    expect(blockInfo(task("[Resolved on 2026-01-01] — was [dependency] x")).tag).toBeNull();
+  });
+
+  test("bloqueo vigente primero e historial después: tag y motivo del vigente", () => {
+    const info = blockInfo(task("`[dependencia]` espera la Tarea 14. Antes: `[Resuelto el 2026-10-05]` — era `[postergada]` x"));
+    expect(info).toEqual({ tag: "dependencia", reason: "espera la Tarea 14." });
+  });
+
+  test("busca en cualquier campo y salta los que son historial", () => {
+    const info = blockInfo({
+      fields: [
+        { label: "Bloqueos", value: "`[Resuelto el 2026-01-01]` — era `[dependencia]` x" },
+        { label: "Notas", value: "`[postergada]` conviene esperar" },
+      ],
+    });
+    expect(info.tag).toBe("postergada");
+  });
+
+  test("ignora placeholders y links markdown", () => {
     expect(blockInfo(task("[Placeholder — motivo]")).tag).toBeNull();
     expect(blockInfo(task("ver [el diseño](../x.md)")).tag).toBeNull();
+    expect(blockInfo(task("ver [el diseño](../x.md) `[dependencia]` x")).tag).toBe("dependencia");
   });
 
   test("acepta el tag sin backticks", () => {
