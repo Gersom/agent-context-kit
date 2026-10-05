@@ -9,10 +9,13 @@
     "url": "git+https://github.com/Gersom/agent-context-kit.git"
   },
   "scripts": {
-    "tasks": "bun scripts/task-tracker/index.js",
-    "test": "bun test"
+    "tasks": "bun scripts/task-tracker/index.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "picocolors": "^1.1.1"
+    "@types/bun": "^1.4.2",
+    "picocolors": "^1.1.1",
+    "typescript": "^7.0.2"
   }
 }

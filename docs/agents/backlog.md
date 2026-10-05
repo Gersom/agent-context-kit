@@ -11,7 +11,7 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 
 **Dos secciones:** las tareas viven en "Tareas libres" (listas para tomar) o "Tareas bloqueadas / pospuestas" (no se toman todavía). Cuando el motivo de una tarea bloqueada deja de aplicar, se mueve a "Tareas libres" — ver Regla 7 de `rules.md` (no se borra el campo `Bloqueos`, se marca como resuelto).
 
-**Agrupamiento (solo en "Tareas libres"):** si esta sección supera las 15 tareas (Regla 7 de `rules.md`), se evalúa agrupar 2 o más que compartan un objetivo real. El criterio no es un tope de cantidad — es que el grupo entero quepa en una sola frase de objetivo compartido, sin usar "y" para forzar una tarea que en realidad no pertenece. Un grupo aparece en "Tareas libres" como una sola línea corta; el detalle completo de cada tarea que lo compone se mueve a la sección "Tareas agrupadas" (más abajo), que no hace falta leer salvo que el operador pida el detalle de una tarea puntual o se vaya a tomar una. Si un grupo queda con una sola tarea (las demás se tomaron o cerraron), se desarma: esa tarea vuelve a ser una entrada individual normal en "Tareas libres". Hoy "Tareas libres" tiene 5 tareas — muy por debajo del umbral, no hay grupos formados.
+**Agrupamiento (solo en "Tareas libres"):** si esta sección supera las 15 tareas (Regla 7 de `rules.md`), se evalúa agrupar 2 o más que compartan un objetivo real. El criterio no es un tope de cantidad — es que el grupo entero quepa en una sola frase de objetivo compartido, sin usar "y" para forzar una tarea que en realidad no pertenece. Un grupo aparece en "Tareas libres" como una sola línea corta; el detalle completo de cada tarea que lo compone se mueve a la sección "Tareas agrupadas" (más abajo), que no hace falta leer salvo que el operador pida el detalle de una tarea puntual o se vaya a tomar una. Si un grupo queda con una sola tarea (las demás se tomaron o cerraron), se desarma: esa tarea vuelve a ser una entrada individual normal en "Tareas libres". Hoy "Tareas libres" tiene 4 tareas — muy por debajo del umbral, no hay grupos formados.
 
 **Numeración:** cada tarea tiene un número correlativo fijo, asignado una sola vez al crearse. El número **nunca se reutiliza**, ni siquiera cuando la tarea se cierra (hecha o descartada) y pasa a `history.md`. No es un orden de cola: se puede tomar tareas fuera de orden.
 
@@ -58,18 +58,6 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Detalles:** las normas a verificar salen de `src/docs/template-architecture.md` (sección "Anclas de sección") y de las plantillas de `src/template/agents/`; ante una diferencia, gana la plantilla (Regla 4). Dependencias en `devDependencies` del `package.json` raíz (ver `rules.md`).
 - **Agregada:** 2026-10-05.
 
-### Tarea 18 — Migrar a TypeScript
-
-- **Descripción:** pasar `scripts/task-tracker/` de JavaScript a TypeScript (incluidos los tests), aprovechando que Bun ejecuta `.ts` directamente sin compilar. Revierte la decisión de la Tarea 10 de usar JavaScript (ver `history.md`), tomada porque el operador había pedido `index.js`.
-- **Decisiones/temas a definir antes de empezar:**
-  - Orden respecto de la Tarea 11 (la Tarea 14, reestructuración, ya se cerró: la estructura de carpetas es la definitiva).
-  - Nivel de estrictez de `tsconfig.json` (ej. `strict: true`) y si se agrega un chequeo de tipos (`tsc --noEmit` con `typescript` en `devDependencies`) como script del `package.json` raíz.
-  - Si los futuros scripts de `scripts/` (ej. Tarea 15) también van en TypeScript por defecto — sería una regla nueva en `rules.md`.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador la priorice.
-- **Detalles:** el script `"tasks"` del `package.json` raíz pasa a apuntar a `scripts/task-tracker/index.ts`; actualizar `docs/architecture.md` y la regla de `scripts/` en `rules.md`. Los 64 tests de `bun test` tienen que seguir pasando.
-- **Agregada:** 2026-10-05.
-
 ### Tarea 11 — Refinar script de seguimiento de tareas
 
 - **Descripción:** pulir el script de la Tarea 10 para que la salida sea más detallada y robusta, y cerrar el circuito para los repos que ya adoptaron el skill.
@@ -102,4 +90,4 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 <!-- agent-context-kit:section=grouped -->
 ## Tareas agrupadas
 
-No aplica todavía — ningún grupo formado ("Tareas libres" tiene 5 tareas, bien por debajo del umbral de 15).
+No aplica todavía — ningún grupo formado ("Tareas libres" tiene 4 tareas, bien por debajo del umbral de 15).

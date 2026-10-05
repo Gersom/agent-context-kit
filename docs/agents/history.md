@@ -14,6 +14,18 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-10-05 — ✅ Tarea 18 — Migrar a TypeScript
+
+- `scripts/task-tracker/` (código y tests, 32 archivos) pasó de JavaScript a TypeScript con `git mv`, imports con extensión `.ts`. Bun ejecuta `.ts` sin compilar; `"tasks"` apunta ahora a `index.ts`. Revierte la decisión de la Tarea 10 de usar JavaScript.
+- Configuración en la raíz: `tsconfig.json` (la recomendada por Bun, con `strict: true`, sobre `scripts/**/*.ts`), `typescript` y `@types/bun` en `devDependencies`, y script `bun run typecheck` (`tsc --noEmit`). Por qué el chequeo: Bun ejecuta TypeScript **sin revisar tipos**, así que sin `tsc` los errores de tipos pasarían desapercibidos.
+- Tipos: los tipos que vivían en comentarios JSDoc pasaron a TypeScript; los compartidos (tarea, grupo, sección, modelo, resultados de lectura y de rutas) quedaron en `src/shared/types.ts`. Sin `any` ni aserciones `!`. Ningún error de `tsc` apuntó a un bug real: todos eran de tipos (anotaciones faltantes, comprobaciones de `null` que TypeScript no deducía).
+- Se unificó la función de hora que había quedado duplicada en la Tarea 14: ahora vive en `src/shared/time.ts`, así `io/` no depende de `ui/`.
+- Verificación: `bun test` → 64 tests, todos pasan (5 corridas); `bun run typecheck` sin errores; `bun run tasks . --once` contra este repo muestra la tarea en curso; ruta inexistente → código 1. Comparando textos y regex con la versión JavaScript, solo cambian tipos, comentarios y la unificación de la hora.
+- Decisiones del operador: `strict: true`; chequeo de tipos; TypeScript por defecto para los scripts nuevos de `scripts/` (regla nueva en `rules.md`, junto con que `bun run typecheck` tiene que pasar igual que `bun test`). Se actualizó también `docs/architecture.md`.
+- Sugerencia que quedó sin aplicar: activar `noUncheckedIndexedAccess` (más seguro con los accesos por índice y los grupos de regex, a costa de varios chequeos más).
+- El operador decidió no hacer la revisión que `gentle-ai` propuso sobre las Tareas 17 y 14 (~3100 líneas, mayormente archivos movidos); el rechazo quedó registrado en `gentle-ai`.
+- Al revisar las bloqueadas (Regla 7): ninguna dependía de esta tarea.
+
 ## 2026-10-05 — ✅ Tarea 14 — Estructuración del script de seguimiento de tareas
 
 - Refactor puro de `scripts/task-tracker/`, con la estructura acordada con el operador: `index.js` queda solo como arranque; `src/app.js` (ciclo leer → modelo → pintar, watcher, Ctrl+C); `src/cli/` (argumentos, pregunta de la ruta); `src/io/` (rutas, lectura, watcher, lectura con memoria); `src/parse/` (`parser.js` de ~300 líneas dividido en markdown, secciones, bloques, handoff y backlog); `src/model/` (`blockInfo` separado de `buildModel`); `src/ui/` (render y utilidades de formato).

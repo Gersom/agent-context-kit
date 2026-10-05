@@ -57,8 +57,9 @@ Estas reglas vienen con el skill y aplican sin importar el proyecto. No se borra
 
 ## Reglas específicas de este proyecto
 
-- No hay linter/formatter configurado. El skill en sí (`src/`: `SKILL.md`, flujos y plantillas `.md`) es documentación markdown pura, sin código ejecutable ni build step. El repo tiene además herramientas propias en `scripts/` (JavaScript con Bun, ej. `scripts/task-tracker/`) que **no forman parte del skill distribuido** ni se copian a los repos destino.
+- No hay linter/formatter configurado. El skill en sí (`src/`: `SKILL.md`, flujos y plantillas `.md`) es documentación markdown pura, sin código ejecutable ni build step. El repo tiene además herramientas propias en `scripts/` (TypeScript con Bun, ej. `scripts/task-tracker/`) que **no forman parte del skill distribuido** ni se copian a los repos destino.
 - Dependencias de `scripts/`: solo en `devDependencies` del `package.json` raíz — no un `package.json` por script. Se instalan con `bun install` en la raíz; `node_modules/` no se commitea y `bun.lock` sí. Tests con `bun test` desde la raíz.
+- Los scripts nuevos de `scripts/` se escriben en **TypeScript** por defecto (decisión del operador, 2026-10-05), con el `tsconfig.json` de la raíz (`strict`). Bun ejecuta `.ts` sin revisar tipos, así que `bun run typecheck` (`tsc --noEmit`) tiene que pasar sin errores junto con `bun test`.
 - Los nombres de archivo del catálogo (`backlog.md`, `handoff.md`, `stack.md`, etc.) se mantienen siempre en inglés, independientemente del idioma del contenido (ver regla por defecto 3).
 - Versionado con SemVer: `package.json` (`version`) + tags de git `vX.Y.Z`, con releases manuales en GitHub por tag — no automatizado vía CI, porque los releases son poco frecuentes y esto es un repo de documentación, no software que se despliega. Criterio de bump:
   - **patch** — fixes/ajustes de redacción en plantillas existentes.
