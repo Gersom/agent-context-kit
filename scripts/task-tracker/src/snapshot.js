@@ -14,7 +14,10 @@ export const RETRY_MS = 300;
  * - Falla un archivo que ya se leyó bien en la sesión → si se permite reintentar, `needsRetry`
  *   (quien llama vuelve a leer en `RETRY_MS`); si no, se usa la última versión buena con aviso.
  * - Falla un archivo que nunca se leyó bien → se devuelve tal cual (`null` o vacío) y el modelo
- *   decide (ej. sin `backlog.md` es el set mínimo, no un error).
+ *   decide (ej. sin `backlog.md` es el set mínimo, no un error). Solo en la **primera** lectura
+ *   de la sesión se pide un reintento (el tracker pudo arrancar justo mientras un agente
+ *   reescribía el archivo); en lecturas posteriores no, para no sumar `RETRY_MS` a cada
+ *   redibujo de un set mínimo.
  * @param {string} agentsDir
  * @param {{ readFile?: typeof readFileSafe, now?: () => Date, formatTime?: (date: Date) => string }} [options]
  */
@@ -22,6 +25,7 @@ export function createSnapshotReader(agentsDir, options = {}) {
   const { readFile = readFileSafe, now = () => new Date(), formatTime = defaultFormatTime } = options;
   /** @type {Record<string, { text: string, at: Date } | null>} */
   const lastGood = Object.fromEntries(WATCHED_FILES.map((name) => [name, null]));
+  let isFirstRead = true;
 
   /**
    * @param {{ allowRetry?: boolean }} [readOptions]
@@ -31,6 +35,8 @@ export function createSnapshotReader(agentsDir, options = {}) {
     const texts = {};
     const warnings = [];
     let needsRetry = false;
+    const firstRead = isFirstRead;
+    isFirstRead = false;
 
     for (const name of WATCHED_FILES) {
       const { text, error, code } = readFile(join(agentsDir, name));
@@ -42,6 +48,7 @@ export function createSnapshotReader(agentsDir, options = {}) {
 
       const previous = lastGood[name];
       if (!previous) {
+        if (allowRetry && firstRead) needsRetry = true;
         texts[name] = text;
         if (error) warnings.push(error);
         continue;

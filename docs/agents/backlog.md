@@ -19,7 +19,7 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 
 **Anclas de sección:** cada sección de tareas va precedida por un comentario `<!-- agent-context-kit:section=... -->` (`free`, `blocked`, `grouped`). Son comentarios de máquina — los usa el script de seguimiento de tareas (`scripts/task-tracker/`) para ubicar las secciones sin depender del idioma de los headers. No se traducen, no se borran ni se mueven al actualizar este archivo. Detalle completo en [`../../src/docs/template-architecture.md`](../../src/docs/template-architecture.md), sección "Anclas de sección".
 
-**Próximo número de tarea:** 17
+**Próximo número de tarea:** 18
 
 ---
 
@@ -62,9 +62,9 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 
 - **Descripción:** reorganizar las carpetas y archivos de `scripts/task-tracker/` para que la estructura acompañe el crecimiento del script (hoy `src/` tiene 5 archivos planos y `parser.js` ya ronda las 300 líneas), sin cambiar su comportamiento.
 - **Decisiones/temas a definir antes de empezar:** qué estructura — se define con el operador al empezar esta tarea (propuesta inicial: subcarpetas por responsabilidad — `cli/`, `io/`, `parse/`, `model/`, `ui/` — con los tests espejando esa estructura).
-- **Bloqueos:** `[Resuelto el 2026-10-05]` — era `[dependencia]` depende de que la Tarea 13 (Corregir observaciones de la revisión del script) esté resuelta — orden 13 → 14 → 11 definido por el operador el 2026-10-05; además, los tests del punto de entrada y del watcher que suma la 13 cubren este refactor. La Tarea 13 se cerró el 2026-10-05 (ver `history.md`).
+- **Bloqueos:** `[Resuelto el 2026-10-05]` — era `[dependencia]` depende de que la Tarea 17 (Corregir observaciones de la segunda revisión del script) esté resuelta — el operador pidió hacerla antes de esta (2026-10-05), para que esta siga siendo un refactor puro. Antes: `[Resuelto el 2026-10-05]` — era `[dependencia]` depende de que la Tarea 13 (Corregir observaciones de la revisión del script) esté resuelta — orden 13 → 14 → 11 definido por el operador el 2026-10-05; además, los tests del punto de entrada y del watcher que suma la 13 cubren este refactor. La Tarea 13 se cerró el 2026-10-05 (ver `history.md`). La Tarea 17 se cerró el 2026-10-05 (ver `history.md`).
 - **Desbloquea:** Tarea 11.
-- **Disparador:** cuando se cierre la Tarea 13.
+- **Disparador:** cuando el operador la tome (ya no está bloqueada; va antes de la Tarea 11).
 - **Detalles:** es un refactor puro: los tests de `bun test` tienen que pasar igual antes y después; actualizar `docs/architecture.md` con la estructura nueva.
 - **Agregada:** 2026-10-05.
 

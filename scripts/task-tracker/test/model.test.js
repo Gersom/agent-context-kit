@@ -59,6 +59,8 @@ describe("buildModel", () => {
       "",
       "### Tarea 8 — Ya desbloqueada",
       "",
+      // Un `[algo]` en medio de otro campo no cuenta como bloqueo ni oculta el aviso.
+      "- **Descripción:** revisar el caso [algo] del diseño.",
       "- **Bloqueos:** `[Resuelto el 2026-10-05]` — era `[dependencia]` esperaba la Tarea 7.",
       "",
       "<!-- agent-context-kit:section=grouped -->",
@@ -102,10 +104,27 @@ describe("blockInfo", () => {
   test("ignora placeholders y links markdown", () => {
     expect(blockInfo(task("[Placeholder — motivo]")).tag).toBeNull();
     expect(blockInfo(task("ver [el diseño](../x.md)")).tag).toBeNull();
-    expect(blockInfo(task("ver [el diseño](../x.md) `[dependencia]` x")).tag).toBe("dependencia");
+    expect(blockInfo(task("[el diseño](../x.md) `[dependencia]` x")).tag).toBeNull();
   });
 
-  test("acepta el tag sin backticks", () => {
+  test("acepta el tag inicial con o sin backticks", () => {
     expect(blockInfo(task("[postergada] sin backticks")).tag).toBe("postergada");
+    expect(blockInfo(task("  `[dependencia]` con espacios antes")).tag).toBe("dependencia");
+  });
+
+  test("solo cuenta el tag con el que empieza el campo, no uno en el medio", () => {
+    expect(blockInfo(task("ver `[dependencia]` más abajo")).tag).toBeNull();
+    const info = blockInfo({
+      fields: [
+        { label: "Descripción", value: "revisar el caso [algo] del diseño" },
+        { label: "Bloqueos", value: "`[dependencia]` espera la Tarea 3." },
+      ],
+    });
+    expect(info).toEqual({ tag: "dependencia", reason: "espera la Tarea 3." });
+  });
+
+  test("el recorte de una etiqueta final tipo 'Antes:' solo se aplica si hay historial", () => {
+    expect(blockInfo(task("`[dependencia]` falta definir el formato, ver:")).reason).toBe("falta definir el formato, ver:");
+    expect(blockInfo(task("`[dependencia]` espera X. Antes: `[Resuelto el 2026-10-05]` — era y")).reason).toBe("espera X.");
   });
 });

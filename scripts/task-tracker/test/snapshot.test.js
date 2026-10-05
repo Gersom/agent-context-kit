@@ -61,17 +61,32 @@ describe("createSnapshotReader", () => {
     expect(snap.warnings).toEqual(["backlog.md no se pudo leer (error EBUSY): mostrando la versión de las 16:20:00."]);
   });
 
-  test("backlog.md que nunca existió (set mínimo): null, sin aviso ni reintento", () => {
+  test("backlog.md que nunca existió (set mínimo): solo se reintenta en la primera lectura", () => {
     const fs = fakeFs({ "handoff.md": "# H", "backlog.md": null });
     const reader = createSnapshotReader("/x", options(fs.readFile));
-    reader.read();
+    expect(reader.read().needsRetry).toBe(true);
     const snap = reader.read();
     expect(snap).toEqual({ handoffText: "# H", backlogText: null, warnings: [], needsRetry: false });
   });
 
-  test("error de lectura de un archivo nunca leído: se informa tal cual", () => {
+  test("primera lectura con handoff.md vacío (un agente lo está reescribiendo): pide reintento", () => {
+    const fs = fakeFs({ "handoff.md": "", "backlog.md": "# B" });
+    const reader = createSnapshotReader("/x", options(fs.readFile));
+    expect(reader.read().needsRetry).toBe(true);
+    fs.files["handoff.md"] = "# H";
+    expect(reader.read({ allowRetry: false })).toEqual({ handoffText: "# H", backlogText: "# B", warnings: [], needsRetry: false });
+  });
+
+  test("sin permiso de reintento (--once), la primera lectura no pide reintento", () => {
+    const fs = fakeFs({ "handoff.md": "", "backlog.md": null });
+    expect(createSnapshotReader("/x", options(fs.readFile)).read({ allowRetry: false }).needsRetry).toBe(false);
+  });
+
+  test("error de lectura de un archivo nunca leído: reintento en la primera lectura y después se informa tal cual", () => {
     const fs = fakeFs({ "handoff.md": { code: "EPERM" }, "backlog.md": null });
-    const snap = createSnapshotReader("/x", options(fs.readFile)).read();
+    const reader = createSnapshotReader("/x", options(fs.readFile));
+    expect(reader.read().needsRetry).toBe(true);
+    const snap = reader.read({ allowRetry: false });
     expect(snap.handoffText).toBeNull();
     expect(snap.needsRetry).toBe(false);
     expect(snap.warnings).toEqual(["No se pudo leer handoff.md: EPERM"]);

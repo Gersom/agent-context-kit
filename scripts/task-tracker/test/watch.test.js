@@ -4,10 +4,27 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { invocationDir, watchDir } from "../src/reader.js";
 
-const DEBOUNCE_MS = 50;
-// Margen amplio: fs.watch en Windows puede entregar los eventos con algo de retraso.
-const SETTLE_MS = 600;
+const DEBOUNCE_MS = 100;
+// Silencio que se espera después del primer aviso para afirmar que no llega otro.
+const QUIET_MS = DEBOUNCE_MS * 4;
+// Tope de cada espera: fs.watch en Windows (o una máquina cargada) puede entregar los eventos
+// con retraso, así que se espera hasta que se cumpla la condición en vez de un tiempo fijo.
+const WAIT_TIMEOUT_MS = 4000;
+const TEST_TIMEOUT_MS = 15000;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Espera en bucle hasta que `condition()` sea verdadera; falla si se pasa del tope.
+ * @param {() => boolean} condition
+ * @param {{ timeout?: number, interval?: number }} [options]
+ */
+async function waitFor(condition, { timeout = WAIT_TIMEOUT_MS, interval = 20 } = {}) {
+  const start = Date.now();
+  while (!condition()) {
+    if (Date.now() - start > timeout) throw new Error(`waitFor: la condición no se cumplió en ${timeout} ms`);
+    await sleep(interval);
+  }
+}
 
 describe("watchDir", () => {
   let dir;
@@ -15,13 +32,42 @@ describe("watchDir", () => {
   let calls;
   let errors;
 
-  beforeEach(async () => {
+  /** Espera hasta que pasen `QUIET_MS` sin avisos nuevos. */
+  async function waitForQuiet() {
+    let count = calls.length;
+    let since = Date.now();
+    await waitFor(() => {
+      if (calls.length !== count) {
+        count = calls.length;
+        since = Date.now();
+      }
+      return Date.now() - since >= QUIET_MS;
+    });
+  }
+
+  /**
+   * "Calienta" el watcher: escribe handoff.md en bucle hasta recibir el primer aviso (así se sabe
+   * que ya está enganchado), espera a que se calme y reinicia el registro de avisos.
+   */
+  async function warmUp() {
+    let n = 0;
+    await waitFor(
+      () => {
+        if (calls.length > 0) return true;
+        writeFileSync(join(dir, "handoff.md"), `# calentando ${n++}\n`);
+        return false;
+      },
+      { interval: DEBOUNCE_MS * 2 },
+    );
+    await waitForQuiet();
+    calls.length = 0;
+  }
+
+  beforeEach(() => {
     dir = mkdtempSync(join(tmpdir(), "task-tracker-watch-"));
     calls = [];
     errors = [];
     stop = watchDir(dir, (file) => calls.push(file), (message) => errors.push(message), DEBOUNCE_MS);
-    // Darle tiempo al watcher a engancharse antes de escribir.
-    await sleep(100);
   });
 
   afterEach(() => {
@@ -29,25 +75,46 @@ describe("watchDir", () => {
     rmSync(dir, { recursive: true, force: true });
   });
 
-  test("varias escrituras seguidas → un solo aviso con el nombre del archivo", async () => {
-    for (const n of [1, 2, 3]) writeFileSync(join(dir, "handoff.md"), `# Handoff ${n}\n`);
-    await sleep(SETTLE_MS);
-    expect(errors).toEqual([]);
-    expect(calls).toEqual(["handoff.md"]);
-  });
+  test(
+    "varias escrituras seguidas → un solo aviso con el nombre del archivo",
+    async () => {
+      await warmUp();
+      for (const n of [1, 2, 3]) writeFileSync(join(dir, "handoff.md"), `# Handoff ${n}\n`);
+      await waitFor(() => calls.length >= 1);
+      await waitForQuiet();
+      expect(errors).toEqual([]);
+      expect(calls).toEqual(["handoff.md"]);
+    },
+    TEST_TIMEOUT_MS,
+  );
 
-  test("ignora archivos que no son handoff.md ni backlog.md", async () => {
-    writeFileSync(join(dir, "otro.txt"), "x");
-    writeFileSync(join(dir, "history.md"), "x");
-    await sleep(SETTLE_MS);
-    expect(calls).toEqual([]);
-  });
+  test(
+    "ignora archivos que no son handoff.md ni backlog.md",
+    async () => {
+      await warmUp();
+      writeFileSync(join(dir, "otro.txt"), "x");
+      writeFileSync(join(dir, "history.md"), "x");
+      // Marcador: cuando llega su aviso, cualquier evento de los otros archivos ya se procesó,
+      // así la aserción negativa no depende de un tiempo fijo.
+      writeFileSync(join(dir, "handoff.md"), "# marcador\n");
+      await waitFor(() => calls.length >= 1);
+      await waitForQuiet();
+      expect(calls).toEqual(["handoff.md"]);
+    },
+    TEST_TIMEOUT_MS,
+  );
 
-  test("informa el último archivo vigilado que cambió", async () => {
-    writeFileSync(join(dir, "backlog.md"), "# Backlog\n");
-    await sleep(SETTLE_MS);
-    expect(calls).toEqual(["backlog.md"]);
-  });
+  test(
+    "informa el último archivo vigilado que cambió",
+    async () => {
+      await warmUp();
+      writeFileSync(join(dir, "backlog.md"), "# Backlog\n");
+      await waitFor(() => calls.length >= 1);
+      await waitForQuiet();
+      expect(calls).toEqual(["backlog.md"]);
+    },
+    TEST_TIMEOUT_MS,
+  );
 });
 
 describe("invocationDir", () => {

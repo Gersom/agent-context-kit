@@ -14,11 +14,20 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-10-05 — ✅ Tarea 17 — Corregir observaciones de la segunda revisión del script
+
+- **Tag de bloqueo:** `blockInfo` solo acepta el tag con el que **empieza** el valor de un campo (con o sin backticks); los tags en medio del texto se ignoran, así un `[algo]` dentro de `Descripción` ya no se toma como bloqueo ni oculta el aviso "sin bloqueo vigente". Convención ajustada en `src/docs/template-architecture.md` y en el campo `Bloqueos` de `src/template/agents/backlog.md` ("el valor empieza con la etiqueta del motivo"). Todos los `Bloqueos` de este backlog ya cumplían.
+- **Motivo:** la etiqueta final tipo "Antes:" se recorta solo cuando hay historial después; un motivo que termina en "ver:" queda intacto.
+- **Primera lectura:** `src/snapshot.js` reintenta una vez un archivo que todavía no se leyó bien, solo en la primera lectura de la sesión (si el tracker arranca justo mientras un agente lo reescribe); en lecturas posteriores no, para no sumar 300 ms a cada redibujo del set mínimo.
+- **Tests de `watchDir`:** sin esperas fijas para lo que puede fallar por lentitud — esperan en bucle con tope, "calientan" el watcher antes de medir y comprueban que otro archivo no avisa usando un `handoff.md` marcador.
+- Verificación: `bun test` → 64 tests, todos pasan, en 9 corridas seguidas (6 del agente que implementó + 3 de revisión).
+- Al revisar las bloqueadas (Regla 7): la Tarea 14 dependía de esta tarea → movida a "Tareas libres" con su bloqueo marcado como resuelto. La Tarea 11 sigue bloqueada por la 14.
+
 ## 2026-10-05 — ✅ Tarea 16 — Segunda revisión de código de la rama `feat/task-tracker`
 
 - Revisión de lo sumado desde la revisión de la Tarea 12 (sobre todo la Tarea 13, `95382d7`; ~490 líneas), pedida por el operador después de que `gentle-ai review assess` volviera a marcar riesgo medio con el presupuesto del slice superado. Revisión nativa de `gentle-ai` (lente `review-reliability`) con consentimiento del operador.
-- Resultado: **aprobada** y confirmada (`review-5dffdeca0adb3fba`). Sin hallazgos bloqueantes; 4 observaciones no bloqueantes, pendientes de decidir con el operador dónde se resuelven:
-  - (WARNING) `blockInfo` recorre los campos en orden y toma el primer tag de cada uno: un `[algo]` sin backticks (que no sea link) en un campo anterior a `Bloqueos` (ej. `Descripción`) se toma como tag de bloqueo en lugar del real, y puede ocultar el aviso "sin bloqueo vigente". El código anterior priorizaba los tags con backticks en todos los campos.
+- Resultado: **aprobada** y confirmada (`review-5dffdeca0adb3fba`). Sin hallazgos bloqueantes; 4 observaciones no bloqueantes, todas resueltas en la Tarea 17:
+  - (WARNING, resuelta en la Tarea 17) `blockInfo` recorre los campos en orden y toma el primer tag de cada uno: un `[algo]` sin backticks (que no sea link) en un campo anterior a `Bloqueos` (ej. `Descripción`) se toma como tag de bloqueo en lugar del real, y puede ocultar el aviso "sin bloqueo vigente". El código anterior priorizaba los tags con backticks en todos los campos.
   - (SUGGESTION) El recorte de una etiqueta final tipo `Antes:` en el motivo se aplica siempre, aunque no haya historial: un motivo que termina en `ver:` pierde esa palabra. Aplicarlo solo cuando hay historial.
   - (SUGGESTION) Un archivo que nunca se leyó bien no se reintenta: si el tracker arranca justo mientras un agente reescribe `handoff.md` (o está trabado), muestra vacío/error hasta el próximo evento. Antes sí se reintentaba en la primera lectura.
   - (SUGGESTION) Los tests de `watchDir` usan esperas fijas (100 ms / 600 ms); en una máquina cargada podrían fallar de forma intermitente. Mejor esperar en bucle hasta que se cumpla la condición, con un tope.
