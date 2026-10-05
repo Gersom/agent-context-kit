@@ -19,7 +19,7 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 
 **Anclas de sección:** cada sección de tareas va precedida por un comentario `<!-- agent-context-kit:section=... -->` (`free`, `blocked`, `grouped`). Son comentarios de máquina — los usa el script de seguimiento de tareas (`scripts/task-tracker/`) para ubicar las secciones sin depender del idioma de los headers. No se traducen, no se borran ni se mueven al actualizar este archivo. Detalle completo en [`../../src/docs/template-architecture.md`](../../src/docs/template-architecture.md), sección "Anclas de sección".
 
-**Próximo número de tarea:** 19
+**Próximo número de tarea:** 21
 
 ---
 
@@ -58,21 +58,13 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Detalles:** las normas a verificar salen de `src/docs/template-architecture.md` (sección "Anclas de sección") y de las plantillas de `src/template/agents/`; ante una diferencia, gana la plantilla (Regla 4). Dependencias en `devDependencies` del `package.json` raíz (ver `rules.md`).
 - **Agregada:** 2026-10-05.
 
-### Tarea 11 — Refinar script de seguimiento de tareas
+### Tarea 20 — Actualizar la sección "Estructura del repositorio" del README raíz
 
-- **Descripción:** pulir el script de la Tarea 10 para que la salida sea más detallada y robusta, y cerrar el circuito para los repos que ya adoptaron el skill.
-- **Decisiones/temas a definir antes de empezar:**
-  - Qué nivel de detalle mostrar por tarea (ej. solo título vs. descripción, bloqueos, disparador, motivo de pausa, qué espera para retomarse).
-  - Si se agregan atajos de teclado (ej. `q` para salir, alternar vista compacta/detallada).
-- **Bloqueos:** `[Resuelto el 2026-10-05]` — era `[dependencia]` depende de que la Tarea 14 (Estructuración del script de seguimiento de tareas) esté resuelta — orden 13 → 14 → 11 definido por el operador el 2026-10-05. Antes: `[Resuelto el 2026-10-05]` — era `[dependencia]` depende de que la Tarea 10 (Crear script funcional de seguimiento de tareas) esté resuelta. La Tarea 10 se cerró el 2026-10-05 (ver `history.md`). La Tarea 14 se cerró el 2026-10-05 (ver `history.md`).
-- **Disparador:** cuando el operador la tome (ya no está bloqueada).
-- **Detalles:**
-  - Salida más detallada: encabezado con nombre/path del proyecto vigilado, hora de la última actualización y qué archivo cambió; estados vacíos claros ("Sin tarea en curso", "Ninguna"); errores de parseo visibles en pantalla en vez de silenciosos; ajuste al ancho de la terminal.
-  - Robustez: placeholders de plantilla sin completar, saltos de línea CRLF y paths de Windows.
-  - Ya cubierto por la Tarea 10 (ver `history.md`), solo revisar si alcanza: encabezado con proyecto/ruta/hora/archivo que cambió, estados vacíos, avisos en pantalla, recorte al ancho de la terminal, CRLF, aviso de placeholders y comillas en rutas pegadas.
-  - Las observaciones no bloqueantes de la revisión de la Tarea 12 se sacaron de acá: las resuelve la Tarea 13 (Corregir observaciones de la revisión del script), que se hace antes que esta.
-  - Documentar cómo usar el script (README del repo y/o de `scripts/task-tracker/`).
-  - Entregar al operador el **prompt de normalización** para los repos que ya adoptaron el skill: un prompt que le pida al agente de ese repo agregar las anclas de la Tarea 9 y ajustar `backlog.md`/`handoff.md` a la estructura que espera el script.
+- **Descripción:** la sección "Estructura del repositorio" de `README.md` está desactualizada: muestra `SKILL.md` y `template/` en la raíz, cuando hoy viven en `src/` (y no menciona `docs/`, `scripts/` ni `package.json`). Alinearla con la estructura real, linkeando a `docs/architecture.md` en vez de duplicar el árbol completo (Regla 1).
+- **Decisiones/temas a definir antes de empezar:** Ninguno.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador quiera, o antes del release `v1.1.0`.
+- **Detalles:** detectado durante la Tarea 11 al sumar al README la sección del task-tracker; quedó fuera de su alcance.
 - **Agregada:** 2026-10-05.
 
 <!-- agent-context-kit:section=blocked -->
@@ -86,6 +78,15 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Disparador:** cuando el operador quiera hacer pública la skill, o priorice esta tarea explícitamente.
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
+
+### Tarea 19 — Prompt de normalización para repos que ya adoptaron el skill
+
+- **Descripción:** escribir el prompt que el operador corre en cada repo que adoptó el skill antes de las anclas (Tarea 9), para que el agente de ese repo agregue las anclas de sección y ajuste `backlog.md`/`handoff.md` (y el formato de `history.md`) a la estructura que lee el task-tracker. Se entrega al operador en el chat y queda guardado junto al script para reusarlo.
+- **Decisiones/temas a definir antes de empezar:** dónde queda guardado (propuesta: README de `scripts/task-tracker/`).
+- **Bloqueos:** `[postergada]` hasta que el task-tracker llegue a su versión MVP (mínimo producto viable) — pedido del operador el 2026-10-05, porque el prompt tiene que reflejar la estructura final que lee el script. Qué cuenta como MVP lo decide el operador (el agente puede sugerirlo, el operador confirma).
+- **Disparador:** cuando el operador confirme que el task-tracker llegó a su MVP.
+- **Detalles:** antes estaba dentro de la Tarea 11; se sacó a esta tarea a pedido del operador. La Tarea 15 (validador) puede servir para verificar el resultado del prompt en cada repo.
+- **Agregada:** 2026-10-05.
 
 <!-- agent-context-kit:section=grouped -->
 ## Tareas agrupadas

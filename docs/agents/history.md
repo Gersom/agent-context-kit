@@ -14,6 +14,21 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-10-05 — ✅ Tarea 11 — Refinar script de seguimiento de tareas
+
+- **Pantalla rediseñada** a pedido del operador: encabezado con el nombre de la carpeta del repo en mayúsculas y sin guiones (`AGENT CONTEXT KIT`), la ruta del repo y "Última actualización HH:MM:SS · se modificó <archivo>"; un bloque por archivo con su separador `━━ archivo ━━`, en este orden:
+  - `history.md` — "TAREAS COMPLETADAS" con las 5 últimas entradas, compactas (`T-18: título`), **tachadas** (código ANSI de tachado) y con la fecha sin tachar; las descartadas marcadas con ✖. `history.md` ahora también se vigila y se lee (opcional, como `backlog.md`).
+  - `handoff.md` — en detalle: la tarea en progreso con su plan y cada subsección (`Qué falta`, `Próximo paso`, etc., con el título tal como está escrito), y cada pausada con todos sus campos.
+  - `backlog.md` — compacto (`T-N: título`); en las bloqueadas, debajo, las tareas que menciona su motivo (`→ espera T-3: título`), con aviso si esa tarea ya está cerrada en `history.md` (pista para la Regla 7).
+- **Atajos** en terminal interactiva: `q` / Ctrl+C salen, `r` redibuja. Sin terminal interactiva o con `--once`, no se activan.
+- **Documentación:** `scripts/task-tracker/README.md` (uso, rutas, atajos, qué lee y cómo, avisos frecuentes), mención en el `README.md` raíz y en `docs/architecture.md`; en `src/docs/template-architecture.md` se documentó el formato de `history.md` que lee el script (entradas `## <fecha> — ✅|❌ [Tarea N —] título`, nuevas arriba, sin anclas).
+- **Versión `1.1.0`** en `package.json` (bump minor acordado en la Tarea 9: anclas + script). El tag `v1.1.0` y el release en GitHub van después del merge a `main`, que decide el operador.
+- Verificación: `bun test` → 92 tests en 17 archivos, todos pasan (5 corridas); `bun run typecheck` sin errores; la salida contra este repo coincide con el diseño acordado.
+- Decisiones del operador: el prompt de normalización se sacó a la Tarea 19 (`[postergada]` hasta que el operador confirme el MVP del script); no hay vista alternable (por eso no hay atajo `d`); "completadas" incluye las descartadas; los guiones bajos del nombre del repo no se convierten.
+- Las dependencias de una bloqueada se muestran para cualquier tag cuyo motivo mencione tareas, no solo `[dependencia]`, porque el nombre del tag se traduce según el idioma.
+- Tarea nueva surgida: la 20 (sección "Estructura del repositorio" del `README.md` raíz, desactualizada desde antes).
+- Al revisar las bloqueadas (Regla 7): la Tarea 4 sigue esperando a la 3; la 19 sigue postergada hasta que el operador confirme el MVP.
+
 ## 2026-10-05 — ✅ Tarea 18 — Migrar a TypeScript
 
 - `scripts/task-tracker/` (código y tests, 32 archivos) pasó de JavaScript a TypeScript con `git mv`, imports con extensión `.ts`. Bun ejecuta `.ts` sin compilar; `"tasks"` apunta ahora a `index.ts`. Revierte la decisión de la Tarea 10 de usar JavaScript.

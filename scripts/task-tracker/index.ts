@@ -1,6 +1,9 @@
 // Seguimiento de tareas: vigila docs/agents/ de un proyecto y muestra en la terminal la tarea
-// en progreso, las pausadas y las pendientes de handoff.md / backlog.md, redibujando en cada
-// cambio. Pensado para correr en una terminal aparte mientras un agente trabaja en otra.
+// en progreso, las pausadas, las pendientes y las últimas completadas (handoff.md, backlog.md y
+// history.md), redibujando en cada cambio. Pensado para correr en una terminal aparte mientras
+// un agente trabaja en otra.
+//
+// Atajos (terminal interactiva): `q` o Ctrl+C salen, `r` redibuja.
 //
 // Uso (desde la raíz de agent-context-kit):
 //   bun run tasks                 → pregunta la ruta a vigilar
@@ -20,9 +23,9 @@ import type { ResolveOk } from "./src/shared/types.ts";
 const { once, pathArg } = parseArgs(process.argv.slice(2));
 
 const target = pathArg != null ? resolveFromArg(pathArg) : askForPath();
-const { agentsDir, projectName } = target;
+const { agentsDir, projectName, projectDir } = target;
 
-startApp({ agentsDir, projectName, once });
+startApp({ agentsDir, projectName, projectDir, once });
 
 /** Ruta pasada por argumento: si no es válida, se informa y se sale con código 1. */
 function resolveFromArg(input: string): ResolveOk {

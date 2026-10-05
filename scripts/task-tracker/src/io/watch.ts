@@ -1,4 +1,4 @@
-// Vigilancia de la carpeta de agentes: avisa cuando cambian handoff.md o backlog.md.
+// Vigilancia de la carpeta de agentes: avisa cuando cambian handoff.md, backlog.md o history.md.
 
 import { type FSWatcher, watch } from "node:fs";
 import { basename } from "node:path";

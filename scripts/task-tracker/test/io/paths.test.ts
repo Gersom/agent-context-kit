@@ -2,7 +2,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } fr
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { cleanPathInput, invocationDir, projectNameFor, resolveAgentsDir } from "../../src/io/paths.ts";
+import { cleanPathInput, invocationDir, projectDirFor, projectNameFor, resolveAgentsDir } from "../../src/io/paths.ts";
 import type { ResolveError, ResolveOk, ResolveResult } from "../../src/shared/types.ts";
 
 /** Afirma que la ruta se resolvió bien y lo deja tipado como tal. */
@@ -36,6 +36,7 @@ describe("resolveAgentsDir", () => {
   test("acepta la raíz del proyecto y busca docs/agents", () => {
     const result = expectOk(resolveAgentsDir(join(root, "mi-app")));
     expect(result.agentsDir).toBe(join(root, "mi-app", "docs", "agents"));
+    expect(result.projectDir).toBe(join(root, "mi-app"));
     expect(result.projectName).toBe("mi-app");
   });
 
@@ -67,6 +68,12 @@ describe("helpers de rutas", () => {
   test("projectNameFor usa la carpeta que contiene docs/agents", () => {
     expect(projectNameFor(join("x", "proy", "docs", "agents"))).toBe("proy");
     expect(projectNameFor(join("x", "suelta"))).toBe("suelta");
+  });
+
+  test("projectDirFor: la raíz del repo, o la carpeta vigilada si no sigue la estructura", () => {
+    expect(projectDirFor(join("x", "proy", "docs", "agents"))).toBe(join("x", "proy"));
+    expect(projectDirFor(join("x", "otra", "agent-context", "agents"))).toBe(join("x", "otra"));
+    expect(projectDirFor(join("x", "suelta"))).toBe(join("x", "suelta"));
   });
 });
 

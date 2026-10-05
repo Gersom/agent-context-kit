@@ -2,16 +2,66 @@ import { describe, expect, test } from "bun:test";
 import { buildModel } from "../../src/model/model.ts";
 import { fixture } from "../helpers.ts";
 
-const load = (name: string) => buildModel({ handoffText: fixture(name, "handoff.md"), backlogText: fixture(name, "backlog.md") });
+const load = (name: string) =>
+  buildModel({
+    handoffText: fixture(name, "handoff.md"),
+    backlogText: fixture(name, "backlog.md"),
+    historyText: fixture(name, "history.md"),
+  });
 
 describe("buildModel", () => {
-  test("tarea en curso con progreso del plan y próximo paso", () => {
+  test("tarea en curso con progreso del plan y sus subsecciones de detalle (sin la del plan)", () => {
     const { current } = load("es-anchors");
     if (!current) throw new Error("se esperaba una tarea en curso");
     expect(current.number).toBe(12);
     expect(current.plan).toMatchObject({ done: 2, total: 5 });
     expect(current.plan.currentStep?.text).toBe("Paso 3 — Escribir el modelo");
-    expect(current.nextStep).toBe("Paso 3 — escribir `model.js`.\nSegunda línea del próximo paso.");
+    expect(current.details).toEqual([
+      { title: "Qué falta", body: "Pasos 3 y 4." },
+      { title: "Próximo paso concreto", body: "Paso 3 — escribir `model.js`.\nSegunda línea del próximo paso." },
+    ]);
+  });
+
+  test("completadas: las 5 primeras entradas de history.md", () => {
+    const model = load("es-anchors");
+    expect(model.hasHistory).toBe(true);
+    expect(model.completed.map((e) => e.number)).toEqual([11, 10, null, 9, 7]);
+  });
+
+  test("sin history.md no hay completadas, ni aviso ni nota extra", () => {
+    const model = load("minimal");
+    expect(model.hasHistory).toBe(false);
+    expect(model.completed).toEqual([]);
+  });
+
+  test("bloqueadas: tareas de las que dependen, con su título", () => {
+    const model = load("es-anchors");
+    expect(model.blocked.map((t) => t.dependsOn)).toEqual([
+      [{ number: 3, title: "Exportar como skill", closed: false }],
+      [{ number: 4, title: "Deploy en skills.sh", closed: false }],
+    ]);
+  });
+
+  test("bloqueadas: marca la dependencia que ya está cerrada en history.md", () => {
+    const backlog = [
+      "<!-- agent-context-kit:section=free -->",
+      "## Libres",
+      "<!-- agent-context-kit:section=blocked -->",
+      "## Bloqueadas",
+      "",
+      "### Tarea 8 — Esperando una ya cerrada",
+      "",
+      "- **Bloqueos:** `[dependencia]` espera la Tarea 9 y la T-2.",
+    ].join("\n");
+    const model = buildModel({
+      handoffText: fixture("minimal", "handoff.md"),
+      backlogText: backlog,
+      historyText: fixture("es-anchors", "history.md"),
+    });
+    expect(model.blocked[0].dependsOn).toEqual([
+      { number: 9, title: "Preparar fixtures", closed: true },
+      { number: 2, title: null, closed: false },
+    ]);
   });
 
   test("libres con grupo enlazado a sus tareas agrupadas, y conteos", () => {

@@ -87,11 +87,11 @@ describe("watchDir", () => {
   );
 
   test(
-    "ignora archivos que no son handoff.md ni backlog.md",
+    "ignora archivos que no son handoff.md, backlog.md ni history.md",
     async () => {
       await warmUp();
       writeFileSync(join(dir, "otro.txt"), "x");
-      writeFileSync(join(dir, "history.md"), "x");
+      writeFileSync(join(dir, "rules.md"), "x");
       // Marcador: cuando llega su aviso, cualquier evento de los otros archivos ya se procesó,
       // así la aserción negativa no depende de un tiempo fijo.
       writeFileSync(join(dir, "handoff.md"), "# marcador\n");
@@ -110,6 +110,18 @@ describe("watchDir", () => {
       await waitFor(() => calls.length >= 1);
       await waitForQuiet();
       expect(calls).toEqual(["backlog.md"]);
+    },
+    TEST_TIMEOUT_MS,
+  );
+
+  test(
+    "también avisa cuando cambia history.md",
+    async () => {
+      await warmUp();
+      writeFileSync(join(dir, "history.md"), "# History\n");
+      await waitFor(() => calls.length >= 1);
+      await waitForQuiet();
+      expect(calls).toEqual(["history.md"]);
     },
     TEST_TIMEOUT_MS,
   );

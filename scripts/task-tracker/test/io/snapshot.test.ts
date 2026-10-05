@@ -24,9 +24,20 @@ const options = (readFile: ReadFile) => ({ readFile, now: () => new Date(2026, 9
 
 describe("createSnapshotReader", () => {
   test("primera lectura buena: devuelve el contenido sin avisos", () => {
-    const fs = fakeFs({ "handoff.md": "# H", "backlog.md": "# B" });
+    const fs = fakeFs({ "handoff.md": "# H", "backlog.md": "# B", "history.md": "# Hi" });
     const snap = createSnapshotReader("/x", options(fs.readFile)).read();
-    expect(snap).toEqual({ handoffText: "# H", backlogText: "# B", warnings: [], needsRetry: false });
+    expect(snap).toEqual({ handoffText: "# H", backlogText: "# B", historyText: "# Hi", warnings: [], needsRetry: false });
+  });
+
+  test("history.md se trata igual que los otros: última versión buena con aviso", () => {
+    const fs = fakeFs({ "handoff.md": "# H", "backlog.md": "# B", "history.md": "# Hi" });
+    const reader = createSnapshotReader("/x", options(fs.readFile));
+    reader.read();
+    fs.files["history.md"] = null;
+    expect(reader.read().needsRetry).toBe(true);
+    const snap = reader.read({ allowRetry: false });
+    expect(snap.historyText).toBe("# Hi");
+    expect(snap.warnings).toEqual(["history.md no se pudo leer (no existe): mostrando la versión de las 16:20:00."]);
   });
 
   test("fallo transitorio de un archivo que ya se leyó bien: pide reintento", () => {
@@ -37,7 +48,7 @@ describe("createSnapshotReader", () => {
     expect(reader.read().needsRetry).toBe(true);
   });
 
-  test("fallo persistente: última versión buena con aviso, para ambos archivos por igual", () => {
+  test("fallo persistente: última versión buena con aviso, para todos los archivos por igual", () => {
     const fs = fakeFs({ "handoff.md": "# H", "backlog.md": "# B" });
     const reader = createSnapshotReader("/x", options(fs.readFile));
     reader.read();
@@ -64,12 +75,12 @@ describe("createSnapshotReader", () => {
     expect(snap.warnings).toEqual(["backlog.md no se pudo leer (error EBUSY): mostrando la versión de las 16:20:00."]);
   });
 
-  test("backlog.md que nunca existió (set mínimo): solo se reintenta en la primera lectura", () => {
+  test("backlog.md e history.md que nunca existieron (set mínimo): solo se reintenta en la primera lectura", () => {
     const fs = fakeFs({ "handoff.md": "# H", "backlog.md": null });
     const reader = createSnapshotReader("/x", options(fs.readFile));
     expect(reader.read().needsRetry).toBe(true);
     const snap = reader.read();
-    expect(snap).toEqual({ handoffText: "# H", backlogText: null, warnings: [], needsRetry: false });
+    expect(snap).toEqual({ handoffText: "# H", backlogText: null, historyText: null, warnings: [], needsRetry: false });
   });
 
   test("primera lectura con handoff.md vacío (un agente lo está reescribiendo): pide reintento", () => {
@@ -77,7 +88,7 @@ describe("createSnapshotReader", () => {
     const reader = createSnapshotReader("/x", options(fs.readFile));
     expect(reader.read().needsRetry).toBe(true);
     fs.files["handoff.md"] = "# H";
-    expect(reader.read({ allowRetry: false })).toEqual({ handoffText: "# H", backlogText: "# B", warnings: [], needsRetry: false });
+    expect(reader.read({ allowRetry: false })).toEqual({ handoffText: "# H", backlogText: "# B", historyText: null, warnings: [], needsRetry: false });
   });
 
   test("sin permiso de reintento (--once), la primera lectura no pide reintento", () => {

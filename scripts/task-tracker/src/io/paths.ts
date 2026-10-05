@@ -56,7 +56,7 @@ export function resolveAgentsDir(input: string, baseDir: string = invocationDir(
   const candidates = [target, ...AGENTS_SUBDIRS.map((sub) => join(target, sub))];
   for (const dir of candidates) {
     if (existsSync(join(dir, "handoff.md"))) {
-      return { ok: true, agentsDir: dir, projectName: projectNameFor(dir) };
+      return { ok: true, agentsDir: dir, projectName: projectNameFor(dir), projectDir: projectDirFor(dir) };
     }
   }
   return { ok: false, error: "No se encontró handoff.md en ninguna de estas carpetas:", tried: candidates };
@@ -68,9 +68,18 @@ export function resolveAgentsDir(input: string, baseDir: string = invocationDir(
  * su propio nombre.
  */
 export function projectNameFor(agentsDir: string): string {
-  const parent = dirname(agentsDir);
-  if (basename(agentsDir) === "agents" && ["docs", "agent-context"].includes(basename(parent))) {
-    return basename(dirname(parent));
-  }
-  return basename(agentsDir);
+  return basename(projectDirFor(agentsDir));
+}
+
+/** `true` si la carpeta de agentes sigue la estructura del skill (`docs/agents` o `agent-context/agents`). */
+function isStandardAgentsDir(agentsDir: string): boolean {
+  return basename(agentsDir) === "agents" && ["docs", "agent-context"].includes(basename(dirname(agentsDir)));
+}
+
+/**
+ * Ruta del repo para el encabezado: la carpeta que contiene `docs/agents` (o
+ * `agent-context/agents`); si la carpeta vigilada no sigue esa estructura, ella misma.
+ */
+export function projectDirFor(agentsDir: string): string {
+  return isStandardAgentsDir(agentsDir) ? dirname(dirname(agentsDir)) : agentsDir;
 }

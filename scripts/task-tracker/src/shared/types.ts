@@ -1,5 +1,5 @@
-// Tipos compartidos del task-tracker: lo que produce el parseo de handoff.md y backlog.md, el
-// modelo que se pinta en pantalla y los resultados de leer archivos y resolver rutas.
+// Tipos compartidos del task-tracker: lo que produce el parseo de handoff.md, backlog.md y
+// history.md, el modelo que se pinta en pantalla y los resultados de leer archivos y resolver rutas.
 
 /** Campo `- **Etiqueta:** valor` de una tarea; la etiqueta queda tal cual (está traducida). */
 export interface Field {
@@ -102,8 +102,19 @@ export interface MissingTaskRef {
 /** Grupo de "Tareas libres" con sus tareas enlazadas desde "Tareas agrupadas". */
 export type FreeGroup = Omit<Group, "tasks"> & { tasks: Array<Task | MissingTaskRef> };
 
+/** Tarea mencionada en el motivo de un bloqueo (ej. "depende de la Tarea 3"). */
+export interface TaskRef {
+  number: number;
+  /** Título si se encontró en backlog, handoff o history; `null` si no. */
+  title: string | null;
+  /** `true` si la tarea ya figura cerrada en history.md (pista para la Regla 7). */
+  closed: boolean;
+}
+
 export interface BlockedTask extends Task {
   block: BlockInfo;
+  /** Tareas de las que depende, según lo que menciona el motivo del bloqueo. */
+  dependsOn: TaskRef[];
 }
 
 export interface Plan {
@@ -115,13 +126,31 @@ export interface Plan {
 
 export interface CurrentTask extends CurrentTaskLine {
   plan: Plan;
-  nextStep: string | null;
+  /** Subsecciones de la tarea salvo la que contiene los checkboxes del plan. */
+  details: Subsection[];
   subsections: Subsection[];
+}
+
+/** Entrada de history.md: `## <fecha> — ✅|❌ [Tarea N —] título`. */
+export interface HistoryEntry {
+  date: string;
+  status: "done" | "discarded";
+  /** `null` si la entrada no tiene número de tarea (ej. tareas anteriores a la numeración). */
+  number: number | null;
+  label: string | null;
+  title: string;
+}
+
+export interface ParsedHistory {
+  entries: HistoryEntry[];
 }
 
 /** Modelo completo para la pantalla. */
 export interface Model {
   hasBacklog: boolean;
+  hasHistory: boolean;
+  /** Últimas entradas de history.md (las más nuevas primero). */
+  completed: HistoryEntry[];
   current: CurrentTask | null;
   paused: Task[];
   free: { tasks: Task[]; groups: FreeGroup[] };
@@ -146,20 +175,34 @@ export type ReadFile = (path: string) => ReadResult;
 export interface SnapshotRead {
   handoffText: string | null;
   backlogText: string | null;
+  historyText: string | null;
   warnings: string[];
   needsRetry: boolean;
 }
 
-export type ResolveOk = { ok: true; agentsDir: string; projectName: string };
+export type ResolveOk = { ok: true; agentsDir: string; projectName: string; projectDir: string };
 export type ResolveError = { ok: false; error: string; tried: string[] };
 export type ResolveResult = ResolveOk | ResolveError;
 
+/**
+ * Qué provocó el redibujo, para el encabezado: el primer pintado, un cambio en un archivo
+ * (`file: null` si el SO no informó cuál) o un redibujo sin cambio de archivos (atajo `r`,
+ * cambio de tamaño de la terminal, error del watcher).
+ */
+export type DrawTrigger = { kind: "start" } | { kind: "change"; file: string | null } | { kind: "redraw" };
+
+/** Qué atajos se muestran al pie: los de teclado, solo Ctrl+C, o ninguno (`--once`). */
+export type Controls = "keys" | "ctrl-c" | "none";
+
 export interface RenderMeta {
+  /** Nombre de la carpeta del repo, tal cual (se formatea al pintar). */
   projectName: string;
-  agentsDir: string;
+  /** Ruta del repo (o la carpeta vigilada, si no sigue la estructura `docs/agents`). */
+  projectDir: string;
   updatedAt: Date;
-  /** `undefined` → primer pintado; `null` → cambio sin nombre de archivo (el SO no lo informó). */
-  changedFile?: string | null;
+  trigger: DrawTrigger;
+  /** Por defecto `"ctrl-c"`. */
+  controls?: Controls;
   width?: number;
   /** `false` para salida sin códigos ANSI (tests); por defecto, lo que detecte picocolors. */
   color?: boolean;

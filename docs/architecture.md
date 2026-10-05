@@ -13,13 +13,14 @@ agent-context-kit/
 │
 ├── scripts/                # Herramientas propias del repo (TypeScript con Bun); no forman parte del skill
 │   └── task-tracker/          # Seguimiento de tareas en la terminal (`bun run tasks [ruta]`)
+│       ├── README.md            # Uso: comandos, atajos, qué muestra y cómo lee los archivos
 │       ├── index.ts             # Arranque: argumentos, ruta a vigilar (o la pregunta) y llama a app
 │       ├── src/
-│       │   ├── app.ts             # Ciclo leer → modelo → pintar; watcher, resize, Ctrl+C
-│       │   ├── cli/               # Argumentos (--once, ruta) y pregunta interactiva de la ruta
+│       │   ├── app.ts             # Ciclo leer → modelo → pintar; watcher, resize, atajos (q, r, Ctrl+C)
+│       │   ├── cli/               # Argumentos (--once, ruta), pregunta interactiva de la ruta y atajos de teclado
 │       │   ├── io/                # Rutas, lectura de archivos, watcher y lectura con memoria
-│       │   ├── parse/             # Markdown → datos: secciones por ancla, bloques, handoff, backlog
-│       │   ├── model/             # Modelo de pantalla y tag de bloqueo vigente
+│       │   ├── parse/             # Markdown → datos: secciones por ancla, bloques, handoff, backlog, history
+│       │   ├── model/             # Modelo de pantalla, tag de bloqueo vigente y tareas de las que depende
 │       │   ├── ui/                # Pintado con picocolors y utilidades de formato
 │       │   └── shared/            # Tipos compartidos (types.ts) y formato de hora (time.ts)
 │       └── test/                # Tests de `bun test` en espejo de src/ + e2e/ (script entero) + fixtures
@@ -54,7 +55,7 @@ agent-context-kit/
 - **`docs/desing.md`** — registro histórico de la conversación de diseño: por qué se tomaron las decisiones de estructura, nombre y flujo. No se actualiza en cada cambio; es el punto de partida, no el estado actual.
 - **`docs/architecture.md`** (este archivo) — foto actual de cómo está organizado el repo, para orientarse rápido sin tener que leer todo `desing.md`.
 - **`docs/agents/`** — este repo usa el skill sobre sí mismo (dogfooding): `rules.md`, `handoff.md`, `backlog.md` y `history.md` documentan el trabajo de este mismo repo, con la misma estructura que el skill genera en un repo destino.
-- **`scripts/task-tracker/`** — herramienta de este repo (no del skill: no se copia a los repos destino) que vigila el `docs/agents/` de cualquier proyecto que use el skill y muestra en la terminal la tarea en progreso, las pausadas y las pendientes, redibujando cada vez que cambian `handoff.md` o `backlog.md`. Se lanza desde la raíz de este repo con `bun run tasks [ruta]` (sin ruta, la pregunta al arrancar); acepta la raíz del proyecto o su carpeta `docs/agents/`, y se pueden correr varias instancias en paralelo, una por proyecto. Ubica las secciones por las anclas descritas en [`src/docs/template-architecture.md`](../src/docs/template-architecture.md) ("Anclas de sección"), con un plan B por orden de secciones para docs que todavía no las tienen. Está escrito en TypeScript (Bun lo ejecuta sin compilar); se verifica con `bun test` y `bun run typecheck`.
+- **`scripts/task-tracker/`** — herramienta de este repo (no del skill: no se copia a los repos destino) que vigila el `docs/agents/` de cualquier proyecto que use el skill y muestra en la terminal la tarea en progreso, las pausadas, las pendientes y las últimas completadas, redibujando cada vez que cambian `handoff.md`, `backlog.md` o `history.md`. Se lanza desde la raíz de este repo con `bun run tasks [ruta]` (sin ruta, la pregunta al arrancar); acepta la raíz del proyecto o su carpeta `docs/agents/`, y se pueden correr varias instancias en paralelo, una por proyecto. Ubica las secciones por las anclas descritas en [`src/docs/template-architecture.md`](../src/docs/template-architecture.md) ("Anclas de sección"), con un plan B por orden de secciones para docs que todavía no las tienen. Está escrito en TypeScript (Bun lo ejecuta sin compilar); se verifica con `bun test` y `bun run typecheck`. Uso, atajos y formatos que lee: [`scripts/task-tracker/README.md`](../scripts/task-tracker/README.md).
 - **`src/SKILL.md`** — punto de entrada del skill: qué dispara su ejecución y qué hace a alto nivel.
 - **`src/docs/questions-flow.md`** — la lógica de decisión propiamente dicha: qué preguntar, en qué orden/rondas, y qué archivos de `src/template/` copiar según las respuestas.
 - **`src/docs/migration-flow.md`** — qué hacer cuando el repo destino ya tiene documentación de contexto en otro formato: cómo detectarla, mapearla y transformarla a la estructura de este skill en vez de tratarla como contenido ajeno.

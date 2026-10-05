@@ -5,7 +5,7 @@ import { basename } from "node:path";
 import type { ReadResult } from "../shared/types.ts";
 
 /** Archivos que se vigilan dentro de la carpeta de agentes. */
-export const WATCHED_FILES: string[] = ["handoff.md", "backlog.md"];
+export const WATCHED_FILES: string[] = ["handoff.md", "backlog.md", "history.md"];
 
 /**
  * Lee un archivo de texto sin cortar el programa. CRLF se normaliza a LF.

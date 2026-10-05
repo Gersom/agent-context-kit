@@ -1,34 +1,47 @@
 // Procesamiento: arma el modelo que se pinta en pantalla a partir de lo que interpretó el
-// parseo (progreso del plan, motivos de bloqueo, grupos, conteos y avisos).
+// parseo (progreso del plan, motivos de bloqueo y sus dependencias, grupos, completadas,
+// conteos y avisos).
 
 import { parseBacklog } from "../parse/backlog.ts";
 import { parseHandoff } from "../parse/handoff.ts";
+import { parseHistory } from "../parse/history.ts";
 import type {
   BlockedTask,
   CurrentTask,
   CurrentTaskLine,
   FreeGroup,
   Group,
+  HistoryEntry,
   InProgress,
   Model,
   ParsedBacklog,
   ParsedFile,
   ParsedHandoff,
+  ParsedHistory,
   Task,
 } from "../shared/types.ts";
 import { blockInfo } from "./block-info.ts";
+import { findTaskRefs, type TaskIndex } from "./task-refs.ts";
+
+/** Cuántas entradas de history.md se muestran en "TAREAS COMPLETADAS". */
+export const COMPLETED_LIMIT = 5;
+
+// Un checkbox de plan (`- [ ] Paso 1`): identifica la subsección del plan, que ya se muestra aparte.
+const CHECKBOX_LINE_RE = /^\s*[-*]\s+\[( |x|X)\]\s+/m;
 
 /**
  * Modelo completo para la pantalla.
- * `backlogText: null` es válido (el set mínimo del skill no genera backlog.md).
+ * `backlogText: null` y `historyText: null` son válidos (el set mínimo del skill no los genera).
  */
 export function buildModel({
   handoffText,
   backlogText,
+  historyText = null,
   readErrors = [],
 }: {
   handoffText: string | null;
   backlogText: string | null;
+  historyText?: string | null;
   readErrors?: string[];
 }): Model {
   const warnings = [...readErrors];
@@ -43,6 +56,13 @@ export function buildModel({
   if (backlogText == null) notes.push("Sin backlog.md (set mínimo del skill): solo se muestran la tarea en progreso y las pausadas.");
   else if (!backlogText.trim()) warnings.push("backlog.md está vacío (¿se está reescribiendo?).");
   else backlog = parseBacklog(backlogText);
+
+  // history.md es opcional (el set mínimo no lo genera): si no existe, no hay sección ni nota.
+  let history: ParsedHistory | null = null;
+  if (historyText != null) {
+    if (!historyText.trim()) warnings.push("history.md está vacío (¿se está reescribiendo?).");
+    else history = parseHistory(historyText);
+  }
 
   const parsedFiles: [string, ParsedFile | null][] = [["handoff.md", handoff], ["backlog.md", backlog]];
   for (const [name, parsed] of parsedFiles) {
@@ -62,16 +82,25 @@ export function buildModel({
     tasks: ref.taskNumbers.map((n) => findGroupedTask(grouped, n) ?? { number: n, label: null, title: null }),
   }));
   const freeTasks = backlog?.free.tasks ?? [];
-  const blocked: BlockedTask[] = (backlog?.blocked ?? []).map((task) => ({ ...task, block: blockInfo(task) }));
+  const paused = handoff?.paused ?? [];
+  const historyEntries = history?.entries ?? [];
+
+  const blockedTasks = backlog?.blocked ?? [];
+  const index = buildTaskIndex({ current, paused, freeTasks, blockedTasks, grouped, historyEntries });
+  const blocked: BlockedTask[] = blockedTasks.map((task) => {
+    const block = blockInfo(task);
+    return { ...task, block, dependsOn: findTaskRefs(block.reason, task.number, index) };
+  });
   for (const task of blocked) {
     if (!task.block.tag) {
       warnings.push(`${task.label} ${task.number} está en "bloqueadas" sin bloqueo vigente: ¿moverla a libres? (Regla 7)`);
     }
   }
-  const paused = handoff?.paused ?? [];
 
   return {
     hasBacklog: backlog != null,
+    hasHistory: history != null,
+    completed: historyEntries.slice(0, COMPLETED_LIMIT),
     current,
     paused,
     free: { tasks: freeTasks, groups: freeGroups },
@@ -87,18 +116,55 @@ export function buildModel({
   };
 }
 
-/** Tarea en progreso con el avance de su plan y el próximo paso. */
+/**
+ * Tarea en progreso con el avance de su plan y sus subsecciones de detalle (todas menos la que
+ * tiene los checkboxes del plan; sus títulos están traducidos, así que no se eligen por nombre).
+ */
 function buildCurrent(task: CurrentTaskLine, { steps, subsections }: InProgress): CurrentTask {
   const done = steps.filter((s) => s.done).length;
   const currentStep = steps.find((s) => !s.done) ?? null;
-  // Por posición: en la plantilla la última subsección es "Próximo paso concreto".
-  const last = subsections[subsections.length - 1];
+  const details = subsections.filter((s) => !CHECKBOX_LINE_RE.test(s.body) && s.body.trim() !== "");
   return {
     ...task,
     plan: { steps, done, total: steps.length, currentStep },
-    nextStep: last?.body ? last.body : null,
+    details,
     subsections,
   };
+}
+
+/** Índice número → título/estado de todas las tareas conocidas, para resolver dependencias. */
+function buildTaskIndex({
+  current,
+  paused,
+  freeTasks,
+  blockedTasks,
+  grouped,
+  historyEntries,
+}: {
+  current: CurrentTask | null;
+  paused: Task[];
+  freeTasks: Task[];
+  blockedTasks: Task[];
+  grouped: Group[];
+  historyEntries: HistoryEntry[];
+}): TaskIndex {
+  const titles = new Map<number, string>();
+  const labels = new Set<string>();
+  const add = (task: { number: number; label: string; title: string }) => {
+    if (!titles.has(task.number)) titles.set(task.number, task.title);
+    labels.add(task.label);
+  };
+  if (current) add(current);
+  for (const task of [...paused, ...freeTasks, ...blockedTasks, ...grouped.flatMap((g) => g.tasks)]) add(task);
+
+  const closed = new Set<number>();
+  for (const entry of historyEntries) {
+    if (entry.number == null) continue;
+    closed.add(entry.number);
+    if (!titles.has(entry.number)) titles.set(entry.number, entry.title);
+    if (entry.label) labels.add(entry.label);
+  }
+  return { titles, closed, labels };
 }
 
 function findGroupedTask(grouped: Group[], number: number): Task | null {

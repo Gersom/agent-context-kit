@@ -19,6 +19,17 @@ Invocar el skill explícitamente, pidiéndoselo al agente:
 - **"Usa la skill agent-context-kit"** — dispara la detección automática normal: si el repo ya tiene documentación de este skill, sigue el flujo de proyecto existente; si no, evalúa si hay contenido de otro sistema para migrar, o dispara el scaffolding normal según el alcance de la tarea.
 - **"Usa la skill agent-context-kit y migra mi proyecto"** — misma detección, pero fuerza el chequeo de migración aunque la heurística de nombres de archivo no encuentre por sí sola suficientes coincidencias como para dispararse (ver "Intención explícita del operador" en [`src/docs/migration-flow.md`](./src/docs/migration-flow.md)).
 
+## Seguimiento de tareas en la terminal
+
+Este repo incluye una herramienta para ver, en una terminal aparte, el estado de las tareas de cualquier proyecto que use el skill (tarea en progreso, pausadas, pendientes y últimas completadas), redibujándose sola cuando cambian sus archivos:
+
+```sh
+bun install
+bun run tasks <ruta-del-proyecto>
+```
+
+Uso, atajos y cómo lee los archivos: [`scripts/task-tracker/README.md`](./scripts/task-tracker/README.md).
+
 ## Estructura del repositorio
 
 ```

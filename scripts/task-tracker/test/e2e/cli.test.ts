@@ -28,19 +28,24 @@ async function run(args: string[]): Promise<{ stdout: string; stderr: string; co
 }
 
 describe("index.ts", () => {
-  test("--once contra un fixture: pinta la pantalla y sale con código 0", async () => {
+  test("--once contra un fixture: pinta los tres bloques y sale con código 0, sin atajos", async () => {
     const { stdout, code } = await run([join(FIXTURES, "es-anchors"), "--once"]);
     expect(code).toBe(0);
+    expect(stdout).toContain("▣ ES ANCHORS");
+    for (const block of ["━━ history.md ━", "━━ handoff.md ━", "━━ backlog.md ━"]) expect(stdout).toContain(block);
+    expect(stdout).toContain("T-11: Escribir el parser de secciones");
     expect(stdout).toContain("Tarea 12 — Implementar el parser de anclas");
-    expect(stdout).toContain("Ctrl+C para salir");
+    expect(stdout).toContain("T-4: Deploy en skills.sh [dependencia]");
+    expect(stdout).not.toContain("Ctrl+C");
     expect(stdout).not.toMatch(/\x1b\[/);
   });
 
-  test("set mínimo con --once: sin secciones de backlog", async () => {
+  test("set mínimo con --once: sin bloques de backlog ni history", async () => {
     const { stdout, code } = await run([join(FIXTURES, "minimal"), "--once"]);
     expect(code).toBe(0);
     expect(stdout).toContain("Sin tarea en curso");
     expect(stdout).not.toContain("LIBRES");
+    expect(stdout).not.toContain("━━ history.md");
   });
 
   test("ruta inexistente por argumento: código 1 sin preguntar", async () => {
