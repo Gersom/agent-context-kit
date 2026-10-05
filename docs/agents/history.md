@@ -14,6 +14,12 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-10-05 — ✅ Tarea 12 — Revisión de código de la rama `feat/task-tracker`
+
+- Revisión de los commits de las Tareas 9 y 10 contra `main` (28 archivos, ~1450 líneas), pedida por el operador después de que `gentle-ai review assess` marcara la rama como riesgo medio con el presupuesto del slice superado. Se corrió la revisión nativa de `gentle-ai` (lente `review-reliability`) con consentimiento del operador.
+- Resultado: **aprobada** y confirmada (`review-9c41ddb06aa2357c`). Sin hallazgos bloqueantes; 3 observaciones no bloqueantes (2 WARNING, 1 SUGGESTION) que se anotaron en la Tarea 11 para evaluarlas al armar su plan: tag de bloqueo resuelto en `blockInfo`, reintento de lectura solo para `handoff.md`, y falta de tests del punto de entrada y del watcher.
+- Se creó y se tomó en el momento, así que no pasó por la lista del backlog (número asignado con el contador).
+
 ## 2026-10-05 — ✅ Tarea 10 — Crear script funcional de seguimiento de tareas
 
 - Se creó `scripts/task-tracker/` (JavaScript, Bun): vigila el `docs/agents/` de un proyecto y redibuja en la terminal la tarea en progreso (con el avance del plan y el próximo paso), las pausadas, las libres (y sus grupos) y las bloqueadas (con su tag `[dependencia]`/`[postergada]`) cada vez que cambian `handoff.md` o `backlog.md`. Separado por responsabilidad: `index.js` (entrada), `src/reader.js` (ubicar la carpeta, leer, vigilar con debounce), `src/parser.js` (markdown → estructura, independiente del idioma), `src/model.js` (procesamiento) y `src/render.js` (pintado con `picocolors`).

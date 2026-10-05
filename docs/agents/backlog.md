@@ -19,7 +19,7 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 
 **Anclas de sección:** cada sección de tareas va precedida por un comentario `<!-- agent-context-kit:section=... -->` (`free`, `blocked`, `grouped`). Son comentarios de máquina — los usa el script de seguimiento de tareas (`scripts/task-tracker/`) para ubicar las secciones sin depender del idioma de los headers. No se traducen, no se borran ni se mueven al actualizar este archivo. Detalle completo en [`../../src/docs/template-architecture.md`](../../src/docs/template-architecture.md), sección "Anclas de sección".
 
-**Próximo número de tarea:** 12
+**Próximo número de tarea:** 13
 
 ---
 
@@ -56,6 +56,11 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Detalles:**
   - Salida más detallada: encabezado con nombre/path del proyecto vigilado, hora de la última actualización y qué archivo cambió; estados vacíos claros ("Sin tarea en curso", "Ninguna"); errores de parseo visibles en pantalla en vez de silenciosos; ajuste al ancho de la terminal.
   - Robustez: placeholders de plantilla sin completar, saltos de línea CRLF y paths de Windows.
+  - Ya cubierto por la Tarea 10 (ver `history.md`), solo revisar si alcanza: encabezado con proyecto/ruta/hora/archivo que cambió, estados vacíos, avisos en pantalla, recorte al ancho de la terminal, CRLF, aviso de placeholders y comillas en rutas pegadas.
+  - Observaciones no bloqueantes de la revisión de la Tarea 12 (evaluarlas al armar el plan de esta tarea):
+    - `blockInfo` (`scripts/task-tracker/src/model.js`) salta el tag `[Resuelto …]` pero devuelve el siguiente tag del mismo campo: con `` `[Resuelto el <fecha>]` — era `[dependencia]` `` muestra el bloqueo viejo. Afecta a una tarea bloqueada que registra un bloqueo anterior ya resuelto antes del actual; el test actual fija ese comportamiento.
+    - El reintento ante un archivo a medio escribir (`index.js`) solo aplica a `handoff.md`: si `backlog.md` falta un instante o da EBUSY/EPERM en Windows mientras un agente lo reescribe, se ocultan LIBRES/BLOQUEADAS y aparece la nota engañosa "Sin backlog.md (set mínimo)" hasta el próximo evento.
+    - Sin tests del punto de entrada ni del watcher: reintento, `--once`, argumento vs. pregunta, EOF, debounce/filtro de `watchDir` y precedencia de `INIT_CWD`/`npm_config_local_prefix`.
   - Documentar cómo usar el script (README del repo y/o de `scripts/task-tracker/`).
   - Entregar al operador el **prompt de normalización** para los repos que ya adoptaron el skill: un prompt que le pida al agente de ese repo agregar las anclas de la Tarea 9 y ajustar `backlog.md`/`handoff.md` a la estructura que espera el script.
 - **Agregada:** 2026-10-05.
