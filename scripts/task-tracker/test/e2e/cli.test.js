@@ -2,9 +2,9 @@
 
 import { describe, expect, test } from "bun:test";
 import { join } from "node:path";
-import { FIXTURES } from "./helpers.js";
+import { FIXTURES } from "../helpers.js";
 
-const INDEX = join(import.meta.dir, "..", "index.js");
+const INDEX = join(import.meta.dir, "..", "..", "index.js");
 
 /** Corre index.js con los argumentos dados, sin datos de entrada y sin colores. */
 async function run(args) {

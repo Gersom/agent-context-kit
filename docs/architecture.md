@@ -12,9 +12,15 @@ agent-context-kit/
 │
 ├── scripts/                # Herramientas propias del repo (Bun); no forman parte del skill
 │   └── task-tracker/          # Seguimiento de tareas en la terminal (`bun run tasks [ruta]`)
-│       ├── index.js             # Punto de entrada: ruta a vigilar, watcher y redibujo
-│       ├── src/                 # reader (archivos/watch), parser (markdown), model, render (picocolors)
-│       └── test/                # Tests de `bun test` + fixtures de handoff/backlog
+│       ├── index.js             # Arranque: argumentos, ruta a vigilar (o la pregunta) y llama a app
+│       ├── src/
+│       │   ├── app.js             # Ciclo leer → modelo → pintar; watcher, resize, Ctrl+C
+│       │   ├── cli/               # Argumentos (--once, ruta) y pregunta interactiva de la ruta
+│       │   ├── io/                # Rutas, lectura de archivos, watcher y lectura con memoria
+│       │   ├── parse/             # Markdown → datos: secciones por ancla, bloques, handoff, backlog
+│       │   ├── model/             # Modelo de pantalla y tag de bloqueo vigente
+│       │   └── ui/                # Pintado con picocolors y utilidades de formato
+│       └── test/                # Tests de `bun test` en espejo de src/ + e2e/ (script entero) + fixtures
 │
 ├── docs/
 │   ├── desing.md            # Documento de diseño: historial de decisiones y pendientes

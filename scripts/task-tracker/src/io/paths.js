@@ -1,11 +1,8 @@
-// Lectura y vigilancia de los archivos de docs/agents/ del proyecto vigilado.
-// Todo lo que toca el sistema de archivos vive acá; el resto del script trabaja sobre strings.
+// Rutas: ubicar la carpeta de agentes del proyecto vigilado a partir de lo que pasa el
+// operador, y el nombre del proyecto para el encabezado.
 
-import { existsSync, readFileSync, statSync, watch } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, resolve } from "node:path";
-
-/** Archivos que se vigilan dentro de la carpeta de agentes. */
-export const WATCHED_FILES = ["handoff.md", "backlog.md"];
 
 /** Subcarpetas donde el skill genera la documentación, relativas a la raíz del proyecto. */
 const AGENTS_SUBDIRS = [join("docs", "agents"), join("agent-context", "agents")];
@@ -81,52 +78,4 @@ export function projectNameFor(agentsDir) {
     return basename(dirname(parent));
   }
   return basename(agentsDir);
-}
-
-/**
- * Lee un archivo de texto sin cortar el programa. CRLF se normaliza a LF.
- * @param {string} path
- * @returns {{ text: string | null, error: string | null, code: string | null }} `text: null` si
- *   no existe; `code` es el código del error de lectura (ej. `EBUSY`), si lo hubo
- */
-export function readFileSafe(path) {
-  try {
-    return { text: readFileSync(path, "utf8").replace(/\r\n?/g, "\n"), error: null, code: null };
-  } catch (err) {
-    if (err?.code === "ENOENT") return { text: null, error: null, code: null };
-    return { text: null, error: `No se pudo leer ${basename(path)}: ${err?.message ?? err}`, code: err?.code ?? null };
-  }
-}
-
-/**
- * Vigila la carpeta (no cada archivo: los agentes suelen reescribir el archivo entero y el
- * watcher de un archivo puede perderse en ese reemplazo). Agrupa ráfagas de eventos con un
- * debounce, porque un solo guardado dispara varios.
- * @param {string} dir
- * @param {(changedFile: string | null) => void} onChange recibe el archivo que cambió (null si el SO no lo informa)
- * @param {(message: string) => void} onError
- * @param {number} [debounceMs]
- * @returns {() => void} función para dejar de vigilar
- */
-export function watchDir(dir, onChange, onError, debounceMs = 150) {
-  let timer = null;
-  let lastFile = null;
-  let watcher;
-  try {
-    watcher = watch(dir, (_event, filename) => {
-      const name = filename ? basename(filename.toString()) : null;
-      if (name && !WATCHED_FILES.includes(name)) return;
-      lastFile = name;
-      clearTimeout(timer);
-      timer = setTimeout(() => onChange(lastFile), debounceMs);
-    });
-    watcher.on("error", (err) => onError(`Error del watcher: ${err?.message ?? err}`));
-  } catch (err) {
-    onError(`No se pudo vigilar ${dir}: ${err?.message ?? err}`);
-    return () => {};
-  }
-  return () => {
-    clearTimeout(timer);
-    watcher.close();
-  };
 }

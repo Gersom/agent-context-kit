@@ -3,7 +3,7 @@
 // no existir, estar vacío o estar trabado —EBUSY/EPERM en Windows— durante unos milisegundos).
 
 import { join } from "node:path";
-import { readFileSafe, WATCHED_FILES } from "./reader.js";
+import { readFileSafe, WATCHED_FILES } from "./files.js";
 
 /** Espera sugerida antes de reintentar una lectura fallida. */
 export const RETRY_MS = 300;

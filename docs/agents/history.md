@@ -14,6 +14,17 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-10-05 — ✅ Tarea 14 — Estructuración del script de seguimiento de tareas
+
+- Refactor puro de `scripts/task-tracker/`, con la estructura acordada con el operador: `index.js` queda solo como arranque; `src/app.js` (ciclo leer → modelo → pintar, watcher, Ctrl+C); `src/cli/` (argumentos, pregunta de la ruta); `src/io/` (rutas, lectura, watcher, lectura con memoria); `src/parse/` (`parser.js` de ~300 líneas dividido en markdown, secciones, bloques, handoff y backlog); `src/model/` (`blockInfo` separado de `buildModel`); `src/ui/` (render y utilidades de formato).
+- Tests en espejo dentro de `test/` (`io/`, `parse/`, `model/`, `ui/`, `e2e/`), con las mismas aserciones: 64 tests, todos pasan, ahora en 14 archivos. Archivos movidos con `git mv` para conservar su historial.
+- Verificación de que fue solo un movimiento: comparando las líneas de lógica antes y después, solo cambian los dos envoltorios nuevos (`parseArgs`, `startApp`) y el nombre de una variable (`args` → `argv`).
+- Decisiones del operador: tests en espejo (no junto al código); `parse/` queda dentro de `task-tracker/` — si se comparte con otro script se decide al hacer la Tarea 15.
+- Pendiente menor: `snapshot.js` tiene una función de formato de hora idéntica a `formatTime` de `ui/format.js`; no se unificó para no salir del refactor puro.
+- Se actualizó el árbol de `scripts/task-tracker/` en `docs/architecture.md`.
+- Se creó además la Tarea 18 (Migrar a TypeScript), a pedido del operador.
+- Al revisar las bloqueadas (Regla 7): la Tarea 11 dependía de esta tarea → movida a "Tareas libres" con su bloqueo marcado como resuelto.
+
 ## 2026-10-05 — ✅ Tarea 17 — Corregir observaciones de la segunda revisión del script
 
 - **Tag de bloqueo:** `blockInfo` solo acepta el tag con el que **empieza** el valor de un campo (con o sin backticks); los tags en medio del texto se ignoran, así un `[algo]` dentro de `Descripción` ya no se toma como bloqueo ni oculta el aviso "sin bloqueo vigente". Convención ajustada en `src/docs/template-architecture.md` y en el campo `Bloqueos` de `src/template/agents/backlog.md` ("el valor empieza con la etiqueta del motivo"). Todos los `Bloqueos` de este backlog ya cumplían.

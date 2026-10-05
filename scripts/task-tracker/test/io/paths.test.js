@@ -1,8 +1,8 @@
-import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { cleanPathInput, projectNameFor, readFileSafe, resolveAgentsDir } from "../src/reader.js";
+import { cleanPathInput, invocationDir, projectNameFor, resolveAgentsDir } from "../../src/io/paths.js";
 
 let root;
 
@@ -47,12 +47,7 @@ describe("resolveAgentsDir", () => {
   });
 });
 
-describe("helpers del reader", () => {
-  test("readFileSafe normaliza CRLF y devuelve null si no existe", () => {
-    expect(readFileSafe(join(root, "mi-app", "docs", "agents", "handoff.md")).text).toBe("# Handoff\n\nx\n");
-    expect(readFileSafe(join(root, "nada.md"))).toEqual({ text: null, error: null, code: null });
-  });
-
+describe("helpers de rutas", () => {
   test("cleanPathInput quita comillas y espacios", () => {
     expect(cleanPathInput(`  '"D:\\a b"'  `)).toBe("D:\\a b");
   });
@@ -60,5 +55,33 @@ describe("helpers del reader", () => {
   test("projectNameFor usa la carpeta que contiene docs/agents", () => {
     expect(projectNameFor(join("x", "proy", "docs", "agents"))).toBe("proy");
     expect(projectNameFor(join("x", "suelta"))).toBe("suelta");
+  });
+});
+
+describe("invocationDir", () => {
+  const KEYS = ["INIT_CWD", "npm_config_local_prefix"];
+  let saved;
+
+  beforeEach(() => {
+    saved = Object.fromEntries(KEYS.map((key) => [key, process.env[key]]));
+  });
+
+  afterEach(() => {
+    for (const key of KEYS) {
+      if (saved[key] === undefined) delete process.env[key];
+      else process.env[key] = saved[key];
+    }
+  });
+
+  test("precedencia: INIT_CWD > npm_config_local_prefix > cwd", () => {
+    process.env.INIT_CWD = "/desde-init";
+    process.env.npm_config_local_prefix = "/desde-prefix";
+    expect(invocationDir()).toBe("/desde-init");
+
+    delete process.env.INIT_CWD;
+    expect(invocationDir()).toBe("/desde-prefix");
+
+    delete process.env.npm_config_local_prefix;
+    expect(invocationDir()).toBe(process.cwd());
   });
 });

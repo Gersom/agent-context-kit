@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { basename } from "node:path";
-import { createSnapshotReader } from "../src/snapshot.js";
+import { createSnapshotReader } from "../../src/io/snapshot.js";
 
 /**
  * readFile falso: `files[name]` puede ser un string (contenido), null (no existe), o

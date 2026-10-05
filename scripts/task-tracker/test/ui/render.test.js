@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { buildModel } from "../src/model.js";
-import { plainText, progressBar, render, truncate } from "../src/render.js";
-import { fixture } from "./helpers.js";
+import { buildModel } from "../../src/model/model.js";
+import { render } from "../../src/ui/render.js";
+import { fixture } from "../helpers.js";
 
 const meta = {
   projectName: "demo",
@@ -38,21 +38,5 @@ describe("render", () => {
   test("ninguna línea supera el ancho de la terminal", () => {
     const out = screen("es-anchors", { width: 40 });
     for (const line of out.split("\n")) expect([...line].length).toBeLessThanOrEqual(40);
-  });
-});
-
-describe("helpers de render", () => {
-  test("truncate agrega … y respeta caracteres multibyte", () => {
-    expect(truncate("áéíóú-abc", 5)).toBe("áéíó…");
-    expect(truncate("corto", 10)).toBe("corto");
-  });
-
-  test("plainText quita negritas y backticks", () => {
-    expect(plainText("**sin** `package.json`")).toBe("sin package.json");
-  });
-
-  test("progressBar", () => {
-    expect(progressBar(0, 0, 4)).toBe("[░░░░]");
-    expect(progressBar(2, 4, 4)).toBe("[██░░]");
   });
 });

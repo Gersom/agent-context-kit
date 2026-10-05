@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { invocationDir, watchDir } from "../src/reader.js";
+import { watchDir } from "../../src/io/watch.js";
 
 const DEBOUNCE_MS = 100;
 // Silencio que se espera después del primer aviso para afirmar que no llega otro.
@@ -115,32 +115,4 @@ describe("watchDir", () => {
     },
     TEST_TIMEOUT_MS,
   );
-});
-
-describe("invocationDir", () => {
-  const KEYS = ["INIT_CWD", "npm_config_local_prefix"];
-  let saved;
-
-  beforeEach(() => {
-    saved = Object.fromEntries(KEYS.map((key) => [key, process.env[key]]));
-  });
-
-  afterEach(() => {
-    for (const key of KEYS) {
-      if (saved[key] === undefined) delete process.env[key];
-      else process.env[key] = saved[key];
-    }
-  });
-
-  test("precedencia: INIT_CWD > npm_config_local_prefix > cwd", () => {
-    process.env.INIT_CWD = "/desde-init";
-    process.env.npm_config_local_prefix = "/desde-prefix";
-    expect(invocationDir()).toBe("/desde-init");
-
-    delete process.env.INIT_CWD;
-    expect(invocationDir()).toBe("/desde-prefix");
-
-    delete process.env.npm_config_local_prefix;
-    expect(invocationDir()).toBe(process.cwd());
-  });
 });

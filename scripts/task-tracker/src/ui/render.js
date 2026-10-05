@@ -1,14 +1,14 @@
 // Pintado del modelo en la terminal con picocolors. render() devuelve un string (testeable);
-// index.js se encarga de limpiar la pantalla y escribirlo.
+// src/app.js se encarga de limpiar la pantalla y escribirlo.
 
 import picocolors from "picocolors";
+import { formatTime, plainText, progressBar, truncate } from "./format.js";
 
-const BAR_WIDTH = 12;
 const NEXT_STEP_MAX_LINES = 3;
 
 /**
  * Pantalla completa.
- * @param {ReturnType<typeof import("./model.js").buildModel>} model
+ * @param {ReturnType<typeof import("../model/model.js").buildModel>} model
  *   `changedFile`: undefined → primer pintado; null → cambio sin nombre de archivo (el SO no lo informó).
  *   `color`: false para salida sin códigos ANSI (tests); por defecto, lo que detecte picocolors.
  * @param {{ projectName: string, agentsDir: string, updatedAt: Date, changedFile?: string | null, width?: number, color?: boolean }} meta
@@ -94,37 +94,7 @@ export function render(model, meta) {
   return out.join("\n") + "\n";
 }
 
-/** Quita el formato markdown inline que en la terminal solo ensucia (negritas y backticks). */
-export function plainText(text) {
-  return text.replace(/\*\*(.+?)\*\*/g, "$1").replace(/`([^`]*)`/g, "$1");
-}
-
 /** `Tarea 9 — título`, con la etiqueta tal como está escrita en el documento. */
 function taskName(task) {
   return `${task.label ?? "#"} ${task.number} — ${task.title}`;
-}
-
-/**
- * Barra de progreso `[█████░░░░░░░]`.
- * @param {number} done
- * @param {number} total
- */
-export function progressBar(done, total, width = BAR_WIDTH) {
-  const filled = total ? Math.round((done / total) * width) : 0;
-  return `[${"█".repeat(filled)}${"░".repeat(width - filled)}]`;
-}
-
-/**
- * Recorta texto plano (sin códigos de color) a un ancho visible, agregando "…".
- * @param {string} text
- * @param {number} max
- */
-export function truncate(text, max) {
-  const chars = [...text.replace(/\s*\n\s*/g, " ")];
-  if (chars.length <= max) return chars.join("");
-  return chars.slice(0, Math.max(1, max - 1)).join("") + "…";
-}
-
-function formatTime(date) {
-  return date.toLocaleTimeString("es", { hour12: false });
 }
