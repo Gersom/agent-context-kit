@@ -14,6 +14,15 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-10-06 — ✅ Tarea 20 — Actualizar la sección "Estructura del repositorio" del README raíz
+
+- La sección de `README.md` ahora muestra la estructura real: `src/` (el skill: `SKILL.md`, flujos de decisión y plantillas), `scripts/` (task-tracker y `_shared/`), `docs/` (documentación del propio repo, con `agents/`), `package.json` y `tsconfig.json`. Una línea por entrada, sin repetir el árbol completo: enlaza a `docs/architecture.md` y a `src/docs/template-architecture.md` (Regla 1).
+- Antes mostraba `SKILL.md` y `template/` en la raíz y no mencionaba `docs/`, `scripts/` ni `package.json`.
+- Fuera de alcance: la sección "Estado" del README ("Proyecto en diseño") puede estar desactualizada; no se tocó.
+- Por pedido del operador durante la tarea, nació la Tarea 28 (renombrar `src/` a `skill/`); al hacerse, el README y `architecture.md` pasarán a decir `skill/`.
+- Verificación: solo documentación; sin código ni tests afectados.
+- La rama `docs/readme-structure` se mergeó a `main`, sin push.
+
 ## 2026-10-06 — ✅ Tarea 27 — Ocultamiento de tareas pausadas y bloqueadas cuando no hay
 
 - En la pantalla del task-tracker, los recuadros PAUSADAS y BLOQUEADAS solo aparecen si hay tareas de ese tipo (`ui/render.ts`); ya no muestran "Ninguna". EN PROGRESO ("Sin tarea en curso"), LIBRES y TAREAS COMPLETADAS no cambian, y los contadores del modelo tampoco.

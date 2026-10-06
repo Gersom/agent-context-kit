@@ -19,7 +19,7 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 
 **Anclas de sección:** cada sección de tareas va precedida por un comentario `<!-- agent-context-kit:section=... -->` (`free`, `blocked`, `grouped`). Son comentarios de máquina — los usa el script de seguimiento de tareas (`scripts/task-tracker/`) para ubicar las secciones sin depender del idioma de los headers. No se traducen, no se borran ni se mueven al actualizar este archivo. Detalle completo en [`../../src/docs/template-architecture.md`](../../src/docs/template-architecture.md), sección "Anclas de sección".
 
-**Próximo número de tarea:** 28
+**Próximo número de tarea:** 29
 
 ---
 
@@ -56,15 +56,6 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador la priorice. Sirve también para verificar el resultado del prompt de normalización de la Tarea 11.
 - **Detalles:** las normas a verificar salen de `src/docs/template-architecture.md` (sección "Anclas de sección") y de las plantillas de `src/template/agents/`; ante una diferencia, gana la plantilla (Regla 4). Dependencias en `devDependencies` del `package.json` raíz (ver `rules.md`).
-- **Agregada:** 2026-10-05.
-
-### Tarea 20 — Actualizar la sección "Estructura del repositorio" del README raíz
-
-- **Descripción:** la sección "Estructura del repositorio" de `README.md` está desactualizada: muestra `SKILL.md` y `template/` en la raíz, cuando hoy viven en `src/` (y no menciona `docs/`, `scripts/` ni `package.json`). Alinearla con la estructura real, linkeando a `docs/architecture.md` en vez de duplicar el árbol completo (Regla 1).
-- **Decisiones/temas a definir antes de empezar:** Ninguno.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador quiera, o antes del release `v1.1.0`.
-- **Detalles:** detectado durante la Tarea 11 al sumar al README la sección del task-tracker; quedó fuera de su alcance.
 - **Agregada:** 2026-10-05.
 
 ### Tarea 19 — Prompt de normalización para repos que ya adoptaron el skill
@@ -127,6 +118,20 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Disparador:** cuando el operador la priorice (el parser compartido ya está en `scripts/_shared/`).
 - **Detalles:** surgió de la conversación del 2026-10-05: busca bajar el consumo de tokens (menos lectura de archivos grandes, menos reescritura) y evitar errores mecánicos (anclas olvidadas, números repetidos). Si se hace la Tarea 15 (validador), sirve de red de seguridad para este script.
 - **Agregada:** 2026-10-05.
+
+### Tarea 28 — Renombrar la carpeta `src/` a `skill/`
+
+- **Descripción:** renombrar la carpeta `src/` (que contiene `SKILL.md`, `docs/` y `template/`) a `skill/`, para que su nombre diga qué es: el skill que se distribuye, a diferencia de `scripts/` (herramientas del repo) y `docs/` (documentación del propio repo). Actualizar todas las referencias y la estructura que describen el README y `docs/architecture.md`.
+- **Decisiones/temas a definir antes de empezar:**
+  - **Versión:** `rules.md` pide bump major cuando se mueven o renombran archivos de `template/` referenciados desde `questions-flow.md`, y prohíbe tocar la estructura de `src/template/` sin autorización explícita. Decidir si este renombrado cuenta como cambio que rompe (major, `v2.0.0`) o no, y si se publica release.
+  - **Qué se reescribe y qué no:** las referencias vivas (README, `docs/architecture.md`, `rules.md`, `docs/agents/*` del estado actual, flujos y plantillas dentro de la carpeta) sí. `docs/desing.md` y las entradas ya cerradas de `history.md` son registro histórico con la ruta de entonces: no se reescriben.
+  - **Distribución:** impacto en la Tarea 3 (exportar como skill utilizable por Claude) y la Tarea 4 (skills.sh): conviene decidirlo antes o junto con ellas, porque `skill/` es lo que se empaquetaría.
+  - Hacer el renombrado con `git mv` para conservar el historial.
+- **Qué revisar:** ~60 menciones de `src/` en `README.md`, `docs/architecture.md`, `docs/agents/rules.md`, `backlog.md`, `handoff.md`, `src/docs/migration-flow.md`, `src/docs/template-architecture.md`, `src/template/README.md` y la plantilla `src/template/agents/handoff.md`. No confundir con el `src/` interno de `scripts/task-tracker/`, que no cambia. Verificar al final con `bun test`, `bun run typecheck` y una búsqueda de `src/` que no deje referencias rotas.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador la priorice. Si va a hacerse, conviene antes de las Tareas 3 y 4.
+- **Detalles:** pedido del operador el 2026-10-06 durante la Tarea 20. La Tarea 20 describe la estructura actual (`src/`); al terminar esta tarea, el README y `docs/architecture.md` pasan a decir `skill/`.
+- **Agregada:** 2026-10-06.
 
 <!-- agent-context-kit:section=blocked -->
 ## Tareas bloqueadas / pospuestas
