@@ -106,8 +106,8 @@ El script no depende del idioma de la documentación (los headers se traducen po
 Desde la raíz de este repo:
 
 ```sh
-bun test            # tests (en scripts/task-tracker/test/, en espejo de src/)
+bun test            # tests (en scripts/task-tracker/test/ y scripts/_shared/test/, en espejo del código)
 bun run typecheck   # chequeo de tipos (Bun ejecuta TypeScript sin revisar tipos)
 ```
 
-La estructura de carpetas está descrita en [`docs/architecture.md`](../../docs/architecture.md).
+El parseo de los archivos (`parse/`, tag de bloqueo, referencias entre tareas) vive en `scripts/_shared/`, compartido con otros scripts. La estructura de carpetas está descrita en [`docs/architecture.md`](../../docs/architecture.md).
