@@ -14,6 +14,14 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-10-06 — ✅ Tarea 22 — Definir y agregar la filosofía del proyecto
+
+- Nuevo `docs/philosophy.md`: la razón de ser del kit (dictada por el operador: contexto que sobrevive entre sesiones, modelos y herramientas de IA, sin releer todo el código) y cinco principios — markdown plano como fuente de verdad del estado, el código gana ante un conflicto (enlaza la Regla 4 de `rules.md` sin duplicarla), versionado y portable, herramientas opcionales, y tolerancia a la edición manual (incluye edición quirúrgica).
+- Decisiones del operador: archivo propio (no regla en `rules.md`, por lo que no hay regla nueva); el principio del código lo agregó él; la razón de ser la dictó él. Se depuró el texto para quitar repeticiones (56 → 44 líneas).
+- Enlazado desde `README.md` y `docs/architecture.md` (árbol y "Qué es cada parte").
+- Es la base de principios de la Tarea 24 (script de gestión de tareas).
+- Verificación: solo documentación; sin código ni tests afectados.
+
 ## 2026-10-05 — ✅ Regla de cierre explícito y MVP del task-tracker
 
 - Regla nueva en `rules.md` (reglas específicas): ninguna tarea se cierra sin que el operador lo pida explícitamente; al terminar se le manda el resumen y se espera, también en tareas chicas sin plan. Decisión del operador después de aplicarla por primera vez en la Tarea 21.

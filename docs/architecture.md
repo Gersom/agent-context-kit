@@ -28,6 +28,7 @@ agent-context-kit/
 ├── docs/
 │   ├── desing.md            # Documento de diseño: historial de decisiones y pendientes
 │   ├── architecture.md      # Este archivo
+│   ├── philosophy.md        # Principios de diseño: por qué el kit es lo que es
 │   └── agents/               # Dogfooding: este repo usa el skill sobre sí mismo
 │       ├── rules.md            # Reglas fijas de este repo
 │       ├── handoff.md          # Estado "en caliente" del trabajo
@@ -54,6 +55,7 @@ agent-context-kit/
 
 - **`docs/desing.md`** — registro histórico de la conversación de diseño: por qué se tomaron las decisiones de estructura, nombre y flujo. No se actualiza en cada cambio; es el punto de partida, no el estado actual.
 - **`docs/architecture.md`** (este archivo) — foto actual de cómo está organizado el repo, para orientarse rápido sin tener que leer todo `desing.md`.
+- **`docs/philosophy.md`** — la razón de ser del kit (contexto que sobrevive entre sesiones, modelos y herramientas de IA) y sus principios de diseño (markdown plano como fuente de verdad, el código gana ante un conflicto, versionado y portable, herramientas opcionales, tolerancia a la edición manual) y las preguntas que debe superar un cambio nuevo. Es el "por qué"; este archivo es el "qué".
 - **`docs/agents/`** — este repo usa el skill sobre sí mismo (dogfooding): `rules.md`, `handoff.md`, `backlog.md` y `history.md` documentan el trabajo de este mismo repo, con la misma estructura que el skill genera en un repo destino.
 - **`scripts/task-tracker/`** — herramienta de este repo (no del skill: no se copia a los repos destino) que vigila el `docs/agents/` de cualquier proyecto que use el skill y muestra en la terminal la tarea en progreso, las pausadas, las pendientes y las últimas completadas, redibujando cada vez que cambian `handoff.md`, `backlog.md` o `history.md`. Se lanza desde la raíz de este repo con `bun run tasks [ruta]` (sin ruta, la pregunta al arrancar); acepta la raíz del proyecto o su carpeta `docs/agents/`, y se pueden correr varias instancias en paralelo, una por proyecto. Ubica las secciones por las anclas descritas en [`src/docs/template-architecture.md`](../src/docs/template-architecture.md) ("Anclas de sección"), con un plan B por orden de secciones para docs que todavía no las tienen. Está escrito en TypeScript (Bun lo ejecuta sin compilar); se verifica con `bun test` y `bun run typecheck`. Uso, atajos y formatos que lee: [`scripts/task-tracker/README.md`](../scripts/task-tracker/README.md).
 - **`src/SKILL.md`** — punto de entrada del skill: qué dispara su ejecución y qué hace a alto nivel.
