@@ -11,6 +11,15 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-06 — ✅ Tarea 29 — Política de lectura selectiva del skill y de la migración
+
+- El skill se aplica una vez por repo; las sesiones siguientes solo leen lo generado. Por eso la política de uso diario quedó en el `AGENTS.md` del repo destino (leer `docs/README.md`, `rules.md` y `handoff.md`; el resto solo si la tarea lo exige; sin leer `backlog.md`/`history.md` con tarea en curso) y la de `SKILL.md` solo cubre generar y migrar (medir antes de leer, `cp` en vez de leer y reescribir, de a un archivo).
+- `docs/README.md` pasó a ser un mapa de ~1,5 KB con la definición de "operador"; `architecture.md` recuperó su árbol anotado (corrige el hallazgo F4 de la Tarea 25). Las Reglas 5 a 8 pasaron, sin renumerar, a una sección final "Al cerrar una tarea" que se lee solo al cerrar. La migración pregunta si conservar `docs-legacy/` y si condensar o mantener el texto.
+- Autorizado por el operador: editar las Reglas por defecto fijas (partir su lectura y acortar su redacción). Sin bump de versión; se decide al publicar la próxima release.
+- Resultado (bytes / 3,1): inicio de sesión de este repo 11.411 → 9.324 B (−18%, README incluido); repo destino ≈ 6.149 B (≈ 1.980 tokens), no comparable 1:1 con la medición anterior porque `SKILL.md` ya no se carga en las sesiones siguientes.
+- Verificación: `bun test` → 123 tests, todos pasan (16 nuevos en `scripts/skill-checks/`); `bun run typecheck` sin errores; 0 enlaces relativos rotos.
+- Commits: `4678fa1`, `f3b85ed`, `8e772d8`, `78107d0`, `4cf8a9e`, `268f39c`, `806e7f1` y el de cierre, en la rama `docs/optimize-context`.
+
 ## 2026-10-06 — ✅ Tarea 25 — Optimización del contenido del kit: menos tokens y sin duplicados
 
 - Se midió una línea base de lo que se carga al iniciar sesión y se auditó el kit (8 hallazgos, F1–F8, todos aprobados y aplicados): comentarios de guía de las plantillas que ya no viajan al repo destino, preámbulos y reglas por defecto recortados, `architecture.md`/`stack.md` reescritos para contener solo lo no deducible del código, flujo "ya existe" resuelto en `SKILL.md` sin abrir `questions-flow.md`, y política de lectura de `history.md`/`backlog.md`. El porqué: el kit solo vale si su costo en tokens se mantiene bajo (`docs/philosophy.md`).
