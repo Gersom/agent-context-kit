@@ -18,7 +18,8 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 - Regla nueva en `rules.md` (reglas específicas): ninguna tarea se cierra sin que el operador lo pida explícitamente; al terminar se le manda el resumen y se espera, también en tareas chicas sin plan. Decisión del operador después de aplicarla por primera vez en la Tarea 21.
 - El operador confirmó que el task-tracker llegó a su MVP → la Tarea 19 (prompt de normalización) se desbloqueó y pasó a "Tareas libres".
-- La rama `feat/task-tracker` (Tareas 9 a 21) se mergeó a `main` y se pusheó, a pedido del operador.
+- La rama `feat/task-tracker` (Tareas 9 a 21) se mergeó a `main` (fast-forward) y se pusheó, a pedido del operador; después se borró la rama local.
+- Se creó el tag `v1.1.0` y el [GitHub Release](https://github.com/Gersom/agent-context-kit/releases/tag/v1.1.0) correspondiente, con notas que resumen los cambios desde `v1.0.0`: anclas de sección, convenciones nuevas de las plantillas (bloqueos, plan de las pausadas, formato de `history.md`) y el task-tracker.
 
 ## 2026-10-05 — ✅ Tarea 21 — Ajustes de pantalla del task-tracker: tachado de pasos y recuadros
 
