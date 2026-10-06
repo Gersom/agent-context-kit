@@ -6,14 +6,20 @@ El "por qué" del kit y lo que debe respetar cualquier cambio nuevo. El "qué" (
 
 ## Para qué existe el kit
 
-`agent-context-kit` empezó como un skill; hoy es un **kit de herramientas** (el skill más los scripts de [`scripts/`](../scripts/)). Mantiene documentación que sirve de **contexto para cualquier agente de IA**:
+`agent-context-kit` empezó como un skill; hoy es un **kit de herramientas** (el skill más los scripts de [`scripts/`](../scripts/)). Mantiene documentación que sirve de **contexto para cualquier agente de IA y para las personas del proyecto**:
 
 - el **estado** del trabajo y el **historial de cambios**;
 - los **datos importantes y las decisiones ya tomadas**, para no volver a discutirlas ni inventar lo ya definido.
 
-Así el agente a cargo conserva el contexto **entre sesiones, al cambiar de modelo, de harness o herramienta de IA**, sin leer todo el código ni adivinar cómo está organizado el proyecto, cómo estaba o qué hay que hacer.
+Con eso:
 
-Todo lo que sigue se deriva de esto: lo que no ayude a que el contexto sobreviva intacto de un agente a otro, no pertenece al kit.
+- **El agente a cargo** conserva el contexto entre sesiones y al cambiar de modelo, de harness o de herramienta de IA, sin leer todo el código ni adivinar cómo está organizado el proyecto, cómo estaba o qué hay que hacer.
+- **Un colaborador** hace `pull` y su agente (el que use) ya sabe el contexto, qué falta y cómo seguir, sin preguntarle a quien hizo el trabajo.
+- **El operador** tiene un mapa de tareas que lo ayuda a no olvidar nada y a retomar el contexto más rápido.
+
+**Qué se gana y qué no:** se reduce el retrabajo y el tiempo de las personas (volver a preguntar, repetir lo ya decidido, rehacer lo ya hecho). No se promete ahorrar tokens: leer la documentación también cuesta, y ese costo se mantiene bajo solo si la documentación se mantiene corta.
+
+Todo lo que sigue se deriva de esto: lo que no ayude a que el contexto sobreviva intacto de un agente o una persona a otra, no pertenece al kit.
 
 ## Principios
 
