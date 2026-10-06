@@ -16,11 +16,11 @@ Estas reglas vienen con el skill y aplican sin importar el proyecto. No se borra
      a. si los pasos están bien o hay que ajustarlos, y
      b. si prefiere que se ejecuten todos los pasos seguidos sin pausas, o uno a la vez — esperando su confirmación después de cada paso para recién ahí seguir al siguiente, debatir el paso actual, o modificarlo.
 
-3. **Idioma de la documentación:** todo el contenido que un agente redacte en esta documentación (prosa y headers de sección) va en el idioma registrado abajo — detectado una sola vez, la primera vez que se generó esta documentación (ver `src/docs/questions-flow.md`, sección "Idioma de la documentación"). No se vuelve a preguntar en sesiones futuras. Excepción, siempre en inglés: nombres de archivo/carpeta del catálogo, y términos propios de este kit o jerga técnica sin traducción natural asentada (ej. "Handoff", "Backlog", "Placeholder", "linter", "commit", "deploy").
+3. **Idioma de la documentación:** todo el contenido que un agente redacte en esta documentación (prosa y headers de sección) va en el idioma registrado abajo — detectado una sola vez, la primera vez que se generó esta documentación (ver `skill/docs/questions-flow.md`, sección "Idioma de la documentación"). No se vuelve a preguntar en sesiones futuras. Excepción, siempre en inglés: nombres de archivo/carpeta del catálogo, y términos propios de este kit o jerga técnica sin traducción natural asentada (ej. "Handoff", "Backlog", "Placeholder", "linter", "commit", "deploy").
 
    **Idioma de la documentación:** Español
 
-4. **El código es la fuente de verdad.** Esta documentación describe el proyecto, pero puede desactualizarse o entrar en conflicto con lo que el código realmente hace. Ante un conflicto entre lo que dice un archivo de acá y lo que el código muestra, **el código gana siempre** — la documentación está equivocada o desactualizada, no al revés. Excepción: que el operador diga explícitamente lo contrario para ese caso puntual. Si se detecta un desvío así, además de seguir el código, conviene corregir el archivo de documentación afectado para que refleje la realidad. En este repo en particular, aplica también entre `src/template/` (el catálogo real) y `docs/desing.md` (registro histórico de diseño, no spec vigente) — ante discrepancia, gana lo que hay en `src/template/`.
+4. **El código es la fuente de verdad.** Esta documentación describe el proyecto, pero puede desactualizarse o entrar en conflicto con lo que el código realmente hace. Ante un conflicto entre lo que dice un archivo de acá y lo que el código muestra, **el código gana siempre** — la documentación está equivocada o desactualizada, no al revés. Excepción: que el operador diga explícitamente lo contrario para ese caso puntual. Si se detecta un desvío así, además de seguir el código, conviene corregir el archivo de documentación afectado para que refleje la realidad. En este repo en particular, aplica también entre `skill/template/` (el catálogo real) y `docs/desing.md` (registro histórico de diseño, no spec vigente) — ante discrepancia, gana lo que hay en `skill/template/`.
 
 5. **Al cerrar una tarea, como mínimo se actualizan `handoff.md`, `backlog.md` y `history.md`:**
    - `handoff.md` → se sobrescribe con el estado actual (o "sin tarea en curso" si no queda nada abierto).
@@ -53,11 +53,11 @@ Estas reglas vienen con el skill y aplican sin importar el proyecto. No se borra
 
 - Estructura de carpetas y por qué está organizado así → [`../architecture.md`](../architecture.md)
 - Historial de decisiones de diseño → [`../desing.md`](../desing.md) (registro histórico, no spec vigente — ver regla 4)
-- Catálogo de plantillas y para qué sirve cada una → [`../../src/docs/template-architecture.md`](../../src/docs/template-architecture.md)
+- Catálogo de plantillas y para qué sirve cada una → [`../../skill/docs/template-architecture.md`](../../skill/docs/template-architecture.md)
 
 ## Reglas específicas de este proyecto
 
-- No hay linter/formatter configurado. El skill en sí (`src/`: `SKILL.md`, flujos y plantillas `.md`) es documentación markdown pura, sin código ejecutable ni build step. El repo tiene además herramientas propias en `scripts/` (TypeScript con Bun, ej. `scripts/task-tracker/`) que **no forman parte del skill distribuido** ni se copian a los repos destino.
+- No hay linter/formatter configurado. El skill en sí (`skill/`: `SKILL.md`, flujos y plantillas `.md`) es documentación markdown pura, sin código ejecutable ni build step. El repo tiene además herramientas propias en `scripts/` (TypeScript con Bun, ej. `scripts/task-tracker/`) que **no forman parte del skill distribuido** ni se copian a los repos destino.
 - Dependencias de `scripts/`: solo en `devDependencies` del `package.json` raíz — no un `package.json` por script. Se instalan con `bun install` en la raíz; `node_modules/` no se commitea y `bun.lock` sí. Tests con `bun test` desde la raíz.
 - Los scripts nuevos de `scripts/` se escriben en **TypeScript** por defecto (decisión del operador, 2026-10-05), con el `tsconfig.json` de la raíz (`strict`). Bun ejecuta `.ts` sin revisar tipos, así que `bun run typecheck` (`tsc --noEmit`) tiene que pasar sin errores junto con `bun test`.
 - Los nombres de archivo del catálogo (`backlog.md`, `handoff.md`, `stack.md`, etc.) se mantienen siempre en inglés, independientemente del idioma del contenido (ver regla por defecto 3).
@@ -65,14 +65,14 @@ Estas reglas vienen con el skill y aplican sin importar el proyecto. No se borra
   - **patch** — fixes/ajustes de redacción en plantillas existentes.
   - **minor** — contenido nuevo que no rompe nada (nueva plantilla, nueva rama del árbol de preguntas).
   - **major** — cambios que rompen algo que un repo destino ya pudiera estar usando (mover/renombrar archivos de `template/` referenciados desde `questions-flow.md`, cambiar la estructura generada en `docs/agents`/`docs/project`).
-- El catálogo de `src/template/` no se copia literal a un repo destino: el agente lo usa como guía de estructura y redacta el contenido real por proyecto (incluyendo el idioma, ver regla por defecto 3).
+- El catálogo de `skill/template/` no se copia literal a un repo destino: el agente lo usa como guía de estructura y redacta el contenido real por proyecto (incluyendo el idioma, ver regla por defecto 3).
 - **Ninguna tarea se cierra sin que el operador lo pida explícitamente** (decisión del operador, 2026-10-05). Al terminar el trabajo de una tarea, el agente le manda el resumen y espera: si el operador pide correcciones, se hacen y se vuelve a mandar el resumen; recién cuando dice que se cierre se hace el cierre de las Reglas 5 y 7 (`handoff`/`backlog`/`history`, revisión de bloqueadas) y el reporte de la Regla 8. Aplica también a las tareas chicas que se ejecutan sin plan (Regla 2).
 - **Commits coherentes** (decisión del operador, 2026-10-06): cada commit representa un trabajo hecho y se redacta para eso. Una tarea puede tener más de un commit; si toca varios módulos o también documentación, se separa por unidad coherente (ej. uno por módulo, otro para la documentación); si es chica, uno solo alcanza — queda a criterio del agente. Los commits del trabajo se hacen durante la tarea, a medida que cada unidad queda hecha. El título de cada commit de una tarea lleva su número como scope de Conventional Commits, `tipo(T-N): descripción` (ej. `feat(T-27): ocultar pausadas vacías`), también el de cierre (`docs(T-N): close task`); así el log de git distingue los commits de una tarea de los esporádicos o extras, que van sin `(T-N)`. Lo que se commitea **al cerrar** es el commit de cierre: el paso de la tarea a completada (`handoff.md`, `backlog.md` y `history.md`, Reglas 5 y 7). Los commits de otros cambios (ej. agregar tareas al backlog) se hacen cuando el operador lo pide.
 
 ### Qué NO tocar sin autorización explícita
 
-- La estructura de carpetas de `src/template/` — moverla o renombrar archivos rompe las referencias de `questions-flow.md` y `migration-flow.md`, y requiere bump de versión major (ver arriba).
-- Las "Reglas por defecto" de este mismo archivo (y de `src/template/agents/rules.md`, su plantilla) — son fijas por diseño, no se editan por proyecto (ver "Cómo actualizar este archivo" más abajo).
+- La estructura de carpetas de `skill/template/` — moverla o renombrar archivos rompe las referencias de `questions-flow.md` y `migration-flow.md`, y requiere bump de versión major (ver arriba).
+- Las "Reglas por defecto" de este mismo archivo (y de `skill/template/agents/rules.md`, su plantilla) — son fijas por diseño, no se editan por proyecto (ver "Cómo actualizar este archivo" más abajo).
 - `docs/desing.md` — no se actualiza en cada cambio, es un registro histórico de la conversación de diseño original, no el estado actual (para eso está `docs/architecture.md`).
 
 ### Decisiones no negociables

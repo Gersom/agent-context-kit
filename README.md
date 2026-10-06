@@ -19,7 +19,7 @@ Al ejecutarse sobre un repositorio, el skill:
 Invocar el skill explícitamente, pidiéndoselo al agente:
 
 - **"Usa la skill agent-context-kit"** — dispara la detección automática normal: si el repo ya tiene documentación de este skill, sigue el flujo de proyecto existente; si no, evalúa si hay contenido de otro sistema para migrar, o dispara el scaffolding normal según el alcance de la tarea.
-- **"Usa la skill agent-context-kit y migra mi proyecto"** — misma detección, pero fuerza el chequeo de migración aunque la heurística de nombres de archivo no encuentre por sí sola suficientes coincidencias como para dispararse (ver "Intención explícita del operador" en [`src/docs/migration-flow.md`](./src/docs/migration-flow.md)).
+- **"Usa la skill agent-context-kit y migra mi proyecto"** — misma detección, pero fuerza el chequeo de migración aunque la heurística de nombres de archivo no encuentre por sí sola suficientes coincidencias como para dispararse (ver "Intención explícita del operador" en [`skill/docs/migration-flow.md`](./skill/docs/migration-flow.md)).
 
 ## Seguimiento de tareas en la terminal
 
@@ -36,14 +36,14 @@ Uso, atajos y cómo lee los archivos: [`scripts/task-tracker/README.md`](./scrip
 
 ```
 agent-context-kit/
-├── src/             # El skill: SKILL.md, flujos de decisión (docs/) y catálogo de plantillas (template/)
+├── skill/           # El skill: SKILL.md, flujos de decisión (docs/) y catálogo de plantillas (template/)
 ├── scripts/         # Herramientas del repo, no parte del skill: task-tracker y código compartido (_shared/)
 ├── docs/            # Documentación del propio repo: filosofía, arquitectura, diseño y su estado (agents/)
 ├── package.json     # Versión del skill (SemVer) y comandos de los scripts
 └── tsconfig.json    # TypeScript (strict) para scripts/
 ```
 
-El árbol completo y para qué sirve cada parte están en [`docs/architecture.md`](./docs/architecture.md); qué es cada plantilla del catálogo, en [`src/docs/template-architecture.md`](./src/docs/template-architecture.md).
+El árbol completo y para qué sirve cada parte están en [`docs/architecture.md`](./docs/architecture.md); qué es cada plantilla del catálogo, en [`skill/docs/template-architecture.md`](./skill/docs/template-architecture.md).
 
 ## Estado
 
