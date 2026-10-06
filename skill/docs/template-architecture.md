@@ -43,11 +43,11 @@ template/
 
 ## `README.md` (raíz de `template/`)
 
-Guía de estructura/formato para generar el índice raíz de la documentación del proyecto destino. No se copia tal cual: se usa como referencia de qué secciones y tono debe tener el `docs/README.md` que el agente genera al final del flujo, listando únicamente lo que efectivamente se creó. Su primera sección ("Qué es este proyecto") es la única que no se recalcula del listado de archivos: se pregunta una sola vez y se preserva en corridas futuras — es el hueco que cubre "esto es un ecommerce", "esto es una API REST", etc., algo que no encaja en `project/architecture.md` (esa es estructura de carpetas y filosofía de organización, no qué es el proyecto).
+Guía para generar el `docs/README.md` del proyecto destino: lo primero que lee el agente en cada sesión, un mapa mínimo (~1,5 KB). No se copia tal cual: contiene la descripción del proyecto, la definición de "operador" y el árbol de `docs/` con una línea por archivo, listando únicamente lo que efectivamente se creó. La descripción es lo único que no se recalcula: se pregunta una sola vez y se preserva en corridas futuras — cubre "esto es un ecommerce", "esto es una API REST", etc., algo que no encaja en `project/architecture.md` (esa es la estructura del código y su filosofía de organización, no qué es el proyecto).
 
 ## `AGENTS.md` / `CLAUDE.md` (raíz de `template/`)
 
-Los punteros que se aseguran en la raíz del repo destino, en **cualquier** set (incluso el mínimo) — son lo único que le permite a un agente genérico (no solo este skill) encontrar la documentación de contexto sin invocarlo de nuevo. `AGENTS.md` es la fuente de verdad: dice qué leer primero. `CLAUDE.md` nunca duplica ese contenido, solo redirige a `AGENTS.md`. Ambos llevan la sección delimitada `<!-- agent-docs-skill:start/end -->` para poder agregarse al final de un archivo ya existente del operador sin sobrescribirlo ni duplicarse en corridas futuras. Ver el paso 3-4 de la "Ronda final" en [`questions-flow.md`](./questions-flow.md).
+Los punteros que se aseguran en la raíz del repo destino, en **cualquier** set (incluso el mínimo) — son lo único que le permite a un agente genérico (no solo este skill) encontrar la documentación de contexto sin invocarlo de nuevo. `AGENTS.md` es la fuente de verdad: dice qué leer (README, reglas y handoff) y qué no leer salvo necesidad (el resto, y `backlog.md`/`history.md` con una tarea en curso). `CLAUDE.md` nunca duplica ese contenido, solo redirige a `AGENTS.md`. Ambos llevan la sección delimitada `<!-- agent-docs-skill:start/end -->` para poder agregarse al final de un archivo ya existente del operador sin sobrescribirlo ni duplicarse en corridas futuras. Ver el paso 3-4 de la "Ronda final" en [`questions-flow.md`](./questions-flow.md).
 
 ## `agents/`
 
@@ -92,7 +92,7 @@ Las secciones de tareas de `handoff.md` y `backlog.md` van precedidas, en la lí
 
 Documentación técnica y de dominio sobre el proyecto en sí (no sobre el proceso de trabajo).
 
-- **`architecture.md`** — Las convenciones de organización del proyecto destino que no se deducen mirando las carpetas (por qué está organizado así, reglas de dependencia, dónde va cada cosa nueva). No es un árbol de carpetas: eso se ve en el repo y no ayuda al agente a ubicar archivos.
+- **`architecture.md`** — El mapa del código del proyecto destino: un árbol anotado de los niveles superiores (una línea de propósito por entrada, para orientarse sin explorar), las convenciones de organización que no se deducen de las carpetas (por qué está organizado así, reglas de dependencia) y dónde va cada cosa nueva. Se lee solo cuando hace falta ubicarse en el código.
 - **`stack.md`** — Las decisiones de stack que no se ven en los archivos de dependencias: qué se eligió a propósito, por qué cuando no es la opción obvia y qué alternativas se descartaron. No es un inventario de lenguajes y librerías.
 - **`entities.md`** — Modelo de datos o esquema de base de datos, cuando vale la pena documentarlo aparte del código (por ejemplo, si no hay un ORM autodescriptivo o el esquema es complejo).
 - **`infrastructure.md`** — Cómo y dónde se despliega el proyecto: entornos, infraestructura, pipeline de deploy.

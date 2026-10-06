@@ -30,6 +30,7 @@ agent-context-kit/
 │       └── test/                # Tests de `bun test` en espejo de src/ + e2e/ (script entero)
 │
 ├── docs/
+│   ├── README.md            # Mapa de docs/: qué es el proyecto y qué hay en cada archivo (lo primero que lee el agente)
 │   ├── desing.md            # Documento de diseño: historial de decisiones y pendientes
 │   ├── architecture.md      # Este archivo
 │   ├── philosophy.md        # Principios de diseño: por qué el kit es lo que es

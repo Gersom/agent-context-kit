@@ -85,7 +85,7 @@ Una plantilla se completa, no se copia tal cual:
 
 1. Reemplazar los `[Placeholder]` por contenido real (o por la frase alternativa que la propia plantilla sugiere, ej. "Ninguna").
 2. **Quitar los comentarios HTML de guía** (`<!-- ... -->`): son instrucciones para quien completa la plantilla y, si quedan, se vuelven a leer en cada sesión. Se conservan solo la firma `agent-context-kit:signature`, las anclas `agent-context-kit:section=...` y los marcadores `agent-docs-skill:start/end`. Lo que hace falta para mantener el archivo después (formato de una tarea, de una entrada, de una tarea pausada) está en el texto visible de la plantilla, no en comentarios. Excepción: `external/_example-service.md` se copia sin modificar (Ronda 4).
-3. Escribir solo lo que no se deduce del código (Regla 4): no volcar árboles de carpetas ni listas de dependencias; sí convenciones, decisiones y restricciones.
+3. Escribir solo lo que aporta al agente: no volcar listas de dependencias ni módulos uno por uno; sí convenciones, decisiones y restricciones y, en `architecture.md`, el árbol anotado de los niveles superiores del código (una línea de propósito por entrada). Conciso, sin relleno, y lo que ya vive en otro archivo se enlaza, no se repite.
 
 ---
 
@@ -155,11 +155,11 @@ Solo si en la Ronda 3 la respuesta fue "sí" a integraciones externas.
 
 ## Ronda final — Generar README + puntero en la raíz (siempre, en cualquier rama que haya copiado algo)
 
-1. **Generar `docs/README.md`** (no copiar `template/README.md` literal): usando ese archivo solo como guía de estructura/formato, armar un índice que enlace únicamente a los archivos que efectivamente existen en `docs/` tras esta ejecución (si no se copió `glossary.md`, no aparece en el índice; si se crearon 3 `external/*.md`, los 3 quedan listados; etc.). Este paso se omite en el set mínimo (no hay README en ese set); en ese caso, el paso 3 tampoco enlaza a `docs/README.md`.
-   - **Sección "Qué es este proyecto":** si `docs/README.md` no existe todavía, o existe pero no tiene esa sección, preguntar: *"¿Podés describir en 1-2 frases qué es este proyecto (qué hace, para quién)?"* y escribirla como primera sección del archivo. Si ya existe con esa sección, preservarla tal cual al regenerar el resto del índice — no se vuelve a preguntar.
+1. **Generar `docs/README.md`** (no copiar `template/README.md` literal): usando ese archivo solo como guía, armar el mapa mínimo (~1,5 KB como máximo) con la descripción del proyecto, la definición de "operador" y el árbol de `docs/` con solo los archivos que existen tras esta ejecución (si no se copió `glossary.md`, no aparece; si se crearon 3 `external/*.md`, los 3 quedan listados). Este paso se omite en el set mínimo (no hay README en ese set); en ese caso, el paso 3 tampoco enlaza a `docs/README.md`.
+   - **Descripción del proyecto:** si `docs/README.md` no existe todavía, o existe pero no la tiene, preguntar: *"¿Podés describir en 1-2 frases qué es este proyecto (qué hace, para quién)?"* y escribirla justo debajo del título. Si ya existe, preservarla tal cual al regenerar el resto — no se vuelve a preguntar.
 2. Determinar si se usó `docs/` o `agent-context/` (según lógica de detección de conflicto, punto 4.1 del documento de diseño).
 3. **`AGENTS.md` (fuente de verdad — se asegura siempre, en cualquier set, incluso el mínimo):**
-   - No existe → crear a partir de `template/AGENTS.md`, ajustando la ruta `docs/`/`agent-context/` y quitando la línea de `docs/README.md` si ese archivo no se generó (set mínimo).
+   - No existe → crear a partir de `template/AGENTS.md`, ajustando la ruta `docs/`/`agent-context/` y quitando las líneas de los archivos que no se generaron (en el set mínimo: `docs/README.md`, `backlog.md` e `history.md`).
    - Existe con otro contenido del operador → no se sobrescribe: se agrega la sección delimitada `<!-- agent-docs-skill:start -->` ... `<!-- agent-docs-skill:end -->` de `template/AGENTS.md` al final, solo si el marcador no está ya presente.
 4. **`CLAUDE.md` (redirige a `AGENTS.md`, nunca duplica su contenido — se asegura siempre, en cualquier set):**
    - No existe → crear a partir de `template/CLAUDE.md`, literal.
