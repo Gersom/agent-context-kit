@@ -14,6 +14,12 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-10-05 — ✅ Regla de cierre explícito y MVP del task-tracker
+
+- Regla nueva en `rules.md` (reglas específicas): ninguna tarea se cierra sin que el operador lo pida explícitamente; al terminar se le manda el resumen y se espera, también en tareas chicas sin plan. Decisión del operador después de aplicarla por primera vez en la Tarea 21.
+- El operador confirmó que el task-tracker llegó a su MVP → la Tarea 19 (prompt de normalización) se desbloqueó y pasó a "Tareas libres".
+- La rama `feat/task-tracker` (Tareas 9 a 21) se mergeó a `main` y se pusheó, a pedido del operador.
+
 ## 2026-10-05 — ✅ Tarea 21 — Ajustes de pantalla del task-tracker: tachado de pasos y recuadros
 
 - **Recuadros:** cada tipo de tarea (completadas, en progreso, pausadas, libres, bloqueadas) va en un recuadro de esquinas redondeadas (`ui/box.ts`), con el título del tipo en el borde superior izquierdo y el archivo del que sale a la derecha; reemplazan a los separadores `━━ archivo ━━`. Todos tienen el ancho de la terminal (o `COLUMNS`, o 100 sin terminal; mínimo 40), con el texto largo recortado sin romper el borde (el ancho se mide en columnas visibles con `Bun.stringWidth`).

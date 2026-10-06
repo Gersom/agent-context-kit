@@ -66,6 +66,7 @@ Estas reglas vienen con el skill y aplican sin importar el proyecto. No se borra
   - **minor** — contenido nuevo que no rompe nada (nueva plantilla, nueva rama del árbol de preguntas).
   - **major** — cambios que rompen algo que un repo destino ya pudiera estar usando (mover/renombrar archivos de `template/` referenciados desde `questions-flow.md`, cambiar la estructura generada en `docs/agents`/`docs/project`).
 - El catálogo de `src/template/` no se copia literal a un repo destino: el agente lo usa como guía de estructura y redacta el contenido real por proyecto (incluyendo el idioma, ver regla por defecto 3).
+- **Ninguna tarea se cierra sin que el operador lo pida explícitamente** (decisión del operador, 2026-10-05). Al terminar el trabajo de una tarea, el agente le manda el resumen y espera: si el operador pide correcciones, se hacen y se vuelve a mandar el resumen; recién cuando dice que se cierre se hace el cierre de las Reglas 5 y 7 (`handoff`/`backlog`/`history`, revisión de bloqueadas) y el reporte de la Regla 8. Aplica también a las tareas chicas que se ejecutan sin plan (Regla 2).
 
 ### Qué NO tocar sin autorización explícita
 

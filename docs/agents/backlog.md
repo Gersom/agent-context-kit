@@ -11,7 +11,7 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 
 **Dos secciones:** las tareas viven en "Tareas libres" (listas para tomar) o "Tareas bloqueadas / pospuestas" (no se toman todavía). Cuando el motivo de una tarea bloqueada deja de aplicar, se mueve a "Tareas libres" — ver Regla 7 de `rules.md` (no se borra el campo `Bloqueos`, se marca como resuelto).
 
-**Agrupamiento (solo en "Tareas libres"):** si esta sección supera las 15 tareas (Regla 7 de `rules.md`), se evalúa agrupar 2 o más que compartan un objetivo real. El criterio no es un tope de cantidad — es que el grupo entero quepa en una sola frase de objetivo compartido, sin usar "y" para forzar una tarea que en realidad no pertenece. Un grupo aparece en "Tareas libres" como una sola línea corta; el detalle completo de cada tarea que lo compone se mueve a la sección "Tareas agrupadas" (más abajo), que no hace falta leer salvo que el operador pida el detalle de una tarea puntual o se vaya a tomar una. Si un grupo queda con una sola tarea (las demás se tomaron o cerraron), se desarma: esa tarea vuelve a ser una entrada individual normal en "Tareas libres". Hoy "Tareas libres" tiene 4 tareas — muy por debajo del umbral, no hay grupos formados.
+**Agrupamiento (solo en "Tareas libres"):** si esta sección supera las 15 tareas (Regla 7 de `rules.md`), se evalúa agrupar 2 o más que compartan un objetivo real. El criterio no es un tope de cantidad — es que el grupo entero quepa en una sola frase de objetivo compartido, sin usar "y" para forzar una tarea que en realidad no pertenece. Un grupo aparece en "Tareas libres" como una sola línea corta; el detalle completo de cada tarea que lo compone se mueve a la sección "Tareas agrupadas" (más abajo), que no hace falta leer salvo que el operador pida el detalle de una tarea puntual o se vaya a tomar una. Si un grupo queda con una sola tarea (las demás se tomaron o cerraron), se desarma: esa tarea vuelve a ser una entrada individual normal en "Tareas libres". Hoy "Tareas libres" tiene 5 tareas — muy por debajo del umbral, no hay grupos formados.
 
 **Numeración:** cada tarea tiene un número correlativo fijo, asignado una sola vez al crearse. El número **nunca se reutiliza**, ni siquiera cuando la tarea se cierra (hecha o descartada) y pasa a `history.md`. No es un orden de cola: se puede tomar tareas fuera de orden.
 
@@ -67,6 +67,15 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Detalles:** detectado durante la Tarea 11 al sumar al README la sección del task-tracker; quedó fuera de su alcance.
 - **Agregada:** 2026-10-05.
 
+### Tarea 19 — Prompt de normalización para repos que ya adoptaron el skill
+
+- **Descripción:** escribir el prompt que el operador corre en cada repo que adoptó el skill antes de las anclas (Tarea 9), para que el agente de ese repo agregue las anclas de sección y ajuste `backlog.md`/`handoff.md` (y el formato de `history.md`) a la estructura que lee el task-tracker. Se entrega al operador en el chat y queda guardado junto al script para reusarlo.
+- **Decisiones/temas a definir antes de empezar:** dónde queda guardado (propuesta: README de `scripts/task-tracker/`).
+- **Bloqueos:** `[Resuelto el 2026-10-05]` — era `[postergada]` hasta que el task-tracker llegue a su versión MVP (mínimo producto viable) — pedido del operador el 2026-10-05, porque el prompt tiene que reflejar la estructura final que lee el script. Qué cuenta como MVP lo decide el operador (el agente puede sugerirlo, el operador confirma). El operador confirmó el MVP el 2026-10-05, al cerrar la Tarea 21.
+- **Disparador:** cuando el operador la tome (el MVP ya está confirmado).
+- **Detalles:** antes estaba dentro de la Tarea 11; se sacó a esta tarea a pedido del operador. La Tarea 15 (validador) puede servir para verificar el resultado del prompt en cada repo.
+- **Agregada:** 2026-10-05.
+
 <!-- agent-context-kit:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
@@ -79,16 +88,7 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 19 — Prompt de normalización para repos que ya adoptaron el skill
-
-- **Descripción:** escribir el prompt que el operador corre en cada repo que adoptó el skill antes de las anclas (Tarea 9), para que el agente de ese repo agregue las anclas de sección y ajuste `backlog.md`/`handoff.md` (y el formato de `history.md`) a la estructura que lee el task-tracker. Se entrega al operador en el chat y queda guardado junto al script para reusarlo.
-- **Decisiones/temas a definir antes de empezar:** dónde queda guardado (propuesta: README de `scripts/task-tracker/`).
-- **Bloqueos:** `[postergada]` hasta que el task-tracker llegue a su versión MVP (mínimo producto viable) — pedido del operador el 2026-10-05, porque el prompt tiene que reflejar la estructura final que lee el script. Qué cuenta como MVP lo decide el operador (el agente puede sugerirlo, el operador confirma).
-- **Disparador:** cuando el operador confirme que el task-tracker llegó a su MVP.
-- **Detalles:** antes estaba dentro de la Tarea 11; se sacó a esta tarea a pedido del operador. La Tarea 15 (validador) puede servir para verificar el resultado del prompt en cada repo.
-- **Agregada:** 2026-10-05.
-
 <!-- agent-context-kit:section=grouped -->
 ## Tareas agrupadas
 
-No aplica todavía — ningún grupo formado ("Tareas libres" tiene 4 tareas, bien por debajo del umbral de 15).
+No aplica todavía — ningún grupo formado ("Tareas libres" tiene 5 tareas, bien por debajo del umbral de 15).
