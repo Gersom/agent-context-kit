@@ -14,6 +14,14 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-10-06 — ✅ Tarea 27 — Ocultamiento de tareas pausadas y bloqueadas cuando no hay
+
+- En la pantalla del task-tracker, los recuadros PAUSADAS y BLOQUEADAS solo aparecen si hay tareas de ese tipo (`ui/render.ts`); ya no muestran "Ninguna". EN PROGRESO ("Sin tarea en curso"), LIBRES y TAREAS COMPLETADAS no cambian, y los contadores del modelo tampoco.
+- Tests: se ajustó el de "estados vacíos y set mínimo" (pasó de 2 recuadros a 1) y se agregó uno que cubre los dos casos (sin pausadas ni bloqueadas no aparecen; con ellas sí). README del task-tracker actualizado.
+- Verificación: `bun test` → 107 tests en 18 archivos, todos pasan; `bun run typecheck` sin errores; `bun run tasks docs/agents --once` sin recuadro PAUSADAS.
+- Aparte, a pedido del operador durante la tarea: regla de "Commits coherentes" en `rules.md` (varios commits por tarea por unidad coherente, título `tipo(T-N): descripción`, commit de cierre con handoff/backlog/history). Primera tarea cerrada con esa convención.
+- La rama `feat/hide-empty-sections` se mergeó a `main`, sin push.
+
 ## 2026-10-06 — ✅ Tarea 23 — Separar el parser de `parse/*.ts` para reutilizarlo en otros scripts
 
 - Nuevo módulo compartido `scripts/_shared/` (decisión del operador: el `_` marca código de apoyo, y las carpetas de `scripts/` sin `_` son scripts independientes; documentado en `docs/architecture.md`). Contiene `parse/` (backlog, blocks, handoff, history, markdown, sections), `tasks/` (`block-info`, `task-refs`), `types.ts` con los tipos del dominio, y `test/` con los tests en espejo, los fixtures y `helpers.ts`.
