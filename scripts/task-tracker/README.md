@@ -82,7 +82,7 @@ El tachado usa el código de tachado de la terminal: Windows Terminal, VS Code y
 
 ## Cómo lee los archivos
 
-El script no depende del idioma de la documentación (los headers se traducen por proyecto). Lo que usa está descrito en [`src/docs/template-architecture.md`](../../src/docs/template-architecture.md), sección "Anclas de sección":
+El script no depende del idioma de la documentación (los headers se traducen por proyecto). Lo que usa está descrito en [`skill/docs/template-architecture.md`](../../skill/docs/template-architecture.md), sección "Anclas de sección":
 
 - **Anclas de sección** en `handoff.md` y `backlog.md`: comentarios `<!-- agent-context-kit:section=<id> -->` antes de cada sección (`in-progress`, `paused`, `free`, `blocked`, `grouped`). Si un archivo no tiene ninguna, el script usa un **plan B**: toma las secciones `##` por orden de aparición y lo avisa en pantalla.
 - **Tareas:** headers `### Tarea N — título` (`####` dentro de un grupo), con `—`, `–` o `-`. La tarea en progreso es la primera línea `Tarea N — título` de su sección, antes de la primera subsección.

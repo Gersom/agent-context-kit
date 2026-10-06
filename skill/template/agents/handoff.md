@@ -1,4 +1,4 @@
-<!-- agent-context-kit:signature — ignorar al leer/actualizar este archivo, no es contenido. Existe solo para identificar que fue generado por https://github.com/Gersom/agent-context-kit, útil para el flujo de migración (ver src/docs/migration-flow.md) cuando hay que distinguir este skill de un sistema de documentación parecido pero distinto. Opcional: su ausencia no significa que el archivo no sea de este skill. -->
+<!-- agent-context-kit:signature — ignorar al leer/actualizar este archivo, no es contenido. Existe solo para identificar que fue generado por https://github.com/Gersom/agent-context-kit, útil para el flujo de migración (ver skill/docs/migration-flow.md) cuando hay que distinguir este skill de un sistema de documentación parecido pero distinto. Opcional: su ausencia no significa que el archivo no sea de este skill. -->
 
 # Handoff
 
@@ -11,7 +11,7 @@ Si no hay ninguna tarea en curso, la sección "Tarea en progreso" debe decir exp
 
 Regla 6 de `rules.md`: este archivo se actualiza en cada paso completado del plan, no solo al cerrar la tarea — el objetivo es que, si la conversación se corta a mitad de camino, un chat nuevo pueda retomar exactamente desde acá sin depender de la memoria de la sesión anterior.
 
-**Anclas de sección:** "Tarea en progreso" y "Tareas pausadas" van precedidas por un comentario `<!-- agent-context-kit:section=... -->` (`in-progress`, `paused`). Son comentarios de máquina — los usa el script de seguimiento de tareas (`scripts/task-tracker/` del repo de agent-context-kit) para ubicar las secciones sin depender del idioma de los headers. No se traducen ni se mueven, y como este archivo se sobrescribe completo, **hay que reescribirlas siempre** en cada actualización. La tarea en progreso se identifica por la primera `Tarea N — título` dentro de la sección `in-progress`; si no hay ninguna, no hay tarea en curso. Detalle completo en `src/docs/template-architecture.md` del repo de agent-context-kit, sección "Anclas de sección".
+**Anclas de sección:** "Tarea en progreso" y "Tareas pausadas" van precedidas por un comentario `<!-- agent-context-kit:section=... -->` (`in-progress`, `paused`). Son comentarios de máquina — los usa el script de seguimiento de tareas (`scripts/task-tracker/` del repo de agent-context-kit) para ubicar las secciones sin depender del idioma de los headers. No se traducen ni se mueven, y como este archivo se sobrescribe completo, **hay que reescribirlas siempre** en cada actualización. La tarea en progreso se identifica por la primera `Tarea N — título` dentro de la sección `in-progress`; si no hay ninguna, no hay tarea en curso. Detalle completo en `skill/docs/template-architecture.md` del repo de agent-context-kit, sección "Anclas de sección".
 
 ---
 

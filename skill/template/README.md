@@ -70,4 +70,4 @@ Punto de entrada a la documentación de contexto de este proyecto para agentes d
 
 <!-- Listar cada archivo real que haya terminado ahí, tal como está (sin plantilla propia). -->
 
-*(solo si esta documentación se generó migrando un sistema previo y quedó contenido sin equivalente claro en la estructura de este skill — ver `src/docs/migration-flow.md`)*
+*(solo si esta documentación se generó migrando un sistema previo y quedó contenido sin equivalente claro en la estructura de este skill — ver `skill/docs/migration-flow.md`)*
