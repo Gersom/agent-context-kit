@@ -14,6 +14,15 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-10-06 — ✅ Tarea 28 — Renombrar la carpeta `src/` a `skill/`
+
+- La carpeta `src/` (con `SKILL.md`, `docs/` y `template/`) pasó a `skill/`, hecho con `git mv` para conservar el historial. Se actualizaron las referencias vivas: archivos dentro de `skill/`, README del task-tracker, `README.md`, `docs/architecture.md`, `docs/agents/rules.md` y las descripciones de las tareas abiertas del backlog. Los enlaces internos del skill son relativos, así que no se rompieron.
+- `docs/desing.md` y las entradas ya cerradas de `history.md` se dejaron como están: son registro histórico con la ruta de entonces. El `src/` interno de `scripts/task-tracker/` no cambia.
+- Autorizado por el operador: cambiar solo la ruta (no el contenido) dentro de las Reglas por defecto 3 y 4 de `rules.md`, que son fijas. Sin bump de versión (queda en 1.1.0); se decide al publicar la próxima release.
+- Efecto conocido: los repos que ya generaron documentación con las plantillas `agents/handoff.md` y `agents/backlog.md` quedan con un puntero de texto a `src/docs/template-architecture.md`; no rompe nada.
+- Verificación: `bun test` → 107 tests, todos pasan; `bun run typecheck` sin errores; búsqueda de `src/` sin restos fuera del `src/` interno del task-tracker y de los registros históricos.
+- La rama `refactor/rename-src-to-skill` se mergeó a `main`, sin push.
+
 ## 2026-10-06 — ✅ Tarea 20 — Actualizar la sección "Estructura del repositorio" del README raíz
 
 - La sección de `README.md` ahora muestra la estructura real: `src/` (el skill: `SKILL.md`, flujos de decisión y plantillas), `scripts/` (task-tracker y `_shared/`), `docs/` (documentación del propio repo, con `agents/`), `package.json` y `tsconfig.json`. Una línea por entrada, sin repetir el árbol completo: enlaza a `docs/architecture.md` y a `src/docs/template-architecture.md` (Regla 1).

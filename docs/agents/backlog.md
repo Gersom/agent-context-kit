@@ -11,13 +11,13 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 
 **Dos secciones:** las tareas viven en "Tareas libres" (listas para tomar) o "Tareas bloqueadas / pospuestas" (no se toman todavía). Cuando el motivo de una tarea bloqueada deja de aplicar, se mueve a "Tareas libres" — ver Regla 7 de `rules.md` (no se borra el campo `Bloqueos`, se marca como resuelto).
 
-**Agrupamiento (solo en "Tareas libres"):** si esta sección supera las 15 tareas (Regla 7 de `rules.md`), se evalúa agrupar 2 o más que compartan un objetivo real. El criterio no es un tope de cantidad — es que el grupo entero quepa en una sola frase de objetivo compartido, sin usar "y" para forzar una tarea que en realidad no pertenece. Un grupo aparece en "Tareas libres" como una sola línea corta; el detalle completo de cada tarea que lo compone se mueve a la sección "Tareas agrupadas" (más abajo), que no hace falta leer salvo que el operador pida el detalle de una tarea puntual o se vaya a tomar una. Si un grupo queda con una sola tarea (las demás se tomaron o cerraron), se desarma: esa tarea vuelve a ser una entrada individual normal en "Tareas libres". Hoy "Tareas libres" tiene 8 tareas — muy por debajo del umbral, no hay grupos formados.
+**Agrupamiento (solo en "Tareas libres"):** si esta sección supera las 15 tareas (Regla 7 de `rules.md`), se evalúa agrupar 2 o más que compartan un objetivo real. El criterio no es un tope de cantidad — es que el grupo entero quepa en una sola frase de objetivo compartido, sin usar "y" para forzar una tarea que en realidad no pertenece. Un grupo aparece en "Tareas libres" como una sola línea corta; el detalle completo de cada tarea que lo compone se mueve a la sección "Tareas agrupadas" (más abajo), que no hace falta leer salvo que el operador pida el detalle de una tarea puntual o se vaya a tomar una. Si un grupo queda con una sola tarea (las demás se tomaron o cerraron), se desarma: esa tarea vuelve a ser una entrada individual normal en "Tareas libres". Hoy "Tareas libres" tiene 7 tareas — muy por debajo del umbral, no hay grupos formados.
 
 **Numeración:** cada tarea tiene un número correlativo fijo, asignado una sola vez al crearse. El número **nunca se reutiliza**, ni siquiera cuando la tarea se cierra (hecha o descartada) y pasa a `history.md`. No es un orden de cola: se puede tomar tareas fuera de orden.
 
 > Numeración iniciada el 2026-09-24. Tareas ya cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Anclas de sección:** cada sección de tareas va precedida por un comentario `<!-- agent-context-kit:section=... -->` (`free`, `blocked`, `grouped`). Son comentarios de máquina — los usa el script de seguimiento de tareas (`scripts/task-tracker/`) para ubicar las secciones sin depender del idioma de los headers. No se traducen, no se borran ni se mueven al actualizar este archivo. Detalle completo en [`../../src/docs/template-architecture.md`](../../src/docs/template-architecture.md), sección "Anclas de sección".
+**Anclas de sección:** cada sección de tareas va precedida por un comentario `<!-- agent-context-kit:section=... -->` (`free`, `blocked`, `grouped`). Son comentarios de máquina — los usa el script de seguimiento de tareas (`scripts/task-tracker/`) para ubicar las secciones sin depender del idioma de los headers. No se traducen, no se borran ni se mueven al actualizar este archivo. Detalle completo en [`../../skill/docs/template-architecture.md`](../../skill/docs/template-architecture.md), sección "Anclas de sección".
 
 **Próximo número de tarea:** 29
 
@@ -28,7 +28,7 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 
 ### Tarea 1 — Probar el flujo completo end-to-end sobre un repo real
 
-- **Descripción:** validar en la práctica tanto el scaffolding nuevo como el flujo de migración (`src/docs/migration-flow.md`) corriendo el skill sobre uno o más repos reales del operador (ej. `gercash-backend`, `gercash-frontend`, `gercash-ai-service`, `gercash-whatsapp-bot`), ya que varios tienen sistemas de documentación propios que sirven como caso de uso real para el flujo de migración.
+- **Descripción:** validar en la práctica tanto el scaffolding nuevo como el flujo de migración (`skill/docs/migration-flow.md`) corriendo el skill sobre uno o más repos reales del operador (ej. `gercash-backend`, `gercash-frontend`, `gercash-ai-service`, `gercash-whatsapp-bot`), ya que varios tienen sistemas de documentación propios que sirven como caso de uso real para el flujo de migración.
 - **Decisiones/temas a definir antes de empezar:** elegir sobre qué repo(s) probar primero y si se prueba scaffolding nuevo, migración, o ambos.
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador quiera validar el skill sobre un proyecto real, o priorice esta tarea explícitamente.
@@ -55,7 +55,7 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
   - Si solo reporta o también corrige (`--fix`); la corrección de los repos ya adoptados hoy la cubre el prompt de normalización de la Tarea 11.
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador la priorice. Sirve también para verificar el resultado del prompt de normalización de la Tarea 11.
-- **Detalles:** las normas a verificar salen de `src/docs/template-architecture.md` (sección "Anclas de sección") y de las plantillas de `src/template/agents/`; ante una diferencia, gana la plantilla (Regla 4). Dependencias en `devDependencies` del `package.json` raíz (ver `rules.md`).
+- **Detalles:** las normas a verificar salen de `skill/docs/template-architecture.md` (sección "Anclas de sección") y de las plantillas de `skill/template/agents/`; ante una diferencia, gana la plantilla (Regla 4). Dependencias en `devDependencies` del `package.json` raíz (ver `rules.md`).
 - **Agregada:** 2026-10-05.
 
 ### Tarea 19 — Prompt de normalización para repos que ya adoptaron el skill
@@ -69,17 +69,17 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 
 ### Tarea 25 — Optimización del contenido del kit: menos tokens y sin duplicados
 
-- **Descripción:** revisar el contenido del kit (las plantillas de `src/template/`, las reglas y los archivos de `docs/agents/`) para que cada archivo aporte solo lo que el agente no puede deducir del código ni del README, y para que lo que se carga en cada sesión sea lo mínimo. Incluye la revisión de contenido duplicado.
+- **Descripción:** revisar el contenido del kit (las plantillas de `skill/template/`, las reglas y los archivos de `docs/agents/`) para que cada archivo aporte solo lo que el agente no puede deducir del código ni del README, y para que lo que se carga en cada sesión sea lo mínimo. Incluye la revisión de contenido duplicado.
 - **Decisiones/temas a definir antes de empezar:**
   - **Qué cuenta como duplicado:** contenido que ya está en otro archivo del kit (Regla 1 de `rules.md`) o que se deduce del código, del README o de la documentación existente del proyecto.
   - **Qué se carga siempre vs. a demanda:** hoy `AGENTS.md` lleva a leer `rules.md` (~10 KB) y `handoff.md` en cada sesión; `history.md` ya pesa ~49 KB y crece con cada tarea. Definir qué debe leerse siempre y qué solo cuando hace falta (ej. `history.md` solo ante una pregunta puntual; `backlog.md` solo lo relevante).
   - **Cómo se mide:** el objetivo del kit es reducir retrabajo y tiempo del operador, con un costo en tokens bajo (ver `docs/philosophy.md`), así que se miden las dos cosas: (a) tokens al arrancar una sesión; (b) qué tan bien se retoma una tarea cortada, cuántas preguntas tiene que hacer el agente al operador y cuánto retrabajo hubo por contexto faltante o decisiones repetidas. Siempre con y sin kit. Lo natural es hacerlo junto con la Tarea 1 (probar el flujo sobre un repo real); decidir si se agrega allí o se hace acá.
   - **Reglas por defecto de `rules.md`:** son fijas y no se editan sin autorización explícita del operador; si acortarlas ayuda, requiere su aprobación.
 - **Qué revisar:**
-  - Plantillas de `src/template/project/` (arquitectura, stack, etc.): son las que más se parecen a lo que el estudio penaliza (descripción del repo que el agente deduce solo). Dejar solo decisiones y restricciones que no se ven en el código.
+  - Plantillas de `skill/template/project/` (arquitectura, stack, etc.): son las que más se parecen a lo que el estudio penaliza (descripción del repo que el agente deduce solo). Dejar solo decisiones y restricciones que no se ven en el código.
   - Solapamientos entre `README.md`, `docs/architecture.md`, `docs/philosophy.md`, `rules.md` y las plantillas.
   - Tamaño y política de lectura de `rules.md`, `handoff.md`, `backlog.md` y `history.md` (por ejemplo, una política de archivar o resumir `history.md`).
-  - El flujo de preguntas (`src/docs/questions-flow.md`): que no genere archivos de contexto que se duplican con el código o entre sí.
+  - El flujo de preguntas (`skill/docs/questions-flow.md`): que no genere archivos de contexto que se duplican con el código o entre sí.
   - Que los comandos de lectura compactos de la Tarea 24 (`next`, `show N`, `status`) cubran el caso de no leer archivos enteros.
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador la priorice. Conviene antes de seguir sumando plantillas o contenido nuevo al kit.
@@ -112,26 +112,12 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
   - Formato estructurado de los bloqueos que permita desbloquear solo (ej. `blocked-by: Tarea 12`); los bloqueos en texto libre quedan para revisión manual.
   - Cómo entra el texto libre (descripciones, `Detalles`): por flags o por stdin.
   - Posiciones (línea/offset) de bloques y campos en el parser compartido (`scripts/_shared/`), necesarias para la edición quirúrgica; se agregan en esta tarea, no existen todavía.
-  - Cómo se reflejan en `rules.md` y en las plantillas de `src/template/`: el script es opcional, y si no existe el agente sigue editando a mano como hoy (la distribución del kit sigue siendo markdown puro).
+  - Cómo se reflejan en `rules.md` y en las plantillas de `skill/template/`: el script es opcional, y si no existe el agente sigue editando a mano como hoy (la distribución del kit sigue siendo markdown puro).
   - Si se hace por etapas: primero comandos de lectura, después los de escritura, empezando por los más mecánicos.
 - **Bloqueos:** `[Resuelto el 2026-10-06]` — era `[dependencia]` de la Tarea 23 (separar el parser para reutilizarlo), que dejó el parser en `scripts/_shared/`. Las posiciones línea/offset para editar quirúrgicamente NO se hicieron en esa tarea: se agregan acá. El script debe respetar `docs/philosophy.md`.
 - **Disparador:** cuando el operador la priorice (el parser compartido ya está en `scripts/_shared/`).
 - **Detalles:** surgió de la conversación del 2026-10-05: busca bajar el consumo de tokens (menos lectura de archivos grandes, menos reescritura) y evitar errores mecánicos (anclas olvidadas, números repetidos). Si se hace la Tarea 15 (validador), sirve de red de seguridad para este script.
 - **Agregada:** 2026-10-05.
-
-### Tarea 28 — Renombrar la carpeta `src/` a `skill/`
-
-- **Descripción:** renombrar la carpeta `src/` (que contiene `SKILL.md`, `docs/` y `template/`) a `skill/`, para que su nombre diga qué es: el skill que se distribuye, a diferencia de `scripts/` (herramientas del repo) y `docs/` (documentación del propio repo). Actualizar todas las referencias y la estructura que describen el README y `docs/architecture.md`.
-- **Decisiones/temas a definir antes de empezar:**
-  - **Versión:** `rules.md` pide bump major cuando se mueven o renombran archivos de `template/` referenciados desde `questions-flow.md`, y prohíbe tocar la estructura de `src/template/` sin autorización explícita. Decidir si este renombrado cuenta como cambio que rompe (major, `v2.0.0`) o no, y si se publica release.
-  - **Qué se reescribe y qué no:** las referencias vivas (README, `docs/architecture.md`, `rules.md`, `docs/agents/*` del estado actual, flujos y plantillas dentro de la carpeta) sí. `docs/desing.md` y las entradas ya cerradas de `history.md` son registro histórico con la ruta de entonces: no se reescriben.
-  - **Distribución:** impacto en la Tarea 3 (exportar como skill utilizable por Claude) y la Tarea 4 (skills.sh): conviene decidirlo antes o junto con ellas, porque `skill/` es lo que se empaquetaría.
-  - Hacer el renombrado con `git mv` para conservar el historial.
-- **Qué revisar:** ~60 menciones de `src/` en `README.md`, `docs/architecture.md`, `docs/agents/rules.md`, `backlog.md`, `handoff.md`, `src/docs/migration-flow.md`, `src/docs/template-architecture.md`, `src/template/README.md` y la plantilla `src/template/agents/handoff.md`. No confundir con el `src/` interno de `scripts/task-tracker/`, que no cambia. Verificar al final con `bun test`, `bun run typecheck` y una búsqueda de `src/` que no deje referencias rotas.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador la priorice. Si va a hacerse, conviene antes de las Tareas 3 y 4.
-- **Detalles:** pedido del operador el 2026-10-06 durante la Tarea 20. La Tarea 20 describe la estructura actual (`src/`); al terminar esta tarea, el README y `docs/architecture.md` pasan a decir `skill/`.
-- **Agregada:** 2026-10-06.
 
 <!-- agent-context-kit:section=blocked -->
 ## Tareas bloqueadas / pospuestas
@@ -148,4 +134,4 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 <!-- agent-context-kit:section=grouped -->
 ## Tareas agrupadas
 
-No aplica todavía — ningún grupo formado ("Tareas libres" tiene 8 tareas, bien por debajo del umbral de 15).
+No aplica todavía — ningún grupo formado ("Tareas libres" tiene 7 tareas, bien por debajo del umbral de 15).
