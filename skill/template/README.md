@@ -10,6 +10,19 @@ sesión: es un mapa mínimo, de ~1,5 KB como máximo. Se genera al final del flu
   Omitir lo que no existe, sin secciones vacías ni "N/A". Los `*` marcan archivos condicionales
   (criterio en `questions-flow.md`): quitarlos al generar.
 - No repetir el orden de lectura (vive en `AGENTS.md`) ni contenido de otros archivos: enlazar.
+- En modo multi-operador (ver `docs/multi-operator.md`), `agents/` se muestra así, con la carpeta real de cada operador:
+
+  ```
+  ├── agents/
+  │   ├── rules.md          # reglas del proyecto, de todos los operadores
+  │   ├── operators.md      # operadores y sus correos de git
+  │   ├── backlog.md        # tareas sin dueño *
+  │   └── <operador>/       # una carpeta por operador
+  │       ├── handoff.md        # su tarea en curso
+  │       ├── backlog.md        # las tareas que tomó
+  │       ├── history.md        # sus tareas cerradas
+  │       └── preferences.md    # su forma de trabajar *
+  ```
 -->
 
 # [Nombre del proyecto]
