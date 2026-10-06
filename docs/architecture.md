@@ -17,6 +17,7 @@ agent-context-kit/
 │   │   ├── parse/               # Markdown → datos: secciones por ancla, bloques, handoff, backlog, history
 │   │   ├── tasks/               # Tag de bloqueo vigente (block-info) y tareas mencionadas en un texto (task-refs)
 │   │   └── test/                # Tests en espejo de parse/ y tasks/ + fixtures/ (docs de ejemplo) + helpers.ts
+│   ├── skill-checks/          # Tests de contenido del skill (`reading-policy.test.ts`): fijan la política de lectura y la estructura de lo que se lee en cada sesión
 │   └── task-tracker/          # Seguimiento de tareas en la terminal (`bun run tasks [ruta]`)
 │       ├── README.md            # Uso: comandos, atajos, qué muestra y cómo lee los archivos
 │       ├── index.ts             # Arranque: argumentos, ruta a vigilar (o la pregunta) y llama a app
