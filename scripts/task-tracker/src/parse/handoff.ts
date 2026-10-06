@@ -1,6 +1,6 @@
 // Interpretación de handoff.md: tarea en progreso (con su plan y subsecciones) y tareas pausadas.
 
-import type { CurrentTaskLine, InProgress, ParsedHandoff, PlanStep } from "../shared/types.ts";
+import type { CurrentTaskLine, InProgress, ParsedHandoff, ParsedPausedTask, PlanStep, Task } from "../shared/types.ts";
 import { parseBlocks } from "./blocks.ts";
 import { isPlaceholder, stripComments } from "./markdown.ts";
 import { findSections, HANDOFF_SECTIONS } from "./sections.ts";
@@ -30,11 +30,7 @@ export function parseInProgress(body: string): InProgress {
     }
   }
 
-  const steps: PlanStep[] = [];
-  for (const line of lines) {
-    const match = line.match(CHECKBOX_RE);
-    if (match) steps.push({ text: match[2], done: match[1] !== " " });
-  }
+  const steps = parseSteps(body);
 
   const subsections: { title: string; lines: string[] }[] = [];
   let sub: { title: string; lines: string[] } | null = null;
@@ -55,6 +51,29 @@ export function parseInProgress(body: string): InProgress {
   };
 }
 
+/** Checkboxes `- [ ] …` / `- [x] …` de un texto, indentados o no, como pasos de plan. */
+export function parseSteps(text: string): PlanStep[] {
+  const steps: PlanStep[] = [];
+  for (const line of text.split("\n")) {
+    const match = line.match(CHECKBOX_RE);
+    if (match) steps.push({ text: match[2], done: match[1] !== " " });
+  }
+  return steps;
+}
+
+/**
+ * Tarea pausada: los pasos del plan que traía al pausarse (los checkboxes de su bloque) y sus
+ * campos, sin el que solo contiene esos checkboxes (el campo `Plan` de la plantilla; su etiqueta
+ * está traducida, así que se reconoce por su contenido), para no repetirlo como texto.
+ */
+export function parsePausedTask(task: Task): ParsedPausedTask {
+  const isPlanField = (value: string) => {
+    const lines = value.split("\n").map((l) => l.trim()).filter(Boolean);
+    return lines.length > 0 && lines.every((l) => CHECKBOX_RE.test(l));
+  };
+  return { ...task, steps: parseSteps(task.body), fields: task.fields.filter((f) => !isPlanField(f.value)) };
+}
+
 /** handoff.md completo. */
 export function parseHandoff(text: string): ParsedHandoff {
   const { sections, usedFallback, missing } = findSections(text, HANDOFF_SECTIONS);
@@ -62,7 +81,7 @@ export function parseHandoff(text: string): ParsedHandoff {
   const pausedBody = stripComments(sections.paused?.body ?? "");
   return {
     inProgress: parseInProgress(inProgressBody),
-    paused: parseBlocks(pausedBody).tasks,
+    paused: parseBlocks(pausedBody).tasks.map(parsePausedTask),
     usedFallback,
     missing,
     placeholders: [inProgressBody, pausedBody].some(isPlaceholder),

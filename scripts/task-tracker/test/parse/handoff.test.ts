@@ -13,6 +13,42 @@ describe("parseHandoff", () => {
     expect(paused[0].fields.map((f) => f.label)).toEqual(["Qué falta", "Por qué se pausó", "Qué espera para retomarse"]);
   });
 
+  test("pausada: los pasos de su plan, sin repetir el campo Plan como texto", () => {
+    const { paused } = parseHandoff(requireFixture("es-anchors", "handoff.md"));
+    expect(paused[0].steps).toEqual([
+      { text: "Paso 1 — Copiar el contenido viejo", done: true },
+      { text: "Paso 2 — Revisar los links", done: false },
+      { text: "Paso 3 — Borrar lo duplicado", done: false },
+    ]);
+    expect(paused[0].fields.some((f) => f.value.includes("[x]"))).toBe(false);
+  });
+
+  test("pausada sin plan, y campo con texto además de checkboxes que se conserva", () => {
+    const text = [
+      "<!-- agent-context-kit:section=in-progress -->",
+      "## En progreso",
+      "",
+      "Sin tarea.",
+      "",
+      "<!-- agent-context-kit:section=paused -->",
+      "## Pausadas",
+      "",
+      "### Task 3 — Sin plan",
+      "",
+      "- **Why paused:** priority.",
+      "",
+      "### Task 4 — Con notas",
+      "",
+      "- **Notes:** ver esto",
+      "  - [ ] algo suelto",
+    ].join("\n");
+    const { paused } = parseHandoff(text);
+    expect(paused[0].steps).toEqual([]);
+    expect(paused[0].fields.map((f) => f.label)).toEqual(["Why paused"]);
+    expect(paused[1].steps).toEqual([{ text: "algo suelto", done: false }]);
+    expect(paused[1].fields.map((f) => f.label)).toEqual(["Notes"]);
+  });
+
   test("sin tarea en curso devuelve null", () => {
     const { inProgress, paused } = parseHandoff(requireFixture("minimal", "handoff.md"));
     expect(inProgress.task).toBeNull();

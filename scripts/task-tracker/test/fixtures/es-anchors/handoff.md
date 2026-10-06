@@ -45,6 +45,10 @@ Segunda línea del próximo paso.
 
 ### Tarea 8 — Migrar la documentación vieja
 
+- **Plan:**
+  - [x] Paso 1 — Copiar el contenido viejo
+  - [ ] Paso 2 — Revisar los links
+  - [ ] Paso 3 — Borrar lo duplicado
 - **Qué falta:** revisar `setup.md`.
 - **Por qué se pausó:** surgió una prioridad mayor.
 - **Qué espera para retomarse:** que se cierre la Tarea 12.

@@ -62,6 +62,9 @@ Tareas que se empezaron (tuvieron su propio "Tarea en progreso" en algún moment
 
 ### Tarea [N] — [Título corto de la tarea]
 
+- **Plan:** (opcional) los pasos que la tarea traía de "Tarea en progreso", copiados tal cual al pausarla — con lo hecho marcado — para retomarla desde el paso correcto. Si la tarea no tenía plan, este campo se borra.
+  - [x] Paso 1 — [placeholder]
+  - [ ] Paso 2 — [placeholder]
 - **Qué falta:** lo mismo que en "Tarea en progreso".
 - **Decisiones a medio camino:** ídem.
 - **Próximo paso concreto:** ídem.

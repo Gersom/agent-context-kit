@@ -18,6 +18,9 @@ import type {
   ParsedFile,
   ParsedHandoff,
   ParsedHistory,
+  PausedTask,
+  Plan,
+  PlanStep,
   Task,
 } from "../shared/types.ts";
 import { blockInfo } from "./block-info.ts";
@@ -82,7 +85,7 @@ export function buildModel({
     tasks: ref.taskNumbers.map((n) => findGroupedTask(grouped, n) ?? { number: n, label: null, title: null }),
   }));
   const freeTasks = backlog?.free.tasks ?? [];
-  const paused = handoff?.paused ?? [];
+  const paused: PausedTask[] = (handoff?.paused ?? []).map((task) => ({ ...task, plan: buildPlan(task.steps) }));
   const historyEntries = history?.entries ?? [];
 
   const blockedTasks = backlog?.blocked ?? [];
@@ -121,14 +124,17 @@ export function buildModel({
  * tiene los checkboxes del plan; sus títulos están traducidos, así que no se eligen por nombre).
  */
 function buildCurrent(task: CurrentTaskLine, { steps, subsections }: InProgress): CurrentTask {
-  const done = steps.filter((s) => s.done).length;
-  const currentStep = steps.find((s) => !s.done) ?? null;
   const details = subsections.filter((s) => !CHECKBOX_LINE_RE.test(s.body) && s.body.trim() !== "");
+  return { ...task, plan: buildPlan(steps), details, subsections };
+}
+
+/** Avance de un plan: pasos hechos, total y el primer paso pendiente (el actual). */
+function buildPlan(steps: PlanStep[]): Plan {
   return {
-    ...task,
-    plan: { steps, done, total: steps.length, currentStep },
-    details,
-    subsections,
+    steps,
+    done: steps.filter((s) => s.done).length,
+    total: steps.length,
+    currentStep: steps.find((s) => !s.done) ?? null,
   };
 }
 

@@ -22,6 +22,14 @@ describe("buildModel", () => {
     ]);
   });
 
+  test("pausadas con el avance de su plan", () => {
+    const [paused] = load("es-anchors").paused;
+    if (!paused) throw new Error("no hay pausadas en el fixture");
+    expect(paused.plan.done).toBe(1);
+    expect(paused.plan.total).toBe(3);
+    expect(paused.plan.currentStep?.text).toBe("Paso 2 — Revisar los links");
+  });
+
   test("completadas: las 5 primeras entradas de history.md", () => {
     const model = load("es-anchors");
     expect(model.hasHistory).toBe(true);

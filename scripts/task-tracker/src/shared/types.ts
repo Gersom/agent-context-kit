@@ -76,9 +76,17 @@ export interface ParsedFile {
   placeholders: boolean;
 }
 
+/**
+ * Tarea pausada: sus campos (sin el que solo contiene los checkboxes del plan, que se muestra
+ * aparte) y los pasos del plan que traía al pausarse.
+ */
+export interface ParsedPausedTask extends Task {
+  steps: PlanStep[];
+}
+
 export interface ParsedHandoff extends ParsedFile {
   inProgress: InProgress;
-  paused: Task[];
+  paused: ParsedPausedTask[];
 }
 
 export interface ParsedBacklog extends ParsedFile {
@@ -124,6 +132,11 @@ export interface Plan {
   currentStep: PlanStep | null;
 }
 
+/** Tarea pausada con el avance de su plan (vacío si no traía plan). */
+export interface PausedTask extends ParsedPausedTask {
+  plan: Plan;
+}
+
 export interface CurrentTask extends CurrentTaskLine {
   plan: Plan;
   /** Subsecciones de la tarea salvo la que contiene los checkboxes del plan. */
@@ -152,7 +165,7 @@ export interface Model {
   /** Últimas entradas de history.md (las más nuevas primero). */
   completed: HistoryEntry[];
   current: CurrentTask | null;
-  paused: Task[];
+  paused: PausedTask[];
   free: { tasks: Task[]; groups: FreeGroup[] };
   blocked: BlockedTask[];
   grouped: Group[];

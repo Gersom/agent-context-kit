@@ -21,7 +21,7 @@ agent-context-kit/
 │       │   ├── io/                # Rutas, lectura de archivos, watcher y lectura con memoria
 │       │   ├── parse/             # Markdown → datos: secciones por ancla, bloques, handoff, backlog, history
 │       │   ├── model/             # Modelo de pantalla, tag de bloqueo vigente y tareas de las que depende
-│       │   ├── ui/                # Pintado con picocolors y utilidades de formato
+│       │   ├── ui/                # Pintado con picocolors (recuadros por tipo de tarea) y utilidades de formato
 │       │   └── shared/            # Tipos compartidos (types.ts) y formato de hora (time.ts)
 │       └── test/                # Tests de `bun test` en espejo de src/ + e2e/ (script entero) + fixtures
 │

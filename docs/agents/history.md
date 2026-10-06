@@ -14,6 +14,16 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-10-05 — ✅ Tarea 21 — Ajustes de pantalla del task-tracker: tachado de pasos y recuadros
+
+- **Recuadros:** cada tipo de tarea (completadas, en progreso, pausadas, libres, bloqueadas) va en un recuadro de esquinas redondeadas (`ui/box.ts`), con el título del tipo en el borde superior izquierdo y el archivo del que sale a la derecha; reemplazan a los separadores `━━ archivo ━━`. Todos tienen el ancho de la terminal (o `COLUMNS`, o 100 sin terminal; mínimo 40), con el texto largo recortado sin romper el borde (el ancho se mide en columnas visibles con `Bun.stringWidth`).
+- **Tachado:** las tareas completadas ya no se tachan; se tacha solo el texto de los **pasos hechos** del plan, en la tarea en progreso y en las pausadas.
+- **Plan de las pausadas:** la plantilla de `handoff.md` suma un campo opcional `Plan` en las pausadas, para conservar los checkboxes al pausar una tarea; el script lo muestra como plan (barra y pasos), sin repetirlo como texto. Documentado en `src/docs/template-architecture.md`.
+- **Colores**, tras seis rondas de correcciones del operador: títulos de los recuadros sin íconos; bordes en gris (`picocolors.gray`) salvo el de "en progreso", que queda verde; tareas completadas (nombre y fecha) en gris 245 de la paleta de 256, con el prefijo `T-N` en verde; título "TAREAS COMPLETADAS" en `#6DB07B` (RGB directo, elegido por el operador a partir del `#4EBA65` del aviso de actualización de Claude Code); textos secundarios (rutas, archivo del borde, campos, pasos hechos, "Ninguna", pie) en gris 250, y ya no queda texto atenuado (`dim`). Los tonos viven en `tones()` de `ui/render.ts`.
+- Verificación: `bun test` → 106 tests en 18 archivos, todos pasan; `bun run typecheck` sin errores. README del script actualizado.
+- Instrucción del operador para esta tarea: no cerrarla hasta que lo pidiera explícitamente; después de cada ronda de correcciones se le mandó el resumen y se esperó.
+- Al revisar las bloqueadas (Regla 7): la Tarea 4 sigue esperando a la 3; la 19 sigue postergada hasta que el operador confirme el MVP.
+
 ## 2026-10-05 — ✅ Tarea 11 — Refinar script de seguimiento de tareas
 
 - **Pantalla rediseñada** a pedido del operador: encabezado con el nombre de la carpeta del repo en mayúsculas y sin guiones (`AGENT CONTEXT KIT`), la ruta del repo y "Última actualización HH:MM:SS · se modificó <archivo>"; un bloque por archivo con su separador `━━ archivo ━━`, en este orden:
