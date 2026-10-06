@@ -2,38 +2,31 @@
 
 Lo primero que cualquier agente debe leer antes de tocar código en este proyecto.
 
-> **Operador:** la persona humana dueña de este proyecto — quien pide las tareas, aprueba decisiones y a quien se le pregunta cuando algo no está definido. El término aparece así en todo este catálogo (`docs/agents/`, `docs/project/`), sin importar el idioma de la documentación (ver Regla 3).
+> **Operador:** la persona humana dueña de este proyecto — quien pide las tareas, aprueba decisiones y a quien se le pregunta cuando algo no está definido. Se llama así en todo el catálogo, sin importar el idioma de la documentación (Regla 3).
 
 ## Reglas por defecto (fijas — no se editan por proyecto)
 
-Estas reglas vienen con el skill y aplican sin importar el proyecto. No se borran ni se reescriben al completar este archivo; si hace falta una regla de proceso adicional, se agrega debajo de estas, no en su reemplazo.
+Vienen con el skill y aplican a cualquier proyecto. No se borran ni se reescriben al completar este archivo; las reglas de proceso adicionales se agregan debajo, no en su reemplazo.
 
-1. **Cada contenido vive en un único archivo: el que le corresponde según su tema** (ej. una decisión técnica va en `decisions.md`, un bug conocido en `known-issues.md`, no repetidos en `rules.md` o `handoff.md`). Cuando un agente escribe o actualiza esta documentación, el contenido nuevo va en su archivo correspondiente. Si ese mismo contenido necesita mencionarse desde otro archivo, no se vuelve a escribir ahí: se pone una mención breve y un link al archivo que tiene el contenido completo. Este archivo mismo lo hace: ver la sección de enlaces más abajo.
+1. **Cada contenido vive en un único archivo, el de su tema** (una decisión técnica en `decisions.md`, un bug conocido en `known-issues.md`; no repetidos en `rules.md` ni `handoff.md`). Si otro archivo necesita mencionarlo, va una mención breve con link, no una copia. Este archivo lo hace en la sección de enlaces.
 
 2. **El tamaño de la tarea decide el proceso:**
-   - **Tarea pequeña o muy pequeña** → ejecutarla directamente, sin plan previo.
-   - **Tarea mediana a grande** → primero armar un plan con los pasos a seguir. Después, en una sola tanda de preguntas agrupadas (no una por una), preguntarle al operador:
-     a. si los pasos están bien o hay que ajustarlos, y
-     b. si prefiere que se ejecuten todos los pasos seguidos sin pausas, o uno a la vez — esperando su confirmación después de cada paso para recién ahí seguir al siguiente, debatir el paso actual, o modificarlo.
+   - **Pequeña o muy pequeña** → se ejecuta directo, sin plan.
+   - **Mediana a grande** → primero un plan con los pasos. Después, en una sola tanda de preguntas agrupadas, preguntarle al operador (a) si los pasos están bien o hay que ajustarlos y (b) si prefiere ejecutarlos todos seguidos o uno a la vez, esperando su confirmación después de cada paso.
 
-3. **Idioma de la documentación:** todo el contenido que un agente redacte en esta documentación (prosa y headers de sección) va en el idioma registrado abajo — detectado una sola vez, la primera vez que se generó esta documentación (ver `questions-flow.md`, sección "Idioma de la documentación"). No se vuelve a preguntar en sesiones futuras. Excepción, siempre en inglés: nombres de archivo/carpeta del catálogo, y términos propios de este kit o jerga técnica sin traducción natural asentada (ej. "Handoff", "Backlog", "Placeholder", "linter", "commit", "deploy").
+3. **Idioma de la documentación:** todo lo que un agente redacte acá (prosa y headers) va en el idioma registrado abajo, detectado una sola vez al generar esta documentación (ver `questions-flow.md`, "Idioma de la documentación"); no se vuelve a preguntar. Siempre en inglés: los nombres de archivo/carpeta del catálogo y los términos del kit o la jerga técnica sin traducción asentada ("Handoff", "Backlog", "Placeholder", "linter", "commit", "deploy").
 
    **Idioma de la documentación:** [Placeholder — se completa la primera vez que se genera esta documentación]
 
-4. **El código es la fuente de verdad.** Esta documentación describe el proyecto, pero puede desactualizarse o entrar en conflicto con lo que el código realmente hace. Ante un conflicto entre lo que dice un archivo de acá (`architecture.md`, `stack.md`, `entities.md`, etc.) y lo que el código muestra, **el código gana siempre** — la documentación está equivocada o desactualizada, no al revés. Excepción: que el operador diga explícitamente lo contrario para ese caso puntual. Si se detecta un desvío así, además de seguir el código, conviene corregir el archivo de documentación afectado para que refleje la realidad (no dejar la discrepancia para la próxima vez).
+4. **El código es la fuente de verdad.** Ante un conflicto entre un archivo de acá (`architecture.md`, `stack.md`, `entities.md`, etc.) y lo que el código hace, **gana el código**: la documentación está desactualizada. Excepción: que el operador diga explícitamente lo contrario para ese caso. Al detectar el desvío, seguir el código y corregir el archivo afectado en vez de dejar la discrepancia.
 
-5. **Al cerrar una tarea, como mínimo se actualizan `handoff.md`, `backlog.md` y `history.md`:**
-   - `handoff.md` → se sobrescribe con el estado actual (o "sin tarea en curso" si no queda nada abierto).
-   - `history.md` → se agrega la entrada de la tarea cerrada (hecha o descartada — ver Regla 7).
-   - `backlog.md` → si la tarea venía de ahí, se saca de la lista; si en el camino surgieron tareas nuevas todavía no hechas, se agregan (ver su sección "Numeración").
-   
-   Esto es lo mínimo indispensable, independientemente de qué otro archivo (`architecture.md`, `decisions.md`, etc.) también haya cambiado por el contenido específico de la tarea.
+5. **Al cerrar una tarea se actualizan, como mínimo:** `handoff.md` (se sobrescribe con el estado actual, o "sin tarea en curso"), `history.md` (la entrada de la tarea, hecha o descartada) y `backlog.md` (se saca la tarea si venía de ahí y se agregan las nuevas que surgieron; ver "Numeración" en ese archivo). Aplica aunque también hayan cambiado otros archivos (`architecture.md`, `decisions.md`, etc.).
 
-6. **`handoff.md` se actualiza en cada paso del plan, no solo al cerrar la tarea.** Además del "al cerrar" que ya exige la Regla 5, en tareas con plan (Regla 2) se sobrescribe `handoff.md` cada vez que se completa un paso, reflejando qué se hizo, qué falta y el próximo paso concreto. El objetivo es continuidad entre sesiones: si la conversación se corta a mitad del plan (ej. en el paso 2 de 5), otro chat debe poder abrir `handoff.md` y retomar exactamente ahí, sin depender de la memoria de la sesión anterior.
+6. **`handoff.md` también se actualiza en cada paso del plan** (Regla 2): qué se hizo, qué falta y el próximo paso concreto, para que un chat nuevo pueda retomar exactamente ahí si la conversación se corta.
 
-7. **El último paso de todo plan (tareas medianas/grandes, Regla 2) es "documentar cierre de tarea".** Ese paso incluye el mínimo de la Regla 5 (actualizar `handoff`/`backlog`/`history`) y, además, revisar todas las tareas marcadas como bloqueadas en `backlog.md` por si alguna dejó de estarlo. Al desbloquear una, no se borra su campo `Bloqueos` original: se reemplaza por `[Resuelto el <fecha>] — <motivo original>`, conservando el rastro de por qué había estado bloqueada. Para tareas pequeñas (sin plan, Regla 2), esta misma revisión de bloqueadas se hace igual, como parte del mínimo ya exigido por la Regla 5. Este mismo paso también evalúa si "Tareas libres" de `backlog.md` superó las 15 tareas — si es así, ver el mecanismo de agrupamiento descrito en `backlog.md`.
+7. **El último paso de todo plan es "documentar cierre de tarea":** la Regla 5 más revisar las tareas bloqueadas de `backlog.md` por si alguna dejó de estarlo. Al desbloquear una no se borra su campo `Bloqueos`: se reemplaza por `[Resuelto el <fecha>] — <motivo original>`. En tareas sin plan, esta revisión se hace igual al cerrar. También se evalúa si "Tareas libres" superó las 15 tareas (ver "Agrupamiento" en `backlog.md`).
 
-8. **Reporte de cierre.** Al terminar de cerrar una tarea, el agente resume en el chat qué cambió, con este formato (las secciones sin contenido se omiten):
+8. **Reporte de cierre.** Al terminar el cierre, el agente resume en el chat con este formato (se omiten las secciones sin contenido):
 
    ```
    **Tareas resueltas:**
@@ -51,8 +44,8 @@ Estas reglas vienen con el skill y aplican sin importar el proyecto. No se borra
 
 ## Enlaces (evitar duplicar contexto)
 
-- Estructura de carpetas y por qué está organizado así → [`../project/architecture.md`](../project/architecture.md)
-- Stack tecnológico → [`../project/stack.md`](../project/stack.md)
+- Convenciones de organización y dónde va cada cosa nueva → [`../project/architecture.md`](../project/architecture.md)
+- Decisiones de stack y qué no usar → [`../project/stack.md`](../project/stack.md)
 - El "por qué" de decisiones técnicas ya tomadas → [`../project/decisions.md`](../project/decisions.md)
 - Bugs conocidos / zonas frágiles → [`./known-issues.md`](./known-issues.md)
 
