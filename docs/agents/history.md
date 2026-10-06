@@ -14,6 +14,15 @@ Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `
 
 ---
 
+## 2026-10-06 — ✅ Tarea 23 — Separar el parser de `parse/*.ts` para reutilizarlo en otros scripts
+
+- Nuevo módulo compartido `scripts/_shared/` (decisión del operador: el `_` marca código de apoyo, y las carpetas de `scripts/` sin `_` son scripts independientes; documentado en `docs/architecture.md`). Contiene `parse/` (backlog, blocks, handoff, history, markdown, sections), `tasks/` (`block-info`, `task-refs`), `types.ts` con los tipos del dominio, y `test/` con los tests en espejo, los fixtures y `helpers.ts`.
+- `shared/types.ts` del task-tracker quedó solo con los tipos de pantalla y de lectura de archivos; importa los del dominio desde `_shared`. Se movieron también `block-info.ts` y `task-refs.ts` porque los necesitan las Tareas 15 y 24.
+- Refactor puro: el task-tracker no cambió de comportamiento. Las posiciones línea/offset del parser no se agregaron (decisión del operador): van en la Tarea 24.
+- Verificación: `bun test` → 106 tests en 18 archivos, todos pasan; `bun run typecheck` sin errores; `bun run tasks docs/agents --once` se ve igual.
+- Aparte: `.codegraph/` (índice local de CodeGraph) se agregó a `.gitignore`. Se mergeó la rama `refactor/shared-parser` a `main`, sin push.
+- Desbloquea la Tarea 24, que pasó a "Tareas libres".
+
 ## 2026-10-06 — ✅ Tarea 22 — Definir y agregar la filosofía del proyecto
 
 - Nuevo `docs/philosophy.md`: la razón de ser del kit (dictada por el operador: contexto que sobrevive entre sesiones, modelos y herramientas de IA, sin releer todo el código) y cinco principios — markdown plano como fuente de verdad del estado, el código gana ante un conflicto (enlaza la Regla 4 de `rules.md` sin duplicarla), versionado y portable, herramientas opcionales, y tolerancia a la edición manual (incluye edición quirúrgica).

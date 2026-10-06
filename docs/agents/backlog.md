@@ -11,7 +11,7 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 
 **Dos secciones:** las tareas viven en "Tareas libres" (listas para tomar) o "Tareas bloqueadas / pospuestas" (no se toman todavía). Cuando el motivo de una tarea bloqueada deja de aplicar, se mueve a "Tareas libres" — ver Regla 7 de `rules.md` (no se borra el campo `Bloqueos`, se marca como resuelto).
 
-**Agrupamiento (solo en "Tareas libres"):** si esta sección supera las 15 tareas (Regla 7 de `rules.md`), se evalúa agrupar 2 o más que compartan un objetivo real. El criterio no es un tope de cantidad — es que el grupo entero quepa en una sola frase de objetivo compartido, sin usar "y" para forzar una tarea que en realidad no pertenece. Un grupo aparece en "Tareas libres" como una sola línea corta; el detalle completo de cada tarea que lo compone se mueve a la sección "Tareas agrupadas" (más abajo), que no hace falta leer salvo que el operador pida el detalle de una tarea puntual o se vaya a tomar una. Si un grupo queda con una sola tarea (las demás se tomaron o cerraron), se desarma: esa tarea vuelve a ser una entrada individual normal en "Tareas libres". Hoy "Tareas libres" tiene 7 tareas — muy por debajo del umbral, no hay grupos formados.
+**Agrupamiento (solo en "Tareas libres"):** si esta sección supera las 15 tareas (Regla 7 de `rules.md`), se evalúa agrupar 2 o más que compartan un objetivo real. El criterio no es un tope de cantidad — es que el grupo entero quepa en una sola frase de objetivo compartido, sin usar "y" para forzar una tarea que en realidad no pertenece. Un grupo aparece en "Tareas libres" como una sola línea corta; el detalle completo de cada tarea que lo compone se mueve a la sección "Tareas agrupadas" (más abajo), que no hace falta leer salvo que el operador pida el detalle de una tarea puntual o se vaya a tomar una. Si un grupo queda con una sola tarea (las demás se tomaron o cerraron), se desarma: esa tarea vuelve a ser una entrada individual normal en "Tareas libres". Hoy "Tareas libres" tiene 8 tareas — muy por debajo del umbral, no hay grupos formados.
 
 **Numeración:** cada tarea tiene un número correlativo fijo, asignado una sola vez al crearse. El número **nunca se reutiliza**, ni siquiera cuando la tarea se cierra (hecha o descartada) y pasa a `history.md`. No es un orden de cola: se puede tomar tareas fuera de orden.
 
@@ -112,6 +112,22 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Detalles:** nace de la conversación del 2026-10-06. El valor de compartir contexto por git está en `docs/philosophy.md`; esta tarea cubre lo que hoy lo impide. Es razonamiento de diseño: no se verificó con fuentes externas cómo lo resuelven otras herramientas.
 - **Agregada:** 2026-10-06.
 
+### Tarea 24 — Script para gestionar las tareas (handoff, backlog, history)
+
+- **Descripción:** script nuevo en `scripts/` (aparte del task-tracker, que sigue siendo solo de lectura y no cambia) con comandos que el agente ejecuta en vez de editar a mano `handoff.md`, `backlog.md` y `history.md`: agregar una tarea, empezarla, marcar el paso en que va, pausarla, bloquearla o desbloquearla, y cerrarla (hecha o descartada). Al cerrar aplica lo mecánico de las Reglas 5 a 8 de `rules.md`: actualiza los tres archivos, "Próximo número de tarea" y las anclas, lista las tareas bloqueadas a revisar y genera el reporte de cierre. También comandos de lectura compactos (ej. `next`, `show N`, `status`) para que el agente no tenga que leer `history.md` entero (~49 KB) ni todo el backlog.
+- **Decisiones/temas a definir antes de empezar:**
+  - **Ya decidido (2026-10-05):** edición quirúrgica del markdown — los `.md` siguen siendo la fuente de verdad, el script solo modifica lo que corresponde y el diff de git muestra únicamente ese cambio. No se usa base de datos ni formato estructurado aparte.
+  - Nombre de la carpeta y del comando (ej. `scripts/task-manager/` y `bun run task ...`).
+  - Formato estructurado de los bloqueos que permita desbloquear solo (ej. `blocked-by: Tarea 12`); los bloqueos en texto libre quedan para revisión manual.
+  - Cómo entra el texto libre (descripciones, `Detalles`): por flags o por stdin.
+  - Posiciones (línea/offset) de bloques y campos en el parser compartido (`scripts/_shared/`), necesarias para la edición quirúrgica; se agregan en esta tarea, no existen todavía.
+  - Cómo se reflejan en `rules.md` y en las plantillas de `src/template/`: el script es opcional, y si no existe el agente sigue editando a mano como hoy (la distribución del kit sigue siendo markdown puro).
+  - Si se hace por etapas: primero comandos de lectura, después los de escritura, empezando por los más mecánicos.
+- **Bloqueos:** `[Resuelto el 2026-10-06]` — era `[dependencia]` de la Tarea 23 (separar el parser para reutilizarlo), que dejó el parser en `scripts/_shared/`. Las posiciones línea/offset para editar quirúrgicamente NO se hicieron en esa tarea: se agregan acá. El script debe respetar `docs/philosophy.md`.
+- **Disparador:** cuando el operador la priorice (el parser compartido ya está en `scripts/_shared/`).
+- **Detalles:** surgió de la conversación del 2026-10-05: busca bajar el consumo de tokens (menos lectura de archivos grandes, menos reescritura) y evitar errores mecánicos (anclas olvidadas, números repetidos). Si se hace la Tarea 15 (validador), sirve de red de seguridad para este script.
+- **Agregada:** 2026-10-05.
+
 <!-- agent-context-kit:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
@@ -124,22 +140,7 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 24 — Script para gestionar las tareas (handoff, backlog, history)
-
-- **Descripción:** script nuevo en `scripts/` (aparte del task-tracker, que sigue siendo solo de lectura y no cambia) con comandos que el agente ejecuta en vez de editar a mano `handoff.md`, `backlog.md` y `history.md`: agregar una tarea, empezarla, marcar el paso en que va, pausarla, bloquearla o desbloquearla, y cerrarla (hecha o descartada). Al cerrar aplica lo mecánico de las Reglas 5 a 8 de `rules.md`: actualiza los tres archivos, "Próximo número de tarea" y las anclas, lista las tareas bloqueadas a revisar y genera el reporte de cierre. También comandos de lectura compactos (ej. `next`, `show N`, `status`) para que el agente no tenga que leer `history.md` entero (~49 KB) ni todo el backlog.
-- **Decisiones/temas a definir antes de empezar:**
-  - **Ya decidido (2026-10-05):** edición quirúrgica del markdown — los `.md` siguen siendo la fuente de verdad, el script solo modifica lo que corresponde y el diff de git muestra únicamente ese cambio. No se usa base de datos ni formato estructurado aparte.
-  - Nombre de la carpeta y del comando (ej. `scripts/task-manager/` y `bun run task ...`).
-  - Formato estructurado de los bloqueos que permita desbloquear solo (ej. `blocked-by: Tarea 12`); los bloqueos en texto libre quedan para revisión manual.
-  - Cómo entra el texto libre (descripciones, `Detalles`): por flags o por stdin.
-  - Cómo se reflejan en `rules.md` y en las plantillas de `src/template/`: el script es opcional, y si no existe el agente sigue editando a mano como hoy (la distribución del kit sigue siendo markdown puro).
-  - Si se hace por etapas: primero comandos de lectura, después los de escritura, empezando por los más mecánicos.
-- **Bloqueos:** `[dependencia]` depende de la Tarea 23 (separar el parser para reutilizarlo): el script necesita el parser compartido, con posiciones para editar quirúrgicamente. La Tarea 22 (filosofía, `docs/philosophy.md`) ya está resuelta (2026-10-06): el script debe respetar sus principios.
-- **Disparador:** cuando la Tarea 23 esté resuelta y el operador priorice esta tarea.
-- **Detalles:** surgió de la conversación del 2026-10-05: busca bajar el consumo de tokens (menos lectura de archivos grandes, menos reescritura) y evitar errores mecánicos (anclas olvidadas, números repetidos). Si se hace la Tarea 15 (validador), sirve de red de seguridad para este script.
-- **Agregada:** 2026-10-05.
-
 <!-- agent-context-kit:section=grouped -->
 ## Tareas agrupadas
 
-No aplica todavía — ningún grupo formado ("Tareas libres" tiene 7 tareas, bien por debajo del umbral de 15).
+No aplica todavía — ningún grupo formado ("Tareas libres" tiene 8 tareas, bien por debajo del umbral de 15).
