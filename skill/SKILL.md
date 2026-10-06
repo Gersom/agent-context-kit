@@ -9,17 +9,23 @@ description: Genera o actualiza la documentación de contexto de un proyecto (re
 
 Al empezar a trabajar sobre un repositorio, antes de tocar código. También se puede invocar explícitamente — ver "Cómo usar" en el `README.md` raíz; pedir explícitamente migrar (ej. *"...y migra mi proyecto"*) fuerza el chequeo de [`docs/migration-flow.md`](./docs/migration-flow.md) aunque la heurística automática no encuentre suficientes coincidencias.
 
+## Política de lectura (obligatoria al aplicar el skill)
+
+Este skill se aplica una vez por repo (generar o migrar); en las sesiones siguientes el agente lee solo la documentación ya generada, guiado por el `AGENTS.md` del repo. Esta política rige lo que se lee **ahora**, incluidos los flujos que enlaza; si un paso la contradice, gana ella.
+
+1. **Leer solo lo que el paso actual necesita.** Si ningún paso requiere un archivo, no se abre.
+2. **Medir antes de leer** (`wc -c`). Se lee entero solo si pesa ≤ 8 KB o el flujo lo manda expresamente; si pesa más, por búsqueda (`grep -n`) o por rango (`offset`/`limit`).
+3. **Clasificar con nombres, tamaños y primeras líneas** (`ls`, `wc -c`, `head`), sin abrir el contenido.
+4. **Mover o copiar con `cp`/`mv`**, nunca leyendo y reescribiendo. Un archivo se lee solo para transformarlo.
+5. **De a un archivo, sin acarrear ni releer:** procesar uno, escribir su resultado y pasar al siguiente.
+
 ## Paso 1 — ¿Ya existe documentación de este skill?
 
 Revisar si el repo destino tiene `docs/agents/` y/o `docs/project/` (o sus equivalentes bajo `agent-context/`, si `docs/` está ocupado por otra documentación).
 
-### Si existe → flujo de proyecto existente (se resuelve acá, sin abrir más archivos)
+### Si existe → no hay nada que generar
 
-1. Leer `docs/agents/rules.md` (ahí está registrado el idioma de la documentación: usarlo, no volver a preguntar) y `docs/agents/handoff.md`.
-2. Leer de `docs/agents/backlog.md` solo lo relevante a la tarea pedida (buscar por título, sin leerlo entero). `history.md` no se lee salvo que haga falta el porqué de algo concreto.
-3. Ejecutar la tarea pedida.
-4. Actualizar `handoff.md` (se sobrescribe; en cada paso del plan, Regla 6) y, al cerrar, `history.md` y `backlog.md` (Reglas 5 y 7 de `rules.md`). Si `handoff.md` o `backlog.md` no tienen las anclas de sección (`<!-- agent-context-kit:section=... -->`), agregarlas — ver [`docs/template-architecture.md`](./docs/template-architecture.md), "Anclas de sección".
-5. Fin: no seguir con el árbol de preguntas.
+Seguir el `AGENTS.md` del repo (qué leer y en qué orden; el idioma de la documentación está en `rules.md`: no se vuelve a preguntar) y ejecutar la tarea pedida. Si a `handoff.md` o `backlog.md` les faltan las anclas de sección (`<!-- agent-context-kit:section=... -->`), agregarlas — ver [`docs/template-architecture.md`](./docs/template-architecture.md), "Anclas de sección". No seguir con el árbol de preguntas.
 
 ### Si no existe → abrir el flujo que corresponda
 
