@@ -4,6 +4,8 @@
 
 Este archivo se abre solo cuando **no** existe documentación de este skill en el repo destino: el caso "ya existe" se resuelve en [`../SKILL.md`](../SKILL.md), sin pasar por acá.
 
+Rige la política de lectura de [`../SKILL.md`](../SKILL.md): de `template/` se lee solo cada plantilla que se va a completar, y lo que se copia sin cambios (`CLAUDE.md`, `external/_example-service.md`) se copia con `cp`, sin leerlo.
+
 Convención de rutas: `template/X` se refiere a la plantilla en este skill; `docs/X` se refiere al destino en el repo del operador (o `agent-context/X` si aplica el conflicto descrito en el punto 4.1 del documento de diseño).
 
 **Convención de interacción — rondas:** las preguntas se agrupan en rondas. Dentro de una misma ronda todas las preguntas se hacen juntas, en una sola interacción, porque son independientes entre sí (ninguna depende de la respuesta de otra de la misma ronda). Solo se avanza a la siguiente ronda una vez respondida la anterior, porque su resultado puede condicionar qué se pregunta después.
@@ -62,7 +64,7 @@ El agente ya revisó en [`../SKILL.md`](../SKILL.md) (paso 1) si existe `docs/ag
 Preguntar las 3 juntas, en una sola interacción:
 
 1. **¿Es un proyecto nuevo o uno existente al que se le agrega documentación retroactiva?**
-   - Si es **existente** → revisar el historial de git (`git log`) para reconstruir un `agents/history.md` inicial en vez de dejarlo vacío. Extraer hitos relevantes de los commits, no un volcado literal del log (todas las entradas reconstruidas así van como ✅ Hecha).
+   - Si es **existente** → revisar el historial de git (`git log --oneline`, sin diffs) para reconstruir un `agents/history.md` inicial en vez de dejarlo vacío. Extraer hitos relevantes de los commits, no un volcado literal del log (todas las entradas reconstruidas así van como ✅ Hecha).
    - Si es **nuevo** → `agents/history.md` se copia vacío/con la plantilla base.
 
 2. **¿En qué etapa está el proyecto?** → guardar como `ETAPA`:
@@ -84,7 +86,7 @@ Preguntar las 3 juntas, en una sola interacción:
 Una plantilla se completa, no se copia tal cual:
 
 1. Reemplazar los `[Placeholder]` por contenido real (o por la frase alternativa que la propia plantilla sugiere, ej. "Ninguna").
-2. **Quitar los comentarios HTML de guía** (`<!-- ... -->`): son instrucciones para quien completa la plantilla y, si quedan, se vuelven a leer en cada sesión. Se conservan solo la firma `agent-context-kit:signature`, las anclas `agent-context-kit:section=...` y los marcadores `agent-docs-skill:start/end`. Lo que hace falta para mantener el archivo después (formato de una tarea, de una entrada, de una tarea pausada) está en el texto visible de la plantilla, no en comentarios. Excepción: `external/_example-service.md` se copia sin modificar (Ronda 4).
+2. **Quitar los comentarios HTML de guía** (`<!-- ... -->`): son instrucciones para quien completa la plantilla y, si quedan, se vuelven a leer en cada sesión. Se conservan solo la firma `agent-context-kit:signature`, las anclas `agent-context-kit:section=...` y los marcadores `agent-docs-skill:start/end`. Lo que hace falta para mantener el archivo después (formato de una tarea, de una entrada, de una tarea pausada) está en el texto visible de la plantilla, no en comentarios. Excepción: `external/_example-service.md` se copia sin modificar, con `cp` (Ronda 4).
 3. En el set mínimo (sin `docs/README.md`), agregar al inicio de `rules.md` la definición de "operador" que lleva el `README.md`: *"**Operador:** la persona dueña del proyecto que le pide tareas al agente, aprueba decisiones y a quien se le pregunta cuando algo no está definido."*
 4. Escribir solo lo que aporta al agente: no volcar listas de dependencias ni módulos uno por uno; sí convenciones, decisiones y restricciones y, en `architecture.md`, el árbol anotado de los niveles superiores del código (una línea de propósito por entrada). Conciso, sin relleno, y lo que ya vive en otro archivo se enlaza, no se repite.
 
@@ -178,7 +180,7 @@ Solo si en la Ronda 3 la respuesta fue "sí" a integraciones externas.
 | Set | Se dispara con | Archivos incluidos | Por qué |
 |---|---|---|---|
 | **Mínimo** | a) Tarea puntual / c) Testear algo puntual | `agents/rules.md`, `agents/handoff.md`, `AGENTS.md`/`CLAUDE.md` (raíz) | Solo necesita no romper nada (reglas) y saber en qué está el proyecto ahora (handoff). No amerita backlog/history: es de un solo uso, sin ciclo de vida que registrar. El puntero raíz sí se asegura igual, porque es lo único que le permite a un agente genérico (no solo este skill) encontrar esa documentación sin invocar el skill de nuevo. |
-| **Intermedio** | b) Agregar una feature a un proyecto existente | Todo el mínimo + `agents/backlog.md`, `agents/history.md`, `project/architecture.md`, `project/stack.md`, `README.md` (generado) | Una feature sí tiene ciclo de vida (se agenda, se trabaja, se cierra o se descarta) → backlog/history. Para encajarla bien hace falta conocer las convenciones de organización (architecture) y las decisiones de stack que no se ven en el código (stack). `README.md` como índice porque ya son 6 archivos; se genera y no se copia porque su contenido depende de qué se haya creado. |
+| **Intermedio** | b) Agregar una feature a un proyecto existente | Todo el mínimo + `agents/backlog.md`, `agents/history.md`, `project/architecture.md`, `project/stack.md`, `README.md` (generado) | Una feature sí tiene ciclo de vida (se agenda, se trabaja, se cierra o se descarta) → backlog/history. Para encajarla bien hace falta conocer las convenciones de organización (architecture) y las decisiones de stack que no se ven en el código (stack). `README.md` como mapa que se lee primero y evita abrir archivos de más; se genera y no se copia porque su contenido depende de qué se haya creado. |
 | **Completo** | d) Desarrollo prolongado / proyecto nuevo | Todo el intermedio + los condicionales de Ronda 2-4 (`roadmap`, `decisions`, `known-issues`, `glossary`, `entities`, `infrastructure`, `testing`, `setup`, `external/*`, `plans/*`) | Proyecto de largo aliento necesita cobertura completa: visión a futuro, decisiones técnicas, dominio de negocio, integraciones, testing. |
 
 ## Resumen — condición de disparo por archivo
