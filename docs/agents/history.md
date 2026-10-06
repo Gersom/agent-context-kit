@@ -1,18 +1,32 @@
 # History
 
-Historial de tareas ya resueltas — hechas o descartadas: el "qué pasó y por qué". A diferencia de [`./handoff.md`](./handoff.md), este archivo **se acumula** — cada tarea resuelta agrega una entrada nueva, no se sobrescriben las anteriores.
+Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qué". A diferencia de [`./handoff.md`](./handoff.md), **se acumula**: cada tarea resuelta agrega una entrada, sin sobrescribir las anteriores. La cola de pendientes vive en [`./backlog.md`](./backlog.md).
 
-No es una cola de pendientes (eso vive en [`./backlog.md`](./backlog.md)): acá solo entran tareas que ya salieron de `handoff.md` por estar resueltas, sea porque se hicieron o porque se decidió no hacerlas.
+- **Entradas nuevas van arriba** (la más reciente primero). Cada una marca su tipo: ✅ **Hecha** o ❌ **Descartada** (el motivo del descarte queda para que no se vuelva a proponer sin verlo).
+- **Formato:** `## <fecha> — ✅|❌ [Tarea N —] <título>` (el segmento `Tarea N —` solo si la tarea tenía número en `backlog.md`; ese número viaja con ella y no se reasigna; las entradas sin número no se numeran retroactivamente). Debajo, 3 a 5 líneas: qué se hizo y **por qué** (el motivo, no la descripción técnica).
+- **Qué no va:** lo que ya dice el código, el diff o el commit, ni lo que explica otro archivo (`decisions.md`, `architecture.md`): linkearlo.
+- **Cómo leerlo:** no hace falta leerlo entero. Para una tarea puntual, buscar su entrada por número o título; para el contexto reciente, las primeras entradas.
 
-**Entradas nuevas van arriba** (orden cronológico inverso, lo más reciente primero).
-
-Cada entrada marca su tipo: ✅ **Hecha** o ❌ **Descartada** (ver Regla 7 de `rules.md`). Todas las entradas de este archivo son ✅ Hecha por ahora — todavía no hubo ninguna tarea descartada.
-
-> Carga inicial reconstruida retroactivamente desde `git log`, ya que este skill se está aplicando sobre su propio repo después de tener historial previo. Por eso quedó como ✅ Hecha — no hay forma de reconstruir descartes desde el log de git.
-
-> Numeración de tareas (ver `backlog.md`) iniciada el 2026-09-24. Las entradas anteriores a esa fecha no tienen número asignado — no se renumeran retroactivamente.
+> Carga inicial reconstruida retroactivamente desde `git log`, ya que este skill se aplicó sobre su propio repo después de tener historial previo (por eso todas son ✅ Hecha: del log no se reconstruyen descartes). Las entradas anteriores al 2026-09-24, cuando empezó la numeración de tareas (ver `backlog.md`), no tienen número y no se renumeran.
 
 ---
+
+## 2026-10-06 — ✅ Tarea 29 — Política de lectura selectiva del skill y de la migración
+
+- El skill se aplica una vez por repo; las sesiones siguientes solo leen lo generado. Por eso la política de uso diario quedó en el `AGENTS.md` del repo destino (leer `docs/README.md`, `rules.md` y `handoff.md`; el resto solo si la tarea lo exige; sin leer `backlog.md`/`history.md` con tarea en curso) y la de `SKILL.md` solo cubre generar y migrar (medir antes de leer, `cp` en vez de leer y reescribir, de a un archivo).
+- `docs/README.md` pasó a ser un mapa de ~1,5 KB con la definición de "operador"; `architecture.md` recuperó su árbol anotado (corrige el hallazgo F4 de la Tarea 25). Las Reglas 5 a 8 pasaron, sin renumerar, a una sección final "Al cerrar una tarea" que se lee solo al cerrar. La migración pregunta si conservar `docs-legacy/` y si condensar o mantener el texto.
+- Autorizado por el operador: editar las Reglas por defecto fijas (partir su lectura y acortar su redacción). Sin bump de versión; se decide al publicar la próxima release.
+- Resultado (bytes / 3,1): inicio de sesión de este repo 11.411 → 9.324 B (−18%, README incluido); repo destino ≈ 6.149 B (≈ 1.980 tokens), no comparable 1:1 con la medición anterior porque `SKILL.md` ya no se carga en las sesiones siguientes.
+- Verificación: `bun test` → 123 tests, todos pasan (16 nuevos en `scripts/skill-checks/`); `bun run typecheck` sin errores; 0 enlaces relativos rotos.
+- Commits: `4678fa1`, `f3b85ed`, `8e772d8`, `78107d0`, `4cf8a9e`, `268f39c`, `806e7f1` y el de cierre, en la rama `docs/optimize-context`.
+
+## 2026-10-06 — ✅ Tarea 25 — Optimización del contenido del kit: menos tokens y sin duplicados
+
+- Se midió una línea base de lo que se carga al iniciar sesión y se auditó el kit (8 hallazgos, F1–F8, todos aprobados y aplicados): comentarios de guía de las plantillas que ya no viajan al repo destino, preámbulos y reglas por defecto recortados, `architecture.md`/`stack.md` reescritos para contener solo lo no deducible del código, flujo "ya existe" resuelto en `SKILL.md` sin abrir `questions-flow.md`, y política de lectura de `history.md`/`backlog.md`. El porqué: el kit solo vale si su costo en tokens se mantiene bajo (`docs/philosophy.md`).
+- Resultado (tokens ≈ bytes / 3,1): inicio de sesión de este repo −14% (13.321 → 11.411 B), plantillas `agents/` −32%, inicio de sesión en un repo destino −67% (31.490 → 10.383 B; estimación que supone que el agente quita los comentarios de guía).
+- Autorizado por el operador: recortar las Reglas por defecto de `rules.md` (fijas) y reescribir `architecture.md`/`stack.md`. Sin bump de versión; se decide al publicar la próxima release.
+- Verificación: `bun test` → 107 tests, todos pasan; `bun run typecheck` sin errores; enlaces relativos sin roturas; el parser del tracker lee las plantillas nuevas.
+- Commits: `b28c1f0`, `2852c20`, `1327727`, `fa890b1` y el de cierre, en la rama `docs/optimize-context`.
 
 ## 2026-10-06 — ✅ Tarea 28 — Renombrar la carpeta `src/` a `skill/`
 

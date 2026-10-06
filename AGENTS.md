@@ -1,5 +1,9 @@
 # Claude
 
-Antes de cualquier tarea, lee [`docs/agents/rules.md`](./docs/agents/rules.md) (reglas fijas) y [`docs/agents/handoff.md`](./docs/agents/handoff.md) (estado actual del trabajo).
+Antes de cualquier tarea, lee en este orden:
 
-Para el diseño completo del proyecto, ver [`docs/desing.md`](./docs/desing.md).
+1. [`docs/README.md`](./docs/README.md) — qué es el proyecto y mapa de `docs/`.
+2. [`docs/agents/rules.md`](./docs/agents/rules.md) — reglas fijas; la sección final «Al cerrar una tarea», solo al cerrar una.
+3. [`docs/agents/handoff.md`](./docs/agents/handoff.md) — estado actual del trabajo.
+
+El resto, solo si la tarea lo exige. Con una tarea en curso en `handoff.md`, no leas `backlog.md` ni `history.md` salvo que la tarea lo requiera; sin tarea en curso, mira la lista de títulos del backlog solo si no te pidieron algo concreto. Un archivo grande se lee por búsqueda (`grep -n`) o por rango, no entero.

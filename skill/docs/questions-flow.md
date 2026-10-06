@@ -2,6 +2,10 @@
 
 Árbol de decisión que el agente debe seguir al ejecutar este skill sobre un repositorio. Cada paso indica: qué preguntar (si algo), cómo interpretar la respuesta, y qué acción concreta tomar (qué archivo copiar de `template/` a `docs/<destino>/` en el repo destino, o qué leer/actualizar).
 
+Este archivo se abre solo cuando **no** existe documentación de este skill en el repo destino: el caso "ya existe" se resuelve en [`../SKILL.md`](../SKILL.md), sin pasar por acá.
+
+Rige la política de lectura de [`../SKILL.md`](../SKILL.md): de `template/` se lee solo cada plantilla que se va a completar, y lo que se copia sin cambios (`CLAUDE.md`, `external/_example-service.md`) se copia con `cp`, sin leerlo.
+
 Convención de rutas: `template/X` se refiere a la plantilla en este skill; `docs/X` se refiere al destino en el repo del operador (o `agent-context/X` si aplica el conflicto descrito en el punto 4.1 del documento de diseño).
 
 **Convención de interacción — rondas:** las preguntas se agrupan en rondas. Dentro de una misma ronda todas las preguntas se hacen juntas, en una sola interacción, porque son independientes entre sí (ninguna depende de la respuesta de otra de la misma ronda). Solo se avanza a la siguiente ronda una vez respondida la anterior, porque su resultado puede condicionar qué se pregunta después.
@@ -10,7 +14,7 @@ Convención de rutas: `template/X` se refiere a la plantilla en este skill; `doc
 
 ## Idioma de la documentación (siempre, antes que cualquier otra cosa)
 
-Corre primero, antes de la Ronda 1 — aplica tanto si se dispara scaffolding nuevo como el flujo de proyecto existente, porque determina en qué idioma se redacta todo lo que sigue.
+Corre primero, antes de la Ronda 1, porque determina en qué idioma se redacta todo lo que sigue.
 
 1. **¿`docs/agents/rules.md` ya existe y tiene el idioma registrado?** (ver la regla "Idioma de la documentación" en sus Reglas por defecto — `template/agents/rules.md`).
    - **Sí** → usar ese valor como `IDIOMA`. No volver a preguntar. Fin de este paso.
@@ -40,19 +44,9 @@ Guardar la respuesta como `ALCANCE`.
 
 ## Detección automática (sin preguntar, corre después de la Ronda 1)
 
-El agente revisa el repo destino:
+El agente ya revisó en [`../SKILL.md`](../SKILL.md) (paso 1) si existe `docs/agents/` y/o `docs/project/` (o sus equivalentes bajo `agent-context/`); si existen, el flujo terminó allá. Acá solo se llega si **no** existen. Falta distinguir:
 
-**¿Existe `docs/agents/` y/o `docs/project/`?** (o sus equivalentes bajo `agent-context/`)
-
-- **SÍ** → el skill ya fue inicializado antes en este repo. **No se dispara scaffolding**, `ALCANCE` deja de ser relevante. Ir directo al **flujo de proyecto existente**:
-  1. Leer `docs/agents/rules.md`.
-  2. Leer `docs/agents/handoff.md`.
-  3. Leer las líneas relevantes de `docs/agents/backlog.md` (relacionadas a la tarea pedida).
-  4. Ejecutar la tarea que pidió el operador.
-  5. Al terminar, actualizar `docs/agents/handoff.md` (siempre se sobrescribe con el estado actual, en cada paso del plan si lo hubo — ver Regla 6) y agregar la entrada correspondiente a `docs/agents/history.md` (hecha o descartada — ver Regla 7). Si `handoff.md` o `backlog.md` no tienen las anclas de sección (`<!-- agent-context-kit:section=... -->`), se agregan al actualizarlos — ver [`template-architecture.md`](./template-architecture.md), sección "Anclas de sección".
-  6. **Fin del flujo.** No continuar con las rondas siguientes.
-
-- **NO, pero `docs/` (o carpeta equivalente) tiene archivos cuyo nombre matchea el catálogo de este skill en una proporción significativa** → hay documentación de contexto previa, pero de otro formato/convención. No se trata como conflicto genuino (eso sería `agent-context/`, ver `docs/desing.md` 4.1): se dispara el **flujo de migración** — ver [`./migration-flow.md`](./migration-flow.md). `ALCANCE` deja de ser relevante hasta que ese flujo termine (internamente se comporta como `ALCANCE = d`).
+- **No existen, pero `docs/` (o carpeta equivalente) tiene archivos cuyo nombre matchea el catálogo de este skill en una proporción significativa** → hay documentación de contexto previa, pero de otro formato/convención. No se trata como conflicto genuino (eso sería `agent-context/`, ver `docs/desing.md` 4.1): se dispara el **flujo de migración** — ver [`./migration-flow.md`](./migration-flow.md). `ALCANCE` deja de ser relevante hasta que ese flujo termine (internamente se comporta como `ALCANCE = d`).
 
 - **NO** → no hay documentación previa de este skill ni nada reconocible para migrar. Continuar según `ALCANCE`:
 
@@ -70,7 +64,7 @@ El agente revisa el repo destino:
 Preguntar las 3 juntas, en una sola interacción:
 
 1. **¿Es un proyecto nuevo o uno existente al que se le agrega documentación retroactiva?**
-   - Si es **existente** → revisar el historial de git (`git log`) para reconstruir un `agents/history.md` inicial en vez de dejarlo vacío. Extraer hitos relevantes de los commits, no un volcado literal del log (todas las entradas reconstruidas así van como ✅ Hecha).
+   - Si es **existente** → revisar el historial de git (`git log --oneline`, sin diffs) para reconstruir un `agents/history.md` inicial en vez de dejarlo vacío. Extraer hitos relevantes de los commits, no un volcado literal del log (todas las entradas reconstruidas así van como ✅ Hecha).
    - Si es **nuevo** → `agents/history.md` se copia vacío/con la plantilla base.
 
 2. **¿En qué etapa está el proyecto?** → guardar como `ETAPA`:
@@ -84,6 +78,17 @@ Preguntar las 3 juntas, en una sola interacción:
    - `fullstack (repo único)`
    - `fullstack (monorepo)`
    - `otro`
+
+---
+
+## Al copiar una plantilla al repo destino (aplica a todas las rondas)
+
+Una plantilla se completa, no se copia tal cual:
+
+1. Reemplazar los `[Placeholder]` por contenido real (o por la frase alternativa que la propia plantilla sugiere, ej. "Ninguna").
+2. **Quitar los comentarios HTML de guía** (`<!-- ... -->`): son instrucciones para quien completa la plantilla y, si quedan, se vuelven a leer en cada sesión. Se conservan solo la firma `agent-context-kit:signature`, las anclas `agent-context-kit:section=...` y los marcadores `agent-docs-skill:start/end`. Lo que hace falta para mantener el archivo después (formato de una tarea, de una entrada, de una tarea pausada) está en el texto visible de la plantilla, no en comentarios. Excepción: `external/_example-service.md` se copia sin modificar, con `cp` (Ronda 4).
+3. En el set mínimo (sin `docs/README.md`), agregar al inicio de `rules.md` la definición de "operador" que lleva el `README.md`: *"**Operador:** la persona dueña del proyecto que le pide tareas al agente, aprueba decisiones y a quien se le pregunta cuando algo no está definido."*
+4. Escribir solo lo que aporta al agente: no volcar listas de dependencias ni módulos uno por uno; sí convenciones, decisiones y restricciones y, en `architecture.md`, el árbol anotado de los niveles superiores del código (una línea de propósito por entrada). Conciso, sin relleno, y lo que ya vive en otro archivo se enlaza, no se repite.
 
 ---
 
@@ -153,11 +158,11 @@ Solo si en la Ronda 3 la respuesta fue "sí" a integraciones externas.
 
 ## Ronda final — Generar README + puntero en la raíz (siempre, en cualquier rama que haya copiado algo)
 
-1. **Generar `docs/README.md`** (no copiar `template/README.md` literal): usando ese archivo solo como guía de estructura/formato, armar un índice que enlace únicamente a los archivos que efectivamente existen en `docs/` tras esta ejecución (si no se copió `glossary.md`, no aparece en el índice; si se crearon 3 `external/*.md`, los 3 quedan listados; etc.). Este paso se omite en el set mínimo (no hay README en ese set); en ese caso, el paso 3 tampoco enlaza a `docs/README.md`.
-   - **Sección "Qué es este proyecto":** si `docs/README.md` no existe todavía, o existe pero no tiene esa sección, preguntar: *"¿Podés describir en 1-2 frases qué es este proyecto (qué hace, para quién)?"* y escribirla como primera sección del archivo. Si ya existe con esa sección, preservarla tal cual al regenerar el resto del índice — no se vuelve a preguntar.
+1. **Generar `docs/README.md`** (no copiar `template/README.md` literal): usando ese archivo solo como guía, armar el mapa mínimo (~1,5 KB como máximo) con la descripción del proyecto, la definición de "operador" y el árbol de `docs/` con solo los archivos que existen tras esta ejecución (si no se copió `glossary.md`, no aparece; si se crearon 3 `external/*.md`, los 3 quedan listados). Este paso se omite en el set mínimo (no hay README en ese set); en ese caso, el paso 3 tampoco enlaza a `docs/README.md`.
+   - **Descripción del proyecto:** si `docs/README.md` no existe todavía, o existe pero no la tiene, preguntar: *"¿Podés describir en 1-2 frases qué es este proyecto (qué hace, para quién)?"* y escribirla justo debajo del título. Si ya existe, preservarla tal cual al regenerar el resto — no se vuelve a preguntar.
 2. Determinar si se usó `docs/` o `agent-context/` (según lógica de detección de conflicto, punto 4.1 del documento de diseño).
 3. **`AGENTS.md` (fuente de verdad — se asegura siempre, en cualquier set, incluso el mínimo):**
-   - No existe → crear a partir de `template/AGENTS.md`, ajustando la ruta `docs/`/`agent-context/` y quitando la línea de `docs/README.md` si ese archivo no se generó (set mínimo).
+   - No existe → crear a partir de `template/AGENTS.md`, ajustando la ruta `docs/`/`agent-context/` y quitando las líneas de los archivos que no se generaron (en el set mínimo: `docs/README.md`, `backlog.md` e `history.md`).
    - Existe con otro contenido del operador → no se sobrescribe: se agrega la sección delimitada `<!-- agent-docs-skill:start -->` ... `<!-- agent-docs-skill:end -->` de `template/AGENTS.md` al final, solo si el marcador no está ya presente.
 4. **`CLAUDE.md` (redirige a `AGENTS.md`, nunca duplica su contenido — se asegura siempre, en cualquier set):**
    - No existe → crear a partir de `template/CLAUDE.md`, literal.
@@ -175,7 +180,7 @@ Solo si en la Ronda 3 la respuesta fue "sí" a integraciones externas.
 | Set | Se dispara con | Archivos incluidos | Por qué |
 |---|---|---|---|
 | **Mínimo** | a) Tarea puntual / c) Testear algo puntual | `agents/rules.md`, `agents/handoff.md`, `AGENTS.md`/`CLAUDE.md` (raíz) | Solo necesita no romper nada (reglas) y saber en qué está el proyecto ahora (handoff). No amerita backlog/history: es de un solo uso, sin ciclo de vida que registrar. El puntero raíz sí se asegura igual, porque es lo único que le permite a un agente genérico (no solo este skill) encontrar esa documentación sin invocar el skill de nuevo. |
-| **Intermedio** | b) Agregar una feature a un proyecto existente | Todo el mínimo + `agents/backlog.md`, `agents/history.md`, `project/architecture.md`, `project/stack.md`, `README.md` (generado) | Una feature sí tiene ciclo de vida (se agenda, se trabaja, se cierra o se descarta) → backlog/history. Para encajarla bien hace falta entender la estructura (architecture) y qué tecnologías ya están en uso (stack). `README.md` como índice porque ya son 6 archivos; se genera y no se copia porque su contenido depende de qué se haya creado. |
+| **Intermedio** | b) Agregar una feature a un proyecto existente | Todo el mínimo + `agents/backlog.md`, `agents/history.md`, `project/architecture.md`, `project/stack.md`, `README.md` (generado) | Una feature sí tiene ciclo de vida (se agenda, se trabaja, se cierra o se descarta) → backlog/history. Para encajarla bien hace falta conocer las convenciones de organización (architecture) y las decisiones de stack que no se ven en el código (stack). `README.md` como mapa que se lee primero y evita abrir archivos de más; se genera y no se copia porque su contenido depende de qué se haya creado. |
 | **Completo** | d) Desarrollo prolongado / proyecto nuevo | Todo el intermedio + los condicionales de Ronda 2-4 (`roadmap`, `decisions`, `known-issues`, `glossary`, `entities`, `infrastructure`, `testing`, `setup`, `external/*`, `plans/*`) | Proyecto de largo aliento necesita cobertura completa: visión a futuro, decisiones técnicas, dominio de negocio, integraciones, testing. |
 
 ## Resumen — condición de disparo por archivo

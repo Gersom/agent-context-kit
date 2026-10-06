@@ -1,15 +1,12 @@
 # Handoff
 
-Estado "en caliente" del trabajo: en qué se está ahora mismo. **Este archivo se sobrescribe completo cada vez que se actualiza** — no se agregan entradas nuevas debajo de las viejas, es una foto del presente, no un historial.
+Estado "en caliente": en qué se está ahora. **Se sobrescribe completo** en cada actualización (en cada paso del plan y al cerrar la tarea): es una foto del presente, no un historial, con el próximo paso concreto para que un chat nuevo retome sin depender de la sesión anterior.
 
-- Historial de tareas ya cerradas (hechas o descartadas) → [`./history.md`](./history.md)
-- Cola de tareas pendientes que todavía no se empezaron → [`./backlog.md`](./backlog.md)
-
-Si no hay ninguna tarea en curso, la sección "Tarea en progreso" debe decir explícitamente "Sin tarea en curso". "Tareas pausadas" es independiente y queda en "Ninguna" cuando no hay ninguna pausada.
-
-Regla 6 de `rules.md`: este archivo se actualiza en cada paso completado del plan, no solo al cerrar la tarea — así, si la conversación se corta a mitad de camino, un chat nuevo puede retomar exactamente desde acá.
-
-**Anclas de sección:** "Tarea en progreso" y "Tareas pausadas" van precedidas por un comentario `<!-- agent-context-kit:section=... -->` (`in-progress`, `paused`). Son comentarios de máquina — los usa el script de seguimiento de tareas (`scripts/task-tracker/`) para ubicar las secciones sin depender del idioma de los headers. No se traducen ni se mueven, y como este archivo se sobrescribe completo, **hay que reescribirlas siempre** en cada actualización. La tarea en progreso se identifica por la primera `Tarea N — título` dentro de la sección `in-progress`. Detalle completo en [`../../skill/docs/template-architecture.md`](../../skill/docs/template-architecture.md), sección "Anclas de sección".
+- Pendientes → [`./backlog.md`](./backlog.md) · Cerradas (hechas o descartadas) → [`./history.md`](./history.md)
+- Sin tarea en curso: "Tarea en progreso" dice "Sin tarea en curso" (no deja el contenido de la última cerrada); "Tareas pausadas" queda en "Ninguna" si no hay.
+- **No borres ni muevas los comentarios `<!-- agent-context-kit:section=... -->`** (`in-progress`, `paused`): los lee el script de seguimiento de tareas; como el archivo se reescribe completo, hay que reescribirlos siempre. La tarea en curso va en una línea `Tarea N — título` antes de la primera subsección `###`.
+- **Tarea pausada:** un bloque `### Tarea N — título` con `Plan` (opcional: los checkboxes de "Tarea en progreso" tal cual), `Qué falta`, `Decisiones a medio camino`, `Próximo paso concreto`, `Por qué se pausó` y `Qué espera para retomarse`.
+- Las reglas para cerrar una tarea están al final de [`rules.md`](./rules.md).
 
 ---
 

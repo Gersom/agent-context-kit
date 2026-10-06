@@ -10,7 +10,7 @@ No inventa un flujo nuevo de scaffolding — una vez resuelta la migración, se 
 
 Inmediatamente después del chequeo de "¿Existe `docs/agents/` y/o `docs/project/`?" en `questions-flow.md`:
 
-- **Existen** → flujo de proyecto existente normal (ya cubierto en `questions-flow.md`, no cambia nada acá).
+- **Existen** → flujo de proyecto existente normal (ya cubierto en `../SKILL.md`, no cambia nada acá).
 - **No existen, pero `docs/` (o la carpeta que cumpla ese rol) tiene archivos cuyo nombre matchea el catálogo de este skill** (ver heurística abajo) en una proporción significativa → se dispara **este** flujo, en vez de continuar directo con `ALCANCE`.
 - **No existen y tampoco hay coincidencias** → sigue el flujo normal de `questions-flow.md` sin cambios (crear `docs/` nuevo, o usar `agent-context/` si hay conflicto real con contenido no relacionado — ver `docs/desing.md` 4.1).
 
@@ -24,16 +24,16 @@ Si el operador pide explícitamente migrar (ej. *"usa la skill agent-context-kit
 
 ## Prioridad: firma de este skill sobre la heurística
 
-Antes de aplicar la tabla de heurística, revisar si alguno de los archivos candidatos a `handoff.md` (cualquiera que matchee el patrón `handoff` en el nombre) contiene el comentario de firma `agent-context-kit:signature` en sus primeras líneas (ver `template/agents/handoff.md`).
+Antes de aplicar la tabla de heurística, revisar si alguno de los archivos candidatos a `handoff.md` (cualquiera que matchee el patrón `handoff` en el nombre) contiene el comentario de firma `agent-context-kit:signature`. Se mira solo con `head -n 3`, sin abrir el archivo (ver `template/agents/handoff.md`).
 
-- **Si la firma está presente** → este `docs/` ya fue generado por este mismo skill, no es un sistema distinto. No se dispara la migración: se trata como el flujo de proyecto existente de `questions-flow.md` (leer `rules.md`/`handoff.md`/`backlog.md`, ejecutar la tarea, actualizar al final), aunque la estructura de carpetas no calce exactamente con `docs/agents/`+`docs/project/` (por ejemplo, si se movió o renombró algo a mano después de generarla). Si a ese `handoff.md`/`backlog.md` le faltan las anclas de sección, se agregan igual al actualizarlos (ver [`template-architecture.md`](./template-architecture.md), sección "Anclas de sección").
+- **Si la firma está presente** → este `docs/` ya fue generado por este mismo skill, no es un sistema distinto. No se dispara la migración: se trata como el flujo de proyecto existente de `../SKILL.md` (seguir el `AGENTS.md` del repo y ejecutar la tarea), aunque la estructura de carpetas no calce exactamente con `docs/agents/`+`docs/project/` (por ejemplo, si se movió o renombró algo a mano después de generarla). Si a ese `handoff.md`/`backlog.md` le faltan las anclas de sección, se agregan igual al actualizarlos (ver [`template-architecture.md`](./template-architecture.md), sección "Anclas de sección").
 - **Si no está presente** → no descarta nada por sí solo — la firma es opcional (un `handoff.md` de este skill generado antes de que existiera esta firma, o editado a mano, puede no tenerla). Se sigue con la heurística de nombre normalmente.
 
 La firma es una señal de alta confianza cuando aparece, pero su ausencia es neutral, no una señal de "es de otro sistema".
 
 ## Heurística de detección y mapeo
 
-Por cada archivo dentro del `docs/` existente (recursivo, sin importar en qué subcarpeta esté), comparar su nombre (normalizado: minúsculas, sin guiones/underscores) contra este catálogo — coincidencia por nombre exacto o por contener el término:
+Por cada archivo dentro del `docs/` existente (recursivo, sin importar en qué subcarpeta esté), comparar su nombre (normalizado: minúsculas, sin guiones/underscores) contra este catálogo — coincidencia por nombre exacto o por contener el término. El mapeo se arma **solo con nombres y tamaños** (`ls`, `wc -c`), sin abrir el contenido (política de lectura de [`../SKILL.md`](../SKILL.md)):
 
 | Patrón en el nombre | Destino en este skill |
 |---|---|
@@ -64,24 +64,30 @@ Si un archivo **no matchea ningún patrón** → va a `docs/others/<nombre-origi
 
 ## Ronda de confirmación (siempre, antes de tocar nada)
 
-Antes de mover o escribir un solo archivo, mostrar al operador la tabla de mapeo propuesta completa (origen → destino), incluyendo qué archivos van a `docs/others/` por no tener match y cuáles quedarían fusionados. Preguntar en una sola tanda:
+Antes de mover o escribir un solo archivo, mostrar al operador la tabla de mapeo propuesta completa (origen → destino, con tamaños), incluyendo qué archivos van a `docs/others/` por no tener match y cuáles quedarían fusionados. Preguntar en una sola tanda:
 
 1. ¿La tabla de mapeo está bien, o hay que corregir algún archivo puntual?
 2. Si hay fusiones propuestas, ¿corresponde fusionarlas tal cual, o deberían quedar separadas de otra forma?
+3. **¿Querés conservar la documentación vieja en `docs-legacy/`?** Si `docs-legacy/` ya existe (de una migración anterior), decirlo en la pregunta: se conserva tal cual y no se crea otro respaldo, o se reemplaza.
+4. **¿Querés condensar el texto para ahorrar tokens, o mantenerlo tal cual?** Condensar = quitar relleno y repeticiones, enlazar en vez de duplicar y fusionar lo redundante, conservando todos los hechos, decisiones, fechas y números; mantener = no se reescribe el texto, solo se adapta a la estructura y las anclas de este skill.
 
 Solo después de la confirmación se ejecuta la migración — nunca se mueve o transforma contenido en base a una heurística sin confirmar.
 
 ## Ejecución
 
-1. **Resguardar el original primero, intacto.** Copiar la carpeta `docs/` existente completa a `docs-legacy/` en la raíz del repo destino, sin modificarla. Si `docs-legacy/` ya existe (de una migración anterior), preguntar antes de sobrescribir — no pisar un respaldo previo en silencio.
-2. **Migrar cada archivo mapeado.** Por cada par (origen ya resguardado en `docs-legacy/`, destino confirmado): leer el contenido real y reescribirlo para que encaje en la plantilla correspondiente de `skill/template/<categoría>/<archivo>.md` — conservando toda la información del original (no se descarta contenido), pero con la estructura y convenciones de este skill. La plantilla real de cada archivo define el formato esperado — incluidas, en `handoff.md` y `backlog.md`, las anclas de sección (`<!-- agent-context-kit:section=... -->`), que se insertan siempre aunque el original no tuviera nada equivalente (ver [`template-architecture.md`](./template-architecture.md), sección "Anclas de sección").
-3. **Copiar el contenido sin mapeo, tal cual.** Por cada archivo sin match, copiarlo sin transformar a `docs/others/`, preservando su nombre original. `docs/others/` no tiene plantilla propia en `template/` — es una carpeta de resguardo para no perder contenido, no un catálogo curado como el resto de `docs/`.
+1. **Resguardar el original, según la respuesta 3.**
+   - **Conservar** → copiar la carpeta `docs/` completa a `docs-legacy/` en la raíz del repo destino con `cp -r`, sin modificarla ni leerla. Si `docs-legacy/` ya existía, solo se reemplaza si el operador lo eligió así en la pregunta 3; si no, queda como estaba y no se copia nada.
+   - **No conservar** → no se crea `docs-legacy/`. Antes de seguir, verificar con `git status --porcelain` que el repo sea git y que `docs/` no tenga cambios sin commitear; si no, avisar que el original quedaría sin respaldo y pedir confirmación. Los archivos viejos se leen en su lugar y se reemplazan por los nuevos con `git mv`/`mv`.
+2. **Migrar cada archivo mapeado, de a uno.** Por cada par (origen, destino confirmado): medir el origen (`wc -c`); leerlo (entero si pesa ≤ 8 KB, por trozos si pesa más: se procesa y se escribe cada trozo antes de leer el siguiente) y reescribirlo para que encaje en la plantilla correspondiente de `skill/template/<categoría>/<archivo>.md`, con la estructura y convenciones de este skill. Se conserva toda la información del original: con "mantener" el texto no se reescribe; con "condensar" se aplica lo definido en la pregunta 4 (los hechos, decisiones, fechas y números no se pierden). La plantilla real de cada archivo define el formato esperado — incluidas, en `handoff.md` y `backlog.md`, las anclas de sección (`<!-- agent-context-kit:section=... -->`), que se insertan siempre aunque el original no tuviera nada equivalente (ver [`template-architecture.md`](./template-architecture.md), sección "Anclas de sección").
+3. **Copiar el contenido sin mapeo, tal cual y sin leerlo.** Por cada archivo sin match, copiarlo con `cp` a `docs/others/`, preservando su nombre original. `docs/others/` no tiene plantilla propia en `template/` — es una carpeta de resguardo para no perder contenido, no un catálogo curado como el resto de `docs/`.
 4. **Completar lo que falte.** Seguir con el resto de `questions-flow.md` como si `ALCANCE = d` (desarrollo prolongado): lo que el `docs/` viejo no tenía (ej. si nunca existió un `rules.md`) se genera vacío/con placeholders igual que en cualquier scaffolding nuevo, y las Rondas 2-4 se preguntan igual para lo que no se pudo inferir del contenido migrado.
+   - **Numeración del backlog:** si las tareas migradas a `backlog.md` no tienen número, numerarlas de arriba hacia abajo, dejar "Próximo número de tarea" en max+1 y anotar en el archivo "Numeración iniciada el <fecha>; las tareas cerradas antes (en `history.md`) no tienen número retroactivo". No se renumera `history.md` hacia atrás.
 5. **Ronda final.** Igual que en `questions-flow.md`: generar `docs/README.md` (listando `others/` en el índice si terminó existiendo), asegurar el puntero en `CLAUDE.md`/`AGENTS.md`.
-6. **Dejar registro de la migración.** La primera entrada de `docs/agents/history.md` no queda vacía ni es un volcado de `git log`: se registra la migración en sí (como ✅ Hecha) — qué se migró, desde qué archivos de `docs-legacy/`, y qué quedó en `others/` sin mapear.
+6. **Dejar registro de la migración.** La primera entrada de `docs/agents/history.md` no queda vacía ni es un volcado de `git log`: se registra la migración en sí (como ✅ Hecha) — qué se migró y desde qué archivos (de `docs-legacy/` o del git si no se conservó), si se condensó o se mantuvo el texto, y qué quedó en `others/` sin mapear.
 
 ## Qué NO hace este flujo
 
-- No borra `docs-legacy/` automáticamente. Queda como respaldo indefinido hasta que el operador decida borrarlo a mano — el flujo no vuelve a tocarlo después de crearlo.
+- No borra `docs-legacy/` automáticamente. Si se conserva, queda como respaldo indefinido hasta que el operador decida borrarlo a mano — el flujo no vuelve a tocarlo después de crearlo.
+- No lee el contenido de archivos para clasificarlos ni los que no tienen mapeo.
 - No reformatea contenido dentro de `docs/others/` — ese contenido no se transforma, solo se resguarda para que no se pierda ni quede invisible.
 - No decide fusiones ambiguas por su cuenta sin pasar por la ronda de confirmación.

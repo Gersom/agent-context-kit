@@ -1,25 +1,29 @@
 # Backlog
 
-Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en curso (eso vive en [`./handoff.md`](./handoff.md)) ni lo ya cerrado (eso vive en [`./history.md`](./history.md)).
+Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en curso (eso vive en [`./handoff.md`](./handoff.md)) ni lo ya cerrado ([`./history.md`](./history.md)).
 
-**Ciclo de vida de un item:**
-1. Se agrega acá cuando se identifica pero todavía no se empieza.
-2. Cuando se empieza a trabajar, se saca de esta lista y pasa a ser la tarea actual (o pausada) en `handoff.md` (referenciando el título del item).
-3. Cuando se cierra (hecha o descartada), sale de `handoff.md` y se registra en `history.md`.
+**Ciclo de vida:** una tarea se agrega acá al identificarla; al empezar a trabajarla se saca de esta lista y pasa a `handoff.md`; al cerrarla (hecha o descartada) se registra en `history.md`. No dejar acá tareas en curso o cerradas.
 
-No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron — sería duplicar lo que corresponde a `handoff.md`/`history.md`.
+**Dos secciones:** "Tareas libres" (listas para tomar) y "Tareas bloqueadas / pospuestas". Cuando el motivo de un bloqueo deja de aplicar, la tarea pasa a libres (Regla 7 de `rules.md`; `Bloqueos` no se borra, se marca como resuelto).
 
-**Dos secciones:** las tareas viven en "Tareas libres" (listas para tomar) o "Tareas bloqueadas / pospuestas" (no se toman todavía). Cuando el motivo de una tarea bloqueada deja de aplicar, se mueve a "Tareas libres" — ver Regla 7 de `rules.md` (no se borra el campo `Bloqueos`, se marca como resuelto).
+**Numeración:** cada tarea tiene un número correlativo fijo, asignado al crearla y **nunca reutilizado**, ni siquiera al cerrarla: sirve para referenciarla sin ambigüedad ("la tarea 3") y viaja a su entrada de `history.md`. No es un orden de cola. Para agregar una tarea: usar "Próximo número de tarea" (más abajo) y dejarlo en N+1; también se numeran las tareas nuevas que surjan de una tarea en curso.
 
-**Agrupamiento (solo en "Tareas libres"):** si esta sección supera las 15 tareas (Regla 7 de `rules.md`), se evalúa agrupar 2 o más que compartan un objetivo real. El criterio no es un tope de cantidad — es que el grupo entero quepa en una sola frase de objetivo compartido, sin usar "y" para forzar una tarea que en realidad no pertenece. Un grupo aparece en "Tareas libres" como una sola línea corta; el detalle completo de cada tarea que lo compone se mueve a la sección "Tareas agrupadas" (más abajo), que no hace falta leer salvo que el operador pida el detalle de una tarea puntual o se vaya a tomar una. Si un grupo queda con una sola tarea (las demás se tomaron o cerraron), se desarma: esa tarea vuelve a ser una entrada individual normal en "Tareas libres". Hoy "Tareas libres" tiene 7 tareas — muy por debajo del umbral, no hay grupos formados.
+**Formato de cada tarea** (`### Tarea N — título`), todo breve — `Detalles` solo si hace falta, y si el detalle ya vive en otro archivo (`decisions.md`, `known-issues.md`), enlazarlo:
+- **Descripción:** de qué trata (1–3 líneas).
+- **Decisiones/temas a definir antes de empezar:** qué resolver o preguntarle al operador antes de arrancar; "Ninguno" si está todo definido.
+- **Bloqueos:** "Ninguno", o un valor que **empieza** con `[dependencia]` (no se puede empezar técnicamente) o `[postergada]` (conviene esperar) y el motivo. Con bloqueo va en "bloqueadas / pospuestas"; si no, en "libres". Si una tarea ya desbloqueada (`[Resuelto el <fecha>] — …`) se vuelve a bloquear, el bloqueo vigente va **primero** y el historial resuelto después, porque el script de seguimiento toma el tag con el que empieza el campo.
+- **Desbloquea:** (opcional) qué tareas quedan libres al cerrar esta.
+- **Disparador:** cuándo corresponde tomarla; por defecto "cuando el operador pregunte por tareas pendientes".
+- **Detalles:** contexto extendido, solo si hace falta.
+- **Agregada:** fecha.
 
-**Numeración:** cada tarea tiene un número correlativo fijo, asignado una sola vez al crearse. El número **nunca se reutiliza**, ni siquiera cuando la tarea se cierra (hecha o descartada) y pasa a `history.md`. No es un orden de cola: se puede tomar tareas fuera de orden.
+**Agrupamiento (solo en "Tareas libres"):** si superan las 15 tareas (Regla 7), se evalúa agrupar 2 o más que compartan un objetivo real — el grupo entero tiene que caber en una frase de objetivo compartido, sin forzar con "y". El grupo aparece en libres como un bloque `### Grupo — título (Tareas N, M)` con un `Resumen` de una frase; el detalle de cada tarea (`#### Tarea N — título`, mismo formato) se mueve a "Tareas agrupadas", que no hace falta leer salvo para tomar una. Un grupo que queda con una sola tarea se desarma.
 
-> Numeración iniciada el 2026-09-24. Tareas ya cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
+**Anclas de sección:** no borres ni muevas los comentarios `<!-- agent-context-kit:section=... -->` (`free`, `blocked`, `grouped`) que preceden a cada sección: los usa el script de seguimiento de tareas de agent-context-kit.
 
-**Anclas de sección:** cada sección de tareas va precedida por un comentario `<!-- agent-context-kit:section=... -->` (`free`, `blocked`, `grouped`). Son comentarios de máquina — los usa el script de seguimiento de tareas (`scripts/task-tracker/`) para ubicar las secciones sin depender del idioma de los headers. No se traducen, no se borran ni se mueven al actualizar este archivo. Detalle completo en [`../../skill/docs/template-architecture.md`](../../skill/docs/template-architecture.md), sección "Anclas de sección".
+> Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 29
+**Próximo número de tarea:** 30
 
 ---
 
@@ -47,15 +51,15 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 
 ### Tarea 15 — Crear script para validar si un proyecto cumple las normas del task-tracker
 
-- **Descripción:** script en `scripts/` que se corre contra el `docs/agents/` de otro proyecto y reporta si cumple lo que el task-tracker necesita para funcionar bien: anclas de sección presentes, en la línea anterior a su `##` y sin duplicar; headers de tarea `### Tarea N — título` (`####` dentro de grupos); línea de la tarea en progreso antes de la primera subsección; campos `- **Etiqueta:** valor`; tags de bloqueo (con la convención "bloqueo vigente primero" de la Tarea 13); números de tarea sin repetir y "Próximo número de tarea" mayor al máximo usado; placeholders sin completar. La salida lista errores y avisos con archivo y línea, y termina con código distinto de 0 si hay errores.
+- **Descripción:** script en `scripts/` que se corre contra el `docs/agents/` de otro proyecto y reporta si cumple lo que el task-tracker necesita: anclas de sección (presentes, en la línea anterior a su `##`, sin duplicar), headers `### Tarea N — título` (`####` en grupos), línea de la tarea en progreso antes de la primera subsección, campos `- **Etiqueta:** valor`, tags de bloqueo ("bloqueo vigente primero"), números de tarea sin repetir con "Próximo número de tarea" mayor al máximo, y placeholders sin completar. Lista errores y avisos con archivo y línea; sale con código distinto de 0 si hay errores.
 - **Decisiones/temas a definir antes de empezar:**
   - Nombre de la carpeta y del comando (ej. `scripts/docs-check/` y `bun run check <ruta>`).
-  - Qué incumplimientos son error (el task-tracker no puede leerlo) y cuáles aviso (lo lee, pero con plan B o datos incompletos).
-  - Si reutiliza el parser del task-tracker o es independiente — si lo reutiliza, conviene hacerla después de la Tarea 14 (estructura de carpetas).
-  - Si solo reporta o también corrige (`--fix`); la corrección de los repos ya adoptados hoy la cubre el prompt de normalización de la Tarea 11.
+  - Qué es error (el task-tracker no puede leerlo) y qué es aviso (lo lee, pero con plan B o datos incompletos).
+  - Si solo reporta o también corrige (`--fix`); la corrección de repos ya adoptados la cubre el prompt de la Tarea 19.
+  - Reutiliza el parser compartido de `scripts/_shared/` (Tarea 23, ya resuelta).
 - **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador la priorice. Sirve también para verificar el resultado del prompt de normalización de la Tarea 11.
-- **Detalles:** las normas a verificar salen de `skill/docs/template-architecture.md` (sección "Anclas de sección") y de las plantillas de `skill/template/agents/`; ante una diferencia, gana la plantilla (Regla 4). Dependencias en `devDependencies` del `package.json` raíz (ver `rules.md`).
+- **Disparador:** cuando el operador la priorice; sirve también para verificar el resultado del prompt de la Tarea 19.
+- **Detalles:** las normas salen de `skill/docs/template-architecture.md` ("Anclas de sección") y de las plantillas de `skill/template/agents/`; ante una diferencia, gana la plantilla (Regla 4).
 - **Agregada:** 2026-10-05.
 
 ### Tarea 19 — Prompt de normalización para repos que ya adoptaron el skill
@@ -67,56 +71,32 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 - **Detalles:** antes estaba dentro de la Tarea 11; se sacó a esta tarea a pedido del operador. La Tarea 15 (validador) puede servir para verificar el resultado del prompt en cada repo.
 - **Agregada:** 2026-10-05.
 
-### Tarea 25 — Optimización del contenido del kit: menos tokens y sin duplicados
-
-- **Descripción:** revisar el contenido del kit (las plantillas de `skill/template/`, las reglas y los archivos de `docs/agents/`) para que cada archivo aporte solo lo que el agente no puede deducir del código ni del README, y para que lo que se carga en cada sesión sea lo mínimo. Incluye la revisión de contenido duplicado.
-- **Decisiones/temas a definir antes de empezar:**
-  - **Qué cuenta como duplicado:** contenido que ya está en otro archivo del kit (Regla 1 de `rules.md`) o que se deduce del código, del README o de la documentación existente del proyecto.
-  - **Qué se carga siempre vs. a demanda:** hoy `AGENTS.md` lleva a leer `rules.md` (~10 KB) y `handoff.md` en cada sesión; `history.md` ya pesa ~49 KB y crece con cada tarea. Definir qué debe leerse siempre y qué solo cuando hace falta (ej. `history.md` solo ante una pregunta puntual; `backlog.md` solo lo relevante).
-  - **Cómo se mide:** el objetivo del kit es reducir retrabajo y tiempo del operador, con un costo en tokens bajo (ver `docs/philosophy.md`), así que se miden las dos cosas: (a) tokens al arrancar una sesión; (b) qué tan bien se retoma una tarea cortada, cuántas preguntas tiene que hacer el agente al operador y cuánto retrabajo hubo por contexto faltante o decisiones repetidas. Siempre con y sin kit. Lo natural es hacerlo junto con la Tarea 1 (probar el flujo sobre un repo real); decidir si se agrega allí o se hace acá.
-  - **Reglas por defecto de `rules.md`:** son fijas y no se editan sin autorización explícita del operador; si acortarlas ayuda, requiere su aprobación.
-- **Qué revisar:**
-  - Plantillas de `skill/template/project/` (arquitectura, stack, etc.): son las que más se parecen a lo que el estudio penaliza (descripción del repo que el agente deduce solo). Dejar solo decisiones y restricciones que no se ven en el código.
-  - Solapamientos entre `README.md`, `docs/architecture.md`, `docs/philosophy.md`, `rules.md` y las plantillas.
-  - Tamaño y política de lectura de `rules.md`, `handoff.md`, `backlog.md` y `history.md` (por ejemplo, una política de archivar o resumir `history.md`).
-  - El flujo de preguntas (`skill/docs/questions-flow.md`): que no genere archivos de contexto que se duplican con el código o entre sí.
-  - Que los comandos de lectura compactos de la Tarea 24 (`next`, `show N`, `status`) cubran el caso de no leer archivos enteros.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador la priorice. Conviene antes de seguir sumando plantillas o contenido nuevo al kit.
-- **Detalles:** nace de la conversación del 2026-10-06 sobre si el kit ahorra tokens. Evidencia: el estudio *Evaluating AGENTS.md* (ETH Zurich, arXiv 2602.11988) encontró que los archivos de contexto de repo no mejoran la tasa de éxito (generados por LLM: −0,5% a −2%; escritos por humanos: +4% marginal) y aumentan el costo de inferencia entre 19% y 23%; las vistas generales de estructura no ayudaron a encontrar archivos más rápido, y al quitar la documentación existente los archivos generados mejoraron 2,7% (en buena parte duplican lo ya documentado). Recomiendan solo requisitos mínimos y esenciales. Matiz: el estudio mide tareas independientes (un bug, una vez), no continuidad entre sesiones, así que no refuta el valor de `handoff`/`history`; sí advierte contra la parte descriptiva del repo. Apoyo: el informe *Context Rot* (Chroma) muestra que todos los modelos probados se degradan al crecer el contexto, incluso en tareas simples. Fuentes: https://arxiv.org/html/2602.11988v1, https://trychroma.com/research/context-rot. El valor del kit está en la continuidad y en no volver a discutir lo decidido (ver `docs/philosophy.md`), no en ahorrar la lectura del código.
-- **Agregada:** 2026-10-06.
-
 ### Tarea 26 — Soportar varios operadores trabajando en paralelo
 
-- **Descripción:** hoy el kit asume un solo operador y un solo hilo de trabajo. Diseñar cómo funcionan `handoff.md`, `backlog.md` y `history.md` cuando dos o más personas (cada una con su agente) trabajan a la vez en el mismo repo y comparten el estado por git, para que un colaborador pueda hacer `pull` y retomar el contexto sin preguntarle a quien hizo el trabajo, y sin conflictos de merge constantes.
+- **Descripción:** el kit asume un solo operador y un solo hilo de trabajo. Diseñar cómo funcionan `handoff.md`, `backlog.md` y `history.md` cuando varias personas (cada una con su agente) trabajan a la vez y comparten el estado por git, para que un colaborador haga `pull` y retome el contexto sin preguntarle a quien hizo el trabajo, sin conflictos de merge constantes.
 - **Decisiones/temas a definir antes de empezar:**
   - Si el kit debe soportar varios operadores o se documenta como limitación (decisión del operador).
-  - Cómo se resuelve cada punto de choque:
-    - `handoff.md` se sobrescribe completo y tiene una sola tarea en progreso: ¿un handoff por persona o por rama? ¿varias tareas en progreso?
-    - "Próximo número de tarea" lo tomarían dos personas a la vez y se repetirían números (que por regla no se reutilizan): ¿rangos por persona? ¿otra forma de asignar?
-    - Las entradas nuevas de `history.md` van arriba y generan conflictos de merge.
-    - `rules.md` define "operador" en singular (una persona dueña del proyecto): qué pasa con varios.
-  - Cómo afecta al task-tracker (qué tarea en progreso muestra si hay varias) y a la Tarea 24 (script de gestión).
-  - Que cualquier solución respete `docs/philosophy.md`: markdown plano, sin romper el flujo manual.
+  - Puntos de choque: `handoff.md` se sobrescribe completo con una sola tarea en progreso (¿un handoff por persona o por rama? ¿varias tareas en progreso?); "Próximo número de tarea" lo tomarían dos personas y se repetirían números (¿rangos por persona?); las entradas nuevas de `history.md` van arriba y chocan en el merge; `rules.md` define "operador" en singular.
+  - Efecto en el task-tracker (qué tarea en progreso muestra) y en la Tarea 24; la solución debe respetar `docs/philosophy.md` (markdown plano, sin romper el flujo manual).
 - **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador decida que el kit debe soportar colaboración entre varias personas, o cuando un segundo colaborador empiece a usarlo.
-- **Detalles:** nace de la conversación del 2026-10-06. El valor de compartir contexto por git está en `docs/philosophy.md`; esta tarea cubre lo que hoy lo impide. Es razonamiento de diseño: no se verificó con fuentes externas cómo lo resuelven otras herramientas.
+- **Disparador:** cuando el operador decida que el kit soporte colaboración entre varias personas, o cuando un segundo colaborador empiece a usarlo.
+- **Detalles:** nace de la conversación del 2026-10-06; es razonamiento de diseño, no se verificó con fuentes externas cómo lo resuelven otras herramientas.
 - **Agregada:** 2026-10-06.
 
 ### Tarea 24 — Script para gestionar las tareas (handoff, backlog, history)
 
-- **Descripción:** script nuevo en `scripts/` (aparte del task-tracker, que sigue siendo solo de lectura y no cambia) con comandos que el agente ejecuta en vez de editar a mano `handoff.md`, `backlog.md` y `history.md`: agregar una tarea, empezarla, marcar el paso en que va, pausarla, bloquearla o desbloquearla, y cerrarla (hecha o descartada). Al cerrar aplica lo mecánico de las Reglas 5 a 8 de `rules.md`: actualiza los tres archivos, "Próximo número de tarea" y las anclas, lista las tareas bloqueadas a revisar y genera el reporte de cierre. También comandos de lectura compactos (ej. `next`, `show N`, `status`) para que el agente no tenga que leer `history.md` entero (~49 KB) ni todo el backlog.
+- **Descripción:** script nuevo en `scripts/` (el task-tracker sigue siendo solo de lectura) con comandos que el agente ejecuta en vez de editar a mano `handoff.md`, `backlog.md` y `history.md`: agregar una tarea, empezarla, marcar el paso en que va, pausarla, bloquearla o desbloquearla y cerrarla (hecha o descartada). Al cerrar aplica lo mecánico de las Reglas 5 a 8: actualiza los tres archivos, "Próximo número de tarea" y las anclas, lista las bloqueadas a revisar y genera el reporte de cierre. Con comandos de lectura compactos (`next`, `show N`, `status`) para no leer `history.md` (~55 KB) ni todo el backlog.
 - **Decisiones/temas a definir antes de empezar:**
-  - **Ya decidido (2026-10-05):** edición quirúrgica del markdown — los `.md` siguen siendo la fuente de verdad, el script solo modifica lo que corresponde y el diff de git muestra únicamente ese cambio. No se usa base de datos ni formato estructurado aparte.
+  - **Ya decidido (2026-10-05):** edición quirúrgica del markdown; los `.md` siguen siendo la fuente de verdad y el diff de git muestra solo el cambio. Sin base de datos ni formato aparte.
   - Nombre de la carpeta y del comando (ej. `scripts/task-manager/` y `bun run task ...`).
-  - Formato estructurado de los bloqueos que permita desbloquear solo (ej. `blocked-by: Tarea 12`); los bloqueos en texto libre quedan para revisión manual.
-  - Cómo entra el texto libre (descripciones, `Detalles`): por flags o por stdin.
-  - Posiciones (línea/offset) de bloques y campos en el parser compartido (`scripts/_shared/`), necesarias para la edición quirúrgica; se agregan en esta tarea, no existen todavía.
-  - Cómo se reflejan en `rules.md` y en las plantillas de `skill/template/`: el script es opcional, y si no existe el agente sigue editando a mano como hoy (la distribución del kit sigue siendo markdown puro).
-  - Si se hace por etapas: primero comandos de lectura, después los de escritura, empezando por los más mecánicos.
-- **Bloqueos:** `[Resuelto el 2026-10-06]` — era `[dependencia]` de la Tarea 23 (separar el parser para reutilizarlo), que dejó el parser en `scripts/_shared/`. Las posiciones línea/offset para editar quirúrgicamente NO se hicieron en esa tarea: se agregan acá. El script debe respetar `docs/philosophy.md`.
-- **Disparador:** cuando el operador la priorice (el parser compartido ya está en `scripts/_shared/`).
-- **Detalles:** surgió de la conversación del 2026-10-05: busca bajar el consumo de tokens (menos lectura de archivos grandes, menos reescritura) y evitar errores mecánicos (anclas olvidadas, números repetidos). Si se hace la Tarea 15 (validador), sirve de red de seguridad para este script.
+  - Formato estructurado de los bloqueos para desbloquear solo (ej. `blocked-by: Tarea 12`); los de texto libre quedan para revisión manual.
+  - Cómo entra el texto libre (descripciones, `Detalles`): flags o stdin.
+  - Posiciones (línea/offset) de bloques y campos en el parser compartido de `scripts/_shared/`; se agregan en esta tarea.
+  - Reflejo en `rules.md` y en las plantillas: el script es opcional; sin él, el agente edita a mano como hoy (el kit sigue siendo markdown puro).
+  - Hacerlo por etapas: primero comandos de lectura, después los de escritura, empezando por los más mecánicos.
+- **Bloqueos:** `[Resuelto el 2026-10-06]` — era `[dependencia]` de la Tarea 23 (parser compartido, ya en `scripts/_shared/`); las posiciones línea/offset no se hicieron allí y se agregan acá. Debe respetar `docs/philosophy.md`.
+- **Disparador:** cuando el operador la priorice.
+- **Detalles:** surgió el 2026-10-05: busca bajar el consumo de tokens (menos lectura y reescritura) y evitar errores mecánicos (anclas olvidadas, números repetidos). La Tarea 15 (validador) sirve de red de seguridad.
 - **Agregada:** 2026-10-05.
 
 <!-- agent-context-kit:section=blocked -->
@@ -134,4 +114,4 @@ No dejar en este archivo tareas que ya se están trabajando o que ya se cerraron
 <!-- agent-context-kit:section=grouped -->
 ## Tareas agrupadas
 
-No aplica todavía — ningún grupo formado ("Tareas libres" tiene 7 tareas, bien por debajo del umbral de 15).
+No aplica todavía — ningún grupo formado.
