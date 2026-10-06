@@ -76,7 +76,7 @@ Solo con una terminal interactiva (sin `--once` ni salida redirigida):
 - **`backlog.md`, compacto:** libres (y sus grupos) y bloqueadas como `T-N: título`. Cada bloqueada muestra su tag (`[dependencia]`, `[postergada]`…) y las tareas que menciona su motivo; si alguna ya está cerrada en `history.md`, lo marca en amarillo como recordatorio de la Regla 7 (moverla a libres).
 - **Avisos:** al final, fuera de los recuadros, lo que no se pudo leer o interpretar (ver abajo).
 
-`backlog.md` e `history.md` son opcionales: el set mínimo del skill solo genera `handoff.md`, y en ese caso sus recuadros no aparecen.
+`backlog.md` e `history.md` son opcionales: el set mínimo del skill solo genera `handoff.md`, y en ese caso sus recuadros no aparecen. Los recuadros PAUSADAS y BLOQUEADAS tampoco aparecen cuando no hay tareas de ese tipo (los demás se muestran siempre, con "Sin tarea en curso" o "Ninguna" si están vacíos).
 
 El tachado usa el código de tachado de la terminal: Windows Terminal, VS Code y la mayoría de las terminales actuales lo muestran; si una no lo soporta, el texto sale normal. Con `NO_COLOR` no hay colores ni tachado.
 

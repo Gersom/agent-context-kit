@@ -139,15 +139,27 @@ describe("render", () => {
     expect(out).not.toContain("Tarea 4 —");
   });
 
+  test("pausadas y bloqueadas no aparecen cuando no hay ninguna", () => {
+    const backlogText = "<!-- agent-context-kit:section=free -->\n## Tareas libres\n\n### Tarea 1 — Algo libre\n\n- **Descripción:** x\n";
+    const out = render(buildModel({ handoffText: fixture("minimal", "handoff.md"), backlogText }), meta);
+    expect(out).toContain("╭─ LIBRES (1)");
+    expect(out).not.toContain("PAUSADAS");
+    expect(out).not.toContain("BLOQUEADAS");
+    // Con tareas pausadas y bloqueadas sí aparecen.
+    const full = screen("es-anchors");
+    expect(full).toContain("╭─ PAUSADAS");
+    expect(full).toContain("╭─ BLOQUEADAS");
+  });
+
   test("estados vacíos y set mínimo (sin backlog ni history)", () => {
     const out = screen("minimal", { trigger: { kind: "change", file: "handoff.md" } });
     expect(rowWith(out, "Sin tarea")).toBe("Sin tarea en curso");
-    expect(rowWith(out, "Ninguna")).toBe("Ninguna");
+    expect(out).not.toContain("PAUSADAS");
     expect(out).not.toContain("LIBRES");
     expect(out).not.toContain("history.md");
     expect(out).toContain("Sin backlog.md");
     expect(out).toContain("· se modificó handoff.md");
-    expect(out.split("\n").filter((l) => l.startsWith("╭"))).toHaveLength(2);
+    expect(out.split("\n").filter((l) => l.startsWith("╭"))).toHaveLength(1);
   });
 
   test("pie según los controles disponibles", () => {

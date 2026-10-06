@@ -85,14 +85,16 @@ export function render(model: Model, meta: RenderMeta): string {
     }
   }, pc.green);
 
-  box(`PAUSADAS (${model.counts.paused})`, "handoff.md", pc.yellow, (row) => {
-    if (!model.paused.length) row(0, { paint: secondary, text: "Ninguna" });
-    for (const task of model.paused) {
-      row(0, { paint: pc.yellow, text: `• ${fullTaskName(task)}` });
-      planRows(task.plan, 4, row, pc);
-      for (const field of task.fields) row(4, { paint: secondary, text: `${field.label}: ${field.value}` });
-    }
-  });
+  // Pausadas y bloqueadas solo se muestran si hay alguna.
+  if (model.paused.length) {
+    box(`PAUSADAS (${model.counts.paused})`, "handoff.md", pc.yellow, (row) => {
+      for (const task of model.paused) {
+        row(0, { paint: pc.yellow, text: `• ${fullTaskName(task)}` });
+        planRows(task.plan, 4, row, pc);
+        for (const field of task.fields) row(4, { paint: secondary, text: `${field.label}: ${field.value}` });
+      }
+    });
+  }
 
   // backlog.md (compacto)
   if (model.hasBacklog) {
@@ -108,10 +110,11 @@ export function render(model: Model, meta: RenderMeta): string {
       }
     });
 
-    box(`BLOQUEADAS (${model.counts.blocked})`, "backlog.md", pc.red, (row) => {
-      if (!model.blocked.length) row(0, { paint: secondary, text: "Ninguna" });
-      for (const task of model.blocked) blockedRows(task, row, pc);
-    });
+    if (model.blocked.length) {
+      box(`BLOQUEADAS (${model.counts.blocked})`, "backlog.md", pc.red, (row) => {
+        for (const task of model.blocked) blockedRows(task, row, pc);
+      });
+    }
   }
 
   // Notas y avisos, fuera de los recuadros
