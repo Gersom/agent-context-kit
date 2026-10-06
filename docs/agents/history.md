@@ -19,6 +19,7 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 - Resultado (bytes / 3,1): inicio de sesión de este repo 11.411 → 9.324 B (−18%, README incluido); repo destino ≈ 6.149 B (≈ 1.980 tokens), no comparable 1:1 con la medición anterior porque `SKILL.md` ya no se carga en las sesiones siguientes.
 - Verificación: `bun test` → 123 tests, todos pasan (16 nuevos en `scripts/skill-checks/`); `bun run typecheck` sin errores; 0 enlaces relativos rotos.
 - Commits: `4678fa1`, `f3b85ed`, `8e772d8`, `78107d0`, `4cf8a9e`, `268f39c`, `806e7f1` y el de cierre, en la rama `docs/optimize-context`.
+- A pedido del operador, la rama (Tareas 25 y 29) se mergeó a `main` y se pusheó, y se publicó la versión 1.2.0 (bump **minor**: no cambia los archivos que genera el skill ni mueve archivos de `template/`): tag `v1.2.0` y [GitHub Release](https://github.com/Gersom/agent-context-kit/releases/tag/v1.2.0) con notas que resumen los cambios desde `v1.1.0`.
 
 ## 2026-10-06 — ✅ Tarea 25 — Optimización del contenido del kit: menos tokens y sin duplicados
 
