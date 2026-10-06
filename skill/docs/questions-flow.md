@@ -2,6 +2,8 @@
 
 Árbol de decisión que el agente debe seguir al ejecutar este skill sobre un repositorio. Cada paso indica: qué preguntar (si algo), cómo interpretar la respuesta, y qué acción concreta tomar (qué archivo copiar de `template/` a `docs/<destino>/` en el repo destino, o qué leer/actualizar).
 
+Este archivo se abre solo cuando **no** existe documentación de este skill en el repo destino: el caso "ya existe" se resuelve en [`../SKILL.md`](../SKILL.md), sin pasar por acá.
+
 Convención de rutas: `template/X` se refiere a la plantilla en este skill; `docs/X` se refiere al destino en el repo del operador (o `agent-context/X` si aplica el conflicto descrito en el punto 4.1 del documento de diseño).
 
 **Convención de interacción — rondas:** las preguntas se agrupan en rondas. Dentro de una misma ronda todas las preguntas se hacen juntas, en una sola interacción, porque son independientes entre sí (ninguna depende de la respuesta de otra de la misma ronda). Solo se avanza a la siguiente ronda una vez respondida la anterior, porque su resultado puede condicionar qué se pregunta después.
@@ -10,7 +12,7 @@ Convención de rutas: `template/X` se refiere a la plantilla en este skill; `doc
 
 ## Idioma de la documentación (siempre, antes que cualquier otra cosa)
 
-Corre primero, antes de la Ronda 1 — aplica tanto si se dispara scaffolding nuevo como el flujo de proyecto existente, porque determina en qué idioma se redacta todo lo que sigue.
+Corre primero, antes de la Ronda 1, porque determina en qué idioma se redacta todo lo que sigue.
 
 1. **¿`docs/agents/rules.md` ya existe y tiene el idioma registrado?** (ver la regla "Idioma de la documentación" en sus Reglas por defecto — `template/agents/rules.md`).
    - **Sí** → usar ese valor como `IDIOMA`. No volver a preguntar. Fin de este paso.
@@ -40,19 +42,9 @@ Guardar la respuesta como `ALCANCE`.
 
 ## Detección automática (sin preguntar, corre después de la Ronda 1)
 
-El agente revisa el repo destino:
+El agente ya revisó en [`../SKILL.md`](../SKILL.md) (paso 1) si existe `docs/agents/` y/o `docs/project/` (o sus equivalentes bajo `agent-context/`); si existen, el flujo terminó allá. Acá solo se llega si **no** existen. Falta distinguir:
 
-**¿Existe `docs/agents/` y/o `docs/project/`?** (o sus equivalentes bajo `agent-context/`)
-
-- **SÍ** → el skill ya fue inicializado antes en este repo. **No se dispara scaffolding**, `ALCANCE` deja de ser relevante. Ir directo al **flujo de proyecto existente**:
-  1. Leer `docs/agents/rules.md`.
-  2. Leer `docs/agents/handoff.md`.
-  3. Leer las líneas relevantes de `docs/agents/backlog.md` (relacionadas a la tarea pedida).
-  4. Ejecutar la tarea que pidió el operador.
-  5. Al terminar, actualizar `docs/agents/handoff.md` (siempre se sobrescribe con el estado actual, en cada paso del plan si lo hubo — ver Regla 6) y agregar la entrada correspondiente a `docs/agents/history.md` (hecha o descartada — ver Regla 7). Si `handoff.md` o `backlog.md` no tienen las anclas de sección (`<!-- agent-context-kit:section=... -->`), se agregan al actualizarlos — ver [`template-architecture.md`](./template-architecture.md), sección "Anclas de sección".
-  6. **Fin del flujo.** No continuar con las rondas siguientes.
-
-- **NO, pero `docs/` (o carpeta equivalente) tiene archivos cuyo nombre matchea el catálogo de este skill en una proporción significativa** → hay documentación de contexto previa, pero de otro formato/convención. No se trata como conflicto genuino (eso sería `agent-context/`, ver `docs/desing.md` 4.1): se dispara el **flujo de migración** — ver [`./migration-flow.md`](./migration-flow.md). `ALCANCE` deja de ser relevante hasta que ese flujo termine (internamente se comporta como `ALCANCE = d`).
+- **No existen, pero `docs/` (o carpeta equivalente) tiene archivos cuyo nombre matchea el catálogo de este skill en una proporción significativa** → hay documentación de contexto previa, pero de otro formato/convención. No se trata como conflicto genuino (eso sería `agent-context/`, ver `docs/desing.md` 4.1): se dispara el **flujo de migración** — ver [`./migration-flow.md`](./migration-flow.md). `ALCANCE` deja de ser relevante hasta que ese flujo termine (internamente se comporta como `ALCANCE = d`).
 
 - **NO** → no hay documentación previa de este skill ni nada reconocible para migrar. Continuar según `ALCANCE`:
 
@@ -84,6 +76,16 @@ Preguntar las 3 juntas, en una sola interacción:
    - `fullstack (repo único)`
    - `fullstack (monorepo)`
    - `otro`
+
+---
+
+## Al copiar una plantilla al repo destino (aplica a todas las rondas)
+
+Una plantilla se completa, no se copia tal cual:
+
+1. Reemplazar los `[Placeholder]` por contenido real (o por la frase alternativa que la propia plantilla sugiere, ej. "Ninguna").
+2. **Quitar los comentarios HTML de guía** (`<!-- ... -->`): son instrucciones para quien completa la plantilla y, si quedan, se vuelven a leer en cada sesión. Se conservan solo la firma `agent-context-kit:signature`, las anclas `agent-context-kit:section=...` y los marcadores `agent-docs-skill:start/end`. Lo que hace falta para mantener el archivo después (formato de una tarea, de una entrada, de una tarea pausada) está en el texto visible de la plantilla, no en comentarios. Excepción: `external/_example-service.md` se copia sin modificar (Ronda 4).
+3. Escribir solo lo que no se deduce del código (Regla 4): no volcar árboles de carpetas ni listas de dependencias; sí convenciones, decisiones y restricciones.
 
 ---
 
@@ -175,7 +177,7 @@ Solo si en la Ronda 3 la respuesta fue "sí" a integraciones externas.
 | Set | Se dispara con | Archivos incluidos | Por qué |
 |---|---|---|---|
 | **Mínimo** | a) Tarea puntual / c) Testear algo puntual | `agents/rules.md`, `agents/handoff.md`, `AGENTS.md`/`CLAUDE.md` (raíz) | Solo necesita no romper nada (reglas) y saber en qué está el proyecto ahora (handoff). No amerita backlog/history: es de un solo uso, sin ciclo de vida que registrar. El puntero raíz sí se asegura igual, porque es lo único que le permite a un agente genérico (no solo este skill) encontrar esa documentación sin invocar el skill de nuevo. |
-| **Intermedio** | b) Agregar una feature a un proyecto existente | Todo el mínimo + `agents/backlog.md`, `agents/history.md`, `project/architecture.md`, `project/stack.md`, `README.md` (generado) | Una feature sí tiene ciclo de vida (se agenda, se trabaja, se cierra o se descarta) → backlog/history. Para encajarla bien hace falta entender la estructura (architecture) y qué tecnologías ya están en uso (stack). `README.md` como índice porque ya son 6 archivos; se genera y no se copia porque su contenido depende de qué se haya creado. |
+| **Intermedio** | b) Agregar una feature a un proyecto existente | Todo el mínimo + `agents/backlog.md`, `agents/history.md`, `project/architecture.md`, `project/stack.md`, `README.md` (generado) | Una feature sí tiene ciclo de vida (se agenda, se trabaja, se cierra o se descarta) → backlog/history. Para encajarla bien hace falta conocer las convenciones de organización (architecture) y las decisiones de stack que no se ven en el código (stack). `README.md` como índice porque ya son 6 archivos; se genera y no se copia porque su contenido depende de qué se haya creado. |
 | **Completo** | d) Desarrollo prolongado / proyecto nuevo | Todo el intermedio + los condicionales de Ronda 2-4 (`roadmap`, `decisions`, `known-issues`, `glossary`, `entities`, `infrastructure`, `testing`, `setup`, `external/*`, `plans/*`) | Proyecto de largo aliento necesita cobertura completa: visión a futuro, decisiones técnicas, dominio de negocio, integraciones, testing. |
 
 ## Resumen — condición de disparo por archivo
