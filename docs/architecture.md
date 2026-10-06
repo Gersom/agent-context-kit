@@ -12,6 +12,11 @@ agent-context-kit/
 ├── tsconfig.json           # TypeScript (strict) para scripts/; `bun run typecheck` = tsc --noEmit
 │
 ├── scripts/                # Herramientas propias del repo (TypeScript con Bun); no forman parte del skill
+│   ├── _shared/               # Código compartido entre scripts (el `_` marca que no es un script: las carpetas sin `_` sí lo son)
+│   │   ├── types.ts             # Tipos del dominio: tarea, campo, sección, entrada de historial, handoff/backlog interpretados
+│   │   ├── parse/               # Markdown → datos: secciones por ancla, bloques, handoff, backlog, history
+│   │   ├── tasks/               # Tag de bloqueo vigente (block-info) y tareas mencionadas en un texto (task-refs)
+│   │   └── test/                # Tests en espejo de parse/ y tasks/ + fixtures/ (docs de ejemplo) + helpers.ts
 │   └── task-tracker/          # Seguimiento de tareas en la terminal (`bun run tasks [ruta]`)
 │       ├── README.md            # Uso: comandos, atajos, qué muestra y cómo lee los archivos
 │       ├── index.ts             # Arranque: argumentos, ruta a vigilar (o la pregunta) y llama a app
@@ -19,11 +24,10 @@ agent-context-kit/
 │       │   ├── app.ts             # Ciclo leer → modelo → pintar; watcher, resize, atajos (q, r, Ctrl+C)
 │       │   ├── cli/               # Argumentos (--once, ruta), pregunta interactiva de la ruta y atajos de teclado
 │       │   ├── io/                # Rutas, lectura de archivos, watcher y lectura con memoria
-│       │   ├── parse/             # Markdown → datos: secciones por ancla, bloques, handoff, backlog, history
-│       │   ├── model/             # Modelo de pantalla, tag de bloqueo vigente y tareas de las que depende
+│       │   ├── model/             # Modelo de pantalla: arma lo que se pinta con lo que interpretó el parseo
 │       │   ├── ui/                # Pintado con picocolors (recuadros por tipo de tarea) y utilidades de formato
-│       │   └── shared/            # Tipos compartidos (types.ts) y formato de hora (time.ts)
-│       └── test/                # Tests de `bun test` en espejo de src/ + e2e/ (script entero) + fixtures
+│       │   └── shared/            # Tipos de pantalla y de lectura de archivos (types.ts) y formato de hora (time.ts)
+│       └── test/                # Tests de `bun test` en espejo de src/ + e2e/ (script entero)
 │
 ├── docs/
 │   ├── desing.md            # Documento de diseño: historial de decisiones y pendientes
@@ -57,6 +61,7 @@ agent-context-kit/
 - **`docs/architecture.md`** (este archivo) — foto actual de cómo está organizado el repo, para orientarse rápido sin tener que leer todo `desing.md`.
 - **`docs/philosophy.md`** — la razón de ser del kit (contexto que sobrevive entre sesiones, modelos y herramientas de IA) y sus principios de diseño (markdown plano como fuente de verdad, el código gana ante un conflicto, versionado y portable, herramientas opcionales, tolerancia a la edición manual) y las preguntas que debe superar un cambio nuevo. Es el "por qué"; este archivo es el "qué".
 - **`docs/agents/`** — este repo usa el skill sobre sí mismo (dogfooding): `rules.md`, `handoff.md`, `backlog.md` y `history.md` documentan el trabajo de este mismo repo, con la misma estructura que el skill genera en un repo destino.
+- **`scripts/_shared/`** — código compartido entre los scripts de `scripts/`: el parseo de `handoff.md`, `backlog.md` y `history.md` (`parse/`), el tag de bloqueo y las referencias entre tareas (`tasks/`), los tipos del dominio y los fixtures de prueba. Convención: una carpeta de `scripts/` con `_` al inicio es código de apoyo, no un script que se ejecuta; las que no lo llevan son scripts independientes (decisión del operador, 2026-10-06). Lo usa el task-tracker; lo van a usar el validador y el script de gestión de tareas (Tareas 15 y 24 del backlog).
 - **`scripts/task-tracker/`** — herramienta de este repo (no del skill: no se copia a los repos destino) que vigila el `docs/agents/` de cualquier proyecto que use el skill y muestra en la terminal la tarea en progreso, las pausadas, las pendientes y las últimas completadas, redibujando cada vez que cambian `handoff.md`, `backlog.md` o `history.md`. Se lanza desde la raíz de este repo con `bun run tasks [ruta]` (sin ruta, la pregunta al arrancar); acepta la raíz del proyecto o su carpeta `docs/agents/`, y se pueden correr varias instancias en paralelo, una por proyecto. Ubica las secciones por las anclas descritas en [`src/docs/template-architecture.md`](../src/docs/template-architecture.md) ("Anclas de sección"), con un plan B por orden de secciones para docs que todavía no las tienen. Está escrito en TypeScript (Bun lo ejecuta sin compilar); se verifica con `bun test` y `bun run typecheck`. Uso, atajos y formatos que lee: [`scripts/task-tracker/README.md`](../scripts/task-tracker/README.md).
 - **`src/SKILL.md`** — punto de entrada del skill: qué dispara su ejecución y qué hace a alto nivel.
 - **`src/docs/questions-flow.md`** — la lógica de decisión propiamente dicha: qué preguntar, en qué orden/rondas, y qué archivos de `src/template/` copiar según las respuestas.
