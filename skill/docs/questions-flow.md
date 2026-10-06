@@ -85,7 +85,8 @@ Una plantilla se completa, no se copia tal cual:
 
 1. Reemplazar los `[Placeholder]` por contenido real (o por la frase alternativa que la propia plantilla sugiere, ej. "Ninguna").
 2. **Quitar los comentarios HTML de guía** (`<!-- ... -->`): son instrucciones para quien completa la plantilla y, si quedan, se vuelven a leer en cada sesión. Se conservan solo la firma `agent-context-kit:signature`, las anclas `agent-context-kit:section=...` y los marcadores `agent-docs-skill:start/end`. Lo que hace falta para mantener el archivo después (formato de una tarea, de una entrada, de una tarea pausada) está en el texto visible de la plantilla, no en comentarios. Excepción: `external/_example-service.md` se copia sin modificar (Ronda 4).
-3. Escribir solo lo que aporta al agente: no volcar listas de dependencias ni módulos uno por uno; sí convenciones, decisiones y restricciones y, en `architecture.md`, el árbol anotado de los niveles superiores del código (una línea de propósito por entrada). Conciso, sin relleno, y lo que ya vive en otro archivo se enlaza, no se repite.
+3. En el set mínimo (sin `docs/README.md`), agregar al inicio de `rules.md` la definición de "operador" que lleva el `README.md`: *"**Operador:** la persona dueña del proyecto que le pide tareas al agente, aprueba decisiones y a quien se le pregunta cuando algo no está definido."*
+4. Escribir solo lo que aporta al agente: no volcar listas de dependencias ni módulos uno por uno; sí convenciones, decisiones y restricciones y, en `architecture.md`, el árbol anotado de los niveles superiores del código (una línea de propósito por entrada). Conciso, sin relleno, y lo que ya vive en otro archivo se enlaza, no se repite.
 
 ---
 
