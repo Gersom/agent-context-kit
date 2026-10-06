@@ -36,16 +36,14 @@ Uso, atajos y cómo lee los archivos: [`scripts/task-tracker/README.md`](./scrip
 
 ```
 agent-context-kit/
-├── SKILL.md              # Trigger + instrucciones de alto nivel del skill
-├── docs/
-│   └── questions-flow.md # Árbol completo de preguntas y ramas de decisión
-└── template/              # Catálogo maestro de plantillas
-    ├── README.md
-    ├── agents/            # rules, handoff, backlog, history, roadmap
-    ├── project/           # architecture, stack, entities, infrastructure, decisions, glossary, testing, setup
-    ├── external/           # plantilla por cada servicio externo integrado
-    └── plans/              # documentación de negocio (costos, límites, pagos)
+├── src/             # El skill: SKILL.md, flujos de decisión (docs/) y catálogo de plantillas (template/)
+├── scripts/         # Herramientas del repo, no parte del skill: task-tracker y código compartido (_shared/)
+├── docs/            # Documentación del propio repo: filosofía, arquitectura, diseño y su estado (agents/)
+├── package.json     # Versión del skill (SemVer) y comandos de los scripts
+└── tsconfig.json    # TypeScript (strict) para scripts/
 ```
+
+El árbol completo y para qué sirve cada parte están en [`docs/architecture.md`](./docs/architecture.md); qué es cada plantilla del catálogo, en [`src/docs/template-architecture.md`](./src/docs/template-architecture.md).
 
 ## Estado
 
