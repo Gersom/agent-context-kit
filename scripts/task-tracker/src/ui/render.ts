@@ -8,7 +8,8 @@
 
 import picocolors from "picocolors";
 import { formatTime } from "../shared/time.ts";
-import type { BlockedTask, DrawTrigger, HistoryEntry, Model, Plan, RenderMeta, TaskRef } from "../shared/types.ts";
+import type { BlockedTask, DrawTrigger, Model, Plan, RenderMeta } from "../shared/types.ts";
+import type { HistoryEntry, TaskRef } from "../../../_shared/types.ts";
 import { boxBottom, boxRow, boxTop, type Paint, type Segment } from "./box.ts";
 import { displayProjectName, plainText, progressBar, shortTaskName, truncate, visibleLength } from "./format.ts";
 

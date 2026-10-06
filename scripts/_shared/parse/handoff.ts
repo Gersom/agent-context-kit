@@ -1,6 +1,6 @@
 // Interpretación de handoff.md: tarea en progreso (con su plan y subsecciones) y tareas pausadas.
 
-import type { CurrentTaskLine, InProgress, ParsedHandoff, ParsedPausedTask, PlanStep, Task } from "../shared/types.ts";
+import type { CurrentTaskLine, InProgress, ParsedHandoff, ParsedPausedTask, PlanStep, Task } from "../types.ts";
 import { parseBlocks } from "./blocks.ts";
 import { isPlaceholder, stripComments } from "./markdown.ts";
 import { findSections, HANDOFF_SECTIONS } from "./sections.ts";

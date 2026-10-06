@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { blockInfo } from "../../src/model/block-info.ts";
+import { blockInfo } from "../../tasks/block-info.ts";
 
 describe("blockInfo", () => {
   const task = (value: string) => ({ fields: [{ label: "Bloqueos", value }] });

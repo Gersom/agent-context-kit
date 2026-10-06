@@ -2,7 +2,7 @@
 
 import { describe, expect, test } from "bun:test";
 import { join } from "node:path";
-import { FIXTURES } from "../helpers.ts";
+import { FIXTURES } from "../../../_shared/test/helpers.ts";
 
 const INDEX = join(import.meta.dir, "..", "..", "index.ts");
 

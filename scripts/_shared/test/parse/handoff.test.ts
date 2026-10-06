@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseHandoff } from "../../src/parse/handoff.ts";
+import { parseHandoff } from "../../parse/handoff.ts";
 import { requireFixture } from "../helpers.ts";
 
 describe("parseHandoff", () => {

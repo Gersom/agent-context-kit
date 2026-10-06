@@ -2,29 +2,24 @@
 // parseo (progreso del plan, motivos de bloqueo y sus dependencias, grupos, completadas,
 // conteos y avisos).
 
-import { parseBacklog } from "../parse/backlog.ts";
-import { parseHandoff } from "../parse/handoff.ts";
-import { parseHistory } from "../parse/history.ts";
+import { parseBacklog } from "../../../_shared/parse/backlog.ts";
+import { parseHandoff } from "../../../_shared/parse/handoff.ts";
+import { parseHistory } from "../../../_shared/parse/history.ts";
+import type { BlockedTask, CurrentTask, FreeGroup, Model, PausedTask, Plan } from "../shared/types.ts";
 import type {
-  BlockedTask,
-  CurrentTask,
   CurrentTaskLine,
-  FreeGroup,
   Group,
   HistoryEntry,
   InProgress,
-  Model,
   ParsedBacklog,
   ParsedFile,
   ParsedHandoff,
   ParsedHistory,
-  PausedTask,
-  Plan,
   PlanStep,
   Task,
-} from "../shared/types.ts";
-import { blockInfo } from "./block-info.ts";
-import { findTaskRefs, type TaskIndex } from "./task-refs.ts";
+} from "../../../_shared/types.ts";
+import { blockInfo } from "../../../_shared/tasks/block-info.ts";
+import { findTaskRefs, type TaskIndex } from "../../../_shared/tasks/task-refs.ts";
 
 /** Cuántas entradas de history.md se muestran en "TAREAS COMPLETADAS". */
 export const COMPLETED_LIMIT = 5;

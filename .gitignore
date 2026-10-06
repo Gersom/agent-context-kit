@@ -4,3 +4,6 @@ dist/
 
 # Dependencias de los scripts (scripts/)
 node_modules/
+
+# Índice local de CodeGraph
+.codegraph/

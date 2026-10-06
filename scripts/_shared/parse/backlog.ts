@@ -1,6 +1,6 @@
 // Interpretación de backlog.md: tareas libres (y referencias a grupos), bloqueadas y agrupadas.
 
-import type { ParsedBacklog } from "../shared/types.ts";
+import type { ParsedBacklog } from "../types.ts";
 import { parseBlocks } from "./blocks.ts";
 import { isPlaceholder, stripComments } from "./markdown.ts";
 import { BACKLOG_SECTIONS, findSections } from "./sections.ts";

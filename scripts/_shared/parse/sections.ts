@@ -2,7 +2,7 @@
 // `<!-- agent-context-kit:section=<id> -->` (ver src/docs/template-architecture.md, sección
 // "Anclas de sección"), con plan B por orden de aparición. No depende del idioma.
 
-import type { Section, SectionsResult } from "../shared/types.ts";
+import type { Section, SectionsResult } from "../types.ts";
 import { commentStateAfter } from "./markdown.ts";
 
 /** Ids de sección por archivo, en el orden en que aparecen en la plantilla (plan B posicional). */

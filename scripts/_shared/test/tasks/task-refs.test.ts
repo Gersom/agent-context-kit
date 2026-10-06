@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { findTaskRefs, type TaskIndex } from "../../src/model/task-refs.ts";
+import { findTaskRefs, type TaskIndex } from "../../tasks/task-refs.ts";
 
 const index: TaskIndex = {
   titles: new Map([

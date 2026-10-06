@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { stripComments } from "../../src/parse/markdown.ts";
+import { stripComments } from "../../parse/markdown.ts";
 
 describe("stripComments", () => {
   test("quita comentarios inline y multilínea", () => {

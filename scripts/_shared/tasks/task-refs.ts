@@ -2,7 +2,7 @@
 // Tarea 3"), independiente del idioma: se usan las etiquetas que el propio documento usa en
 // sus headers de tarea ("Tarea", "Task"…), además de la forma corta `T-N`.
 
-import type { TaskRef } from "../shared/types.ts";
+import type { TaskRef } from "../types.ts";
 
 export interface TaskIndex {
   /** Número → título de cada tarea conocida (backlog, handoff o history). */

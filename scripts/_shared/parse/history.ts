@@ -1,7 +1,7 @@
 // Interpretación de history.md: sus entradas `## <fecha> — ✅|❌ [Tarea N —] título`, en el orden
 // del archivo (por convención, las más nuevas arriba). No usa anclas: cada entrada es un `## `.
 
-import type { HistoryEntry, ParsedHistory } from "../shared/types.ts";
+import type { HistoryEntry, ParsedHistory } from "../types.ts";
 import { commentStateAfter, isPlaceholder } from "./markdown.ts";
 
 const H2_RE = /^##(?!#)\s+(.+?)\s*$/;

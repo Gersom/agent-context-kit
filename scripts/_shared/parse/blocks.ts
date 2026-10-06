@@ -1,7 +1,7 @@
 // Bloques de tareas y grupos dentro de una sección, con sus campos `- **Etiqueta:** valor`.
 // Los textos de headers y etiquetas se conservan tal cual, sin interpretarlos (están traducidos).
 
-import type { Field, Group, ParsedBlocks, Task } from "../shared/types.ts";
+import type { Field, Group, ParsedBlocks, Task } from "../types.ts";
 import { isPlaceholder } from "./markdown.ts";
 
 // `### Tarea 4 — título` / `#### Task 12 - title` (acepta —, – o -).

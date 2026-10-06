@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { buildModel } from "../../src/model/model.ts";
-import { fixture } from "../helpers.ts";
+import { fixture } from "../../../_shared/test/helpers.ts";
 
 const load = (name: string) =>
   buildModel({

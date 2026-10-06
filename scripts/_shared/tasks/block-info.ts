@@ -1,6 +1,6 @@
 // Tag de bloqueo vigente de una tarea bloqueada y su motivo, independiente del idioma.
 
-import type { BlockInfo, Field } from "../shared/types.ts";
+import type { BlockInfo, Field } from "../types.ts";
 
 // Tag `[...]` con backticks (`[dependencia]`) o sin ellos, sin confundirlo con un link markdown
 // `[texto](url)`. LEADING_TAG_RE solo acepta el tag con el que empieza el valor del campo.

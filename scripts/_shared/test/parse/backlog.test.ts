@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseBacklog } from "../../src/parse/backlog.ts";
+import { parseBacklog } from "../../parse/backlog.ts";
 import { requireFixture } from "../helpers.ts";
 
 describe("parseBacklog", () => {

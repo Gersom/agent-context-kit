@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { BACKLOG_SECTIONS, findSections } from "../../src/parse/sections.ts";
+import { BACKLOG_SECTIONS, findSections } from "../../parse/sections.ts";
 import { requireFixture } from "../helpers.ts";
 
 describe("findSections", () => {

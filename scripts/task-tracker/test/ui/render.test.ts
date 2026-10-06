@@ -3,7 +3,7 @@ import { buildModel } from "../../src/model/model.ts";
 import type { RenderMeta } from "../../src/shared/types.ts";
 import { visibleLength } from "../../src/ui/format.ts";
 import { dependencyText, render, screenWidth, triggerText } from "../../src/ui/render.ts";
-import { fixture } from "../helpers.ts";
+import { fixture } from "../../../_shared/test/helpers.ts";
 
 const meta: RenderMeta = {
   projectName: "demo-app",

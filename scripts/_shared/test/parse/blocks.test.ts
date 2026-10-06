@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseBlocks, parseFields } from "../../src/parse/blocks.ts";
+import { parseBlocks, parseFields } from "../../parse/blocks.ts";
 
 describe("parseFields", () => {
   test("lee etiqueta y valor sin depender del idioma, con continuaciones indentadas", () => {
