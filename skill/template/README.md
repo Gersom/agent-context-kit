@@ -42,8 +42,8 @@ Punto de entrada a la documentación de contexto de este proyecto para agentes d
 
 ## El proyecto (`project/`)
 
-- [`architecture.md`](./project/architecture.md) — estructura de carpetas y filosofía de organización. *(set intermedio/completo)*
-- [`stack.md`](./project/stack.md) — stack tecnológico. *(set intermedio/completo)*
+- [`architecture.md`](./project/architecture.md) — convenciones de organización que no se ven en las carpetas. *(set intermedio/completo)*
+- [`stack.md`](./project/stack.md) — decisiones de stack que no se ven en las dependencias. *(set intermedio/completo)*
 - [`decisions.md`](./project/decisions.md) — ADRs, el porqué de decisiones ya tomadas. *(solo set completo, etapa ≠ idea/setup)*
 - [`entities.md`](./project/entities.md) — modelo de datos, si aplica. *(condicional)*
 - [`infrastructure.md`](./project/infrastructure.md) — entornos y deploy, si aplica. *(condicional)*

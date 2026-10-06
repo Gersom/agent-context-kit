@@ -1,27 +1,17 @@
 # Arquitectura
 
-Estructura de carpetas del proyecto y la filosofía de organización detrás: no solo qué carpetas hay, sino **por qué** está organizado así. Es lo que le permite a un agente ubicar dónde debería ir un archivo nuevo sin tener que preguntar o adivinar por convención implícita.
-
-No es el stack tecnológico (eso va en [`./stack.md`](./stack.md)) ni el modelo de datos (eso va en [`./entities.md`](./entities.md), si aplica).
+Las convenciones de organización del proyecto que **no se deducen mirando las carpetas**, y por qué están así. No es un árbol de carpetas ni un listado de módulos (eso se ve en el repo y se desactualiza), ni el stack ([`./stack.md`](./stack.md)), ni el modelo de datos ([`./entities.md`](./entities.md), si aplica).
 
 ---
 
-## Estructura de carpetas
+## Convenciones de organización
 
-<!-- Árbol de carpetas de primer/segundo nivel, con un comentario breve por carpeta. No hace falta listar cada archivo — el objetivo es orientar, no ser un índice exhaustivo. -->
+<!-- Solo lo que un agente no puede inferir de la estructura: ¿se organiza por feature/dominio o por capa técnica? ¿monorepo con paquetes independientes? ¿hay reglas de dependencia (ej. "cada feature es autocontenida y no importa de otra directamente")? Si la estructura es autoexplicativa, decir eso y no listar carpetas. Carpetas con un propósito no obvio, una línea por carpeta. -->
 
-```
-[Placeholder — árbol de carpetas]
-```
-
-## Filosofía de organización
-
-<!-- El "por qué" detrás de la estructura: ¿es por feature/dominio, por capa técnica (controllers/services/models), monorepo con paquetes independientes, etc.? ¿Hay alguna convención que no sea obvia mirando la estructura (ej. "cada feature es autocontenida y no debería importar de otra feature directamente")? -->
-
-[Placeholder]
+[Placeholder, o "La organización es la convencional del stack — no hace falta documentar nada más"]
 
 ## Dónde va cada cosa nueva
 
-<!-- Guía rápida para que un agente sepa dónde ubicar código nuevo sin tener que inferirlo de la estructura. Ej. "un nuevo endpoint va en X", "un nuevo componente de UI compartido va en Y". Omitir si la estructura ya es autoexplicativa. -->
+<!-- Guía corta para ubicar código nuevo cuando no es evidente (ej. "un nuevo endpoint va en X", "un componente de UI compartido va en Y"). Omitir si la estructura ya es autoexplicativa. -->
 
-[Placeholder, o "La estructura de carpetas es autoexplicativa — no hace falta una guía aparte"]
+[Placeholder, o "Autoexplicativo — no hace falta una guía aparte"]
