@@ -39,6 +39,11 @@ describe("render", () => {
     ]);
   });
 
+  test("encabezado en modo multi-operador: agrega el operador al título, donde la ruta larga no lo recorta", () => {
+    const lines = screen("es-anchors", { operator: "ana" }).split("\n");
+    expect(lines.slice(0, 2)).toEqual(["▣ DEMO APP · ana", "  /proyectos/demo-app"]);
+  });
+
   test("un recuadro por tipo, en orden, con el título a la izquierda y el archivo a la derecha", () => {
     const out = screen("es-anchors");
     expect(out).not.toMatch(/\x1b\[/);

@@ -53,7 +53,8 @@ export function render(model: Model, meta: RenderMeta): string {
   };
 
   // Encabezado
-  line(0, `▣ ${displayProjectName(meta.projectName)}`, (s) => pc.bold(pc.magenta(s)));
+  const operator = meta.operator ? ` · ${meta.operator}` : "";
+  line(0, `▣ ${displayProjectName(meta.projectName)}${operator}`, (s) => pc.bold(pc.magenta(s)));
   line(2, meta.projectDir, secondary);
   line(2, `Última actualización ${formatTime(meta.updatedAt)} · ${triggerText(meta.trigger)}`, secondary);
   blank();

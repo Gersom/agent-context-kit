@@ -28,6 +28,18 @@ beforeAll(() => {
   mkdirSync(join(root, "otra", "agent-context", "agents"), { recursive: true });
   writeFileSync(join(root, "otra", "agent-context", "agents", "handoff.md"), "# Handoff\n");
   mkdirSync(join(root, "vacia"));
+
+  // Modo multi-operador: operators.md y una carpeta por operador.
+  const multi = join(root, "multi-app", "docs", "agents");
+  mkdirSync(join(multi, "ana"), { recursive: true });
+  writeFileSync(
+    join(multi, "operators.md"),
+    "# Operadores\n\n<!-- agent-context-kit:section=operators -->\n## Lista\n\n- ana: ana@mail.com\n- luis (solo team-backlog): luis@mail.com\n",
+  );
+  writeFileSync(join(multi, "ana", "handoff.md"), "# Handoff\n");
+  // Carpetas de operador sin operators.md: estado inconsistente.
+  mkdirSync(join(root, "rota", "docs", "agents", "ana"), { recursive: true });
+  writeFileSync(join(root, "rota", "docs", "agents", "ana", "handoff.md"), "# Handoff\n");
 });
 
 afterAll(() => rmSync(root, { recursive: true, force: true }));
@@ -57,6 +69,42 @@ describe("resolveAgentsDir", () => {
   test("carpeta inexistente o ruta vacía", () => {
     expect(resolveAgentsDir(join(root, "no-existe")).ok).toBe(false);
     expect(resolveAgentsDir("   ").ok).toBe(false);
+  });
+});
+
+describe("resolveAgentsDir en modo multi-operador", () => {
+  const multi = () => join(root, "multi-app");
+
+  test("detecta operators.md y resuelve la carpeta del operador por su correo", () => {
+    const result = expectOk(resolveAgentsDir(multi(), undefined, { email: "Ana@Mail.com" }));
+    expect(result.agentsDir).toBe(join(multi(), "docs", "agents", "ana"));
+    expect(result.operator).toBe("ana");
+    expect(result.projectName).toBe("multi-app");
+    expect(result.projectDir).toBe(multi());
+  });
+
+  test("--operator indica la carpeta sin mirar el correo", () => {
+    const result = expectOk(resolveAgentsDir(multi(), undefined, { operator: "ana", email: null }));
+    expect(result.operator).toBe("ana");
+  });
+
+  test("si no se resuelve solo, informa el motivo y las carpetas a elegir", () => {
+    const unknown = expectError(resolveAgentsDir(multi(), undefined, { email: "otra@mail.com" }));
+    expect(unknown.error).toContain("otra@mail.com no figura");
+    expect(unknown.operatorChoices).toEqual(["ana"]);
+    expect(expectError(resolveAgentsDir(multi(), undefined, { email: "luis@mail.com" })).error).toContain("solo team-backlog");
+  });
+
+  test("la carpeta de un operador pasada directamente también sirve", () => {
+    const result = expectOk(resolveAgentsDir(join(multi(), "docs", "agents", "ana")));
+    expect(result.operator).toBe("ana");
+    expect(result.projectName).toBe("multi-app");
+  });
+
+  test("carpetas de operador sin operators.md: avisa en vez de asumir modo plano", () => {
+    const result = expectError(resolveAgentsDir(join(root, "rota")));
+    expect(result.error).toContain("falta operators.md");
+    expect(result.error).toContain("ana");
   });
 });
 

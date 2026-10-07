@@ -26,6 +26,15 @@ bun run tasks D:/proyectos/mi-app --once   # pinta una sola vez y sale
 - **Qué ruta acepta:** la raíz del proyecto (busca adentro `docs/agents/` o `agent-context/agents/`) o directamente la carpeta que contiene `handoff.md`. Las rutas relativas se resuelven desde la carpeta en la que lanzaste el comando, y se pueden pegar con comillas (Windows las agrega al arrastrar una carpeta a la terminal).
 - **Varios proyectos a la vez:** cada instancia es independiente (sin archivos de bloqueo, puertos ni estado compartido), así que podés tener una terminal por proyecto. El título de la ventana muestra el nombre del proyecto.
 - **`--once`:** pinta una vez y sale, sin vigilar ni atajos. Sirve para probar o para scripts.
+- **`--operator <carpeta>`:** en modo multi-operador (ver abajo), vigila la carpeta de ese operador en lugar de la que corresponde a tu correo de git.
+
+### Modo multi-operador
+
+Si la carpeta de agentes tiene `operators.md` (varias personas trabajando en paralelo, ver `skill/docs/multi-operator.md`), el script lo detecta solo: lee `git config user.email` del repo, busca ese correo en `operators.md` (sin distinguir mayúsculas) y vigila `docs/agents/<carpeta>/`, que tiene los mismos `handoff.md`, `backlog.md` e `history.md` de siempre. El título muestra el operador (`▣ MI APP · ana`). Sin `operators.md`, todo funciona como antes.
+
+- **No se resuelve solo** (el correo no figura, figura como «solo team-backlog», no hay `git`): lo dice y deja elegir una carpeta de la lista; con `--once` o sin terminal falla y sugiere `--operator`.
+- **Otro operador:** `--operator ana`, o pasar directamente su carpeta (`docs/agents/ana`). Solo vigila una carpeta por instancia; la vista de todos los operadores a la vez no está hecha todavía.
+- **Falta `operators.md` pero hay carpetas de operador:** avisa y no asume modo plano.
 
 ### Atajos de teclado
 

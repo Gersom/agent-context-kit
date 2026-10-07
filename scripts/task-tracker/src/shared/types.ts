@@ -84,8 +84,10 @@ export interface SnapshotRead {
   needsRetry: boolean;
 }
 
-export type ResolveOk = { ok: true; agentsDir: string; projectName: string; projectDir: string };
-export type ResolveError = { ok: false; error: string; tried: string[] };
+/** `operator`: carpeta del operador vigilado, solo en modo multi-operador. */
+export type ResolveOk = { ok: true; agentsDir: string; projectName: string; projectDir: string; operator?: string };
+/** `operatorChoices`: carpetas entre las que elegir cuando el operador no se pudo resolver solo. */
+export type ResolveError = { ok: false; error: string; tried: string[]; operatorChoices?: string[] };
 export type ResolveResult = ResolveOk | ResolveError;
 
 /**
@@ -103,6 +105,8 @@ export interface RenderMeta {
   projectName: string;
   /** Ruta del repo (o la carpeta vigilada, si no sigue la estructura `docs/agents`). */
   projectDir: string;
+  /** Carpeta del operador vigilado (modo multi-operador); se muestra en el encabezado. */
+  operator?: string;
   updatedAt: Date;
   trigger: DrawTrigger;
   /** Por defecto `"ctrl-c"`. */

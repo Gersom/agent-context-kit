@@ -17,11 +17,14 @@ export function startApp({
   agentsDir,
   projectName,
   projectDir,
+  operator,
   once,
 }: {
   agentsDir: string;
   projectName: string;
   projectDir: string;
+  /** Carpeta del operador vigilado (modo multi-operador). */
+  operator?: string;
   once: boolean;
 }): void {
   const watcherErrors: string[] = [];
@@ -49,13 +52,13 @@ export function startApp({
       historyText: snap.historyText,
       readErrors,
     });
-    const screen = render(model, { projectName, projectDir, updatedAt: new Date(), trigger, controls });
+    const screen = render(model, { projectName, projectDir, operator, updatedAt: new Date(), trigger, controls });
 
     if (!once && process.stdout.isTTY) process.stdout.write("\x1b[2J\x1b[3J\x1b[H");
     process.stdout.write(screen);
   }
 
-  if (process.stdout.isTTY) process.stdout.write(`\x1b]0;tareas · ${displayProjectName(projectName)}\x07`);
+  if (process.stdout.isTTY) process.stdout.write(`\x1b]0;tareas · ${displayProjectName(projectName)}${operator ? ` · ${operator}` : ""}\x07`);
 
   draw({ kind: "start" });
   if (once) return;
