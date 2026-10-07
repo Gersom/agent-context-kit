@@ -96,11 +96,12 @@ export type Stage = "unowned" | "blocked" | "free" | "current" | "paused" | "com
 
 /** Lo que dice la flecha entre una etapa y la siguiente que se muestra. */
 const ARROWS: Partial<Record<`${Stage}>${Stage}`, string>> = {
-  "unowned>blocked": "↓ se toma",
   "unowned>free": "↓ se toma",
   "unowned>current": "↓ se toma",
-  "blocked>free": "↑ bloquea · ↓ desbloquea",
+  "free>blocked": "↓ bloquea · ↑ desbloquea",
   "free>current": "↓ empieza",
+  // Una bloqueada no empieza directo: primero se desbloquea y pasa a libres, de donde empieza.
+  "blocked>current": "↓ empieza (desde libres)",
   "current>paused": "↑ retoma · ↓ pausa",
   "current>completed": "↓ se cierra",
   "paused>completed": "↓ se cierra",
@@ -113,7 +114,7 @@ export function arrowText(from: Stage, to: Stage): string {
 
 /**
  * Panel de un operador (o del proyecto, en modo plano). Los recuadros van en el orden del flujo
- * de una tarea, de arriba abajo: sin dueño → bloqueadas ⇅ libres → en progreso ⇅ pausadas →
+ * de una tarea, de arriba abajo: sin dueño → libres ⇅ bloqueadas → en progreso ⇅ pausadas →
  * completadas, con una línea de flecha entre los que se muestran. Ver `RenderMeta`.
  */
 export function render(model: Model, meta: RenderMeta): string {
@@ -124,22 +125,7 @@ export function render(model: Model, meta: RenderMeta): string {
     // team-backlog.md (modo multi-operador): las tareas sin dueño
     { id: "unowned", shown: Boolean(meta.teamBacklog?.present), draw: () => meta.teamBacklog && teamBacklogBox(canvas, meta.teamBacklog, meta.compact) },
 
-    // backlog.md (compacto): bloqueadas solo si hay alguna
-    {
-      id: "blocked",
-      shown: model.hasBacklog && model.blocked.length > 0,
-      draw: () =>
-        box(`BLOQUEADAS (${model.counts.blocked})`, "backlog.md", pc.red, (row) => {
-          if (meta.compact) {
-            // Solo la última (la más reciente de la lista), sin las tareas de las que depende.
-            const last = model.blocked[model.blocked.length - 1];
-            const tag = last.block.tag ? ` [${last.block.tag}]` : "";
-            compactRow(row, `${shortTaskName(last.number, last.title)}${tag}`, pc.red, model.blocked.length - 1, width, secondary);
-            return;
-          }
-          for (const task of model.blocked) blockedRows(task, row, pc);
-        }),
-    },
+    // backlog.md (compacto): libres y, debajo, bloqueadas (solo si hay alguna)
     {
       id: "free",
       shown: model.hasBacklog,
@@ -166,6 +152,21 @@ export function render(model: Model, meta: RenderMeta): string {
               if (task.title) row(2, { paint: secondary, text: `· ${shortTaskName(task.number, task.title)}` });
             }
           }
+        }),
+    },
+    {
+      id: "blocked",
+      shown: model.hasBacklog && model.blocked.length > 0,
+      draw: () =>
+        box(`BLOQUEADAS (${model.counts.blocked})`, "backlog.md", pc.red, (row) => {
+          if (meta.compact) {
+            // Solo la última (la más reciente de la lista), sin las tareas de las que depende.
+            const last = model.blocked[model.blocked.length - 1];
+            const tag = last.block.tag ? ` [${last.block.tag}]` : "";
+            compactRow(row, `${shortTaskName(last.number, last.title)}${tag}`, pc.red, model.blocked.length - 1, width, secondary);
+            return;
+          }
+          for (const task of model.blocked) blockedRows(task, row, pc);
         }),
     },
 

@@ -50,8 +50,8 @@ describe("render", () => {
     expect(out).not.toContain("━━");
     const tops = out.split("\n").filter((l) => l.startsWith("╭"));
     expect(tops.map((l) => l.match(/^╭─ (.+?) ─+ (\S+\.md) ─╮$/)?.slice(1))).toEqual([
-      ["BLOQUEADAS (2)", "backlog.md"],
       ["LIBRES (4)", "backlog.md"],
+      ["BLOQUEADAS (2)", "backlog.md"],
       ["EN PROGRESO", "handoff.md"],
       ["PAUSADAS (1)", "handoff.md"],
       ["TAREAS COMPLETADAS (últimas 5)", "history.md"],
@@ -64,14 +64,15 @@ describe("render", () => {
       .split("\n")
       .filter((l) => /^ {3}[↑↓]/.test(l))
       .map((l) => l.trim());
-    expect(arrows).toEqual(["↑ bloquea · ↓ desbloquea", "↓ empieza", "↑ retoma · ↓ pausa", "↓ se cierra"]);
+    expect(arrows).toEqual(["↓ bloquea · ↑ desbloquea", "↓ empieza (desde libres)", "↑ retoma · ↓ pausa", "↓ se cierra"]);
   });
 
   test("arrowText: la transición entre cada par de etapas y «↓» si no hay una conocida", () => {
-    expect(arrowText("unowned", "blocked")).toBe("↓ se toma");
+    expect(arrowText("unowned", "free")).toBe("↓ se toma");
     expect(arrowText("unowned", "current")).toBe("↓ se toma");
-    expect(arrowText("blocked", "free")).toBe("↑ bloquea · ↓ desbloquea");
+    expect(arrowText("free", "blocked")).toBe("↓ bloquea · ↑ desbloquea");
     expect(arrowText("free", "current")).toBe("↓ empieza");
+    expect(arrowText("blocked", "current")).toBe("↓ empieza (desde libres)");
     expect(arrowText("current", "paused")).toBe("↑ retoma · ↓ pausa");
     expect(arrowText("current", "completed")).toBe("↓ se cierra");
     expect(arrowText("paused", "completed")).toBe("↓ se cierra");
