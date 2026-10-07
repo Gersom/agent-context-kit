@@ -12,14 +12,12 @@ import { normalizeTitle } from "../query/find.ts";
 import { relFile } from "../query/format.ts";
 import { requireDoc } from "../workspace/docs.ts";
 import { requireOwnFolder } from "../workspace/ownership.ts";
+import { BLOCKING_TAGS } from "../write/blocking.ts";
 import { requiredFlag, singleLine, textFlag } from "../write/flags.ts";
 import { detectLanguage, NONE_RE, STRINGS } from "../write/language.ts";
 import { reserveNextNumber } from "../write/numbering.ts";
 import { formatLocalDate, renderTaskBlock } from "../write/render.ts";
 import { backlogTasks, headerLabels, labelResolver } from "../write/samples.ts";
-
-/** Tags de bloqueo que mandan la tarea a «bloqueadas / pospuestas» (español e inglés). */
-const BLOCKING_TAGS = /^(dependencia|postergada|dependency|postponed)$/i;
 
 /** ¿El texto de `--bloqueo` bloquea la tarea? Si dice algo pero sin el tag esperado, avisa en vez de adivinar. */
 export function classifyBlocker(value: string): { blocked: boolean; warning: string | null } {

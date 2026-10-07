@@ -72,6 +72,9 @@ export interface Strings {
   allDone: string;
   /** «Próximo paso concreto» cuando ya no queda ningún paso pendiente. */
   planDone: string;
+  // Lo que escribe `unblock`: `[Resuelto el <fecha>] — era <bloqueo original>`.
+  resolved: string;
+  was: string;
 }
 
 export const STRINGS: Record<Lang, Strings> = {
@@ -106,6 +109,8 @@ export const STRINGS: Record<Lang, Strings> = {
     pendingSteps: "Pasos pendientes:",
     allDone: "Todos los pasos del plan están hechos; falta cerrar la tarea.",
     planDone: "Plan completo: falta cerrar la tarea.",
+    resolved: "Resuelto el",
+    was: "era",
   },
   en: {
     task: "Task",
@@ -138,6 +143,8 @@ export const STRINGS: Record<Lang, Strings> = {
     pendingSteps: "Pending steps:",
     allDone: "All the plan steps are done; the task is left to close.",
     planDone: "Plan complete: the task is left to close.",
+    resolved: "Resolved on",
+    was: "was",
   },
 };
 
