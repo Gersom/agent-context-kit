@@ -122,3 +122,18 @@ export interface HistoryEntry {
 export interface ParsedHistory {
   entries: HistoryEntry[];
 }
+
+/** Línea de operators.md: `- <carpeta>[ (solo team-backlog)]: <correo>, <correo>`. */
+export interface OperatorEntry {
+  folder: string;
+  /** Correos de git en minúsculas. */
+  emails: string[];
+  /** `true` con la marca `(solo team-backlog)`: el operador no tiene carpeta propia. */
+  folderless: boolean;
+}
+
+export interface ParsedOperators {
+  operators: OperatorEntry[];
+  /** Líneas de la lista que no se pudieron leer: se avisan, no se ignoran en silencio. */
+  unreadable: string[];
+}
