@@ -1,6 +1,6 @@
 # task-manager
 
-Gestiona las tareas de un proyecto que usa el skill `agent-context-kit` editando de forma **quirúrgica** sus archivos (`handoff.md`, `backlog.md`, `history.md` y, en modo multi-operador, `team-backlog.md`), en lugar de que un agente o una persona los edite a mano. Los comandos de negocio se van sumando por etapas; hoy están la infraestructura, dos comandos de diagnóstico, los de lectura (`status`, `next`, `show`) y los primeros de escritura (`add`, `start`). Los demás (`step`, `pause`, `close`, ...) vienen después.
+Gestiona las tareas de un proyecto que usa el skill `agent-context-kit` editando de forma **quirúrgica** sus archivos (`handoff.md`, `backlog.md`, `history.md` y, en modo multi-operador, `team-backlog.md`), en lugar de que un agente o una persona los edite a mano. Los comandos de negocio se van sumando por etapas; hoy están la infraestructura, dos comandos de diagnóstico, los de lectura (`status`, `next`, `show`) y los de escritura que llevan una tarea por su ciclo de vida (`add`, `start`, `step`, `pause`, `resume`, `block`, `unblock`). El cierre (`close`) viene después.
 
 Es **opcional** y es una herramienta de este repo, no parte del skill: no se copia a los repos destino (principio 4 de [`docs/philosophy.md`](../../docs/philosophy.md)). Sin ella, los archivos se editan a mano igual.
 
@@ -25,6 +25,11 @@ bun run task status --json            # lo mismo, estructurado, para otros scrip
 bun run task add --titulo "..." --descripcion "..."          # muestra el diff; NO escribe
 bun run task add --titulo "..." --descripcion "..." --apply  # ahora sí escribe
 bun run task start 24 --plan - --apply < pasos.txt           # empieza la Tarea 24
+bun run task step 2 --apply                                  # marca el paso 2 y actualiza «Qué falta» / «Próximo paso»
+bun run task pause --motivo "..." --espera "..." --apply     # pausa la tarea en curso
+bun run task resume 24 --apply                               # la retoma
+bun run task block 7 --tag dependencia --motivo "depende de la Tarea 3" --apply
+bun run task unblock --apply                                 # desbloquea las que dependían de tareas ya cerradas
 bun run task <comando> --dry-run      # muestra el diff sin escribir nada (también con --apply)
 bun run task <comando> --agents D:/proyectos/mi-app --operator ana
 ```
@@ -40,6 +45,11 @@ bun run task <comando> --agents D:/proyectos/mi-app --operator ana
 | `show <N>` | El bloque completo de una tarea y de dónde salió. |
 | `add` `*` | Agrega una tarea a tu `backlog.md` (con el siguiente número) o, con `--team`, al `team-backlog.md`. |
 | `start <N>` `*` | Empieza una tarea: la saca del backlog y arma «Tarea en progreso» en el `handoff.md`. Con `--team "<título>"`, la toma del `team-backlog.md`. |
+| `step [<N \| texto>...]` `*` | Marca (o con `--undo` desmarca) pasos del plan de la tarea en curso y pone al día «Qué falta» y «Próximo paso concreto». |
+| `pause` `*` | Pasa la tarea en curso a «Tareas pausadas» y deja «Sin tarea en curso». |
+| `resume <N>` `*` | Inverso de `pause`: la pausada vuelve a «Tarea en progreso». |
+| `block <N>` `*` | Bloquea una tarea libre del backlog (`Bloqueos` + la mueve a «bloqueadas / pospuestas»). |
+| `unblock [<N>]` `*` | Desbloquea una tarea (`N`) o, sin número, las que bloqueaba una tarea ya cerrada. |
 
 **Flags globales** (valen para todos los comandos, antes o después de su nombre):
 
@@ -155,6 +165,7 @@ Reglas de seguridad que aplica el **núcleo** (no cada comando) a todo comando q
 - **`--apply` obligatorio.** Sin él, el comando calcula todo, verifica el resultado y muestra el diff, pero no escribe. Con `--dry-run` tampoco escribe aunque se pase `--apply`.
 - **Solo la carpeta propia.** Si la carpeta resuelta no es la del correo de `git config user.email` (otro operador, o no se pudo verificar), el comando se niega con un error claro, sin escribir ni mostrar el diff: las carpetas de otros operadores son de solo lectura. En el repo plano no hay otros operadores. **Excepción:** lo que solo cambia el `team-backlog.md` (`add --team`) es un archivo compartido y no lo exige.
 - **Todo por `planChanges`/`commitChanges`:** verificación de legibilidad (anclas y secciones), detección de cambios concurrentes, escritura atómica, CRLF/LF respetados, todo o nada entre los archivos que toca un comando.
+- **`--json`:** los comandos de escritura nuevos (`step`, `pause`, `resume`, `block`, `unblock`) lo aceptan: en vez del diff y los mensajes imprimen `{ schema, command, applied, dryRun, pending, files: [{ file, changed, written }], ...datos del comando }`. `applied`: se escribió algún archivo; `pending`: había cambios y falta `--apply`. (`add` y `start` todavía no lo tienen.)
 - **Números sin repetir:** antes de numerar, «Próximo número de tarea» tiene que ser mayor que la tarea más alta que ya existe en handoff, backlog (con grupos) e history; si no, error que lo explica (no se elige otro número por cuenta propia).
 
 ### `add`
@@ -179,11 +190,63 @@ bun run task start --team "Migrar el CI" [--plan -] [--modo ...] [--force] [--ap
 
 Empieza una tarea, **en una sola operación** sobre todos los archivos (o ninguno):
 
-- Exige que **no haya otra tarea en curso** (si la hay, error que sugiere pausarla; `pause` llega en una etapa posterior) y que la elegida esté en «libres». Una **bloqueada** da error salvo con `--force` (queda constancia en la salida); una **pausada** o **cerrada**, error claro; una **agrupada**, error (sacarla de «Tareas agrupadas» todavía no está soportado). Repetir el mismo `start --apply` falla limpio: ya hay una tarea en curso.
+- Exige que **no haya otra tarea en curso** (si la hay, error que sugiere pausarla con `pause`) y que la elegida esté en «libres». Una **bloqueada** da error salvo con `--force` (queda constancia en la salida); una **pausada** (se retoma con `resume`) o **cerrada**, error claro; una **agrupada**, error (sacarla de «Tareas agrupadas» todavía no está soportado). Repetir el mismo `start --apply` falla limpio: ya hay una tarea en curso.
 - Saca su bloque de `backlog.md` sin dejar huecos ni líneas en blanco dobles; si era la última, la sección queda con «Ninguna.» (`None.` en inglés).
 - Reescribe el cuerpo de «Tarea en progreso» de `handoff.md` según su plantilla, sin tocar el resto del archivo ni las anclas: la línea `Tarea N — título` antes de la primera subsección `###`, un párrafo con la descripción, **Plan** (solo con `--plan`: una línea por paso; se agrega siempre el último paso «Documentar cierre de tarea»; con `--modo`, la línea «Modo de ejecución acordado»), **Qué falta**, **Decisiones a medio camino** (con lo que la tarea traía en «decisiones», si no era «Ninguno») y **Próximo paso concreto** (el primer paso del plan, o «Empezar la tarea.»), en ese orden. Los campos de la tarea que el handoff no tiene dónde poner (`Detalles`, `Desbloquea`...) se copian tal cual, en líneas `- **Campo:** valor` tras la descripción, para que no se pierdan al sacarla del backlog.
 - Con `--team`: la tarea sale de `team-backlog.md` (por título, o una parte única), recibe el siguiente número de tu secuencia (el contador pasa a N+1) y el handoff lleva la línea `- **Origen:** team-backlog`. Los tres archivos cambian juntos.
 - La rama y el commit no son asunto del script.
+
+### `step`
+
+```sh
+bun run task step [<N | texto>...] [--undo] [--falta <texto>] [--decisiones <texto>] [--proximo <texto>] [--json] [--apply]
+```
+
+Marca pasos del «Plan» de la tarea en curso (Regla 6 de `rules.md`: el handoff se pone al día en cada paso):
+
+- Cada argumento es el **número** del paso (posición en el plan, desde 1) o **parte de su texto** (sin distinguir mayúsculas ni acentos; si coincide con varios, error que los lista). Se pueden pasar varios. `--undo` los desmarca. Un paso que ya estaba en ese estado avisa y no cambia nada.
+- «Qué falta» y «Próximo paso concreto» se reescriben **solos solo si siguen con el texto que puso el script**: el de `start` (`Todos los pasos del plan.`, el primer paso) o el que `step` generó antes (`Pasos pendientes:` con la lista de los pasos sin hacer; `Plan completo: falta cerrar la tarea.` al terminar). Un texto que alguien escribió no se pisa: se avisa y se actualiza con `--falta` / `--proximo`. «Decisiones a medio camino» nunca cambia solo (`--decisiones`).
+- `--falta`, `--decisiones` y `--proximo` (admiten `-` para stdin; uno solo por ejecución) reemplazan el cuerpo de esa subsección, también sin marcar ningún paso (`step --proximo "..."`). Los comentarios HTML del principio de la subsección se conservan.
+- Las subsecciones se reconocen por su título en español o inglés. Sin plan (sin checkboxes) no hay pasos que marcar; sí se pueden actualizar los textos.
+
+### `pause`
+
+```sh
+bun run task pause --motivo <texto> --espera <texto> [--falta <texto>] [--decisiones <texto>] [--proximo <texto>] [--json] [--apply]
+```
+
+Pasa la tarea en curso al final de «Tareas pausadas» como un bloque `### Tarea N — título` y deja «Tarea en progreso» en `Sin tarea en curso` (los comentarios y las anclas no se mueven):
+
+- Campos del bloque, en este orden: `Descripción`, los extras que la tarea traía (`Origen`, `Detalles`...), `Plan` (los checkboxes tal cual, con lo ya marcado), `Modo de ejecución acordado`, `Qué falta`, `Decisiones a medio camino`, `Próximo paso concreto`, `Por qué se pausó` (`--motivo`, obligatorio) y `Qué espera para retomarse` (`--espera`, obligatorio). `Descripción`, los extras y el modo no figuran en el formato de la plantilla: se agregan para que `resume` pueda devolver la tarea tal cual estaba. `--falta`, `--decisiones` y `--proximo` reemplazan lo que se guarda.
+- **Contenido ajeno:** si «Tarea en progreso» tiene algo que no reconoce —una subsección con otro título, texto suelto dentro del plan que no sea un paso ni el modo, checkboxes fuera del plan, texto antes de la línea de la tarea— se niega con un error que lo dice y no escribe nada: hay que pausar a mano. No pierde información sin avisar.
+
+### `resume`
+
+```sh
+bun run task resume <N | T-N> [--json] [--apply]
+```
+
+El inverso de `pause`: saca la tarea de «Tareas pausadas» y rearma «Tarea en progreso» con su descripción, plan (con lo ya marcado), modo, textos y extras. `Por qué se pausó` y `Qué espera para retomarse` se descartan. Falla si **ya hay una tarea en curso** (el error sugiere `pause`) o si la tarea no está pausada. Una pausada escrita a mano a la que le falte algún campo recibe los textos por defecto de `start`. `pause` + `resume` deja el archivo idéntico.
+
+### `block`
+
+```sh
+bun run task block <N> --tag <dependencia|postergada> --motivo <texto> [--json] [--apply]
+```
+
+Bloquea una tarea **libre** de tu `backlog.md`: pone `Bloqueos` en `` `[tag]` motivo `` (si ya traía un `[Resuelto ...]` de un bloqueo anterior, queda después: el vigente va primero) y mueve su bloque al final de «Tareas bloqueadas / pospuestas». Sin formato nuevo: nombrar `Tarea N` en el motivo es lo que permite que `unblock` la desbloquee sola. Errores: la tarea ya está bloqueada (editar `Bloqueos` a mano), agrupada (sacarla de «Tareas agrupadas» no está soportado), pausada, en curso o cerrada. Solo opera sobre tu `backlog.md` (no sobre el `team-backlog.md`).
+
+### `unblock`
+
+```sh
+bun run task unblock [<N | T-N>] [--json] [--apply]
+```
+
+Mueve tareas de «bloqueadas / pospuestas» al final de «Tareas libres» (Regla 7: `Bloqueos` no se borra, pasa a `` `[Resuelto el <fecha>]` — era `[tag]` motivo ``):
+
+- **Sin número**, revisa todas las bloqueadas: desbloquea solas las cuyo motivo nombra `Tarea N` y **todas esas tareas figuran cerradas en `history.md`** (las mismas que `status` marca «candidata a desbloquear»), y las que ya no tenían un bloqueo vigente (solo se mueven). Lista aparte las de **revisión manual** (el motivo no nombra una tarea: texto libre, o nombra una de otro operador con `T-N@operador`) y las que **siguen bloqueadas** (alguna tarea mencionada no está cerrada). Nada de eso se toca.
+- **Con número**, desbloquea esa tarea sin más condiciones (la revisión manual ya la hizo quien lo pide); error si no está bloqueada.
+- Si no hay nada que desbloquear, lo dice y no escribe.
 
 ### Dónde y cómo escriben
 
@@ -253,7 +316,7 @@ scripts/task-manager/
 │   ├── query/        # Consulta reutilizable: dónde vive una tarea, estado del operador, próximo número, formato
 │   ├── workspace/    # Ruta de agentes, operador (operators.md + correo de git), espacio de trabajo y lectura de archivos
 │   ├── edit/         # Ediciones por rango, ubicar/sacar un bloque en una sección (`layout.ts`), verificación de legibilidad, diff, escritura atómica y cambios de varios archivos
-│   └── write/        # Lo que escriben los comandos: idioma y etiquetas, formato de los bloques y del handoff, contador de número de tarea
+│   └── write/        # Lo que escriben los comandos: idioma y etiquetas, formato de los bloques y del handoff, contador de número de tarea, lectura de «Tarea en progreso» (`handoff.ts`), campo `Bloqueos` (`blocking.ts`) y `--json` de los que escriben
 └── test/             # Tests de `bun test` en espejo de src/ + e2e/ (script entero); trabajan en directorios temporales
 ```
 
