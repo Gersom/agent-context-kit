@@ -11,6 +11,14 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-06 — ✅ Tarea 30 — Vista de equipo en el task-tracker (todos los operadores)
+
+- En modo multi-operador el tracker abre en una vista de equipo: el recuadro EQUIPO es un selector con una fila por operador (su tarea en curso con el avance del plan, sus libres y bloqueadas y la última tarea que cerró) y, debajo, el recuadro "SIN DUEÑO" con las tareas de `team-backlog.md`. `↑`/`↓` eligen, `Enter` abre el panel del operador (que lleva el mismo recuadro "SIN DUEÑO" debajo de BLOQUEADAS) y `b`, `Esc` o Retroceso vuelven. `bun run tasks <ruta> <operador>` abre su panel de frente.
+- Decisiones del operador: selector en lugar de un resumen fijo encima, con la última completada en la fila de cada operador (sin recuadro mezclado de completadas); el título del recuadro es "SIN DUEÑO"; las teclas para volver son `b` y `Esc`. Cambio sobre la Tarea 26: se eliminó la pregunta interactiva de operador y el correo de git ya no abre el panel propio, solo deja la fila marcada `(tú)` y preseleccionada. Solo lectura, nunca modifica carpetas ajenas.
+- Código: parser de `team-backlog.md` en `scripts/_shared/parse/`, lectura del equipo con un lector con memoria por carpeta, `watchDir` con lista de archivos (se vigilan la raíz y cada operador), modelo del equipo, navegación como función pura de estado y teclas (`cli/nav.ts`), teclas con flechas (`cli/keys.ts`) y `render.ts` con lienzo compartido entre el panel y la vista de equipo.
+- Verificación: `bun test` → 220 tests, todos pasan (57 nuevos); `bun run typecheck` sin errores; 0 enlaces relativos rotos; el script entero probado con un repo multi real con git (vista de equipo, operador por segundo argumento, `--operator`, carpeta directa y error con operador inexistente). Pendiente: el bucle interactivo del selector (modo raw) no se pudo ejecutar en este entorno; solo está cubierta su lógica pura.
+- Commits: `75545ae`, `64c096d`, `cb54b63`, `331d0dd`, `2963a61` y el de cierre, en la rama `feat/team-view` (sale de `feat/multi-operator`).
+
 ## 2026-10-06 — ✅ Tarea 26 — Soportar varios operadores trabajando en paralelo
 
 - Modo multi-operador opcional (opt-in en la Ronda 3 de `questions-flow.md`): cada operador tiene su carpeta `docs/agents/<operador>/` con su `handoff.md`, `backlog.md` e `history.md`, así nadie edita los archivos de otro y desaparecen los conflictos de merge y los números repetidos. El modo se detecta por `docs/agents/operators.md`; el operador actual, por el correo de `git config user.email`. Las reglas y el diseño completo están en `skill/docs/multi-operator.md`.

@@ -87,15 +87,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** surgió el 2026-10-05: busca bajar el consumo de tokens (menos lectura y reescritura) y evitar errores mecánicos (anclas olvidadas, números repetidos). La Tarea 15 (validador) sirve de red de seguridad.
 - **Agregada:** 2026-10-05.
 
-### Tarea 30 — Vista de equipo en el task-tracker (todos los operadores)
-
-- **Descripción:** en el modo multi-operador (Tarea 26), mostrar en el task-tracker las tareas en progreso, libres y completadas de todos los operadores y del `team-backlog.md`, además de las del operador actual (que la Tarea 26 ya resuelve).
-- **Decisiones/temas a definir antes de empezar:** cómo se muestra (recuadros por operador, filtro, tecla para cambiar de vista); cómo lee el `team-backlog.md`, que no lleva números; es solo lectura, nunca edita carpetas ajenas.
-- **Bloqueos:** `[Resuelto el 2026-10-06]` — era `[dependencia]` de la Tarea 26 (define la estructura multi-operador y cómo se resuelve el operador actual); cerrada ese día.
-- **Disparador:** cuando el operador la priorice.
-- **Detalles:** nace de la conversación del 2026-10-06, al definir el alcance de la Tarea 26. Ya existen el parser de `operators.md` (`scripts/_shared/parse/operators.ts`) y la resolución del operador actual (`scripts/task-tracker/src/io/operator.ts`).
-- **Agregada:** 2026-10-06.
-
 <!-- agent-context-kit:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
