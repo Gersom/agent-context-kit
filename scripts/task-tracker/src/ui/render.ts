@@ -53,7 +53,7 @@ function createCanvas(meta: RenderMeta, subtitle?: string) {
     out.push(" ".repeat(indent) + color(truncate(plainText(text), width - indent)));
   const blank = () => out.push("");
 
-  const { secondary, completedGreen } = tones(pc);
+  const { secondary, completed, completedGreen } = tones(pc);
 
   /** Recuadro completo: borde superior con título y archivo, filas y borde inferior. */
   const box = (title: string, file: string, color: Paint, fill: (row: Row) => void, border: Paint = pc.gray) => {
@@ -71,7 +71,7 @@ function createCanvas(meta: RenderMeta, subtitle?: string) {
   line(2, `Última actualización ${formatTime(meta.updatedAt)} · ${triggerText(meta.trigger)}`, secondary);
   blank();
 
-  return { pc, width, out, line, blank, box, secondary, completedGreen };
+  return { pc, width, out, line, blank, box, secondary, completed, completedGreen };
 }
 
 type Canvas = ReturnType<typeof createCanvas>;
@@ -208,16 +208,18 @@ function summaryLine(op: TeamRow): string {
   return parts.join(" · ");
 }
 
-/** Recuadro "SIN DUEÑO": las tareas del team-backlog.md, libres primero y después las bloqueadas. */
-function teamBacklogBox({ box, pc, secondary }: Canvas, backlog: TeamBacklogModel): void {
+/**
+ * Recuadro "SIN DUEÑO": las tareas del team-backlog.md, libres primero y después las bloqueadas.
+ * Usa la paleta de "tareas completadas" (título y viñeta en su verde, texto en su gris); solo el
+ * tag de bloqueo va en rojo, para no perder esa señal.
+ */
+function teamBacklogBox({ box, pc, secondary, completed, completedGreen }: Canvas, backlog: TeamBacklogModel): void {
   if (!backlog.present) return;
   const total = backlog.free.length + backlog.blocked.length;
-  box(`SIN DUEÑO (${total})`, "team-backlog.md", pc.blue, (row) => {
+  box(`SIN DUEÑO (${total})`, "team-backlog.md", completedGreen, (row) => {
     if (!total) row(0, { paint: secondary, text: "Ninguna" });
-    for (const task of backlog.free) row(0, { paint: pc.blue, text: `• ${task.title}` });
-    for (const task of backlog.blocked) {
-      const tag = task.block.tag ? ` [${task.block.tag}]` : "";
-      row(0, { paint: pc.red, text: `• ${task.title}${tag}` });
+    for (const task of [...backlog.free, ...backlog.blocked]) {
+      row(0, { paint: completedGreen, text: "• " }, { paint: completed, text: task.title }, ...(task.block.tag ? [{ paint: pc.red, text: ` [${task.block.tag}]` }] : []));
       if (task.block.reason) row(4, { paint: secondary, text: `→ ${task.block.reason}` });
     }
   });
