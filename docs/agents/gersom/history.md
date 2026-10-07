@@ -11,6 +11,14 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-07 — ✅ Tarea 31 — Cambiar la organización del render
+
+- El panel del operador muestra los recuadros como el flujo de una tarea, de arriba abajo: SIN DUEÑO → LIBRES ⇅ BLOQUEADAS → EN PROGRESO ⇅ PAUSADAS → COMPLETADAS, con una línea de flecha que nombra cada transición (`↓ se toma`, `↓ bloquea · ↑ desbloquea`, `↓ empieza`, `↑ retoma · ↓ pausa`, `↓ se cierra`). Solo hay flecha entre recuadros que se muestran. La vista de equipo no cambió.
+- Decisiones del operador: el orden de LIBRES y BLOQUEADAS cambió de opinión una vez (primero BLOQUEADAS arriba, al final LIBRES arriba); con el orden final, entre BLOQUEADAS y EN PROGRESO la flecha dice `↓ empieza (desde libres)`, porque una bloqueada no empieza directo. La dirección de cada flecha sigue el movimiento de la tarea.
+- Ampliación: tecla `c` que compacta o expande los recuadros que no son EN PROGRESO ni PAUSADAS (una sola tarea, la más reciente, con `· +N más`; EQUIPO nunca se compacta), tecla `f` que oculta o muestra las flechas, y las opciones `--compact` y `--no-arrows`. El pie pasó al formato `[tecla] acción` sugerido por el operador y se parte en dos líneas si no entra, para que "salir" no se recorte.
+- Verificación: `bun test` → 239 tests, todos pasan (19 nuevos); `bun run typecheck` sin errores; el operador probó a mano el selector y las teclas en una terminal real (queda resuelto lo que había quedado pendiente en la Tarea 30).
+- Commits: `bfad675`, `fa426c1`, `1c2b7e9`, `18385cc` y el de cierre, en la rama `chore/apply-multi-operator`.
+
 ## 2026-10-06 — ✅ Pasado a modo multi-operador
 
 - Este repo pasó de la estructura plana a la multi-operador (dogfooding, con `migration-flow.md`, "Pasar de plano a multi-operador"): `handoff.md`, `backlog.md` e `history.md` se movieron con `git mv` a `docs/agents/gersom/` sin reescribirlos (solo cambiaron dos enlaces relativos) y la numeración continúa (próximo número: 31).
