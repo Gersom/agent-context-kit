@@ -50,8 +50,24 @@ describe("política de lectura: migración", () => {
   });
 });
 
+describe("política de lectura: AGENTS.md de este repo (modo multi-operador)", () => {
+  test("coincide con la variante multi de la plantilla, sin su título", () => {
+    const template = read("skill/template/multi/AGENTS.md");
+    const block = template.slice(template.indexOf("<!-- agent-docs-skill:start -->"), template.indexOf("<!-- agent-docs-skill:end -->"));
+    const body = block.split("\n").slice(2).join("\n").trim(); // sin el marcador ni el título de la sección
+    expect(read("AGENTS.md")).toContain(body);
+  });
+
+  test("lee README, reglas, operadores y el handoff de su carpeta, en ese orden", () => {
+    const text = read("AGENTS.md");
+    const at = ["docs/README.md", "docs/agents/rules.md", "docs/agents/operators.md", "<tu-carpeta>/handoff.md"].map((s) => text.indexOf(s));
+    expect(at.every((n) => n >= 0)).toBe(true);
+    expect([...at].sort((a, b) => a - b)).toEqual(at);
+  });
+});
+
 describe("política de lectura: AGENTS.md", () => {
-  for (const file of ["skill/template/AGENTS.md", "AGENTS.md"]) {
+  for (const file of ["skill/template/AGENTS.md"]) {
     test(`${file} lee README, reglas y handoff en ese orden`, () => {
       const text = withoutComments(read(file));
       const readme = text.indexOf("docs/README.md");
