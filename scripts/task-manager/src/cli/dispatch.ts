@@ -60,6 +60,7 @@ export function validateCommands(commands: Command[]): void {
     for (const [flag, spec] of Object.entries(command.flags ?? {})) {
       if (flag in GLOBAL_FLAGS) throw new Error(`El flag --${flag} del comando «${command.name}» choca con un flag global.`);
       if (spec.stdin && spec.type !== "string") throw new Error(`--${flag} de «${command.name}»: solo un flag de texto puede leer stdin.`);
+      if (spec.multiple && (spec.type !== "string" || spec.stdin)) throw new Error(`--${flag} de «${command.name}»: solo un flag de texto sin stdin puede repetirse.`);
     }
   }
 }

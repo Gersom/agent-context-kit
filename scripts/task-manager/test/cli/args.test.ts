@@ -9,6 +9,7 @@ const spec: Record<string, FlagSpec> = {
   detalles: { type: "string", description: "d", stdin: true },
   nota: { type: "string", description: "n", stdin: true },
   fuerza: { type: "boolean", description: "f" },
+  nueva: { type: "string", description: "n", multiple: true },
 };
 
 describe("splitCommandLine", () => {
@@ -33,6 +34,11 @@ describe("splitCommandLine", () => {
 });
 
 describe("parseFlags", () => {
+  test("un flag repetible devuelve la lista de sus valores", () => {
+    expect(parseFlags(["--nueva", "uno", "--fuerza", "--nueva=dos"], spec).values).toEqual({ nueva: ["uno", "dos"], fuerza: true });
+    expect(parseFlags(["--fuerza"], spec).values.nueva).toBeUndefined();
+  });
+
   test("flags de texto, booleanos, con = y posicionales", () => {
     const { values, positionals } = parseFlags(["3", "--titulo", "Hola mundo", "--fuerza", "--agents=D:/p", "-h"], spec);
     expect(values).toEqual({ titulo: "Hola mundo", fuerza: true, agents: "D:/p", help: true });

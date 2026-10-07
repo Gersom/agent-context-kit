@@ -84,7 +84,7 @@ function usageMessage(caught: unknown): string {
  */
 export function parseFlags(argv: string[], spec: Record<string, FlagSpec>): ParsedFlags {
   const options = Object.fromEntries(
-    Object.entries(spec).map(([name, flag]) => [name, { type: flag.type, ...(flag.short ? { short: flag.short } : {}) }]),
+    Object.entries(spec).map(([name, flag]) => [name, { type: flag.type, ...(flag.short ? { short: flag.short } : {}), ...(flag.multiple ? { multiple: true } : {}) }]),
   );
   try {
     const { values, positionals } = parseArgs({ args: argv, options, allowPositionals: true, strict: true });

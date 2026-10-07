@@ -23,10 +23,12 @@ export interface FlagSpec {
   short?: string;
   /** Solo `string`: el valor `-` lee el texto de la entrada estándar (para textos largos). */
   stdin?: boolean;
+  /** Solo `string`: el flag se puede repetir (`--nueva a --nueva b`) y su valor es la lista de textos. No admite `stdin`. */
+  multiple?: boolean;
 }
 
-/** Valor de un flag ya interpretado: texto (con el stdin ya leído), booleano o ausente. */
-export type FlagValue = string | boolean | undefined;
+/** Valor de un flag ya interpretado: texto (con el stdin ya leído), lista de textos (flag `multiple`), booleano o ausente. */
+export type FlagValue = string | string[] | boolean | undefined;
 
 export interface CommandContext {
   /** Argumentos posicionales (sin el nombre del comando). */

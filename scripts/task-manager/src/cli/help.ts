@@ -6,7 +6,7 @@ import type { Command, FlagSpec } from "./types.ts";
 function flagLine(name: string, spec: FlagSpec): [string, string] {
   const value = spec.type === "string" ? (spec.stdin ? ` <${spec.valueName ?? "texto"}|->` : ` <${spec.valueName ?? "valor"}>`) : "";
   const short = spec.short ? `-${spec.short}, ` : "";
-  return [`${short}--${name}${value}`, spec.description];
+  return [`${short}--${name}${value}`, spec.multiple ? `${spec.description} (repetible)` : spec.description];
 }
 
 /** Alinea pares `[izquierda, derecha]` en dos columnas con sangría de dos espacios. */

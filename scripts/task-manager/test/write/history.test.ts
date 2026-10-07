@@ -1,0 +1,81 @@
+// La entrada de history.md que escribe `close`: formato y dónde se inserta.
+
+import { describe, expect, test } from "bun:test";
+import { parseHistory } from "../../../_shared/parse/history.ts";
+import { normalizeEol } from "../../../_shared/parse/positions.ts";
+import { applyEdits } from "../../src/edit/edits.ts";
+import type { Doc } from "../../src/workspace/docs.ts";
+import { bulletize, insertHistoryEntry, renderHistoryEntry } from "../../src/write/history.ts";
+import { HISTORY_RICH } from "../fixtures.ts";
+import type { ParsedHistory } from "../../../_shared/types.ts";
+
+/** Un history.md en memoria (solo lo que `insertHistoryEntry` lee) y el texto que queda al insertar la entrada. */
+function insertInto(raw: string, entry: string): string {
+  const eol = normalizeEol(raw);
+  const history = { raw, eol, text: eol.text, parsed: parseHistory(eol.text) } as unknown as Doc<ParsedHistory>;
+  return applyEdits(raw, eol, [insertHistoryEntry(history, entry)]);
+}
+
+const ENTRY = renderHistoryEntry({ date: "2026-10-08", outcome: "done", label: "Tarea", number: 12, title: "Algo", text: "Se hizo." });
+
+describe("bulletize", () => {
+  test("cada línea pasa a ser una viñeta; las viñetas y las continuaciones sangradas se conservan; se descartan las líneas en blanco", () => {
+    expect(bulletize("Una línea")).toBe("- Una línea");
+    expect(bulletize("Primera\n\nSegunda")).toBe("- Primera\n- Segunda");
+    expect(bulletize("- Ya viñeta\n  - Sub\n  continúa\n* Otra")).toBe("- Ya viñeta\n  - Sub\n  continúa\n* Otra");
+    expect(bulletize("  Texto  \r\n")).toBe("- Texto");
+  });
+});
+
+describe("renderHistoryEntry", () => {
+  test("hecha: header con ✅, línea en blanco y viñetas", () => {
+    expect(renderHistoryEntry({ date: "2026-10-08", outcome: "done", label: "Tarea", number: 24, title: "El script", text: "Qué.\nPor qué." })).toBe(
+      "## 2026-10-08 — ✅ Tarea 24 — El script\n\n- Qué.\n- Por qué.",
+    );
+  });
+
+  test("descartada: ❌; el `Origen` de la tarea va primero, tal cual", () => {
+    expect(
+      renderHistoryEntry({ date: "2026-10-08", outcome: "discarded", label: "Task", number: 3, title: "X", text: "No hace falta.", origin: "- **Origen:** team-backlog  " }),
+    ).toBe("## 2026-10-08 — ❌ Task 3 — X\n\n- **Origen:** team-backlog\n- No hace falta.");
+  });
+
+  test("el parser de history.md la reconoce con su número, título y resultado", () => {
+    const [entry] = parseHistory(`${renderHistoryEntry({ date: "2026-10-08", outcome: "discarded", label: "Tarea", number: 5, title: "Usar YAML", text: "x" })}\n`).entries;
+    expect(entry).toMatchObject({ date: "2026-10-08", status: "discarded", number: 5, label: "Tarea", title: "Usar YAML" });
+  });
+});
+
+describe("insertHistoryEntry", () => {
+  test("arriba de la primera entrada, con una línea en blanco de por medio", () => {
+    const out = insertInto(HISTORY_RICH, ENTRY);
+    expect(out).toContain("---\n\n## 2026-10-08 — ✅ Tarea 12 — Algo\n\n- Se hizo.\n\n## 2026-10-07 — ✅ Tarea 11 — Escribir el parser");
+    expect(parseHistory(out).entries.map((e) => e.number)).toEqual([12, 11, 10, 9, null, 2]);
+  });
+
+  test("la plantilla (sin entradas): reemplaza la entrada de ejemplo y conserva el comentario que la precede", () => {
+    const template = "# History\n\n---\n\n<!-- Si el skill se agrega de forma retroactiva... -->\n\n## [Placeholder fecha] — ✅ [Placeholder título]\n\n- [Placeholder]\n";
+    expect(insertInto(template, ENTRY)).toBe(`# History\n\n---\n\n<!-- Si el skill se agrega de forma retroactiva... -->\n\n${ENTRY}\n`);
+  });
+
+  test("la entrada de ejemplo no es la última cosa del archivo: lo que sigue se respeta", () => {
+    const text = "# History\n\n## [Placeholder fecha] — ✅ [Placeholder título]\n\n- [Placeholder]\n\n## Notas\n\nAlgo.\n";
+    expect(insertInto(text, ENTRY)).toBe(`# History\n\n${ENTRY}\n\n## Notas\n\nAlgo.\n`);
+  });
+
+  test("un `##` de plantilla dentro de un comentario o de un bloque de código no cuenta", () => {
+    const text = "# History\n\n<!--\n## [Placeholder fecha] — ✅ [Placeholder título]\n-->\n\n```\n## [Placeholder x]\n```\n";
+    expect(insertInto(text, ENTRY)).toBe(`# History\n\n<!--\n## [Placeholder fecha] — ✅ [Placeholder título]\n-->\n\n\`\`\`\n## [Placeholder x]\n\`\`\`\n\n${ENTRY}\n`);
+  });
+
+  test("sin entradas ni plantilla: al final del archivo, con una línea en blanco de por medio", () => {
+    expect(insertInto("# History\n\nIntro.\n", ENTRY)).toBe(`# History\n\nIntro.\n\n${ENTRY}\n`);
+    expect(insertInto("", ENTRY)).toBe(`${ENTRY}\n`);
+  });
+
+  test("respeta CRLF", () => {
+    const out = insertInto(HISTORY_RICH.replace(/\n/g, "\r\n"), ENTRY);
+    expect(out.replace(/\r\n/g, "")).not.toContain("\n");
+    expect(out).toContain("---\r\n\r\n## 2026-10-08 — ✅ Tarea 12 — Algo\r\n\r\n- Se hizo.\r\n\r\n## 2026-10-07");
+  });
+});

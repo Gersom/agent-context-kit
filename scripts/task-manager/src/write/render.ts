@@ -133,13 +133,18 @@ export function assembleInProgress(input: InProgressParts): string {
   return parts.join("\n\n");
 }
 
+/** Reconoce el último paso de todo plan, «Documentar cierre de tarea» (en cualquiera de los idiomas conocidos). */
+export function closingStepRe(S: Pick<Strings, "closeStep">): RegExp {
+  return new RegExp(`^(${S.closeStep}|documentar cierre|document task closure)`, "i");
+}
+
 /**
  * «Tarea en progreso» de una tarea que recién empieza, con los textos por defecto de la plantilla.
  * El plan termina siempre en «Documentar cierre de tarea».
  */
 export function renderInProgress(input: InProgressInput): string {
   const { strings: S, plan } = input;
-  const closing = new RegExp(`^(${S.closeStep}|documentar cierre|document task closure)`, "i");
+  const closing = closingStepRe(S);
   const steps = plan && [...plan, ...(plan.length && closing.test(plan[plan.length - 1]) ? [] : [S.closeStep])];
   return assembleInProgress({
     strings: S,

@@ -75,6 +75,11 @@ export interface Strings {
   // Lo que escribe `unblock`: `[Resuelto el <fecha>] — era <bloqueo original>`.
   resolved: string;
   was: string;
+  // Lo que escribe `close`.
+  /** Descripción de una tarea nueva que surgió al cerrar otra. */
+  raisedWhenClosing(task: string, number: number): string;
+  /** Títulos del reporte de cierre (Regla 8 de rules.md). */
+  report: { done: string; discarded: string; unblocked: string; created: string };
 }
 
 export const STRINGS: Record<Lang, Strings> = {
@@ -111,6 +116,8 @@ export const STRINGS: Record<Lang, Strings> = {
     planDone: "Plan completo: falta cerrar la tarea.",
     resolved: "Resuelto el",
     was: "era",
+    raisedWhenClosing: (task, number) => `Surgió al cerrar la ${task} ${number}; falta detallarla.`,
+    report: { done: "Tareas resueltas", discarded: "Tareas descartadas", unblocked: "Tareas desbloqueadas", created: "Tareas nuevas" },
   },
   en: {
     task: "Task",
@@ -145,6 +152,8 @@ export const STRINGS: Record<Lang, Strings> = {
     planDone: "Plan complete: the task is left to close.",
     resolved: "Resolved on",
     was: "was",
+    raisedWhenClosing: (task, number) => `Raised when closing ${task} ${number}; still to be detailed.`,
+    report: { done: "Resolved tasks", discarded: "Discarded tasks", unblocked: "Unblocked tasks", created: "New tasks" },
   },
 };
 

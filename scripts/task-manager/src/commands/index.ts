@@ -6,6 +6,7 @@ import type { Command } from "../cli/types.ts";
 import { add } from "./add.ts";
 import { anchors } from "./anchors.ts";
 import { block } from "./block.ts";
+import { close } from "./close.ts";
 import { next } from "./next.ts";
 import { pause } from "./pause.ts";
 import { resume } from "./resume.ts";
@@ -16,4 +17,4 @@ import { step } from "./step.ts";
 import { unblock } from "./unblock.ts";
 import { whoami } from "./whoami.ts";
 
-export const COMMANDS: Command[] = [whoami, anchors, status, next, show, add, start, step, pause, resume, block, unblock];
+export const COMMANDS: Command[] = [whoami, anchors, status, next, show, add, start, step, pause, resume, block, unblock, close];

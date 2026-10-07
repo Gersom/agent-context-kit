@@ -211,6 +211,12 @@ describe("validateCommands", () => {
     expect(() => validateCommands([base({ flags: { a: { type: "boolean", description: "x", stdin: true } } })])).toThrow(/solo un flag de texto/);
   });
 
+  test("un flag repetible tiene que ser de texto y no leer stdin", () => {
+    expect(() => validateCommands([base({ flags: { a: { type: "string", description: "x", multiple: true } } })])).not.toThrow();
+    expect(() => validateCommands([base({ flags: { a: { type: "boolean", description: "x", multiple: true } } })])).toThrow(/puede repetirse/);
+    expect(() => validateCommands([base({ flags: { a: { type: "string", description: "x", multiple: true, stdin: true } } })])).toThrow(/puede repetirse/);
+  });
+
   test("run() falla con error inesperado si el registro es inválido", async () => {
     const { code, err } = await exec(["x"], [base({}), base({})]);
     expect(code).toBe(1);
