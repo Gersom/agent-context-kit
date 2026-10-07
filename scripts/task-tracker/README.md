@@ -21,20 +21,25 @@ Desde la raíz de este repo:
 bun run tasks                         # pregunta la ruta a vigilar
 bun run tasks D:/proyectos/mi-app     # raíz del proyecto
 bun run tasks D:/proyectos/mi-app --once   # pinta una sola vez y sale
+bun run tasks D:/proyectos/mi-app ana      # modo multi-operador: abre de frente el panel de «ana»
 ```
 
 - **Qué ruta acepta:** la raíz del proyecto (busca adentro `docs/agents/` o `agent-context/agents/`) o directamente la carpeta que contiene `handoff.md`. Las rutas relativas se resuelven desde la carpeta en la que lanzaste el comando, y se pueden pegar con comillas (Windows las agrega al arrastrar una carpeta a la terminal).
 - **Varios proyectos a la vez:** cada instancia es independiente (sin archivos de bloqueo, puertos ni estado compartido), así que podés tener una terminal por proyecto. El título de la ventana muestra el nombre del proyecto.
 - **`--once`:** pinta una vez y sale, sin vigilar ni atajos. Sirve para probar o para scripts.
-- **`--operator <carpeta>`:** en modo multi-operador (ver abajo), vigila la carpeta de ese operador en lugar de la que corresponde a tu correo de git.
+- **Operador:** en modo multi-operador (ver abajo), un segundo argumento (o `--operator <carpeta>`) abre de frente el panel de ese operador; sin él se abre la vista de equipo.
 
 ### Modo multi-operador
 
-Si la carpeta de agentes tiene `operators.md` (varias personas trabajando en paralelo, ver `skill/docs/multi-operator.md`), el script lo detecta solo: lee `git config user.email` del repo, busca ese correo en `operators.md` (sin distinguir mayúsculas) y vigila `docs/agents/<carpeta>/`, que tiene los mismos `handoff.md`, `backlog.md` e `history.md` de siempre. El título muestra el operador (`▣ MI APP · ana`). Sin `operators.md`, todo funciona como antes.
+Si la carpeta de agentes tiene `operators.md` (varias personas trabajando en paralelo, ver `skill/docs/multi-operator.md`), el script lo detecta solo y vigila toda la carpeta: cada operador con carpeta, `operators.md` y `team-backlog.md`. Sin `operators.md`, todo funciona como antes.
 
-- **No se resuelve solo** (el correo no figura, figura como «solo team-backlog», no hay `git`): lo dice y deja elegir una carpeta de la lista; con `--once` o sin terminal falla y sugiere `--operator`.
-- **Otro operador:** `--operator ana`, o pasar directamente su carpeta (`docs/agents/ana`). Solo vigila una carpeta por instancia; la vista de todos los operadores a la vez no está hecha todavía.
+- **Vista de equipo** (la inicial, sin operador): el recuadro EQUIPO es un selector con una fila por operador (su tarea en curso con el avance del plan; debajo, sus libres, bloqueadas y la última tarea que cerró) y, debajo, el recuadro SIN DUEÑO con las tareas de `team-backlog.md`. El operador de `git config user.email` queda marcado `(tú)` y preseleccionado; los `(solo team-backlog)` aparecen pero no se pueden abrir.
+- **Panel de un operador:** la pantalla de siempre (completadas, en progreso, pausadas, libres y bloqueadas) con el recuadro SIN DUEÑO debajo de BLOQUEADAS. El título muestra el operador (`▣ MI APP · ana`).
+- **Navegación:** `↑`/`↓` eligen, `Enter` abre el panel y `b` o `Esc` vuelven al equipo. Con `--once` o sin terminal no hay selector: se pinta la vista que pediste (el panel del operador indicado, o la de equipo) y se sale.
+- **Operador que no existe o no tiene carpeta** (por argumento): falla con código 1 y lista los operadores con carpeta. Un correo de git que no figura no es un error: solo no hay fila preseleccionada.
+- **Pasar directamente la carpeta de un operador** (`docs/agents/ana`) también abre su panel.
 - **Falta `operators.md` pero hay carpetas de operador:** avisa y no asume modo plano.
+- Es solo lectura: nunca modifica ninguna carpeta.
 
 ### Atajos de teclado
 
@@ -44,6 +49,9 @@ Solo con una terminal interactiva (sin `--once` ni salida redirigida):
 |---|---|
 | `q` o `Ctrl+C` | Salir |
 | `r` | Volver a leer los archivos y redibujar |
+| `↑` / `↓` | Elegir operador (vista de equipo, modo multi-operador) |
+| `Enter` | Abrir el panel del operador elegido |
+| `b`, `Esc` o `Retroceso` | Volver a la vista de equipo |
 
 ## Qué muestra
 

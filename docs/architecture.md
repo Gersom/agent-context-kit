@@ -14,7 +14,7 @@ agent-context-kit/
 ├── scripts/                # Herramientas propias del repo (TypeScript con Bun); no forman parte del skill
 │   ├── _shared/               # Código compartido entre scripts (el `_` marca que no es un script: las carpetas sin `_` sí lo son)
 │   │   ├── types.ts             # Tipos del dominio: tarea, campo, sección, entrada de historial, handoff/backlog interpretados
-│   │   ├── parse/               # Markdown → datos: secciones por ancla, bloques, handoff, backlog, history, operators
+│   │   ├── parse/               # Markdown → datos: secciones por ancla, bloques, handoff, backlog, history, operators, team-backlog
 │   │   ├── tasks/               # Tag de bloqueo vigente (block-info) y tareas mencionadas en un texto (task-refs)
 │   │   └── test/                # Tests en espejo de parse/ y tasks/ + fixtures/ (docs de ejemplo) + helpers.ts
 │   ├── skill-checks/          # Tests de contenido del skill (`reading-policy.test.ts`): fijan la política de lectura y la estructura de lo que se lee en cada sesión
@@ -23,10 +23,10 @@ agent-context-kit/
 │       ├── index.ts             # Arranque: argumentos, ruta a vigilar (o la pregunta) y llama a app
 │       ├── src/
 │       │   ├── app.ts             # Ciclo leer → modelo → pintar; watcher, resize, atajos (q, r, Ctrl+C)
-│       │   ├── cli/               # Argumentos (--once, ruta), pregunta interactiva de la ruta y atajos de teclado
-│       │   ├── io/                # Rutas, operador (modo multi: operators.md + correo de git), lectura de archivos, watcher y lectura con memoria
-│       │   ├── model/             # Modelo de pantalla: arma lo que se pinta con lo que interpretó el parseo
-│       │   ├── ui/                # Pintado con picocolors (recuadros por tipo de tarea) y utilidades de formato
+│       │   ├── cli/               # Argumentos (--once, ruta, operador), pregunta interactiva de la ruta, teclas (incl. flechas) y navegación de la vista de equipo (estado puro)
+│       │   ├── io/                # Rutas, operador (modo multi: operators.md + correo de git), lectura del equipo, lectura de archivos, watcher y lectura con memoria
+│       │   ├── model/             # Modelo de pantalla: arma lo que se pinta con lo que interpretó el parseo (un operador, o el equipo y el team-backlog)
+│       │   ├── ui/                # Pintado con picocolors (recuadros por tipo de tarea; selector EQUIPO y SIN DUEÑO en modo multi) y utilidades de formato
 │       │   └── shared/            # Tipos de pantalla y de lectura de archivos (types.ts) y formato de hora (time.ts)
 │       └── test/                # Tests de `bun test` en espejo de src/ + e2e/ (script entero)
 │
@@ -65,5 +65,5 @@ agent-context-kit/
 - **`docs/desing.md`** — registro histórico de la conversación de diseño original; no es el estado actual (para eso, este archivo).
 - **`docs/agents/`** — dogfooding: este repo usa el skill sobre sí mismo (`rules.md`, `handoff.md`, `backlog.md` y `history.md` documentan el trabajo de este repo, con la estructura que el skill genera en un repo destino).
 - **`skill/`** — el skill: [`SKILL.md`](../skill/SKILL.md) es el punto de entrada (resuelve el caso "ya existe documentación"), [`docs/`](../skill/docs/) tiene los flujos (`questions-flow.md`, `migration-flow.md`, y `multi-operator.md` para el modo de varias personas, que solo se abre si se activa) y qué es cada plantilla ([`template-architecture.md`](../skill/docs/template-architecture.md)), y `template/` es el catálogo de plantillas.
-- **`scripts/_shared/`** — código compartido entre los scripts: parseo de `handoff.md`, `backlog.md`, `history.md` y `operators.md` (`parse/`), tag de bloqueo y referencias entre tareas (`tasks/`), tipos del dominio y fixtures. Lo usan el task-tracker y los scripts que vengan.
+- **`scripts/_shared/`** — código compartido entre los scripts: parseo de `handoff.md`, `backlog.md`, `history.md`, `operators.md` y `team-backlog.md` (`parse/`), tag de bloqueo y referencias entre tareas (`tasks/`), tipos del dominio y fixtures. Lo usan el task-tracker y los scripts que vengan.
 - **`scripts/task-tracker/`** — herramienta de este repo (no del skill, no se copia a los repos destino) que muestra en la terminal el estado de las tareas de un proyecto y se redibuja sola; se lanza con `bun run tasks [ruta]`. Uso, formatos y estructura interna: [`scripts/task-tracker/README.md`](../scripts/task-tracker/README.md).
