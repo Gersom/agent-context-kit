@@ -46,7 +46,8 @@ agent-context-kit/
     │
     ├── docs/
     │   ├── questions-flow.md           # Árbol de decisión (rondas de preguntas) que ejecuta el skill
-    │   ├── migration-flow.md           # Flujo para migrar documentación previa en otro formato
+    │   ├── migration-flow.md           # Flujo para migrar documentación previa en otro formato y pasar de plano a multi-operador
+    │   ├── multi-operator.md           # Modo opcional para varias personas en paralelo: carpeta por operador, team-backlog, flujos
     │   └── template-architecture.md   # Detalle de qué es y para qué sirve cada archivo de template/
     │
     └── template/              # Catálogo maestro de plantillas que el skill copia al repo destino
@@ -54,7 +55,8 @@ agent-context-kit/
         ├── agents/
         ├── project/
         ├── external/
-        └── plans/
+        ├── plans/
+        └── multi/             # Solo modo multi-operador: AGENTS.md, operators.md, team-backlog.md, preferences.md y bloque de rules.md
 ```
 
 ## Qué es cada parte
@@ -62,6 +64,6 @@ agent-context-kit/
 - **`docs/philosophy.md`** — la razón de ser del kit y sus principios de diseño.
 - **`docs/desing.md`** — registro histórico de la conversación de diseño original; no es el estado actual (para eso, este archivo).
 - **`docs/agents/`** — dogfooding: este repo usa el skill sobre sí mismo (`rules.md`, `handoff.md`, `backlog.md` y `history.md` documentan el trabajo de este repo, con la estructura que el skill genera en un repo destino).
-- **`skill/`** — el skill: [`SKILL.md`](../skill/SKILL.md) es el punto de entrada (resuelve el caso "ya existe documentación"), [`docs/`](../skill/docs/) tiene los flujos (`questions-flow.md`, `migration-flow.md`) y qué es cada plantilla ([`template-architecture.md`](../skill/docs/template-architecture.md)), y `template/` es el catálogo de plantillas.
+- **`skill/`** — el skill: [`SKILL.md`](../skill/SKILL.md) es el punto de entrada (resuelve el caso "ya existe documentación"), [`docs/`](../skill/docs/) tiene los flujos (`questions-flow.md`, `migration-flow.md`, y `multi-operator.md` para el modo de varias personas, que solo se abre si se activa) y qué es cada plantilla ([`template-architecture.md`](../skill/docs/template-architecture.md)), y `template/` es el catálogo de plantillas.
 - **`scripts/_shared/`** — código compartido entre los scripts: parseo de `handoff.md`, `backlog.md`, `history.md` y `operators.md` (`parse/`), tag de bloqueo y referencias entre tareas (`tasks/`), tipos del dominio y fixtures. Lo usan el task-tracker y los scripts que vengan.
 - **`scripts/task-tracker/`** — herramienta de este repo (no del skill, no se copia a los repos destino) que muestra en la terminal el estado de las tareas de un proyecto y se redibuja sola; se lanza con `bun run tasks [ruta]`. Uso, formatos y estructura interna: [`scripts/task-tracker/README.md`](../scripts/task-tracker/README.md).
