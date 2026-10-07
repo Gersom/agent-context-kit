@@ -36,5 +36,6 @@ Seguir el `AGENTS.md` del repo (qué leer y en qué orden; el idioma de la docum
 
 - **Qué preguntar y qué copiar** → [`docs/questions-flow.md`](./docs/questions-flow.md)
 - **Migración desde otro sistema de documentación** → [`docs/migration-flow.md`](./docs/migration-flow.md)
+- **Varias personas trabajando en paralelo (modo multi-operador, opcional)** → [`docs/multi-operator.md`](./docs/multi-operator.md); solo se abre si el operador lo activa
 - **Catálogo de plantillas y para qué sirve cada una** → [`docs/template-architecture.md`](./docs/template-architecture.md); plantillas en [`template/`](./template/)
 - **Lógica de detección de conflicto `docs/` vs. `agent-context/` y de los archivos puntero `CLAUDE.md`/`AGENTS.md`** → sección 4 de [`../docs/desing.md`](../docs/desing.md)
