@@ -10,6 +10,7 @@
   },
   "scripts": {
     "tasks": "bun scripts/task-tracker/index.ts",
+    "task": "bun scripts/task-manager/index.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },
