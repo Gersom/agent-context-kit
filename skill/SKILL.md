@@ -25,7 +25,7 @@ Revisar si el repo destino tiene `docs/agents/` y/o `docs/project/` (o sus equiv
 
 ### Si existe → no hay nada que generar
 
-Seguir el `AGENTS.md` del repo (qué leer y en qué orden; el idioma de la documentación está en `rules.md`: no se vuelve a preguntar) y ejecutar la tarea pedida. Si a `handoff.md` o `backlog.md` les faltan las anclas de sección (`<!-- agent-context-kit:section=... -->`), agregarlas — ver [`docs/template-architecture.md`](./docs/template-architecture.md), "Anclas de sección". No seguir con el árbol de preguntas.
+Seguir el `AGENTS.md` del repo (qué leer y en qué orden; el idioma de la documentación está en `rules.md`: no se vuelve a preguntar) y ejecutar la tarea pedida. Si el operador pide pasar a multi-operador (se suma otra persona), abrir [`docs/migration-flow.md`](./docs/migration-flow.md), sección "Pasar de plano a multi-operador". Si a `handoff.md` o `backlog.md` les faltan las anclas de sección (`<!-- agent-context-kit:section=... -->`), agregarlas — ver [`docs/template-architecture.md`](./docs/template-architecture.md), "Anclas de sección". No seguir con el árbol de preguntas.
 
 ### Si no existe → abrir el flujo que corresponda
 
@@ -36,5 +36,6 @@ Seguir el `AGENTS.md` del repo (qué leer y en qué orden; el idioma de la docum
 
 - **Qué preguntar y qué copiar** → [`docs/questions-flow.md`](./docs/questions-flow.md)
 - **Migración desde otro sistema de documentación** → [`docs/migration-flow.md`](./docs/migration-flow.md)
+- **Varias personas trabajando en paralelo (modo multi-operador, opcional)** → [`docs/multi-operator.md`](./docs/multi-operator.md); solo se abre si el operador lo activa
 - **Catálogo de plantillas y para qué sirve cada una** → [`docs/template-architecture.md`](./docs/template-architecture.md); plantillas en [`template/`](./template/)
 - **Lógica de detección de conflicto `docs/` vs. `agent-context/` y de los archivos puntero `CLAUDE.md`/`AGENTS.md`** → sección 4 de [`../docs/desing.md`](../docs/desing.md)

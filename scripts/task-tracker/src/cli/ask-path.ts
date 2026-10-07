@@ -1,4 +1,4 @@
-// Pregunta interactiva de la ruta a vigilar, y cómo se informan las rutas inválidas.
+// Pregunta interactiva de la ruta a vigilar y cómo se informan las rutas inválidas.
 
 import { resolveAgentsDir } from "../io/paths.ts";
 import type { ResolveError, ResolveOk } from "../shared/types.ts";
@@ -7,8 +7,9 @@ import type { ResolveError, ResolveOk } from "../shared/types.ts";
  * Pregunta la ruta hasta que sea válida. El `prompt()` de Bun devuelve null tanto para una
  * línea vacía como para el fin de la entrada: en una terminal se vuelve a preguntar (se sale
  * con Ctrl+C); con entrada redirigida, varias respuestas null seguidas se toman como EOF.
+ * @param operator operador cuyo panel abrir de frente (modo multi-operador), si se indicó
  */
-export function askForPath(): ResolveOk {
+export function askForPath(operator?: string): ResolveOk {
   let emptyAnswers = 0;
   for (;;) {
     const answer = prompt("Ruta del proyecto o de su carpeta docs/agents a vigilar:");
@@ -20,7 +21,7 @@ export function askForPath(): ResolveOk {
       continue;
     }
     emptyAnswers = 0;
-    const result = resolveAgentsDir(answer);
+    const result = resolveAgentsDir(answer, undefined, { operator });
     if (result.ok) return result;
     printResolveError(result);
   }

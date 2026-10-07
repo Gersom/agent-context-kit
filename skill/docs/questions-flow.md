@@ -54,7 +54,7 @@ El agente ya revisó en [`../SKILL.md`](../SKILL.md) (paso 1) si existe `docs/ag
   |---|---|---|
   | a) tarea puntual | Mínimo | Copiar el set mínimo (ver tabla de sets más abajo) y saltar a la **Ronda final (con opt-in)** |
   | c) testear puntual | Mínimo | Igual que (a) |
-  | b) agregar feature | Intermedio | Copiar el set intermedio; evaluar Ronda 3 solo si la feature toca esa área (glossary, external, infra, entities, testing, setup); luego **Ronda final** (sin opt-in, ya se decidió documentar) |
+  | b) agregar feature | Intermedio | Copiar el set intermedio; evaluar Ronda 3 solo si la feature toca esa área (glossary, external, infra, entities, testing, setup), salvo la pregunta de varias personas, que se hace siempre; luego **Ronda final** (sin opt-in, ya se decidió documentar) |
   | d) desarrollo prolongado | Completo | Ir a **Ronda 2** |
 
 ---
@@ -117,6 +117,9 @@ Y según `ETAPA` (sin preguntar):
 
 Preguntar todas juntas, en una sola interacción (todas son independientes entre sí; solo dependen de `ETAPA`, que ya se conoce de la Ronda 2):
 
+- "¿Van a trabajar varias personas en paralelo en este proyecto, cada una con su agente?" (también se pregunta con `ALCANCE = b`)
+  → Sí: **modo multi-operador**, ver la sección homónima más abajo. No: estructura plana, sin cambios.
+
 - **Solo si `ETAPA = producción/mantenimiento`:** "¿Hay bugs conocidos o zonas frágiles del código que un agente debería evitar tocar sin cuidado?"
   → Sí: copiar `template/agents/known-issues.md` → `docs/agents/known-issues.md`
 
@@ -156,13 +159,33 @@ Solo si en la Ronda 3 la respuesta fue "sí" a integraciones externas.
 
 ---
 
+## Modo multi-operador (solo si en la Ronda 3 respondió que sí)
+
+Las reglas del modo están en [`multi-operator.md`](./multi-operator.md) (abrirlo ahora, no antes). Cambia **dónde** se copian algunos archivos y suma otros; el resto del flujo no cambia:
+
+1. **Operador actual:** leer `git config user.email` (si no está, preguntarlo) y preguntar con qué nombre corto registrarlo (minúsculas, sin espacios). Quien genera la documentación toma tareas, así que tiene carpeta.
+2. **Dónde va cada archivo:**
+   - `template/agents/rules.md`, `roadmap.md` y `known-issues.md` (según las condiciones de siempre) → `docs/agents/`, compartidos.
+   - `template/agents/handoff.md`, `backlog.md` e `history.md` → `docs/agents/<operador>/`. Los enlaces a archivos compartidos pasan a `../` (ej. el de `rules.md`).
+   - `template/multi/operators.md` → `docs/agents/operators.md`, con la línea del operador actual (`- <carpeta>: <correo>`).
+   - `template/multi/team-backlog.md` → `docs/agents/team-backlog.md`, vacío.
+   - `template/multi/preferences.md` → `docs/agents/<operador>/preferences.md`, solo si el operador quiere definir sus preferencias; es opcional.
+   - `template/multi/rules.md` no es un archivo: su bloque "Trabajo en paralelo" se agrega a `docs/agents/rules.md`, justo antes de "## Enlaces".
+   - `docs/project/`, `docs/external/` y `docs/plans/` no cambian.
+3. **`agents/history.md` reconstruido desde git** (Ronda 2): va a la carpeta de quien genera la documentación.
+4. **`AGENTS.md`:** se usa `template/multi/AGENTS.md` en lugar de `template/AGENTS.md`; todo lo demás del paso (ruta, marcadores, archivo existente) es igual. `CLAUDE.md` no cambia.
+5. **`docs/README.md`:** el árbol de `agents/` muestra `operators.md`, `team-backlog.md` y las carpetas de operador, y la definición de "operador" va en plural (ver la guía de `template/README.md`).
+6. Los demás operadores se registran solos: la primera vez que su agente no encuentre su correo en `operators.md`, se los pregunta (lo dice el propio `AGENTS.md` multi).
+
+---
+
 ## Ronda final — Generar README + puntero en la raíz (siempre, en cualquier rama que haya copiado algo)
 
 1. **Generar `docs/README.md`** (no copiar `template/README.md` literal): usando ese archivo solo como guía, armar el mapa mínimo (~1,5 KB como máximo) con la descripción del proyecto, la definición de "operador" y el árbol de `docs/` con solo los archivos que existen tras esta ejecución (si no se copió `glossary.md`, no aparece; si se crearon 3 `external/*.md`, los 3 quedan listados). Este paso se omite en el set mínimo (no hay README en ese set); en ese caso, el paso 3 tampoco enlaza a `docs/README.md`.
    - **Descripción del proyecto:** si `docs/README.md` no existe todavía, o existe pero no la tiene, preguntar: *"¿Podés describir en 1-2 frases qué es este proyecto (qué hace, para quién)?"* y escribirla justo debajo del título. Si ya existe, preservarla tal cual al regenerar el resto — no se vuelve a preguntar.
 2. Determinar si se usó `docs/` o `agent-context/` (según lógica de detección de conflicto, punto 4.1 del documento de diseño).
 3. **`AGENTS.md` (fuente de verdad — se asegura siempre, en cualquier set, incluso el mínimo):**
-   - No existe → crear a partir de `template/AGENTS.md`, ajustando la ruta `docs/`/`agent-context/` y quitando las líneas de los archivos que no se generaron (en el set mínimo: `docs/README.md`, `backlog.md` e `history.md`).
+   - No existe → crear a partir de `template/AGENTS.md` (o `template/multi/AGENTS.md` en modo multi), ajustando la ruta `docs/`/`agent-context/` y quitando las líneas de los archivos que no se generaron (en el set mínimo: `docs/README.md`, `backlog.md` e `history.md`).
    - Existe con otro contenido del operador → no se sobrescribe: se agrega la sección delimitada `<!-- agent-docs-skill:start -->` ... `<!-- agent-docs-skill:end -->` de `template/AGENTS.md` al final, solo si el marcador no está ya presente.
 4. **`CLAUDE.md` (redirige a `AGENTS.md`, nunca duplica su contenido — se asegura siempre, en cualquier set):**
    - No existe → crear a partir de `template/CLAUDE.md`, literal.
@@ -204,6 +227,9 @@ Solo si en la Ronda 3 la respuesta fue "sí" a integraciones externas.
 | `project/infrastructure.md` | Hay infraestructura/deploy relevante |
 | `project/testing.md` | Hay estrategia de testing (o se quiere establecer) |
 | `project/setup.md` | Setup local no trivial |
+| `agents/operators.md`, `agents/team-backlog.md` (de `template/multi/`) | Solo en modo multi-operador |
+| `<operador>/preferences.md` (de `template/multi/`) | Solo en modo multi-operador y si el operador quiere definirlas |
+| `agents/handoff.md`, `backlog.md`, `history.md` | En modo multi van a `agents/<operador>/` (sección "Modo multi-operador") |
 | `external/_example-service.md` (plantilla) | Se copia sin renombrar junto con las integraciones declaradas, para que quede disponible si se agregan más adelante |
 | `external/<servicio>.md` | Por cada integración externa declarada |
 | `plans/*` | Hay costos, límites de uso o pagos |

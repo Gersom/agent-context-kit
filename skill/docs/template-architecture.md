@@ -20,6 +20,13 @@ template/
 │   ├── roadmap.md
 │   └── known-issues.md
 │
+├── multi/                 (solo modo multi-operador)
+│   ├── AGENTS.md
+│   ├── operators.md
+│   ├── team-backlog.md
+│   ├── preferences.md
+│   └── rules.md            (bloque para agregar a agents/rules.md)
+│
 ├── project/
 │   ├── architecture.md
 │   ├── stack.md
@@ -48,6 +55,10 @@ Guía para generar el `docs/README.md` del proyecto destino: lo primero que lee 
 ## `AGENTS.md` / `CLAUDE.md` (raíz de `template/`)
 
 Los punteros que se aseguran en la raíz del repo destino, en **cualquier** set (incluso el mínimo) — son lo único que le permite a un agente genérico (no solo este skill) encontrar la documentación de contexto sin invocarlo de nuevo. `AGENTS.md` es la fuente de verdad: dice qué leer (README, reglas y handoff) y qué no leer salvo necesidad (el resto, y `backlog.md`/`history.md` con una tarea en curso). `CLAUDE.md` nunca duplica ese contenido, solo redirige a `AGENTS.md`. Ambos llevan la sección delimitada `<!-- agent-docs-skill:start/end -->` para poder agregarse al final de un archivo ya existente del operador sin sobrescribirlo ni duplicarse en corridas futuras. Ver el paso 3-4 de la "Ronda final" en [`questions-flow.md`](./questions-flow.md).
+
+## `multi/` (modo multi-operador, opcional)
+
+Plantillas que se usan solo si el operador dice que varias personas trabajan en paralelo (ver [`multi-operator.md`](./multi-operator.md)); un proyecto de una sola persona no las toca. `multi/AGENTS.md` reemplaza al `AGENTS.md` plano. `operators.md` mapea cada carpeta de operador con sus correos de git. `team-backlog.md` es el backlog del equipo, de tareas sin dueño y sin numeración (se copia como `docs/agents/team-backlog.md`; el `backlog.md` de cada operador es el de las tareas que tomó). `preferences.md` es la forma de trabajar de un operador, que no puede contradecir `rules.md`. `rules.md` no es un archivo: es un bloque, "Trabajo en paralelo", que se agrega al `rules.md` del proyecto sin tocar sus Reglas por defecto. El `handoff.md`, `backlog.md` e `history.md` de cada operador salen de las plantillas de `agents/`, copiadas a `docs/agents/<operador>/`.
 
 ## `agents/`
 

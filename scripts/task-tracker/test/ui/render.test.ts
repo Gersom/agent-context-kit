@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { buildModel } from "../../src/model/model.ts";
 import type { RenderMeta } from "../../src/shared/types.ts";
 import { visibleLength } from "../../src/ui/format.ts";
-import { dependencyText, render, screenWidth, triggerText } from "../../src/ui/render.ts";
+import { arrowText, dependencyText, render, screenWidth, triggerText } from "../../src/ui/render.ts";
 import { fixture } from "../../../_shared/test/helpers.ts";
 
 const meta: RenderMeta = {
@@ -39,19 +39,53 @@ describe("render", () => {
     ]);
   });
 
-  test("un recuadro por tipo, en orden, con el título a la izquierda y el archivo a la derecha", () => {
+  test("encabezado en modo multi-operador: agrega el operador al título, donde la ruta larga no lo recorta", () => {
+    const lines = screen("es-anchors", { operator: "ana" }).split("\n");
+    expect(lines.slice(0, 2)).toEqual(["▣ DEMO APP · ana", "  /proyectos/demo-app"]);
+  });
+
+  test("un recuadro por tipo, en el orden del flujo de una tarea, con el título a la izquierda y el archivo a la derecha", () => {
     const out = screen("es-anchors");
     expect(out).not.toMatch(/\x1b\[/);
     expect(out).not.toContain("━━");
     const tops = out.split("\n").filter((l) => l.startsWith("╭"));
     expect(tops.map((l) => l.match(/^╭─ (.+?) ─+ (\S+\.md) ─╮$/)?.slice(1))).toEqual([
-      ["TAREAS COMPLETADAS (últimas 5)", "history.md"],
-      ["EN PROGRESO", "handoff.md"],
-      ["PAUSADAS (1)", "handoff.md"],
       ["LIBRES (4)", "backlog.md"],
       ["BLOQUEADAS (2)", "backlog.md"],
+      ["EN PROGRESO", "handoff.md"],
+      ["PAUSADAS (1)", "handoff.md"],
+      ["TAREAS COMPLETADAS (últimas 5)", "history.md"],
     ]);
     expect(out.split("\n").filter((l) => l.startsWith("╰"))).toHaveLength(5);
+  });
+
+  test("una línea de flecha con el nombre de la transición entre cada par de recuadros", () => {
+    const arrows = screen("es-anchors")
+      .split("\n")
+      .filter((l) => /^ {3}[↑↓]/.test(l))
+      .map((l) => l.trim());
+    expect(arrows).toEqual(["↓ bloquea · ↑ desbloquea", "↓ empieza (desde libres)", "↑ retoma · ↓ pausa", "↓ se cierra"]);
+  });
+
+  test("arrowText: la transición entre cada par de etapas y «↓» si no hay una conocida", () => {
+    expect(arrowText("unowned", "free")).toBe("↓ se toma");
+    expect(arrowText("unowned", "current")).toBe("↓ se toma");
+    expect(arrowText("free", "blocked")).toBe("↓ bloquea · ↑ desbloquea");
+    expect(arrowText("free", "current")).toBe("↓ empieza");
+    expect(arrowText("blocked", "current")).toBe("↓ empieza (desde libres)");
+    expect(arrowText("current", "paused")).toBe("↑ retoma · ↓ pausa");
+    expect(arrowText("current", "completed")).toBe("↓ se cierra");
+    expect(arrowText("paused", "completed")).toBe("↓ se cierra");
+    expect(arrowText("free", "completed")).toBe("↓");
+  });
+
+  test("las flechas solo van entre recuadros que se muestran", () => {
+    // Sin pausadas ni bloqueadas ni historial: solo LIBRES → EN PROGRESO.
+    const model = buildModel({ handoffText: "# H\n", backlogText: fixture("es-anchors", "backlog.md"), historyText: null });
+    const out = render({ ...model, blocked: [], paused: [], counts: { ...model.counts, blocked: 0, paused: 0 } }, meta);
+    expect(out.split("\n").filter((l) => /^ {3}[↑↓]/.test(l)).map((l) => l.trim())).toEqual(["↓ empieza"]);
+    // Set mínimo (solo handoff.md): un único recuadro, sin flechas.
+    expect(screen("minimal")).not.toMatch(/\n {3}[↑↓]/);
   });
 
   test("todos los recuadros tienen el ancho de la pantalla, con y sin color", () => {
@@ -163,9 +197,22 @@ describe("render", () => {
   });
 
   test("pie según los controles disponibles", () => {
-    expect(screen("minimal", { controls: "keys" })).toContain("q o Ctrl+C para salir · r para redibujar");
-    expect(screen("minimal")).toContain("Ctrl+C para salir");
+    expect(screen("minimal", { controls: "keys" })).toContain("[c] compactar - [f] ocultar flechas - [r] redibujar - [Ctrl+C o q] salir");
+    expect(screen("minimal", { controls: "keys", compact: true, arrows: false })).toContain("[c] expandir - [f] mostrar flechas - [r] redibujar - [Ctrl+C o q] salir");
+    expect(screen("minimal")).toContain("[Ctrl+C] salir");
     expect(screen("minimal", { controls: "none" })).not.toContain("Ctrl+C");
+  });
+
+  test("el pie se parte en más líneas si no entra, y «salir» nunca se recorta", () => {
+    const full = "[Esc o b] volver al equipo - [c] compactar - [f] ocultar flechas - [r] redibujar - [Ctrl+C o q] salir";
+    expect(screen("minimal", { controls: "keys", multiView: "operator", width: 120 })).toContain(full);
+    const narrow = screen("minimal", { controls: "keys", multiView: "operator", width: 60 }).split("\n");
+    const at = narrow.findIndex((l) => l.startsWith("[Esc o b]"));
+    const footer = narrow.slice(at).filter(Boolean);
+    expect(footer.length).toBeGreaterThan(1);
+    for (const line of footer) expect(visibleLength(line)).toBeLessThanOrEqual(60);
+    expect(footer.join(" - ").replace(/ - - /g, " - ")).toContain("[Ctrl+C o q] salir");
+    expect(footer.join(" ")).not.toContain("…");
   });
 
   test("colores: bordes en gris salvo en progreso, completadas (nombre y fecha) en su gris, título verde, secundarios en gris claro", () => {

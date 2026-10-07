@@ -11,6 +11,39 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-07 — ✅ Tarea 31 — Cambiar la organización del render
+
+- El panel del operador muestra los recuadros como el flujo de una tarea, de arriba abajo: SIN DUEÑO → LIBRES ⇅ BLOQUEADAS → EN PROGRESO ⇅ PAUSADAS → COMPLETADAS, con una línea de flecha que nombra cada transición (`↓ se toma`, `↓ bloquea · ↑ desbloquea`, `↓ empieza`, `↑ retoma · ↓ pausa`, `↓ se cierra`). Solo hay flecha entre recuadros que se muestran. La vista de equipo no cambió.
+- Decisiones del operador: el orden de LIBRES y BLOQUEADAS cambió de opinión una vez (primero BLOQUEADAS arriba, al final LIBRES arriba); con el orden final, entre BLOQUEADAS y EN PROGRESO la flecha dice `↓ empieza (desde libres)`, porque una bloqueada no empieza directo. La dirección de cada flecha sigue el movimiento de la tarea.
+- Ampliación: tecla `c` que compacta o expande los recuadros que no son EN PROGRESO ni PAUSADAS (una sola tarea, la más reciente, con `· +N más`; EQUIPO nunca se compacta), tecla `f` que oculta o muestra las flechas, y las opciones `--compact` y `--no-arrows`. El pie pasó al formato `[tecla] acción` sugerido por el operador y se parte en dos líneas si no entra, para que "salir" no se recorte.
+- Verificación: `bun test` → 239 tests, todos pasan (19 nuevos); `bun run typecheck` sin errores; el operador probó a mano el selector y las teclas en una terminal real (queda resuelto lo que había quedado pendiente en la Tarea 30).
+- Commits: `bfad675`, `fa426c1`, `1c2b7e9`, `18385cc` y el de cierre, en la rama `chore/apply-multi-operator`.
+
+## 2026-10-06 — ✅ Pasado a modo multi-operador
+
+- Este repo pasó de la estructura plana a la multi-operador (dogfooding, con `migration-flow.md`, "Pasar de plano a multi-operador"): `handoff.md`, `backlog.md` e `history.md` se movieron con `git mv` a `docs/agents/gersom/` sin reescribirlos (solo cambiaron dos enlaces relativos) y la numeración continúa (próximo número: 31).
+- Registrados: `gersom` (gersomalaja@gmail.com), sin más operadores por ahora. Se crearon `operators.md` y `team-backlog.md`; el `rules.md` suma el bloque "Trabajo en paralelo" (las Reglas por defecto no se tocaron), el `AGENTS.md` raíz usa la variante multi y `docs/README.md` y `docs/architecture.md` muestran la estructura nueva.
+- La Tarea 19 (prompt de normalización para repos que ya adoptaron el skill) pasó al `team-backlog.md` como tarea sin dueño; su número queda retirado. Cuando alguien la tome recibirá un número de su propia secuencia.
+- Verificación: `bun test` → 219 tests, todos pasan; el tracker abre la vista de equipo de este repo con `gersom` preseleccionado.
+
+## 2026-10-06 — ✅ Tarea 30 — Vista de equipo en el task-tracker (todos los operadores)
+
+- En modo multi-operador el tracker abre en una vista de equipo: el recuadro EQUIPO es un selector con una fila por operador (su tarea en curso con el avance del plan, sus libres y bloqueadas y la última tarea que cerró) y, debajo, el recuadro "SIN DUEÑO" con las tareas de `team-backlog.md`. `↑`/`↓` eligen, `Enter` abre el panel del operador (que lleva el mismo recuadro "SIN DUEÑO" debajo de BLOQUEADAS) y `b`, `Esc` o Retroceso vuelven. `bun run tasks <ruta> <operador>` abre su panel de frente.
+- Decisiones del operador: selector en lugar de un resumen fijo encima, con la última completada en la fila de cada operador (sin recuadro mezclado de completadas); el título del recuadro es "SIN DUEÑO"; las teclas para volver son `b` y `Esc`. Cambio sobre la Tarea 26: se eliminó la pregunta interactiva de operador y el correo de git ya no abre el panel propio, solo deja la fila marcada `(tú)` y preseleccionada. Solo lectura, nunca modifica carpetas ajenas.
+- Código: parser de `team-backlog.md` en `scripts/_shared/parse/`, lectura del equipo con un lector con memoria por carpeta, `watchDir` con lista de archivos (se vigilan la raíz y cada operador), modelo del equipo, navegación como función pura de estado y teclas (`cli/nav.ts`), teclas con flechas (`cli/keys.ts`) y `render.ts` con lienzo compartido entre el panel y la vista de equipo.
+- Verificación: `bun test` → 220 tests, todos pasan (57 nuevos); `bun run typecheck` sin errores; 0 enlaces relativos rotos; el script entero probado con un repo multi real con git (vista de equipo, operador por segundo argumento, `--operator`, carpeta directa y error con operador inexistente). Pendiente: el bucle interactivo del selector (modo raw) no se pudo ejecutar en este entorno; solo está cubierta su lógica pura.
+- Commits: `75545ae`, `64c096d`, `cb54b63`, `331d0dd`, `2963a61` y el de cierre, en la rama `feat/team-view` (sale de `feat/multi-operator`).
+
+## 2026-10-06 — ✅ Tarea 26 — Soportar varios operadores trabajando en paralelo
+
+- Modo multi-operador opcional (opt-in en la Ronda 3 de `questions-flow.md`): cada operador tiene su carpeta `docs/agents/<operador>/` con su `handoff.md`, `backlog.md` e `history.md`, así nadie edita los archivos de otro y desaparecen los conflictos de merge y los números repetidos. El modo se detecta por `docs/agents/operators.md`; el operador actual, por el correo de `git config user.email`. Las reglas y el diseño completo están en `skill/docs/multi-operator.md`.
+- Las tareas sin dueño van a `team-backlog.md`, sin numeración; quien la toma recibe el número de su secuencia (va a su `backlog.md` o directo a su `handoff.md`) y puede devolverla. Hay operadores sin carpeta (`solo team-backlog`) para quien solo recolecta tareas, y `preferences.md` opcional para la forma de trabajar de cada uno, que no puede contradecir `rules.md`.
+- Decisiones del operador: soporte completo por carpeta de operador (en vez de documentar la limitación); nombres cortos y `operators.md` en lugar del correo en la ruta; `team-backlog.md` para lo sin dueño y `backlog.md` para lo tomado; las Reglas por defecto no se tocan: el bloque "Trabajo en paralelo" se agrega a `rules.md` solo en modo multi. Un proyecto de una sola persona no cambia (el diff de sus plantillas contra `main` está vacío). La vista de todos los operadores quedó en la Tarea 30.
+- Task-tracker: detecta el modo, resuelve el operador (con `--operator` o elección interactiva si no puede solo), muestra el operador en el título y avisa si falta `operators.md` habiendo carpetas de operador. Parser de `operators.md` en `scripts/_shared/parse/`.
+- Resultado (bytes / 3,1): inicio de sesión en un repo destino plano 6.149 B (igual que antes); en modo multi 8.945 B, +2.796 B ≈ +900 tokens por sesión que solo paga quien lo activa.
+- Verificación: `bun test` → 163 tests, todos pasan (40 nuevos); `bun run typecheck` sin errores; 0 enlaces relativos rotos; probado con un repo multi real. Sin bump de versión; sería minor, se decide al publicar.
+- Commits: `dd152ef`, `3941426`, `cdc7db8`, `69c307f`, `48d72d5`, `af78ce1`, `274d2b6`, `27add45`, `289932f`, `a94adb9`, `eb1d51d`, `6b33aee` y el de cierre, en la rama `feat/multi-operator`.
+
 ## 2026-10-06 — ✅ Tarea 29 — Política de lectura selectiva del skill y de la migración
 
 - El skill se aplica una vez por repo; las sesiones siguientes solo leen lo generado. Por eso la política de uso diario quedó en el `AGENTS.md` del repo destino (leer `docs/README.md`, `rules.md` y `handoff.md`; el resto solo si la tarea lo exige; sin leer `backlog.md`/`history.md` con tarea en curso) y la de `SKILL.md` solo cubre generar y migrar (medir antes de leer, `cp` en vez de leer y reescribir, de a un archivo).

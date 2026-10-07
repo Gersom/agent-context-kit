@@ -7,6 +7,7 @@ import type {
   CurrentTaskLine,
   Group,
   HistoryEntry,
+  OperatorEntry,
   ParsedPausedTask,
   PlanStep,
   Subsection,
@@ -84,7 +85,16 @@ export interface SnapshotRead {
   needsRetry: boolean;
 }
 
-export type ResolveOk = { ok: true; agentsDir: string; projectName: string; projectDir: string };
+/**
+ * Modo multi-operador: `agentsDir` es la raíz de agentes (con `operators.md`) y `multi` dice qué
+ * abrir. `operator`: panel que se abre de frente (segundo argumento); `preferred`: carpeta del
+ * operador del correo de git, o `null` si no figura con carpeta.
+ */
+export interface MultiInfo {
+  operator?: string;
+  preferred: string | null;
+}
+export type ResolveOk = { ok: true; agentsDir: string; projectName: string; projectDir: string; multi?: MultiInfo };
 export type ResolveError = { ok: false; error: string; tried: string[] };
 export type ResolveResult = ResolveOk | ResolveError;
 
@@ -103,6 +113,19 @@ export interface RenderMeta {
   projectName: string;
   /** Ruta del repo (o la carpeta vigilada, si no sigue la estructura `docs/agents`). */
   projectDir: string;
+  /** Carpeta del operador vigilado (modo multi-operador); se muestra en el encabezado. */
+  operator?: string;
+  /** Tareas sin dueño (modo multi-operador): se pintan en el recuadro "SIN DUEÑO" debajo de las bloqueadas. */
+  teamBacklog?: TeamBacklogModel;
+  /** En modo multi-operador, qué vista es (cambia las teclas que indica el pie). */
+  multiView?: "team" | "operator";
+  /**
+   * `true`: los recuadros de tareas, salvo en progreso y pausadas, muestran una sola tarea (la más
+   * reciente) y cuántas más hay, para ocupar menos pantalla.
+   */
+  compact?: boolean;
+  /** `false`: sin las líneas de flecha entre recuadros. Por defecto `true`. */
+  arrows?: boolean;
   updatedAt: Date;
   trigger: DrawTrigger;
   /** Por defecto `"ctrl-c"`. */
@@ -110,4 +133,62 @@ export interface RenderMeta {
   width?: number;
   /** `false` para salida sin códigos ANSI (tests); por defecto, lo que detecte picocolors. */
   color?: boolean;
+}
+
+/** Lo leído de un operador en la vista de equipo; `snapshot: null` si no tiene carpeta (`solo team-backlog`). */
+export interface TeamOperatorRead {
+  entry: OperatorEntry;
+  snapshot: SnapshotRead | null;
+}
+
+/** Lo leído para la vista de equipo: cada operador, el `team-backlog.md` y los avisos de lectura. */
+export interface TeamRead {
+  operators: TeamOperatorRead[];
+  teamBacklogText: string | null;
+  warnings: string[];
+  needsRetry: boolean;
+}
+
+/** Fila del recuadro EQUIPO: un operador, lo que está haciendo y sus conteos. */
+export interface TeamRow {
+  folder: string;
+  /** `(solo team-backlog)`: no tiene carpeta propia, así que no se puede abrir. */
+  folderless: boolean;
+  /** `true` si su carpeta no tiene `handoff.md` legible (la fila lo indica). */
+  missing: boolean;
+  current: { label: string; number: number; title: string; done: number; total: number } | null;
+  counts: { free: number; blocked: number };
+  /** Última entrada de su `history.md` (las más nuevas van primero). */
+  lastCompleted: HistoryEntry | null;
+}
+
+/** Tarea del `team-backlog.md` lista para pintar (sin número). */
+export interface TeamBacklogTask {
+  title: string;
+  /** Tag y motivo del bloqueo vigente; `tag: null` si no está bloqueada. */
+  block: BlockInfo;
+}
+
+/** Tareas sin dueño: libres primero, después las bloqueadas. */
+export interface TeamBacklogModel {
+  /** `false` si no existe `team-backlog.md` (no se pinta el recuadro). */
+  present: boolean;
+  free: TeamBacklogTask[];
+  blocked: TeamBacklogTask[];
+  warnings: string[];
+}
+
+/** Modelo de la vista de equipo. */
+export interface TeamModel {
+  rows: TeamRow[];
+  teamBacklog: TeamBacklogModel;
+  warnings: string[];
+}
+
+/** Metadatos de la vista de equipo: los de siempre más qué fila está elegida y cuál es "tú". */
+export interface TeamRenderMeta extends RenderMeta {
+  /** Carpeta del operador elegido en el selector. */
+  selected: string | null;
+  /** Carpeta del operador del correo de git (se marca con `(tú)`). */
+  preferred: string | null;
 }

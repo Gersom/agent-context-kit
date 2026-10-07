@@ -91,3 +91,28 @@ Solo después de la confirmación se ejecuta la migración — nunca se mueve o 
 - No lee el contenido de archivos para clasificarlos ni los que no tienen mapeo.
 - No reformatea contenido dentro de `docs/others/` — ese contenido no se transforma, solo se resguarda para que no se pierda ni quede invisible.
 - No decide fusiones ambiguas por su cuenta sin pasar por la ronda de confirmación.
+
+---
+
+## Pasar de plano a multi-operador
+
+Caso distinto al de arriba: el repo **ya usa este skill** en estructura plana (`docs/agents/handoff.md`, etc.) y se suma otra persona. Se pasa al modo de [`multi-operator.md`](./multi-operator.md) sin perder nada. Se dispara solo si el operador lo pide (ej. *"usa agent-context-kit para pasar a multi-operador"*); la política de lectura de [`../SKILL.md`](../SKILL.md) rige igual.
+
+**Antes de tocar nada**, verificar con `git status --porcelain docs/agents` que no haya cambios sin commitear (si los hay, avisar y pedir que se commiteen) y preguntar en una sola tanda:
+
+1. ¿Con qué nombre corto y qué correo(s) de git se registra el operador actual? (propuesta: el correo de `git config user.email`)
+2. ¿Quiénes más van a trabajar? Su nombre corto y correo se agregan a `operators.md`; quien solo agregue tareas se registra como `(solo team-backlog)` y no tiene carpeta.
+3. ¿Alguna tarea del `backlog.md` actual debe pasar al `team-backlog.md` (sin dueño)? Se listan solo los títulos (`grep -n "^###"`). Por defecto ninguna: todas quedan con el operador actual y la numeración continúa.
+
+**Ejecución** (comandos de archivo, sin leer los archivos enteros):
+
+1. `docs/agents/<operador>/`: crear la carpeta y mover con `git mv` `handoff.md`, `backlog.md` e `history.md`. No se renombra ni se reescribe nada de su contenido, salvo el enlace a `rules.md` del `handoff.md`, que pasa a `../rules.md`.
+2. Crear `docs/agents/operators.md` desde `template/multi/operators.md` con las líneas de las respuestas 1 y 2, y `docs/agents/team-backlog.md` desde `template/multi/team-backlog.md`. Si se eligieron tareas en la respuesta 3, moverlas ahí sin número, con `Agregada: <fecha> por <operador>`, y sacarlas del `backlog.md` (el contador no retrocede).
+3. `AGENTS.md` de la raíz: reemplazar la sección delimitada por `<!-- agent-docs-skill:start -->`/`end` por la de `template/multi/AGENTS.md`; `CLAUDE.md` no cambia.
+4. `docs/README.md`: actualizar solo el árbol de `agents/` (ver la guía de `template/README.md`).
+5. `docs/agents/rules.md`: agregar, antes de "## Enlaces", el bloque "Trabajo en paralelo" de `template/multi/rules.md` (ver "Reglas en modo multi-operador" de [`multi-operator.md`](./multi-operator.md)); las Reglas por defecto no se tocan. En `docs/README.md`, pasar la definición de "operador" a plural.
+6. Dejar registro: una entrada ✅ Hecha en el `history.md` del operador (qué pasó a multi y quiénes quedaron registrados), sin número de tarea.
+
+Los demás operadores no hacen nada especial: al hacer `pull`, su agente no encuentra su correo (o lo encuentra, si se registró en la respuesta 2) y se lo pregunta.
+
+**No hace:** volver de multi a plano (se hace a mano: mover los tres archivos del único operador de vuelta a `docs/agents/` y borrar `operators.md` y `team-backlog.md`) ni tocar `docs/project/`, `external/` o `plans/`.

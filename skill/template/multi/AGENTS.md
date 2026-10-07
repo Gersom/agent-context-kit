@@ -1,4 +1,15 @@
-# Claude
+<!--
+GUÍA para el agente, no se copia literal. Variante de `template/AGENTS.md` para el modo
+multi-operador (ver `docs/multi-operator.md`): reemplaza al `AGENTS.md` plano, no se suman.
+Ajustar la ruta `docs/` (puede ser `agent-context/`), igual que en la plantilla plana.
+Debe mantenerse lo más corto posible: se lee en cada sesión.
+
+Si el archivo ya existe con contenido propio del operador, no se sobrescribe: se agrega
+la sección delimitada de abajo al final, solo si el marcador no está ya presente.
+-->
+
+<!-- agent-docs-skill:start -->
+## Documentación de contexto para agentes
 
 Antes de cualquier tarea, lee en este orden:
 
@@ -8,3 +19,4 @@ Antes de cualquier tarea, lee en este orden:
 4. `docs/agents/<tu-carpeta>/handoff.md` — estado actual de tu trabajo; y `preferences.md` si existe.
 
 El resto, solo si la tarea lo exige. Con una tarea en curso en tu `handoff.md`, no leas ningún `backlog.md` ni `history.md` salvo que la tarea lo requiera; sin tarea en curso, mira la lista de títulos de tu `backlog.md` y la de `docs/agents/team-backlog.md` solo si no te pidieron algo concreto. Una tarea que te pidan agregar va a tu `backlog.md`, salvo que digan explícitamente que es para el equipo (`team-backlog.md`); di en cuál la agregaste. Si figuras en `operators.md` como «solo team-backlog», no tienes carpeta: tus tareas van al `team-backlog.md`. Las carpetas de otros operadores, solo si te lo piden o tu tarea depende de ellas, y **nunca las edites**. Un archivo grande se lee por búsqueda (`grep -n`) o por rango, no entero.
+<!-- agent-docs-skill:end -->

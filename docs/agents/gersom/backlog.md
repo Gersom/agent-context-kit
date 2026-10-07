@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 30
+**Próximo número de tarea:** 32
 
 ---
 
@@ -46,7 +46,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Bloqueos:** `[Resuelto el 2026-09-24]` — era `[postergada]` conviene tener el contenido de `SKILL.md` y las plantillas de `example/`/`template/` terminadas antes de empaquetar. Confirmado al cerrar la Tarea 5: `SKILL.md` no tiene placeholders y el catálogo de `template/` está completo desde el 2026-09-22 (ver `history.md`).
 - **Desbloquea:** Tarea 4.
 - **Disparador:** cuando el operador quiera distribuir el skill para uso directo en Claude, o priorice esta tarea explícitamente.
-- **Detalles:** ver pendientes relacionados en [`../desing.md`](../desing.md).
+- **Detalles:** ver pendientes relacionados en [`../../desing.md`](../../desing.md).
 - **Agregada:** 2026-09-24.
 
 ### Tarea 15 — Crear script para validar si un proyecto cumple las normas del task-tracker
@@ -61,27 +61,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador la priorice; sirve también para verificar el resultado del prompt de la Tarea 19.
 - **Detalles:** las normas salen de `skill/docs/template-architecture.md` ("Anclas de sección") y de las plantillas de `skill/template/agents/`; ante una diferencia, gana la plantilla (Regla 4).
 - **Agregada:** 2026-10-05.
-
-### Tarea 19 — Prompt de normalización para repos que ya adoptaron el skill
-
-- **Descripción:** escribir el prompt que el operador corre en cada repo que adoptó el skill antes de las anclas (Tarea 9), para que el agente de ese repo agregue las anclas de sección y ajuste `backlog.md`/`handoff.md` (y el formato de `history.md`) a la estructura que lee el task-tracker. Se entrega al operador en el chat y queda guardado junto al script para reusarlo.
-- **Decisiones/temas a definir antes de empezar:** dónde queda guardado (propuesta: README de `scripts/task-tracker/`).
-- **Bloqueos:** `[Resuelto el 2026-10-05]` — era `[postergada]` hasta que el task-tracker llegue a su versión MVP (mínimo producto viable) — pedido del operador el 2026-10-05, porque el prompt tiene que reflejar la estructura final que lee el script. Qué cuenta como MVP lo decide el operador (el agente puede sugerirlo, el operador confirma). El operador confirmó el MVP el 2026-10-05, al cerrar la Tarea 21.
-- **Disparador:** cuando el operador la tome (el MVP ya está confirmado).
-- **Detalles:** antes estaba dentro de la Tarea 11; se sacó a esta tarea a pedido del operador. La Tarea 15 (validador) puede servir para verificar el resultado del prompt en cada repo.
-- **Agregada:** 2026-10-05.
-
-### Tarea 26 — Soportar varios operadores trabajando en paralelo
-
-- **Descripción:** el kit asume un solo operador y un solo hilo de trabajo. Diseñar cómo funcionan `handoff.md`, `backlog.md` y `history.md` cuando varias personas (cada una con su agente) trabajan a la vez y comparten el estado por git, para que un colaborador haga `pull` y retome el contexto sin preguntarle a quien hizo el trabajo, sin conflictos de merge constantes.
-- **Decisiones/temas a definir antes de empezar:**
-  - Si el kit debe soportar varios operadores o se documenta como limitación (decisión del operador).
-  - Puntos de choque: `handoff.md` se sobrescribe completo con una sola tarea en progreso (¿un handoff por persona o por rama? ¿varias tareas en progreso?); "Próximo número de tarea" lo tomarían dos personas y se repetirían números (¿rangos por persona?); las entradas nuevas de `history.md` van arriba y chocan en el merge; `rules.md` define "operador" en singular.
-  - Efecto en el task-tracker (qué tarea en progreso muestra) y en la Tarea 24; la solución debe respetar `docs/philosophy.md` (markdown plano, sin romper el flujo manual).
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador decida que el kit soporte colaboración entre varias personas, o cuando un segundo colaborador empiece a usarlo.
-- **Detalles:** nace de la conversación del 2026-10-06; es razonamiento de diseño, no se verificó con fuentes externas cómo lo resuelven otras herramientas.
-- **Agregada:** 2026-10-06.
 
 ### Tarea 24 — Script para gestionar las tareas (handoff, backlog, history)
 
