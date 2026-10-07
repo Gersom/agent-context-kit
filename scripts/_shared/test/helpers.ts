@@ -18,3 +18,17 @@ export function requireFixture(name: string, file: string): string {
   if (text == null) throw new Error(`Falta el fixture ${name}/${file}`);
   return text;
 }
+
+/** El fragmento de `text` que cubre un rango (los offsets son los del texto original, fin exclusivo). */
+export function sliceRange(text: string, range: { start: number; end: number }): string {
+  return text.slice(range.start, range.end);
+}
+
+/**
+ * Comprueba que `startLine`/`endLine` de un rango coinciden con sus offsets (líneas 1-based,
+ * `endLine` inclusive o `startLine - 1` si está vacío).
+ */
+export function lineNumbersMatch(text: string, range: { startLine: number; endLine: number; start: number; end: number }): boolean {
+  const lineAt = (offset: number) => text.slice(0, offset).split("\n").length;
+  return range.startLine === lineAt(range.start) && range.endLine === (range.end > range.start ? lineAt(range.end - 1) : range.startLine - 1);
+}

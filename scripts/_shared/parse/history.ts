@@ -3,6 +3,7 @@
 
 import type { HistoryEntry, ParsedHistory } from "../types.ts";
 import { commentStateAfter, isPlaceholder } from "./markdown.ts";
+import { LineIndex } from "./positions.ts";
 
 const H2_RE = /^##(?!#)\s+(.+?)\s*$/;
 const FENCE_RE = /^\s*(```|~~~)/;
@@ -15,14 +16,22 @@ const TRAILING_PAREN_RE = /\s*\([^)]*\)\s*$/;
 /**
  * Entradas de history.md: headers `## ` fuera de comentarios HTML y bloques de código que
  * llevan la marca ✅ (hecha) o ❌ (descartada). Los placeholders de la plantilla se ignoran.
+ * Cada entrada trae su `range` en el texto original: de su header hasta antes del siguiente `## `
+ * (sea o no una entrada, fuera de comentarios y bloques de código) o el fin del texto.
  * @param text documento con saltos de línea LF
  */
 export function parseHistory(text: string): ParsedHistory {
   const entries: HistoryEntry[] = [];
+  const index = new LineIndex(text);
+  // Línea (0-based) de cada `## ` válido, para cerrar el rango de cada entrada.
+  const h2Lines: number[] = [];
+  const pending: { entry: HistoryEntry; next: number; line: number }[] = [];
   let inComment = false;
   let inFence = false;
 
-  for (const line of text.split("\n")) {
+  const lines = text.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     const startsInComment = inComment;
     inComment = commentStateAfter(line, inComment);
     if (startsInComment) continue;
@@ -35,8 +44,17 @@ export function parseHistory(text: string): ParsedHistory {
 
     const h2 = line.match(H2_RE);
     if (!h2) continue;
+    h2Lines.push(i);
     const entry = parseEntry(h2[1]);
-    if (entry) entries.push(entry);
+    if (!entry) continue;
+    const next = h2Lines.length; // posición que tendrá el header siguiente en `h2Lines`
+    entries.push(entry);
+    pending.push({ entry, next, line: i });
+  }
+
+  for (const { entry, next, line } of pending) {
+    const start = index.lineStart(line + 1);
+    entry.range = index.range(start, next < h2Lines.length ? index.lineStart(h2Lines[next] + 1) : text.length);
   }
 
   return { entries };

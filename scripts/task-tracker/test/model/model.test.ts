@@ -16,7 +16,7 @@ describe("buildModel", () => {
     expect(current.number).toBe(12);
     expect(current.plan).toMatchObject({ done: 2, total: 5 });
     expect(current.plan.currentStep?.text).toBe("Paso 3 — Escribir el modelo");
-    expect(current.details).toEqual([
+    expect(current.details).toMatchObject([
       { title: "Qué falta", body: "Pasos 3 y 4." },
       { title: "Próximo paso concreto", body: "Paso 3 — escribir `model.js`.\nSegunda línea del próximo paso." },
     ]);
