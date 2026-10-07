@@ -11,6 +11,16 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-06 — ✅ Tarea 26 — Soportar varios operadores trabajando en paralelo
+
+- Modo multi-operador opcional (opt-in en la Ronda 3 de `questions-flow.md`): cada operador tiene su carpeta `docs/agents/<operador>/` con su `handoff.md`, `backlog.md` e `history.md`, así nadie edita los archivos de otro y desaparecen los conflictos de merge y los números repetidos. El modo se detecta por `docs/agents/operators.md`; el operador actual, por el correo de `git config user.email`. Las reglas y el diseño completo están en `skill/docs/multi-operator.md`.
+- Las tareas sin dueño van a `team-backlog.md`, sin numeración; quien la toma recibe el número de su secuencia (va a su `backlog.md` o directo a su `handoff.md`) y puede devolverla. Hay operadores sin carpeta (`solo team-backlog`) para quien solo recolecta tareas, y `preferences.md` opcional para la forma de trabajar de cada uno, que no puede contradecir `rules.md`.
+- Decisiones del operador: soporte completo por carpeta de operador (en vez de documentar la limitación); nombres cortos y `operators.md` en lugar del correo en la ruta; `team-backlog.md` para lo sin dueño y `backlog.md` para lo tomado; las Reglas por defecto no se tocan: el bloque "Trabajo en paralelo" se agrega a `rules.md` solo en modo multi. Un proyecto de una sola persona no cambia (el diff de sus plantillas contra `main` está vacío). La vista de todos los operadores quedó en la Tarea 30.
+- Task-tracker: detecta el modo, resuelve el operador (con `--operator` o elección interactiva si no puede solo), muestra el operador en el título y avisa si falta `operators.md` habiendo carpetas de operador. Parser de `operators.md` en `scripts/_shared/parse/`.
+- Resultado (bytes / 3,1): inicio de sesión en un repo destino plano 6.149 B (igual que antes); en modo multi 8.945 B, +2.796 B ≈ +900 tokens por sesión que solo paga quien lo activa.
+- Verificación: `bun test` → 163 tests, todos pasan (40 nuevos); `bun run typecheck` sin errores; 0 enlaces relativos rotos; probado con un repo multi real. Sin bump de versión; sería minor, se decide al publicar.
+- Commits: `dd152ef`, `3941426`, `cdc7db8`, `69c307f`, `48d72d5`, `af78ce1`, `274d2b6`, `27add45`, `289932f`, `a94adb9`, `eb1d51d`, `6b33aee` y el de cierre, en la rama `feat/multi-operator`.
+
 ## 2026-10-06 — ✅ Tarea 29 — Política de lectura selectiva del skill y de la migración
 
 - El skill se aplica una vez por repo; las sesiones siguientes solo leen lo generado. Por eso la política de uso diario quedó en el `AGENTS.md` del repo destino (leer `docs/README.md`, `rules.md` y `handoff.md`; el resto solo si la tarea lo exige; sin leer `backlog.md`/`history.md` con tarea en curso) y la de `SKILL.md` solo cubre generar y migrar (medir antes de leer, `cp` en vez de leer y reescribir, de a un archivo).

@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 30
+**Próximo número de tarea:** 31
 
 ---
 
@@ -71,18 +71,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** antes estaba dentro de la Tarea 11; se sacó a esta tarea a pedido del operador. La Tarea 15 (validador) puede servir para verificar el resultado del prompt en cada repo.
 - **Agregada:** 2026-10-05.
 
-### Tarea 26 — Soportar varios operadores trabajando en paralelo
-
-- **Descripción:** el kit asume un solo operador y un solo hilo de trabajo. Diseñar cómo funcionan `handoff.md`, `backlog.md` y `history.md` cuando varias personas (cada una con su agente) trabajan a la vez y comparten el estado por git, para que un colaborador haga `pull` y retome el contexto sin preguntarle a quien hizo el trabajo, sin conflictos de merge constantes.
-- **Decisiones/temas a definir antes de empezar:**
-  - Si el kit debe soportar varios operadores o se documenta como limitación (decisión del operador).
-  - Puntos de choque: `handoff.md` se sobrescribe completo con una sola tarea en progreso (¿un handoff por persona o por rama? ¿varias tareas en progreso?); "Próximo número de tarea" lo tomarían dos personas y se repetirían números (¿rangos por persona?); las entradas nuevas de `history.md` van arriba y chocan en el merge; `rules.md` define "operador" en singular.
-  - Efecto en el task-tracker (qué tarea en progreso muestra) y en la Tarea 24; la solución debe respetar `docs/philosophy.md` (markdown plano, sin romper el flujo manual).
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador decida que el kit soporte colaboración entre varias personas, o cuando un segundo colaborador empiece a usarlo.
-- **Detalles:** nace de la conversación del 2026-10-06; es razonamiento de diseño, no se verificó con fuentes externas cómo lo resuelven otras herramientas.
-- **Agregada:** 2026-10-06.
-
 ### Tarea 24 — Script para gestionar las tareas (handoff, backlog, history)
 
 - **Descripción:** script nuevo en `scripts/` (el task-tracker sigue siendo solo de lectura) con comandos que el agente ejecuta en vez de editar a mano `handoff.md`, `backlog.md` y `history.md`: agregar una tarea, empezarla, marcar el paso en que va, pausarla, bloquearla o desbloquearla y cerrarla (hecha o descartada). Al cerrar aplica lo mecánico de las Reglas 5 a 8: actualiza los tres archivos, "Próximo número de tarea" y las anclas, lista las bloqueadas a revisar y genera el reporte de cierre. Con comandos de lectura compactos (`next`, `show N`, `status`) para no leer `history.md` (~55 KB) ni todo el backlog.
@@ -98,6 +86,15 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador la priorice.
 - **Detalles:** surgió el 2026-10-05: busca bajar el consumo de tokens (menos lectura y reescritura) y evitar errores mecánicos (anclas olvidadas, números repetidos). La Tarea 15 (validador) sirve de red de seguridad.
 - **Agregada:** 2026-10-05.
+
+### Tarea 30 — Vista de equipo en el task-tracker (todos los operadores)
+
+- **Descripción:** en el modo multi-operador (Tarea 26), mostrar en el task-tracker las tareas en progreso, libres y completadas de todos los operadores y del `team-backlog.md`, además de las del operador actual (que la Tarea 26 ya resuelve).
+- **Decisiones/temas a definir antes de empezar:** cómo se muestra (recuadros por operador, filtro, tecla para cambiar de vista); cómo lee el `team-backlog.md`, que no lleva números; es solo lectura, nunca edita carpetas ajenas.
+- **Bloqueos:** `[Resuelto el 2026-10-06]` — era `[dependencia]` de la Tarea 26 (define la estructura multi-operador y cómo se resuelve el operador actual); cerrada ese día.
+- **Disparador:** cuando el operador la priorice.
+- **Detalles:** nace de la conversación del 2026-10-06, al definir el alcance de la Tarea 26. Ya existen el parser de `operators.md` (`scripts/_shared/parse/operators.ts`) y la resolución del operador actual (`scripts/task-tracker/src/io/operator.ts`).
+- **Agregada:** 2026-10-06.
 
 <!-- agent-context-kit:section=blocked -->
 ## Tareas bloqueadas / pospuestas
