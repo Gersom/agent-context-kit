@@ -8,7 +8,17 @@
 
 import picocolors from "picocolors";
 import { formatTime } from "../shared/time.ts";
-import type { BlockedTask, DrawTrigger, Model, Plan, RenderMeta } from "../shared/types.ts";
+import type {
+  BlockedTask,
+  DrawTrigger,
+  Model,
+  Plan,
+  RenderMeta,
+  TeamBacklogModel,
+  TeamModel,
+  TeamRenderMeta,
+  TeamRow,
+} from "../shared/types.ts";
 import type { HistoryEntry, TaskRef } from "../../../_shared/types.ts";
 import { boxBottom, boxRow, boxTop, type Paint, type Segment } from "./box.ts";
 import { displayProjectName, plainText, progressBar, shortTaskName, truncate, visibleLength } from "./format.ts";
@@ -31,8 +41,11 @@ type Colors = ReturnType<typeof picocolors.createColors>;
 /** Agrega una fila al recuadro abierto: sangría + tramos con estilo. */
 type Row = (indent: number, ...segments: Segment[]) => void;
 
-/** Pantalla completa (ver `RenderMeta`). */
-export function render(model: Model, meta: RenderMeta): string {
+/**
+ * Lienzo de una pantalla: las líneas, los recuadros y el encabezado ya escrito. `subtitle` es lo
+ * que va después del nombre del proyecto (el operador en su panel, "equipo" en la vista de equipo).
+ */
+function createCanvas(meta: RenderMeta, subtitle?: string) {
   const pc: Colors = meta.color === undefined ? picocolors : picocolors.createColors(meta.color);
   const width = screenWidth(meta.width);
   const out: string[] = [];
@@ -53,11 +66,35 @@ export function render(model: Model, meta: RenderMeta): string {
   };
 
   // Encabezado
-  const operator = meta.operator ? ` · ${meta.operator}` : "";
-  line(0, `▣ ${displayProjectName(meta.projectName)}${operator}`, (s) => pc.bold(pc.magenta(s)));
+  line(0, `▣ ${displayProjectName(meta.projectName)}${subtitle ? ` · ${subtitle}` : ""}`, (s) => pc.bold(pc.magenta(s)));
   line(2, meta.projectDir, secondary);
   line(2, `Última actualización ${formatTime(meta.updatedAt)} · ${triggerText(meta.trigger)}`, secondary);
   blank();
+
+  return { pc, width, out, line, blank, box, secondary, completedGreen };
+}
+
+type Canvas = ReturnType<typeof createCanvas>;
+
+/** Avisos, notas y pie con las teclas; cierra la pantalla y la devuelve como texto. */
+function finishCanvas({ out, line, blank, secondary, pc }: Canvas, meta: RenderMeta, model: { notes?: string[]; warnings: string[] }): string {
+  const notes = model.notes ?? [];
+  if (notes.length || model.warnings.length) blank();
+  for (const note of notes) line(0, `ℹ ${note}`, secondary);
+  for (const warning of model.warnings) line(0, `! ${warning}`, pc.yellow);
+
+  const footer = footerText(meta.controls ?? "ctrl-c", meta.multiView);
+  if (footer) {
+    blank();
+    line(0, footer, secondary);
+  }
+  return out.join("\n") + "\n";
+}
+
+/** Panel de un operador (o del proyecto, en modo plano). Ver `RenderMeta`. */
+export function render(model: Model, meta: RenderMeta): string {
+  const canvas = createCanvas(meta, meta.operator);
+  const { pc, width, box, secondary, completedGreen } = canvas;
 
   // history.md (compacto)
   if (model.hasHistory) {
@@ -118,17 +155,72 @@ export function render(model: Model, meta: RenderMeta): string {
     }
   }
 
-  // Notas y avisos, fuera de los recuadros
-  if (model.notes.length || model.warnings.length) blank();
-  for (const note of model.notes) line(0, `ℹ ${note}`, secondary);
-  for (const warning of model.warnings) line(0, `! ${warning}`, pc.yellow);
+  // team-backlog.md (modo multi-operador): las tareas sin dueño, debajo de las bloqueadas
+  if (meta.teamBacklog) teamBacklogBox(canvas, meta.teamBacklog);
 
-  const footer = footerText(meta.controls ?? "ctrl-c");
-  if (footer) {
-    blank();
-    line(0, footer, secondary);
+  return finishCanvas(canvas, meta, { notes: model.notes, warnings: [...model.warnings, ...(meta.teamBacklog?.warnings ?? [])] });
+}
+
+/**
+ * Vista de equipo (modo multi-operador): el recuadro EQUIPO, que es el selector (una fila por
+ * operador, con el elegido marcado con `›` y el del correo de git con `(tú)`), y las tareas sin dueño.
+ */
+export function renderTeam(team: TeamModel, meta: TeamRenderMeta): string {
+  const canvas = createCanvas(meta, "equipo");
+  const { pc, box, secondary } = canvas;
+
+  box(`EQUIPO (${team.rows.length})`, "operators.md", pc.green, (row) => {
+    if (!team.rows.length) row(0, { paint: secondary, text: "Ningún operador registrado en operators.md" });
+    // Nombres alineados en columna: la carpeta y, si es el operador del correo de git, "(tú)".
+    const label = (op: TeamRow) => op.folder + (op.folder === meta.preferred ? " (tú)" : "");
+    const nameWidth = Math.max(0, ...team.rows.map((op) => visibleLength(label(op))));
+    for (const op of team.rows) {
+      const chosen = op.folder === meta.selected && !op.folderless;
+      const mark = chosen ? "› " : "  ";
+      const padded = label(op) + " ".repeat(nameWidth - visibleLength(label(op)));
+      const name = { paint: (s: string) => (chosen ? pc.bold(pc.green(s)) : pc.bold(s)), text: `${mark}${padded}` };
+      if (op.folderless) {
+        row(0, name, { paint: secondary, text: "  (solo team-backlog)" });
+      } else if (op.missing) {
+        row(0, name, { paint: pc.yellow, text: "  (sin handoff.md)" });
+      } else if (op.current) {
+        const plan = op.current.total ? ` · plan ${op.current.done}/${op.current.total}` : "";
+        row(0, name, { text: `  ${op.current.label} ${op.current.number} — ${op.current.title}${plan}` });
+      } else {
+        row(0, name, { paint: secondary, text: "  Sin tarea en curso" });
+      }
+      if (!op.folderless && !op.missing) row(4, { paint: secondary, text: summaryLine(op) });
+    }
+  });
+
+  if (team.teamBacklog.present) teamBacklogBox(canvas, team.teamBacklog);
+  return finishCanvas(canvas, meta, { warnings: team.warnings });
+}
+
+/** Segunda línea de la fila de un operador: conteos y su última tarea completada. */
+function summaryLine(op: TeamRow): string {
+  const parts = [`libres ${op.counts.free}`, `bloqueadas ${op.counts.blocked}`];
+  const done = op.lastCompleted;
+  if (done) {
+    const name = done.number == null ? done.title : shortTaskName(done.number, done.title);
+    parts.push(`último cierre: ${name}${done.date ? ` (${done.date})` : ""}`);
   }
-  return out.join("\n") + "\n";
+  return parts.join(" · ");
+}
+
+/** Recuadro "SIN DUEÑO": las tareas del team-backlog.md, libres primero y después las bloqueadas. */
+function teamBacklogBox({ box, pc, secondary }: Canvas, backlog: TeamBacklogModel): void {
+  if (!backlog.present) return;
+  const total = backlog.free.length + backlog.blocked.length;
+  box(`SIN DUEÑO (${total})`, "team-backlog.md", pc.blue, (row) => {
+    if (!total) row(0, { paint: secondary, text: "Ninguna" });
+    for (const task of backlog.free) row(0, { paint: pc.blue, text: `• ${task.title}` });
+    for (const task of backlog.blocked) {
+      const tag = task.block.tag ? ` [${task.block.tag}]` : "";
+      row(0, { paint: pc.red, text: `• ${task.title}${tag}` });
+      if (task.block.reason) row(4, { paint: secondary, text: `→ ${task.block.reason}` });
+    }
+  });
 }
 
 /**
@@ -148,8 +240,12 @@ export function triggerText(trigger: DrawTrigger): string {
   return trigger.file ? `se modificó ${trigger.file}` : "cambio detectado";
 }
 
-function footerText(controls: NonNullable<RenderMeta["controls"]>): string | null {
-  if (controls === "keys") return "q o Ctrl+C para salir · r para redibujar";
+function footerText(controls: NonNullable<RenderMeta["controls"]>, multiView: RenderMeta["multiView"]): string | null {
+  if (controls === "keys") {
+    if (multiView === "team") return "↑/↓ elegir · Enter abrir · q o Ctrl+C salir · r redibujar";
+    if (multiView === "operator") return "b o Esc volver al equipo · q o Ctrl+C salir · r redibujar";
+    return "q o Ctrl+C para salir · r para redibujar";
+  }
   if (controls === "ctrl-c") return "Ctrl+C para salir";
   return null;
 }

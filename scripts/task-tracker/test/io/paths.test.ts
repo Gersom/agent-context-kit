@@ -75,29 +75,36 @@ describe("resolveAgentsDir", () => {
 describe("resolveAgentsDir en modo multi-operador", () => {
   const multi = () => join(root, "multi-app");
 
-  test("detecta operators.md y resuelve la carpeta del operador por su correo", () => {
+  test("detecta operators.md: vigila la raíz de agentes (vista de equipo) y deja al operador del correo como preferido", () => {
     const result = expectOk(resolveAgentsDir(multi(), undefined, { email: "Ana@Mail.com" }));
-    expect(result.agentsDir).toBe(join(multi(), "docs", "agents", "ana"));
-    expect(result.operator).toBe("ana");
+    expect(result.agentsDir).toBe(join(multi(), "docs", "agents"));
+    expect(result.multi).toEqual({ preferred: "ana" });
     expect(result.projectName).toBe("multi-app");
     expect(result.projectDir).toBe(multi());
   });
 
-  test("--operator indica la carpeta sin mirar el correo", () => {
-    const result = expectOk(resolveAgentsDir(multi(), undefined, { operator: "ana", email: null }));
-    expect(result.operator).toBe("ana");
+  test("un correo que no figura (o figura sin carpeta) no es un error: solo no hay preferido", () => {
+    expect(expectOk(resolveAgentsDir(multi(), undefined, { email: "otra@mail.com" })).multi).toEqual({ preferred: null });
+    expect(expectOk(resolveAgentsDir(multi(), undefined, { email: "luis@mail.com" })).multi).toEqual({ preferred: null });
+    expect(expectOk(resolveAgentsDir(multi(), undefined, { email: null })).multi).toEqual({ preferred: null });
   });
 
-  test("si no se resuelve solo, informa el motivo y las carpetas a elegir", () => {
-    const unknown = expectError(resolveAgentsDir(multi(), undefined, { email: "otra@mail.com" }));
-    expect(unknown.error).toContain("otra@mail.com no figura");
-    expect(unknown.operatorChoices).toEqual(["ana"]);
-    expect(expectError(resolveAgentsDir(multi(), undefined, { email: "luis@mail.com" })).error).toContain("solo team-backlog");
+  test("el operador pedido abre su panel de frente, sin mirar el correo", () => {
+    const result = expectOk(resolveAgentsDir(multi(), undefined, { operator: "ANA", email: null }));
+    expect(result.multi).toEqual({ preferred: null, operator: "ana" });
   });
 
-  test("la carpeta de un operador pasada directamente también sirve", () => {
-    const result = expectOk(resolveAgentsDir(join(multi(), "docs", "agents", "ana")));
-    expect(result.operator).toBe("ana");
+  test("un operador que no figura con carpeta es un error que lista los que sí", () => {
+    const unknown = expectError(resolveAgentsDir(multi(), undefined, { operator: "nadie", email: null }));
+    expect(unknown.error).toContain("«nadie» no figura con carpeta");
+    expect(unknown.error).toContain("Operadores con carpeta: ana");
+    expect(expectError(resolveAgentsDir(multi(), undefined, { operator: "luis", email: null })).error).toContain("no figura con carpeta");
+  });
+
+  test("la carpeta de un operador pasada directamente abre su panel", () => {
+    const result = expectOk(resolveAgentsDir(join(multi(), "docs", "agents", "ana"), undefined, { email: null }));
+    expect(result.agentsDir).toBe(join(multi(), "docs", "agents"));
+    expect(result.multi).toEqual({ preferred: null, operator: "ana" });
     expect(result.projectName).toBe("multi-app");
   });
 

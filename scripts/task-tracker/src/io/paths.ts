@@ -3,7 +3,7 @@
 
 import { existsSync, statSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, resolve } from "node:path";
-import type { ResolveResult } from "../shared/types.ts";
+import type { MultiInfo, ResolveResult } from "../shared/types.ts";
 import { isMultiDir, OPERATORS_FILE, operatorFolders, resolveOperator } from "./operator.ts";
 
 /** Subcarpetas donde el skill genera la documentación, relativas a la raíz del proyecto. */
@@ -74,7 +74,7 @@ export function resolveAgentsDir(
     if (isMultiDir(dir)) return resolveMulti(dir, options);
     if (existsSync(join(dir, "handoff.md"))) {
       // La carpeta de un operador pasada directamente: su padre tiene operators.md.
-      if (isMultiDir(dirname(dir))) return multiOk(dirname(dir), basename(dir));
+      if (isMultiDir(dirname(dir))) return resolveMulti(dirname(dir), options, basename(dir));
       return { ok: true, agentsDir: dir, projectName: projectNameFor(dir), projectDir: projectDirFor(dir) };
     }
   }
@@ -92,25 +92,26 @@ export function resolveAgentsDir(
   return { ok: false, error: "No se encontró handoff.md en ninguna de estas carpetas:", tried: candidates };
 }
 
-function multiOk(agentsRoot: string, folder: string): ResolveResult {
-  return {
-    ok: true,
-    agentsDir: join(agentsRoot, folder),
-    projectName: projectNameFor(agentsRoot),
-    projectDir: projectDirFor(agentsRoot),
-    operator: folder,
-  };
-}
+/**
+ * Modo multi-operador: abre la vista de equipo, o de frente el panel de `options.operator` (o de
+ * `direct`, la carpeta pasada como ruta). El operador del correo de git queda como `preferred`;
+ * que no figure no es un error, solo no hay fila preseleccionada.
+ */
+function resolveMulti(agentsRoot: string, options: ResolveOptions, direct?: string): ResolveResult {
+  const repoDir = projectDirFor(agentsRoot);
+  const mine = resolveOperator(agentsRoot, { email: options.email, repoDir });
+  const multi: MultiInfo = { preferred: mine.ok ? mine.folder : null };
 
-function resolveMulti(agentsRoot: string, options: ResolveOptions): ResolveResult {
-  const found = resolveOperator(agentsRoot, { ...options, repoDir: projectDirFor(agentsRoot) });
-  if (found.ok) return multiOk(agentsRoot, found.folder);
-  return {
-    ok: false,
-    error: found.error,
-    tried: [join(agentsRoot, OPERATORS_FILE)],
-    operatorChoices: found.choices.length ? found.choices : undefined,
-  };
+  const wanted = options.operator ?? direct;
+  if (wanted) {
+    const found = resolveOperator(agentsRoot, { operator: wanted, repoDir });
+    if (!found.ok) {
+      const choices = found.choices.length ? ` Operadores con carpeta: ${found.choices.join(", ")}.` : "";
+      return { ok: false, error: found.error + choices, tried: [join(agentsRoot, OPERATORS_FILE)] };
+    }
+    multi.operator = found.folder;
+  }
+  return { ok: true, agentsDir: agentsRoot, projectName: projectNameFor(agentsRoot), projectDir: repoDir, multi };
 }
 
 /**

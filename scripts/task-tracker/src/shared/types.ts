@@ -85,10 +85,17 @@ export interface SnapshotRead {
   needsRetry: boolean;
 }
 
-/** `operator`: carpeta del operador vigilado, solo en modo multi-operador. */
-export type ResolveOk = { ok: true; agentsDir: string; projectName: string; projectDir: string; operator?: string };
-/** `operatorChoices`: carpetas entre las que elegir cuando el operador no se pudo resolver solo. */
-export type ResolveError = { ok: false; error: string; tried: string[]; operatorChoices?: string[] };
+/**
+ * Modo multi-operador: `agentsDir` es la raíz de agentes (con `operators.md`) y `multi` dice qué
+ * abrir. `operator`: panel que se abre de frente (segundo argumento); `preferred`: carpeta del
+ * operador del correo de git, o `null` si no figura con carpeta.
+ */
+export interface MultiInfo {
+  operator?: string;
+  preferred: string | null;
+}
+export type ResolveOk = { ok: true; agentsDir: string; projectName: string; projectDir: string; multi?: MultiInfo };
+export type ResolveError = { ok: false; error: string; tried: string[] };
 export type ResolveResult = ResolveOk | ResolveError;
 
 /**
@@ -108,6 +115,10 @@ export interface RenderMeta {
   projectDir: string;
   /** Carpeta del operador vigilado (modo multi-operador); se muestra en el encabezado. */
   operator?: string;
+  /** Tareas sin dueño (modo multi-operador): se pintan en el recuadro "SIN DUEÑO" debajo de las bloqueadas. */
+  teamBacklog?: TeamBacklogModel;
+  /** En modo multi-operador, qué vista es (cambia las teclas que indica el pie). */
+  multiView?: "team" | "operator";
   updatedAt: Date;
   trigger: DrawTrigger;
   /** Por defecto `"ctrl-c"`. */
@@ -165,4 +176,12 @@ export interface TeamModel {
   rows: TeamRow[];
   teamBacklog: TeamBacklogModel;
   warnings: string[];
+}
+
+/** Metadatos de la vista de equipo: los de siempre más qué fila está elegida y cuál es "tú". */
+export interface TeamRenderMeta extends RenderMeta {
+  /** Carpeta del operador elegido en el selector. */
+  selected: string | null;
+  /** Carpeta del operador del correo de git (se marca con `(tú)`). */
+  preferred: string | null;
 }
