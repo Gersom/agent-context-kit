@@ -35,11 +35,14 @@ agent-context-kit/
 │   ├── desing.md            # Documento de diseño: historial de decisiones y pendientes
 │   ├── architecture.md      # Este archivo
 │   ├── philosophy.md        # Principios de diseño: por qué el kit es lo que es
-│   └── agents/               # Dogfooding: este repo usa el skill sobre sí mismo
-│       ├── rules.md            # Reglas fijas de este repo
-│       ├── handoff.md          # Estado "en caliente" del trabajo
-│       ├── backlog.md          # Cola de tareas pendientes (libres / bloqueadas-pospuestas)
-│       └── history.md          # Historial de tareas resueltas (hechas ✅ / descartadas ❌)
+│   └── agents/               # Dogfooding: este repo usa el skill sobre sí mismo, en modo multi-operador
+│       ├── rules.md            # Reglas de este repo, de todos los operadores
+│       ├── operators.md        # Operadores y sus correos de git
+│       ├── team-backlog.md     # Tareas sin dueño, sin numeración
+│       └── gersom/             # Carpeta de un operador
+│           ├── handoff.md        # Estado "en caliente" de su trabajo
+│           ├── backlog.md        # Sus tareas pendientes (libres / bloqueadas-pospuestas)
+│           └── history.md        # Sus tareas resueltas (hechas ✅ / descartadas ❌)
 │
 └── skill/
     ├── SKILL.md              # Trigger + instrucciones de alto nivel del skill
@@ -63,7 +66,7 @@ agent-context-kit/
 
 - **`docs/philosophy.md`** — la razón de ser del kit y sus principios de diseño.
 - **`docs/desing.md`** — registro histórico de la conversación de diseño original; no es el estado actual (para eso, este archivo).
-- **`docs/agents/`** — dogfooding: este repo usa el skill sobre sí mismo (`rules.md`, `handoff.md`, `backlog.md` y `history.md` documentan el trabajo de este repo, con la estructura que el skill genera en un repo destino).
+- **`docs/agents/`** — dogfooding: este repo usa el skill sobre sí mismo en modo multi-operador (`rules.md`, `operators.md` y `team-backlog.md` son compartidos; cada operador tiene su carpeta con `handoff.md`, `backlog.md` e `history.md`, con la estructura que el skill genera en un repo destino).
 - **`skill/`** — el skill: [`SKILL.md`](../skill/SKILL.md) es el punto de entrada (resuelve el caso "ya existe documentación"), [`docs/`](../skill/docs/) tiene los flujos (`questions-flow.md`, `migration-flow.md`, y `multi-operator.md` para el modo de varias personas, que solo se abre si se activa) y qué es cada plantilla ([`template-architecture.md`](../skill/docs/template-architecture.md)), y `template/` es el catálogo de plantillas.
 - **`scripts/_shared/`** — código compartido entre los scripts: parseo de `handoff.md`, `backlog.md`, `history.md`, `operators.md` y `team-backlog.md` (`parse/`), tag de bloqueo y referencias entre tareas (`tasks/`), tipos del dominio y fixtures. Lo usan el task-tracker y los scripts que vengan.
 - **`scripts/task-tracker/`** — herramienta de este repo (no del skill, no se copia a los repos destino) que muestra en la terminal el estado de las tareas de un proyecto y se redibuja sola; se lanza con `bun run tasks [ruta]`. Uso, formatos y estructura interna: [`scripts/task-tracker/README.md`](../scripts/task-tracker/README.md).
