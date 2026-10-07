@@ -31,15 +31,17 @@ docs/agents/
 └── ana/              # otro operador, misma estructura
 ```
 
-`docs/project/`, `docs/external/`, `docs/plans/` y `docs/README.md` no cambian: son del proyecto y se comparten. Las decisiones técnicas van a `decisions.md`, no al `history.md` de nadie.
+Un operador que solo agrega tareas no tiene carpeta (ver "Quién es el operador actual"). `docs/project/`, `docs/external/`, `docs/plans/` y `docs/README.md` no cambian: son del proyecto y se comparten. Las decisiones técnicas van a `decisions.md`, no al `history.md` de nadie.
 
 ## Quién es el operador actual
 
 1. Leer `git config user.email` (si no está definido, preguntarle al operador su correo).
 2. Buscarlo, sin distinguir mayúsculas, en `operators.md` → esa es su carpeta.
-3. Si no está, preguntar: *"¿Con qué nombre corto te registro? (si ya figurás con otro correo, decime cuál)"*. Si es una persona nueva, crear su carpeta con las plantillas vacías y agregar su línea a `operators.md`; si ya existía, agregar el correo a su línea.
+3. Si no está, preguntar: *"¿Con qué nombre corto te registro? (si ya figurás con otro correo, decime cuál)"* y *"¿Vas a tomar tareas o solo a agregarlas al `team-backlog.md`?"*. Si es una persona nueva que toma tareas, crear su carpeta con las plantillas vacías y agregar su línea a `operators.md`; si solo agrega tareas, registrarla sin carpeta; si ya existía, agregar el correo a su línea.
 
 `operators.md` tiene una línea por operador, `- <carpeta>: <correo>, <correo>`, para que una persona con varios correos (trabajo, personal, `noreply` de GitHub) siga en la misma carpeta. Así el correo no aparece en las rutas.
+
+**Operador sin carpeta:** quien solo recolecta tareas (ej. quien habla con el cliente y no desarrolla) se registra como `- ana (solo team-backlog): <correo>`. No tiene `handoff.md`, `backlog.md` ni `history.md`: su agente solo agrega y edita tareas en el `team-backlog.md` y puede leer en solo lectura el avance de los demás.
 
 ## Numeración y referencias
 
@@ -59,8 +61,22 @@ docs/agents/
 - **Agregada:** <fecha> por <operador>
 ```
 
-- **Tomar una tarea:** el operador la quita del `team-backlog.md` y la agrega al suyo con el siguiente número de su secuencia y un campo `Origen: team-backlog`. Ambos cambios van en el mismo commit. **Una tarea vive en un solo backlog.**
+- **Tomar una tarea:** el operador la quita del `team-backlog.md` y recibe el siguiente número de su secuencia. Va a su `backlog.md` si la deja en espera, o **directo a su `handoff.md`** si la empieza ya (ej. una tarea chica). En los dos casos lleva `Origen: team-backlog`, que viaja hasta su entrada de `history.md`. El cambio va en el mismo commit que la quita del `team-backlog.md`. **Una tarea vive en un solo lugar.**
 - Si dos operadores toman la misma a la vez, el merge muestra un conflicto sobre ese bloque, en vez de dejar dos copias en silencio.
+- **Devolver una tarea** que no se puede seguir: se quita del `backlog.md` del operador y vuelve al `team-backlog.md`, sin número y con la nota `Devuelta por <operador> (antes T-N@operador)`. El número queda retirado y no se reutiliza.
+- **Quien solo recolecta tareas** completa como mínimo título y descripción; el desarrollador que la toma completa el resto.
+
+### Flujo de una tarea
+
+```
+team-backlog.md → backlog.md → handoff.md → history.md     (se toma y espera su turno)
+team-backlog.md →              handoff.md → history.md     (se toma y se empieza ya)
+                  backlog.md → handoff.md → history.md     (la agregó el propio operador)
+```
+
+### "Agrega esta tarea"
+
+Cuando un operador le pide al agente agregar una tarea, va a **su propio `backlog.md`**; solo va al `team-backlog.md` si lo dice explícitamente. Un operador sin carpeta no tiene backlog propio, así que sus tareas van al `team-backlog.md`. El agente dice en su respuesta en qué backlog la agregó.
 - Antes de tomarse se la referencia por título; después, como `T-N@operador`.
 
 ## Qué es de cada uno
