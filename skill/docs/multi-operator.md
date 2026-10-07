@@ -114,4 +114,4 @@ Ante la duda, si una preferencia cambia el código o los archivos compartidos, e
 
 ## Pasar de plano a multi
 
-Lo hace el operador existente cuando se suma otra persona (detalle en [`migration-flow.md`](./migration-flow.md)): se crea su carpeta, se mueven con `git mv` su `handoff.md`, `backlog.md` e `history.md` (la numeración continúa) y se crea `operators.md` y un `team-backlog.md` vacío. Las tareas que no sean suyas pueden pasar después al `team-backlog.md`.
+Lo hace el operador existente cuando se suma otra persona (detalle y comandos en [`migration-flow.md`](./migration-flow.md), "Pasar de plano a multi-operador"): se crea su carpeta, se mueven con `git mv` su `handoff.md`, `backlog.md` e `history.md` (la numeración continúa) y se crea `operators.md` y un `team-backlog.md` vacío. Las tareas que no sean suyas pueden pasar después al `team-backlog.md`.
