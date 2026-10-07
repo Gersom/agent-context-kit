@@ -126,3 +126,36 @@ describe("watchDir", () => {
     TEST_TIMEOUT_MS,
   );
 });
+
+describe("watchDir con una lista de archivos", () => {
+  test("solo avisa de los archivos indicados", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "task-tracker-watch-files-"));
+    const calls: (string | null)[] = [];
+    const stop = watchDir(dir, (file) => calls.push(file), () => {}, DEBOUNCE_MS, ["team-backlog.md"]);
+    try {
+      // Calentar: escribir el archivo vigilado hasta recibir el primer aviso.
+      let n = 0;
+      await waitFor(
+        () => {
+          if (calls.length > 0) return true;
+          writeFileSync(join(dir, "team-backlog.md"), `# ${n++}\n`);
+          return false;
+        },
+        { interval: DEBOUNCE_MS * 2 },
+      );
+      await sleep(QUIET_MS);
+      calls.length = 0;
+
+      writeFileSync(join(dir, "handoff.md"), "# no vigilado\n");
+      await sleep(QUIET_MS);
+      expect(calls).toEqual([]);
+
+      writeFileSync(join(dir, "team-backlog.md"), "# vigilado\n");
+      await waitFor(() => calls.length > 0);
+      expect(calls[0]).toBe("team-backlog.md");
+    } finally {
+      stop();
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }, TEST_TIMEOUT_MS);
+});

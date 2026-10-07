@@ -7,6 +7,7 @@ import type {
   CurrentTaskLine,
   Group,
   HistoryEntry,
+  OperatorEntry,
   ParsedPausedTask,
   PlanStep,
   Subsection,
@@ -114,4 +115,18 @@ export interface RenderMeta {
   width?: number;
   /** `false` para salida sin códigos ANSI (tests); por defecto, lo que detecte picocolors. */
   color?: boolean;
+}
+
+/** Lo leído de un operador en la vista de equipo; `snapshot: null` si no tiene carpeta (`solo team-backlog`). */
+export interface TeamOperatorRead {
+  entry: OperatorEntry;
+  snapshot: SnapshotRead | null;
+}
+
+/** Lo leído para la vista de equipo: cada operador, el `team-backlog.md` y los avisos de lectura. */
+export interface TeamRead {
+  operators: TeamOperatorRead[];
+  teamBacklogText: string | null;
+  warnings: string[];
+  needsRetry: boolean;
 }

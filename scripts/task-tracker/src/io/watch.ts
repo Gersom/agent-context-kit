@@ -15,6 +15,7 @@ function messageOf(caught: unknown): unknown {
  * watcher de un archivo puede perderse en ese reemplazo). Agrupa ráfagas de eventos con un
  * debounce, porque un solo guardado dispara varios.
  * @param onChange recibe el archivo que cambió (null si el SO no lo informa)
+ * @param files archivos que se vigilan (por defecto los de un operador; la raíz del modo multi usa `ROOT_WATCHED_FILES`)
  * @returns función para dejar de vigilar
  */
 export function watchDir(
@@ -22,6 +23,7 @@ export function watchDir(
   onChange: (changedFile: string | null) => void,
   onError: (message: string) => void,
   debounceMs = 150,
+  files: string[] = WATCHED_FILES,
 ): () => void {
   let timer: ReturnType<typeof setTimeout> | undefined;
   let lastFile: string | null = null;
@@ -29,7 +31,7 @@ export function watchDir(
   try {
     watcher = watch(dir, (_event, filename) => {
       const name = filename ? basename(filename.toString()) : null;
-      if (name && !WATCHED_FILES.includes(name)) return;
+      if (name && !files.includes(name)) return;
       lastFile = name;
       clearTimeout(timer);
       timer = setTimeout(() => onChange(lastFile), debounceMs);
