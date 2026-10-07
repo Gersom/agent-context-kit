@@ -15,9 +15,10 @@ import { requireOwnFolder } from "../workspace/ownership.ts";
 import { BLOCKING_TAGS } from "../write/blocking.ts";
 import { requiredFlag, singleLine, textFlag } from "../write/flags.ts";
 import { detectLanguage, NONE_RE, STRINGS } from "../write/language.ts";
+import { renderBacklogTask } from "../write/new-task.ts";
 import { reserveNextNumber } from "../write/numbering.ts";
 import { formatLocalDate, renderTaskBlock } from "../write/render.ts";
-import { backlogTasks, headerLabels, labelResolver } from "../write/samples.ts";
+import { headerLabels, labelResolver } from "../write/samples.ts";
 
 /** ¿El texto de `--bloqueo` bloquea la tarea? Si dice algo pero sin el tag esperado, avisa en vez de adivinar. */
 export function classifyBlocker(value: string): { blocked: boolean; warning: string | null } {
@@ -103,23 +104,18 @@ function addToBacklog(ctx: CommandContext, input: AddInput): void {
   }
 
   // Idioma y etiquetas: las de las tareas que el archivo ya tiene; si no hay, la tabla mínima.
-  const labels = headerLabels(docs);
-  const { lang, notice } = detectLanguage(labels);
+  const { lang, notice } = detectLanguage(headerLabels(docs));
   const S = STRINGS[lang];
-  const tasks = backlogTasks(docs);
-  const sectionTasks = kind.blocked ? backlog.parsed.blocked : backlog.parsed.free.tasks;
-  const label = labelResolver([...sectionTasks, ...tasks].map((task) => task.fields), S);
-  const header = `### ${labels[0] ?? S.task} ${reserved.number} — ${input.title}`;
-
-  const fields: Array<[string, string]> = [
-    [label("description"), input.description],
-    [label("decisions"), input.decisions ?? S.none],
-    [label("blockers"), input.blocker ?? S.none],
-    [label("trigger"), input.trigger ?? S.defaultTrigger],
-  ];
-  if (input.details) fields.push([label("details"), input.details]);
-  fields.push([label("added"), `${formatLocalDate(ctx.now())}.`]);
-  const block = renderTaskBlock(header, fields);
+  const block = renderBacklogTask(docs, S, kind.blocked ? backlog.parsed.blocked : backlog.parsed.free.tasks, {
+    number: reserved.number,
+    title: input.title,
+    description: input.description,
+    decisions: input.decisions,
+    blocker: input.blocker,
+    trigger: input.trigger,
+    details: input.details,
+    date: formatLocalDate(ctx.now()),
+  });
 
   const blocks = kind.blocked ? backlog.parsed.blocked : [...backlog.parsed.free.tasks, ...backlog.parsed.free.groups];
   const insert = insertBlock(backlog.text, section.bodyRange, block, {

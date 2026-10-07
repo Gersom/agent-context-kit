@@ -6,7 +6,8 @@ import { parseFields } from "../../../_shared/parse/blocks.ts";
 import { parseBacklog } from "../../../_shared/parse/backlog.ts";
 import { CliError } from "../../src/cli/errors.ts";
 import { detectLanguage, findFieldOfKind, isFieldKind, STRINGS } from "../../src/write/language.ts";
-import { reserveNextNumber } from "../../src/write/numbering.ts";
+import { renderBacklogTask } from "../../src/write/new-task.ts";
+import { reserveNextNumber, reserveNextNumbers } from "../../src/write/numbering.ts";
 import {
   carriedFields,
   fieldBody,
@@ -18,7 +19,7 @@ import {
   renderTaskBlock,
 } from "../../src/write/render.ts";
 import { labelResolver } from "../../src/write/samples.ts";
-import { BACKLOG_EMPTY, BACKLOG_RICH, HANDOFF_CURRENT, HANDOFF_IDLE, HISTORY_RICH } from "../fixtures.ts";
+import { BACKLOG_EMPTY, BACKLOG_RICH, HANDOFF_CURRENT, HANDOFF_EMPTY, HANDOFF_IDLE, HISTORY_RICH } from "../fixtures.ts";
 import { loadDocs, makeProject } from "../helpers.ts";
 
 describe("idioma", () => {
@@ -210,6 +211,14 @@ describe("reserveNextNumber", () => {
     expect(reserved.edit.text).toBe("21");
   });
 
+  test("reserva varios números seguidos y deja el contador en el último + 1", () => {
+    const docs = docsWith(BACKLOG_RICH);
+    const reserved = reserveNextNumbers(docs, 3);
+    expect(reserved.numbers).toEqual([20, 21, 22]);
+    expect(docs.backlog.text.slice(reserved.edit.start, reserved.edit.end)).toBe("20");
+    expect(reserved.edit.text).toBe("23");
+  });
+
   test("contador igual o menor que la tarea más alta (de cualquier archivo): error que lo explica", () => {
     const low = BACKLOG_RICH.replace("**Próximo número de tarea:** 20", "**Próximo número de tarea:** 18");
     expect(() => reserveNextNumber(docsWith(low))).toThrow(/no es mayor que la tarea más alta[^]*la 18[^]*al menos 19/);
@@ -223,5 +232,27 @@ describe("reserveNextNumber", () => {
   test("sin la línea del contador: error que pide agregarla", () => {
     expect(() => reserveNextNumber(docsWith(BACKLOG_EMPTY.replace("**Próximo número de tarea:** 5\n", "")))).toThrow(CliError);
     expect(() => reserveNextNumber(docsWith(BACKLOG_EMPTY.replace("**Próximo número de tarea:** 5\n", "")))).toThrow(/Próximo número de tarea/);
+  });
+});
+
+describe("renderBacklogTask", () => {
+  test("usa la palabra de header y las etiquetas de las tareas del archivo; lo que no se pasa toma los valores por defecto", () => {
+    const p = makeProject({ folders: ["gersom"], contents: { "backlog.md": BACKLOG_RICH, "handoff.md": HANDOFF_IDLE, "history.md": HISTORY_RICH } });
+    const docs = loadDocs(p, "gersom");
+    const block = renderBacklogTask(docs, STRINGS.es, docs.backlog.parsed.free.tasks, { number: 20, title: "Nueva", description: "Algo.", date: "2026-10-07" });
+    expect(block).toBe(
+      "### Tarea 20 — Nueva\n\n- **Descripción:** Algo.\n- **Decisiones/temas a definir antes de empezar:** Ninguno.\n- **Bloqueos:** Ninguno.\n- **Disparador:** cuando el operador pregunte por tareas pendientes.\n- **Agregada:** 2026-10-07.",
+    );
+    p.cleanup();
+  });
+
+  test("sin tareas de donde copiar usa la tabla del idioma, y los detalles solo si se pasan", () => {
+    const p = makeProject({ folders: ["gersom"], contents: { "backlog.md": BACKLOG_EMPTY, "handoff.md": HANDOFF_EMPTY, "history.md": "# History\n" } });
+    const docs = loadDocs(p, "gersom");
+    const block = renderBacklogTask(docs, STRINGS.en, [], { number: 5, title: "New", description: "Something.", details: "More.", trigger: "later", date: "2026-10-07" });
+    expect(block).toBe(
+      "### Task 5 — New\n\n- **Description:** Something.\n- **Decisions/topics to settle before starting:** None.\n- **Blockers:** None.\n- **Trigger:** later\n- **Details:** More.\n- **Added:** 2026-10-07.",
+    );
+    p.cleanup();
   });
 });

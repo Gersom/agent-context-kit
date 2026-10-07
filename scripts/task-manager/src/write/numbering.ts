@@ -16,12 +16,19 @@ export interface ReservedNumber {
   edit: Edit;
 }
 
+export interface ReservedNumbers {
+  /** Los números que reciben las tareas nuevas, correlativos y en orden. */
+  numbers: number[];
+  /** Edición de `backlog.md` que deja el contador en el último número + 1. */
+  edit: Edit;
+}
+
 /**
- * Reserva el número de «Próximo número de tarea».
+ * Reserva `count` números seguidos desde «Próximo número de tarea».
  * @throws CliError backlog.md ausente o sin la línea del contador, o contador que no es mayor que la
  *   tarea más alta conocida en handoff, backlog (con grupos) e history (se repetiría un número)
  */
-export function reserveNextNumber(docs: Docs): ReservedNumber {
+export function reserveNextNumbers(docs: Docs, count: number): ReservedNumbers {
   const backlog = requireDoc(docs.backlog, "backlog.md");
   const next = findNextTaskNumber(backlog.text);
   if (!next) {
@@ -36,5 +43,14 @@ export function reserveNextNumber(docs: Docs): ReservedNumber {
       `«Próximo número de tarea» (${next.value}, línea ${next.line} de backlog.md) no es mayor que la tarea más alta que ya existe (la ${highest}), así que repetiría un número. Corrígelo a mano (al menos ${highest + 1}) y vuelve a intentarlo: no elijo un número por mi cuenta. No se escribió nada.`,
     );
   }
-  return { number: next.value, edit: replaceRange({ start: next.start, end: next.end }, String(next.value + 1)) };
+  return {
+    numbers: Array.from({ length: count }, (_, i) => next.value + i),
+    edit: replaceRange({ start: next.start, end: next.end }, String(next.value + count)),
+  };
+}
+
+/** Reserva el número de «Próximo número de tarea» (ver `reserveNextNumbers`). */
+export function reserveNextNumber(docs: Docs): ReservedNumber {
+  const { numbers, edit } = reserveNextNumbers(docs, 1);
+  return { number: numbers[0], edit };
 }
