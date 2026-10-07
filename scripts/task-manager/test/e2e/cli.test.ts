@@ -69,6 +69,21 @@ describe("index.ts", () => {
     expect(stdout).toContain("Todas las anclas están en su lugar.");
   });
 
+  test("status, next y show --json leen el repo actual con el correo de git", async () => {
+    if (!hasGit) return;
+    const status = await runCli(["status"]);
+    expect(status.code).toBe(0);
+    expect(status.stdout).toContain("Operador: ana");
+    expect(status.stdout).toContain("En curso: Tarea 12");
+    expect(status.stdout).toContain("Próximo número de tarea: 20");
+    expect((await runCli(["next"])).stdout).toContain("En curso: Tarea 12");
+    const show = JSON.parse((await runCli(["show", "12", "--json"])).stdout);
+    expect(show.matches[0]).toMatchObject({ place: "in-progress", number: 12, operator: null });
+    const missing = await runCli(["show", "999"]);
+    expect(missing.code).toBe(1);
+    expect(missing.stderr).toContain("No existe la Tarea 999");
+  });
+
   test("comando desconocido: código distinto de 0 y mensaje en stderr", async () => {
     const { stderr, code, stdout } = await runCli(["nada"]);
     expect(code).toBe(2);

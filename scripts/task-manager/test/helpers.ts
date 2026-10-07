@@ -6,6 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { requireFixture } from "../../_shared/test/helpers.ts";
 import type { Io } from "../src/cli/types.ts";
+import { type Docs, readDocs } from "../src/workspace/docs.ts";
 
 export const OPERATORS_MD = `# Operadores
 
@@ -66,7 +67,16 @@ export interface ProjectOptions {
   omit?: string[];
   /** Repo plano: los tres archivos van directo en docs/agents/. */
   flat?: boolean;
+  /** Contenido a usar en lugar del fixture, en todas las carpetas (y en el plano). */
+  contents?: Contents;
+  /** Lo mismo, solo para la carpeta de un operador (gana sobre `contents`). */
+  folderContents?: Record<string, Contents>;
+  /** Contenido de team-backlog.md (implica crearlo); por defecto, `TEAM_BACKLOG_MD`. */
+  teamBacklogText?: string;
 }
+
+/** Archivos con contenido propio. */
+export type Contents = Partial<Record<"handoff.md" | "backlog.md" | "history.md", string>>;
 
 /** Crea un proyecto temporal con docs/agents/. Llamar a `cleanup()` al terminar. */
 export function makeProject(options: ProjectOptions = {}): Project {
@@ -74,9 +84,9 @@ export function makeProject(options: ProjectOptions = {}): Project {
   const agents = join(root, "docs", "agents");
   mkdirSync(agents, { recursive: true });
   const omit = options.omit ?? [];
-  const fill = (dir: string) => {
-    for (const file of ["handoff.md", "backlog.md", "history.md"]) {
-      if (!omit.includes(file)) writeFileSync(join(dir, file), requireFixture("es-anchors", file));
+  const fill = (dir: string, own: Contents = {}) => {
+    for (const file of ["handoff.md", "backlog.md", "history.md"] as const) {
+      if (!omit.includes(file)) writeFileSync(join(dir, file), own[file] ?? options.contents?.[file] ?? requireFixture("es-anchors", file));
     }
   };
 
@@ -85,8 +95,23 @@ export function makeProject(options: ProjectOptions = {}): Project {
   if (operators) writeFileSync(join(agents, "operators.md"), operators);
   for (const folder of options.folders ?? []) {
     mkdirSync(join(agents, folder), { recursive: true });
-    fill(join(agents, folder));
+    fill(join(agents, folder), options.folderContents?.[folder]);
   }
-  if (options.teamBacklog) writeFileSync(join(agents, "team-backlog.md"), TEAM_BACKLOG_MD);
+  if (options.teamBacklog || options.teamBacklogText !== undefined) {
+    writeFileSync(join(agents, "team-backlog.md"), options.teamBacklogText ?? TEAM_BACKLOG_MD);
+  }
   return { root, agents, cleanup: () => rmSync(root, { recursive: true, force: true }) };
+}
+
+/** Los archivos de una carpeta del proyecto temporal ya leídos y parseados (la propia de un operador o el repo plano). */
+export function loadDocs(p: Project, folder?: string, teamBacklog = false): Docs {
+  const dir = folder ? join(p.agents, folder) : p.agents;
+  return readDocs({
+    files: {
+      handoff: join(dir, "handoff.md"),
+      backlog: join(dir, "backlog.md"),
+      history: join(dir, "history.md"),
+      teamBacklog: teamBacklog ? join(p.agents, "team-backlog.md") : null,
+    },
+  });
 }

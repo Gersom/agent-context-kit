@@ -4,6 +4,9 @@
 
 import type { Command } from "../cli/types.ts";
 import { anchors } from "./anchors.ts";
+import { next } from "./next.ts";
+import { show } from "./show.ts";
+import { status } from "./status.ts";
 import { whoami } from "./whoami.ts";
 
-export const COMMANDS: Command[] = [whoami, anchors];
+export const COMMANDS: Command[] = [whoami, anchors, status, next, show];

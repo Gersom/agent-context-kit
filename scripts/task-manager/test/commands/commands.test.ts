@@ -33,8 +33,8 @@ async function exec(argv: string[], p: Project, email: string | null = "gersom@m
 }
 
 describe("registro", () => {
-  test("este paso trae solo whoami y anchors", () => {
-    expect(COMMANDS.map((c) => c.name)).toEqual(["whoami", "anchors"]);
+  test("el registro trae los comandos de este paso", () => {
+    expect(COMMANDS.map((c) => c.name)).toEqual(["whoami", "anchors", "status", "next", "show"]);
   });
 });
 

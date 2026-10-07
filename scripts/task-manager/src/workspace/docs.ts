@@ -72,7 +72,7 @@ export function readDoc<P>(kind: DocKind, path: string, parse: (text: string) =>
 }
 
 /** Lee los archivos del espacio de trabajo. Los ausentes quedan con `exists: false` (no es un error). */
-export function readDocs(workspace: Workspace): Docs {
+export function readDocs(workspace: Pick<Workspace, "files">): Docs {
   const { files } = workspace;
   return {
     handoff: readDoc("handoff", files.handoff, parseHandoff),
