@@ -18,6 +18,7 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 - Ampliación: tecla `c` que compacta o expande los recuadros que no son EN PROGRESO ni PAUSADAS (una sola tarea, la más reciente, con `· +N más`; EQUIPO nunca se compacta), tecla `f` que oculta o muestra las flechas, y las opciones `--compact` y `--no-arrows`. El pie pasó al formato `[tecla] acción` sugerido por el operador y se parte en dos líneas si no entra, para que "salir" no se recorte.
 - Verificación: `bun test` → 239 tests, todos pasan (19 nuevos); `bun run typecheck` sin errores; el operador probó a mano el selector y las teclas en una terminal real (queda resuelto lo que había quedado pendiente en la Tarea 30).
 - Commits: `bfad675`, `fa426c1`, `1c2b7e9`, `18385cc` y el de cierre, en la rama `chore/apply-multi-operator`.
+- A pedido del operador, esa rama (que llevaba apiladas las de las Tareas 26 y 30 y el paso de este repo a modo multi) se mergeó a `main` y se pusheó, y se publicó la versión 1.3.0 (bump **minor**: el modo multi es opcional y no cambia lo que se genera en modo plano): tag `v1.3.0` y [GitHub Release](https://github.com/Gersom/agent-context-kit/releases/tag/v1.3.0) con notas que resumen los cambios desde `v1.2.0`. Se borraron las ramas locales ya integradas (`docs/optimize-context`, `feat/multi-operator`, `feat/team-view` y `chore/apply-multi-operator`).
 
 ## 2026-10-06 — ✅ Pasado a modo multi-operador
 
