@@ -11,6 +11,13 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-06 — ✅ Pasado a modo multi-operador
+
+- Este repo pasó de la estructura plana a la multi-operador (dogfooding, con `migration-flow.md`, "Pasar de plano a multi-operador"): `handoff.md`, `backlog.md` e `history.md` se movieron con `git mv` a `docs/agents/gersom/` sin reescribirlos (solo cambiaron dos enlaces relativos) y la numeración continúa (próximo número: 31).
+- Registrados: `gersom` (gersomalaja@gmail.com), sin más operadores por ahora. Se crearon `operators.md` y `team-backlog.md`; el `rules.md` suma el bloque "Trabajo en paralelo" (las Reglas por defecto no se tocaron), el `AGENTS.md` raíz usa la variante multi y `docs/README.md` y `docs/architecture.md` muestran la estructura nueva.
+- La Tarea 19 (prompt de normalización para repos que ya adoptaron el skill) pasó al `team-backlog.md` como tarea sin dueño; su número queda retirado. Cuando alguien la tome recibirá un número de su propia secuencia.
+- Verificación: `bun test` → 219 tests, todos pasan; el tracker abre la vista de equipo de este repo con `gersom` preseleccionado.
+
 ## 2026-10-06 — ✅ Tarea 30 — Vista de equipo en el task-tracker (todos los operadores)
 
 - En modo multi-operador el tracker abre en una vista de equipo: el recuadro EQUIPO es un selector con una fila por operador (su tarea en curso con el avance del plan, sus libres y bloqueadas y la última tarea que cerró) y, debajo, el recuadro "SIN DUEÑO" con las tareas de `team-backlog.md`. `↑`/`↓` eligen, `Enter` abre el panel del operador (que lleva el mismo recuadro "SIN DUEÑO" debajo de BLOQUEADAS) y `b`, `Esc` o Retroceso vuelven. `bun run tasks <ruta> <operador>` abre su panel de frente.
