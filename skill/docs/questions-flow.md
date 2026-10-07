@@ -170,10 +170,11 @@ Las reglas del modo están en [`multi-operator.md`](./multi-operator.md) (abrirl
    - `template/multi/operators.md` → `docs/agents/operators.md`, con la línea del operador actual (`- <carpeta>: <correo>`).
    - `template/multi/team-backlog.md` → `docs/agents/team-backlog.md`, vacío.
    - `template/multi/preferences.md` → `docs/agents/<operador>/preferences.md`, solo si el operador quiere definir sus preferencias; es opcional.
+   - `template/multi/rules.md` no es un archivo: su bloque "Trabajo en paralelo" se agrega a `docs/agents/rules.md`, justo antes de "## Enlaces".
    - `docs/project/`, `docs/external/` y `docs/plans/` no cambian.
 3. **`agents/history.md` reconstruido desde git** (Ronda 2): va a la carpeta de quien genera la documentación.
 4. **`AGENTS.md`:** se usa `template/multi/AGENTS.md` en lugar de `template/AGENTS.md`; todo lo demás del paso (ruta, marcadores, archivo existente) es igual. `CLAUDE.md` no cambia.
-5. **`docs/README.md`:** el árbol de `agents/` muestra `operators.md`, `team-backlog.md` y las carpetas de operador (ver la guía de `template/README.md`).
+5. **`docs/README.md`:** el árbol de `agents/` muestra `operators.md`, `team-backlog.md` y las carpetas de operador, y la definición de "operador" va en plural (ver la guía de `template/README.md`).
 6. Los demás operadores se registran solos: la primera vez que su agente no encuentre su correo en `operators.md`, se los pregunta (lo dice el propio `AGENTS.md` multi).
 
 ---

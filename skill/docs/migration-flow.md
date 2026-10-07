@@ -110,7 +110,7 @@ Caso distinto al de arriba: el repo **ya usa este skill** en estructura plana (`
 2. Crear `docs/agents/operators.md` desde `template/multi/operators.md` con las líneas de las respuestas 1 y 2, y `docs/agents/team-backlog.md` desde `template/multi/team-backlog.md`. Si se eligieron tareas en la respuesta 3, moverlas ahí sin número, con `Agregada: <fecha> por <operador>`, y sacarlas del `backlog.md` (el contador no retrocede).
 3. `AGENTS.md` de la raíz: reemplazar la sección delimitada por `<!-- agent-docs-skill:start -->`/`end` por la de `template/multi/AGENTS.md`; `CLAUDE.md` no cambia.
 4. `docs/README.md`: actualizar solo el árbol de `agents/` (ver la guía de `template/README.md`).
-5. `docs/agents/rules.md`: ajustarlo como indica "Reglas en modo multi-operador" de [`multi-operator.md`](./multi-operator.md).
+5. `docs/agents/rules.md`: agregar, antes de "## Enlaces", el bloque "Trabajo en paralelo" de `template/multi/rules.md` (ver "Reglas en modo multi-operador" de [`multi-operator.md`](./multi-operator.md)); las Reglas por defecto no se tocan. En `docs/README.md`, pasar la definición de "operador" a plural.
 6. Dejar registro: una entrada ✅ Hecha en el `history.md` del operador (qué pasó a multi y quiénes quedaron registrados), sin número de tarea.
 
 Los demás operadores no hacen nada especial: al hacer `pull`, su agente no encuentra su correo (o lo encuentra, si se registró en la respuesta 2) y se lo pregunta.

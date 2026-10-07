@@ -100,6 +100,10 @@ Ante la duda, si una preferencia cambia el código o los archivos compartidos, e
 
 **Al agregar una regla a `rules.md` en modo multi**, el agente le recuerda al operador antes de escribirla: *"Esta regla se aplica a todo el proyecto y a los demás operadores; hay que agregarla con cuidado. ¿Confirmás que es del proyecto y no solo tuya?"* Si es solo suya, la propone para `preferences.md`.
 
+## Reglas en modo multi-operador
+
+Las Reglas por defecto no cambian. Al generar la documentación en modo multi (o al pasar de plano a multi) se agrega a `docs/agents/rules.md`, justo antes de "## Enlaces", el bloque "Trabajo en paralelo" de [`template/multi/rules.md`](../template/multi/rules.md): aclara que los archivos de las Reglas 2 a 8 son los de la carpeta del operador y suma las reglas de referencias, de tareas, de `rules.md` compartido y de plan de ejecución. Un proyecto de una sola persona no lo lleva. En el `README.md` de `docs/`, la definición de "operador" pasa a ser *"cada persona que trabaja en el proyecto con su agente, le pide tareas, aprueba decisiones y es a quien se le pregunta cuando algo no está definido"*.
+
 ## Carpetas de otros operadores
 
 - Se leen solo si el operador lo pide o su tarea depende de ellas (ej. *"¿Ana terminó X?"* → su `handoff.md` e `history.md`), con la política de lectura de [`../SKILL.md`](../SKILL.md): por búsqueda, no enteros.

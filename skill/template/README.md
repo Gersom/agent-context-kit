@@ -23,6 +23,8 @@ sesión: es un mapa mínimo, de ~1,5 KB como máximo. Se genera al final del flu
   │       ├── history.md        # sus tareas cerradas
   │       └── preferences.md    # su forma de trabajar *
   ```
+
+  En ese modo la definición de operador va en plural: *"cada persona que trabaja en el proyecto con su agente, le pide tareas, aprueba decisiones y es a quien se le pregunta cuando algo no está definido."*
 -->
 
 # [Nombre del proyecto]

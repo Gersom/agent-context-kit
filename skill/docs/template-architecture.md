@@ -24,7 +24,8 @@ template/
 │   ├── AGENTS.md
 │   ├── operators.md
 │   ├── team-backlog.md
-│   └── preferences.md
+│   ├── preferences.md
+│   └── rules.md            (bloque para agregar a agents/rules.md)
 │
 ├── project/
 │   ├── architecture.md
@@ -57,7 +58,7 @@ Los punteros que se aseguran en la raíz del repo destino, en **cualquier** set 
 
 ## `multi/` (modo multi-operador, opcional)
 
-Plantillas que se usan solo si el operador dice que varias personas trabajan en paralelo (ver [`multi-operator.md`](./multi-operator.md)); un proyecto de una sola persona no las toca. `multi/AGENTS.md` reemplaza al `AGENTS.md` plano. `operators.md` mapea cada carpeta de operador con sus correos de git. `team-backlog.md` es el backlog del equipo, de tareas sin dueño y sin numeración (se copia como `docs/agents/team-backlog.md`; el `backlog.md` de cada operador es el de las tareas que tomó). `preferences.md` es la forma de trabajar de un operador, que no puede contradecir `rules.md`. El `handoff.md`, `backlog.md` e `history.md` de cada operador salen de las plantillas de `agents/`, copiadas a `docs/agents/<operador>/`.
+Plantillas que se usan solo si el operador dice que varias personas trabajan en paralelo (ver [`multi-operator.md`](./multi-operator.md)); un proyecto de una sola persona no las toca. `multi/AGENTS.md` reemplaza al `AGENTS.md` plano. `operators.md` mapea cada carpeta de operador con sus correos de git. `team-backlog.md` es el backlog del equipo, de tareas sin dueño y sin numeración (se copia como `docs/agents/team-backlog.md`; el `backlog.md` de cada operador es el de las tareas que tomó). `preferences.md` es la forma de trabajar de un operador, que no puede contradecir `rules.md`. `rules.md` no es un archivo: es un bloque, "Trabajo en paralelo", que se agrega al `rules.md` del proyecto sin tocar sus Reglas por defecto. El `handoff.md`, `backlog.md` e `history.md` de cada operador salen de las plantillas de `agents/`, copiadas a `docs/agents/<operador>/`.
 
 ## `agents/`
 
