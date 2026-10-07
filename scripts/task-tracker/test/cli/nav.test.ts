@@ -67,6 +67,13 @@ describe("navReduce en el panel de un operador", () => {
   test("las flechas y Enter no hacen nada dentro del panel", () => {
     for (const key of ["up", "down", "enter"] as const) expect(navReduce(panel, key, ROWS)).toBe(panel);
   });
+
+  test("compactar y las flechas del flujo no cambian la navegación, en ninguna vista", () => {
+    for (const key of ["compact", "flow"] as const) {
+      expect(navReduce(panel, key, ROWS)).toBe(panel);
+      expect(navReduce(team("ana"), key, ROWS)).toEqual(team("ana"));
+    }
+  });
 });
 
 describe("reconcileNav", () => {

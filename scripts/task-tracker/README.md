@@ -22,6 +22,7 @@ bun run tasks                         # pregunta la ruta a vigilar
 bun run tasks D:/proyectos/mi-app     # raíz del proyecto
 bun run tasks D:/proyectos/mi-app --once   # pinta una sola vez y sale
 bun run tasks D:/proyectos/mi-app ana      # modo multi-operador: abre de frente el panel de «ana»
+bun run tasks D:/proyectos/mi-app --compact --no-arrows   # arranca compacto y sin flechas
 ```
 
 - **Qué ruta acepta:** la raíz del proyecto (busca adentro `docs/agents/` o `agent-context/agents/`) o directamente la carpeta que contiene `handoff.md`. Las rutas relativas se resuelven desde la carpeta en la que lanzaste el comando, y se pueden pegar con comillas (Windows las agrega al arrastrar una carpeta a la terminal).
@@ -50,6 +51,8 @@ Solo con una terminal interactiva (sin `--once` ni salida redirigida):
 | `q` o `Ctrl+C` | Salir |
 | `r` | Volver a leer los archivos y redibujar |
 | `↑` / `↓` | Elegir operador (vista de equipo, modo multi-operador) |
+| `c` | Compactar o expandir los recuadros (ver abajo) |
+| `f` | Ocultar o mostrar las flechas del flujo |
 | `Enter` | Abrir el panel del operador elegido |
 | `b`, `Esc` o `Retroceso` | Volver a la vista de equipo |
 
@@ -92,6 +95,8 @@ Solo con una terminal interactiva (sin `--once` ni salida redirigida):
 
 - **Encabezado:** el nombre de la carpeta del proyecto (en mayúsculas, con los guiones como espacios), su ruta y cuándo se redibujó la pantalla por última vez y por qué: "al iniciar", "se modificó <archivo>", "cambio detectado" (el sistema avisó un cambio sin decir en qué archivo) o "redibujado" (atajo `r`, cambio de tamaño de la terminal).
 - **Recuadros:** uno por tipo de tarea, con esquinas redondeadas, el tipo en el borde superior izquierdo y el archivo del que sale a la derecha. Todos tienen el ancho de la terminal (mínimo 40 columnas); sin terminal — salida redirigida o `--once` — se usa la variable `COLUMNS` si está definida, o 100. El texto que no entra se recorta con "…". Los bordes van en gris, salvo el de en progreso, que va en verde para destacar la tarea actual; el título de cada recuadro va del color de su tipo: verde `#6DB07B` completadas (y también sin dueño, que usa la misma paleta: título y viñeta en ese verde, texto en el gris de las completadas y solo el tag de bloqueo en rojo), verde en progreso, amarillo pausadas, cian libres y rojo bloqueadas. Las tareas completadas van en un gris un poco más claro que el de los bordes (nombre y fecha en el mismo color), con el prefijo `T-N` en el mismo verde del título, y los textos secundarios (rutas, archivo del borde, campos de las pausadas, pasos hechos, "Ninguna", pie) en gris claro.
+- **Compacto (`c` o `--compact`):** los recuadros que no son EN PROGRESO ni PAUSADAS (sin dueño, bloqueadas, libres y completadas) muestran una sola tarea, la última, y cuántas más hay (`T-3: Exportar como skill · +3 más`). La última es la más reciente: la última de la lista en sin dueño, bloqueadas y libres, y la última cerrada en completadas. El título conserva el total, las bloqueadas no muestran las tareas de las que dependen, y el nombre de la tarea se recorta antes que el contador. La lista EQUIPO nunca se compacta. Volver a apretar `c` expande. Lo que se elige con `c` y `f` vale mientras el tracker está abierto.
+- **Sin flechas (`f` o `--no-arrows`):** quita las líneas de flecha de abajo, y los recuadros quedan igual pero una línea más pegados.
 - **Orden y flechas:** los recuadros van de arriba abajo como el flujo de una tarea: sin dueño (solo en modo multi-operador) → bloqueadas ⇅ libres → en progreso ⇅ pausadas → completadas. Entre cada par de recuadros que se muestran hay una línea con la transición: `↓ se toma` (desde sin dueño), `↑ bloquea · ↓ desbloquea` (entre bloqueadas y libres), `↓ empieza` (libres → en progreso), `↑ retoma · ↓ pausa` (entre en progreso y pausadas) y `↓ se cierra` (hacia completadas). No hay flecha hacia un recuadro que no se muestra; con el set mínimo (solo `handoff.md`) no hay ninguna.
 - **`history.md`:** las 5 últimas tareas cerradas, con su fecha. Las descartadas se marcan con ✖.
 - **`handoff.md`, en detalle:** la tarea en progreso con el avance de su plan y el resto de sus subsecciones (ej. "Qué falta", "Próximo paso concreto"), y cada tarea pausada con su plan (si lo trae: el campo opcional `Plan` de la plantilla) y todos sus demás campos. En los planes, el texto de los pasos ya hechos sale **tachado** (las tareas no se tachan, solo los pasos). Las etiquetas se muestran tal como están escritas en el documento, así que funciona en cualquier idioma.

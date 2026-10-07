@@ -91,6 +91,15 @@ describe("index.ts en modo multi-operador", () => {
     expect(stdout.indexOf("╭─ EN PROGRESO")).toBeLessThan(stdout.indexOf("─ history.md ─╮"));
   });
 
+  test("--compact y --no-arrows: una sola tarea por recuadro y sin flechas, también en SIN DUEÑO", async () => {
+    const { stdout, code } = await run([repo, "ana", "--once", "--compact", "--no-arrows"]);
+    expect(code).toBe(0);
+    expect(stdout).not.toMatch(/^ {3}[↑↓]/m);
+    expect(stdout).toContain("• Integrar la pasarela [dependencia] · +1 más");
+    expect(stdout).toContain("· +3 más");
+    expect(stdout).toContain("Tarea 12 — Implementar el parser de anclas"); // en progreso no se compacta
+  });
+
   test("--operator equivale al segundo argumento y no distingue mayúsculas", async () => {
     const { stdout, code } = await run([repo, "--operator", "GERSOM", "--once"]);
     expect(code).toBe(0);

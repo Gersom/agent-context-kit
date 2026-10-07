@@ -119,6 +119,13 @@ export interface RenderMeta {
   teamBacklog?: TeamBacklogModel;
   /** En modo multi-operador, qué vista es (cambia las teclas que indica el pie). */
   multiView?: "team" | "operator";
+  /**
+   * `true`: los recuadros de tareas, salvo en progreso y pausadas, muestran una sola tarea (la más
+   * reciente) y cuántas más hay, para ocupar menos pantalla.
+   */
+  compact?: boolean;
+  /** `false`: sin las líneas de flecha entre recuadros. Por defecto `true`. */
+  arrows?: boolean;
   updatedAt: Date;
   trigger: DrawTrigger;
   /** Por defecto `"ctrl-c"`. */

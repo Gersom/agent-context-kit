@@ -20,7 +20,7 @@ import type {
   TeamRow,
 } from "../shared/types.ts";
 import type { HistoryEntry, TaskRef } from "../../../_shared/types.ts";
-import { boxBottom, boxRow, boxTop, type Paint, type Segment } from "./box.ts";
+import { BOX_PADDING, boxBottom, boxRow, boxTop, type Paint, type Segment } from "./box.ts";
 import { displayProjectName, plainText, progressBar, shortTaskName, truncate, visibleLength } from "./format.ts";
 
 /** Ancho mínimo de la pantalla, aunque la terminal sea más angosta. */
@@ -83,7 +83,7 @@ function finishCanvas({ out, line, blank, secondary, pc }: Canvas, meta: RenderM
   for (const note of notes) line(0, `ℹ ${note}`, secondary);
   for (const warning of model.warnings) line(0, `! ${warning}`, pc.yellow);
 
-  const footer = footerText(meta.controls ?? "ctrl-c", meta.multiView);
+  const footer = footerText(meta);
   if (footer) {
     blank();
     line(0, footer, secondary);
@@ -122,7 +122,7 @@ export function render(model: Model, meta: RenderMeta): string {
 
   const stages: { id: Stage; shown: boolean; draw: () => void }[] = [
     // team-backlog.md (modo multi-operador): las tareas sin dueño
-    { id: "unowned", shown: Boolean(meta.teamBacklog?.present), draw: () => meta.teamBacklog && teamBacklogBox(canvas, meta.teamBacklog) },
+    { id: "unowned", shown: Boolean(meta.teamBacklog?.present), draw: () => meta.teamBacklog && teamBacklogBox(canvas, meta.teamBacklog, meta.compact) },
 
     // backlog.md (compacto): bloqueadas solo si hay alguna
     {
@@ -130,6 +130,13 @@ export function render(model: Model, meta: RenderMeta): string {
       shown: model.hasBacklog && model.blocked.length > 0,
       draw: () =>
         box(`BLOQUEADAS (${model.counts.blocked})`, "backlog.md", pc.red, (row) => {
+          if (meta.compact) {
+            // Solo la última (la más reciente de la lista), sin las tareas de las que depende.
+            const last = model.blocked[model.blocked.length - 1];
+            const tag = last.block.tag ? ` [${last.block.tag}]` : "";
+            compactRow(row, `${shortTaskName(last.number, last.title)}${tag}`, pc.red, model.blocked.length - 1, width, secondary);
+            return;
+          }
           for (const task of model.blocked) blockedRows(task, row, pc);
         }),
     },
@@ -139,6 +146,18 @@ export function render(model: Model, meta: RenderMeta): string {
       draw: () =>
         box(`LIBRES (${model.counts.free})`, "backlog.md", pc.cyan, (row) => {
           if (!model.free.tasks.length && !model.free.groups.length) row(0, { paint: secondary, text: "Ninguna" });
+          if (meta.compact && (model.free.tasks.length || model.free.groups.length)) {
+            // Solo la última: la última tarea suelta o, si no hay, el último grupo.
+            const lastTask = model.free.tasks[model.free.tasks.length - 1];
+            const lastGroup = model.free.groups[model.free.groups.length - 1];
+            const text = lastTask
+              ? shortTaskName(lastTask.number, lastTask.title)
+              : `◇ Grupo: ${lastGroup.title} (${lastGroup.taskNumbers.map((n) => `T-${n}`).join(", ")})`;
+            // Lo que se muestra cuenta como 1 tarea suelta o como las de su grupo; el resto, como en el título.
+            const shown = lastTask ? 1 : lastGroup.taskNumbers.length;
+            compactRow(row, text, pc.cyan, model.counts.free - shown, width, secondary);
+            return;
+          }
           for (const task of model.free.tasks) row(0, { paint: pc.cyan, text: shortTaskName(task.number, task.title) });
           for (const group of model.free.groups) {
             const refs = group.taskNumbers.map((n) => `T-${n}`).join(", ");
@@ -193,6 +212,13 @@ export function render(model: Model, meta: RenderMeta): string {
       draw: () =>
         box(`TAREAS COMPLETADAS (últimas ${model.completed.length})`, "history.md", completedGreen, (row) => {
           if (!model.completed.length) row(0, { paint: secondary, text: "Ninguna" });
+          if (meta.compact && model.completed.length) {
+            // Solo la última cerrada (las más nuevas van primero).
+            const more = model.completed.length - 1;
+            const suffix = more > 0 ? ` · +${more} más` : "";
+            row(0, ...completedSegments(model.completed[0], width, pc, visibleLength(suffix)), ...(suffix ? [{ paint: secondary, text: suffix }] : []));
+            return;
+          }
           for (const entry of model.completed) row(0, ...completedSegments(entry, width, pc));
         }),
     },
@@ -201,7 +227,7 @@ export function render(model: Model, meta: RenderMeta): string {
   let previous: Stage | null = null;
   for (const stage of stages) {
     if (!stage.shown) continue;
-    if (previous) line(3, arrowText(previous, stage.id), secondary);
+    if (previous && meta.arrows !== false) line(3, arrowText(previous, stage.id), secondary);
     stage.draw();
     previous = stage.id;
   }
@@ -241,7 +267,7 @@ export function renderTeam(team: TeamModel, meta: TeamRenderMeta): string {
     }
   });
 
-  if (team.teamBacklog.present) teamBacklogBox(canvas, team.teamBacklog);
+  if (team.teamBacklog.present) teamBacklogBox(canvas, team.teamBacklog, meta.compact);
   return finishCanvas(canvas, meta, { warnings: team.warnings });
 }
 
@@ -261,11 +287,26 @@ function summaryLine(op: TeamRow): string {
  * Usa la paleta de "tareas completadas" (título y viñeta en su verde, texto en su gris); solo el
  * tag de bloqueo va en rojo, para no perder esa señal.
  */
-function teamBacklogBox({ box, pc, secondary, completed, completedGreen }: Canvas, backlog: TeamBacklogModel): void {
+function teamBacklogBox({ box, pc, width, secondary, completed, completedGreen }: Canvas, backlog: TeamBacklogModel, compact = false): void {
   if (!backlog.present) return;
   const total = backlog.free.length + backlog.blocked.length;
   box(`SIN DUEÑO (${total})`, "team-backlog.md", completedGreen, (row) => {
     if (!total) row(0, { paint: secondary, text: "Ninguna" });
+    if (compact && total) {
+      // Solo la última (la más reciente de la lista), sin el motivo del bloqueo.
+      const last = [...backlog.free, ...backlog.blocked][total - 1];
+      const tag = last.block.tag ? ` [${last.block.tag}]` : "";
+      const suffix = total > 1 ? ` · +${total - 1} más` : "";
+      const room = Math.max(1, width - BOX_PADDING - visibleLength(`• ${tag}${suffix}`));
+      row(
+        0,
+        { paint: completedGreen, text: "• " },
+        { paint: completed, text: truncate(plainText(last.title), room) },
+        ...(tag ? [{ paint: pc.red, text: tag }] : []),
+        ...(suffix ? [{ paint: secondary, text: suffix }] : []),
+      );
+      return;
+    }
     for (const task of [...backlog.free, ...backlog.blocked]) {
       row(0, { paint: completedGreen, text: "• " }, { paint: completed, text: task.title }, ...(task.block.tag ? [{ paint: pc.red, text: ` [${task.block.tag}]` }] : []));
       if (task.block.reason) row(4, { paint: secondary, text: `→ ${task.block.reason}` });
@@ -290,14 +331,29 @@ export function triggerText(trigger: DrawTrigger): string {
   return trigger.file ? `se modificó ${trigger.file}` : "cambio detectado";
 }
 
-function footerText(controls: NonNullable<RenderMeta["controls"]>, multiView: RenderMeta["multiView"]): string | null {
-  if (controls === "keys") {
-    if (multiView === "team") return "↑/↓ elegir · Enter abrir · q o Ctrl+C salir · r redibujar";
-    if (multiView === "operator") return "b o Esc volver al equipo · q o Ctrl+C salir · r redibujar";
-    return "q o Ctrl+C para salir · r para redibujar";
-  }
+/** Pie con las teclas que valen en esta vista; `c` y `f` dicen lo que harán, según el estado actual. */
+function footerText(meta: RenderMeta): string | null {
+  const controls = meta.controls ?? "ctrl-c";
   if (controls === "ctrl-c") return "Ctrl+C para salir";
-  return null;
+  if (controls !== "keys") return null;
+  const parts: string[] = [];
+  if (meta.multiView === "team") parts.push("↑/↓ elegir", "Enter abrir");
+  if (meta.multiView === "operator") parts.push("b o Esc volver al equipo");
+  parts.push(meta.compact ? "c expandir" : "c compactar");
+  // La vista de equipo no tiene flechas de flujo.
+  if (meta.multiView !== "team") parts.push(meta.arrows === false ? "f mostrar flechas" : "f ocultar flechas");
+  parts.push("q o Ctrl+C salir", "r redibujar");
+  return parts.join(" · ");
+}
+
+/**
+ * Fila de un recuadro compacto: una sola tarea y, aparte, cuántas más hay (`· +3 más`). El texto
+ * de la tarea se recorta antes que el contador.
+ */
+function compactRow(row: Row, text: string, paint: Paint, more: number, width: number, secondary: Paint): void {
+  const suffix = more > 0 ? ` · +${more} más` : "";
+  const room = Math.max(1, width - BOX_PADDING - visibleLength(suffix));
+  row(0, { paint, text: truncate(plainText(text), room) }, ...(suffix ? [{ paint: secondary, text: suffix }] : []));
 }
 
 /** `Tarea 9 — título`, con la etiqueta tal como está escrita en el documento. */
@@ -340,14 +396,14 @@ function planRows(plan: Plan, indent: number, row: Row, pc: Colors): void {
  * Tramos de una tarea completada: el nombre y la fecha (los dos en el mismo gris) y, aparte, la
  * marca de descartada. Si no entra en el ancho del recuadro, se recorta el nombre (no la fecha).
  */
-function completedSegments(entry: HistoryEntry, width: number, pc: Colors): Segment[] {
+function completedSegments(entry: HistoryEntry, width: number, pc: Colors, reserve = 0): Segment[] {
   const { completed, completedGreen } = tones(pc);
   // El prefijo `T-N` va en el verde del título; el resto del nombre, en el gris de las completadas.
   const prefix = entry.number == null ? "" : `T-${entry.number}`;
   const rest = plainText(entry.number == null ? entry.title : shortTaskName(entry.number, entry.title).slice(prefix.length));
   const discarded = entry.status === "discarded" ? " ✖ (descartada)" : "";
   const date = entry.date ? ` · ${entry.date}` : "";
-  const room = width - 4 - visibleLength(prefix + discarded + date);
+  const room = width - 4 - visibleLength(prefix + discarded + date) - reserve;
   const segments: Segment[] = [];
   if (prefix) segments.push({ paint: completedGreen, text: prefix });
   segments.push({ paint: completed, text: truncate(rest, Math.max(1, room)) });

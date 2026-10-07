@@ -196,7 +196,8 @@ describe("render", () => {
   });
 
   test("pie según los controles disponibles", () => {
-    expect(screen("minimal", { controls: "keys" })).toContain("q o Ctrl+C para salir · r para redibujar");
+    expect(screen("minimal", { controls: "keys" })).toContain("c compactar · f ocultar flechas · q o Ctrl+C salir · r redibujar");
+    expect(screen("minimal", { controls: "keys", compact: true, arrows: false })).toContain("c expandir · f mostrar flechas · q o Ctrl+C salir · r redibujar");
     expect(screen("minimal")).toContain("Ctrl+C para salir");
     expect(screen("minimal", { controls: "none" })).not.toContain("Ctrl+C");
   });

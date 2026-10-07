@@ -24,14 +24,21 @@ export function startApp({
   projectName,
   projectDir,
   multi,
+  compact = false,
+  arrows = true,
   once,
 }: {
   agentsDir: string;
   projectName: string;
   projectDir: string;
   multi?: MultiInfo;
+  /** Arranca con los recuadros compactos (una sola tarea por recuadro); la tecla `c` lo alterna. */
+  compact?: boolean;
+  /** Arranca con las flechas del flujo; la tecla `f` las alterna. */
+  arrows?: boolean;
   once: boolean;
 }): void {
+  const ui = { compact, arrows };
   const watcherErrors: string[] = [];
   const snapshot = multi ? null : createSnapshotReader(agentsDir);
   const teamReader = multi ? createTeamReader(agentsDir) : null;
@@ -48,7 +55,7 @@ export function startApp({
    */
   function draw(trigger: DrawTrigger, { isRetry = false }: { isRetry?: boolean } = {}): void {
     const allowRetry = !once && !isRetry;
-    const meta: RenderMeta = { projectName, projectDir, updatedAt: new Date(), trigger, controls };
+    const meta: RenderMeta = { projectName, projectDir, updatedAt: new Date(), trigger, controls, compact: ui.compact, arrows: ui.arrows };
     let screen: string;
 
     if (teamReader && multi) {
@@ -149,6 +156,10 @@ export function startApp({
       for (const key of parseKeys(chunk)) {
         if (key === "quit") return quit();
         if (key === "redraw") {
+          draw({ kind: "redraw" });
+        } else if (key === "compact" || key === "flow") {
+          if (key === "compact") ui.compact = !ui.compact;
+          else ui.arrows = !ui.arrows;
           draw({ kind: "redraw" });
         } else if (multi && nav) {
           const next = navReduce(nav, key, navRows);

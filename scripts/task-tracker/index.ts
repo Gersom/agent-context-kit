@@ -3,14 +3,18 @@
 // history.md), redibujando en cada cambio. Pensado para correr en una terminal aparte mientras
 // un agente trabaja en otra.
 //
-// Atajos (terminal interactiva): `q` o Ctrl+C salen, `r` redibuja. En modo multi-operador, ↑/↓
-// eligen operador en la vista de equipo, Enter abre su panel y `b` o Esc vuelven al equipo.
+// Atajos (terminal interactiva): `q` o Ctrl+C salen, `r` redibuja, `c` compacta o expande los
+// recuadros (una sola tarea por recuadro, salvo en progreso y pausadas) y `f` oculta o muestra las
+// flechas del flujo. En modo multi-operador, ↑/↓ eligen operador en la vista de equipo, Enter
+// abre su panel y `b` o Esc vuelven al equipo.
 //
 // Uso (desde la raíz de agent-context-kit):
 //   bun run tasks                 → pregunta la ruta a vigilar
 //   bun run tasks <ruta>          → raíz del proyecto (busca docs/agents/ o agent-context/agents/)
 //                                   o la carpeta que contiene handoff.md
 //   bun run tasks <ruta> --once   → pinta una sola vez y sale (útil para probar o en CI)
+//   bun run tasks <ruta> --compact --no-arrows
+//                                 → arranca con los recuadros compactos y sin flechas
 //   bun run tasks <ruta> <operador>
 //                                 → en modo multi-operador, abre de frente el panel de ese
 //                                   operador (también `--operator <carpeta>`); sin él, la vista
@@ -25,12 +29,12 @@ import { askForPath, printResolveError } from "./src/cli/ask-path.ts";
 import { resolveAgentsDir } from "./src/io/paths.ts";
 import type { ResolveOk } from "./src/shared/types.ts";
 
-const { once, pathArg, operator } = parseArgs(process.argv.slice(2));
+const { once, pathArg, operator, compact, arrows } = parseArgs(process.argv.slice(2));
 
 const target = pathArg != null ? resolveFromArg(pathArg, operator) : askForPath(operator);
 const { agentsDir, projectName, projectDir, multi } = target;
 
-startApp({ agentsDir, projectName, projectDir, multi, once });
+startApp({ agentsDir, projectName, projectDir, multi, compact, arrows, once });
 
 /** Ruta pasada por argumento: si no es válida, se informa y se sale con código 1. */
 function resolveFromArg(input: string, operatorArg: string | undefined): ResolveOk {

@@ -8,6 +8,11 @@ describe("parseKeys", () => {
     expect(parseKeys("x 1")).toEqual([]);
   });
 
+  test("c compacta o expande y f oculta o muestra las flechas del flujo (mayúscula o minúscula)", () => {
+    expect(parseKeys("cC")).toEqual(["compact", "compact"]);
+    expect(parseKeys("fF")).toEqual(["flow", "flow"]);
+  });
+
   test("las flechas llegan como secuencias de varios caracteres (CSI y SS3)", () => {
     expect(parseKeys("\u001b[A")).toEqual(["up"]);
     expect(parseKeys("\u001b[B")).toEqual(["down"]);

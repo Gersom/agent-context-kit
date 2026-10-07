@@ -1,7 +1,8 @@
-// Teclas de la terminal interactiva: `q` o Ctrl+C salen, `r` redibuja y, en la vista de equipo
-// (modo multi-operador), ↑/↓ eligen operador, Enter lo abre y `b`, Esc o Retroceso vuelven.
+// Teclas de la terminal interactiva: `q` o Ctrl+C salen, `r` redibuja, `c` compacta o expande los
+// recuadros y `f` oculta o muestra las flechas del flujo. En la vista de equipo (modo
+// multi-operador), ↑/↓ eligen operador, Enter lo abre y `b`, Esc o Retroceso vuelven.
 
-export type NavKey = "quit" | "redraw" | "up" | "down" | "enter" | "back";
+export type NavKey = "quit" | "redraw" | "up" | "down" | "enter" | "back" | "compact" | "flow";
 
 /**
  * Teclas de lo que llegó de la terminal en modo raw. Las flechas llegan como secuencias de varios
@@ -35,6 +36,8 @@ export function parseKeys(chunk: string): NavKey[] {
 function singleKey(char: string): NavKey | null {
   if (char === "\u0003" || char === "q" || char === "Q") return "quit";
   if (char === "r" || char === "R") return "redraw";
+  if (char === "c" || char === "C") return "compact";
+  if (char === "f" || char === "F") return "flow";
   if (char === "\r" || char === "\n") return "enter";
   if (char === "b" || char === "B" || char === "\u007f" || char === "\b") return "back";
   return null;
