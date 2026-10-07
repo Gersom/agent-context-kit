@@ -36,6 +36,8 @@ const COMPLETED_GRAY_256 = 245;
 const SECONDARY_GRAY_256 = 250;
 /** Título de "tareas completadas" y prefijo `T-N` de cada una: #6DB07B (elegido por el operador). */
 const COMPLETED_GREEN_RGB = [0x6d, 0xb0, 0x7b] as const;
+/** Título y viñeta de "sin dueño": un azul pálido, #8FB3D9 (elegido por el operador). */
+const UNOWNED_BLUE_RGB = [0x8f, 0xb3, 0xd9] as const;
 
 type Colors = ReturnType<typeof picocolors.createColors>;
 /** Agrega una fila al recuadro abierto: sangría + tramos con estilo. */
@@ -53,7 +55,7 @@ function createCanvas(meta: RenderMeta, subtitle?: string) {
     out.push(" ".repeat(indent) + color(truncate(plainText(text), width - indent)));
   const blank = () => out.push("");
 
-  const { secondary, completed, completedGreen } = tones(pc);
+  const { secondary, completed, completedGreen, unownedBlue } = tones(pc);
 
   /** Recuadro completo: borde superior con título y archivo, filas y borde inferior. */
   const box = (title: string, file: string, color: Paint, fill: (row: Row) => void, border: Paint = pc.gray) => {
@@ -71,7 +73,7 @@ function createCanvas(meta: RenderMeta, subtitle?: string) {
   line(2, `Última actualización ${formatTime(meta.updatedAt)} · ${triggerText(meta.trigger)}`, secondary);
   blank();
 
-  return { pc, width, out, line, blank, box, secondary, completed, completedGreen };
+  return { pc, width, out, line, blank, box, secondary, completed, completedGreen, unownedBlue };
 }
 
 type Canvas = ReturnType<typeof createCanvas>;
@@ -285,13 +287,13 @@ function summaryLine(op: TeamRow): string {
 
 /**
  * Recuadro "SIN DUEÑO": las tareas del team-backlog.md, libres primero y después las bloqueadas.
- * Usa la paleta de "tareas completadas" (título y viñeta en su verde, texto en su gris); solo el
+ * Título y viñeta en un azul pálido, texto de las tareas en el gris de las completadas; solo el
  * tag de bloqueo va en rojo, para no perder esa señal.
  */
-function teamBacklogBox({ box, pc, width, secondary, completed, completedGreen }: Canvas, backlog: TeamBacklogModel, compact = false): void {
+function teamBacklogBox({ box, pc, width, secondary, completed, unownedBlue }: Canvas, backlog: TeamBacklogModel, compact = false): void {
   if (!backlog.present) return;
   const total = backlog.free.length + backlog.blocked.length;
-  box(`SIN DUEÑO (${total})`, "team-backlog.md", completedGreen, (row) => {
+  box(`SIN DUEÑO (${total})`, "team-backlog.md", unownedBlue, (row) => {
     if (!total) row(0, { paint: secondary, text: "Ninguna" });
     if (compact && total) {
       // Solo la última (la más reciente de la lista), sin el motivo del bloqueo.
@@ -301,7 +303,7 @@ function teamBacklogBox({ box, pc, width, secondary, completed, completedGreen }
       const room = Math.max(1, width - BOX_PADDING - visibleLength(`• ${tag}${suffix}`));
       row(
         0,
-        { paint: completedGreen, text: "• " },
+        { paint: unownedBlue, text: "• " },
         { paint: completed, text: truncate(plainText(last.title), room) },
         ...(tag ? [{ paint: pc.red, text: tag }] : []),
         ...(suffix ? [{ paint: secondary, text: suffix }] : []),
@@ -309,7 +311,7 @@ function teamBacklogBox({ box, pc, width, secondary, completed, completedGreen }
       return;
     }
     for (const task of [...backlog.free, ...backlog.blocked]) {
-      row(0, { paint: completedGreen, text: "• " }, { paint: completed, text: task.title }, ...(task.block.tag ? [{ paint: pc.red, text: ` [${task.block.tag}]` }] : []));
+      row(0, { paint: unownedBlue, text: "• " }, { paint: completed, text: task.title }, ...(task.block.tag ? [{ paint: pc.red, text: ` [${task.block.tag}]` }] : []));
       if (task.block.reason) row(4, { paint: secondary, text: `→ ${task.block.reason}` });
     }
   });
@@ -384,13 +386,14 @@ function fullTaskName(task: { label: string; number: number; title: string }): s
  * picocolors, salvo el de "en progreso", que conserva el color de su tipo). Sin color, el texto
  * queda tal cual.
  */
-function tones(pc: Colors): { completed: Paint; completedGreen: Paint; secondary: Paint } {
+function tones(pc: Colors): { completed: Paint; completedGreen: Paint; unownedBlue: Paint; secondary: Paint } {
   const ansi256 = (code: number): Paint => (s) => (pc.isColorSupported ? `\x1b[38;5;${code}m${s}\x1b[39m` : s);
   const rgb = ([r, g, b]: readonly [number, number, number]): Paint => (s) =>
     pc.isColorSupported ? `\x1b[38;2;${r};${g};${b}m${s}\x1b[39m` : s;
   return {
     completed: ansi256(COMPLETED_GRAY_256),
     completedGreen: rgb(COMPLETED_GREEN_RGB),
+    unownedBlue: rgb(UNOWNED_BLUE_RGB),
     secondary: ansi256(SECONDARY_GRAY_256),
   };
 }

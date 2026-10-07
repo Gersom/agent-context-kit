@@ -84,14 +84,15 @@ describe("renderTeam", () => {
     expect(bare).toContain("Ningún operador registrado en operators.md");
   });
 
-  test("SIN DUEÑO usa la paleta de las tareas completadas: título y viñeta en su verde, texto en su gris", () => {
+  test("SIN DUEÑO: título y viñeta en azul pálido, texto en el gris de las completadas y el tag de bloqueo en rojo", () => {
     const colored = renderTeam(team, { ...meta, color: true });
     const box = colored.slice(colored.indexOf("SIN DUEÑO"));
-    expect(colored).toContain("\x1b[38;2;109;176;123mSIN DUEÑO"); // verde #6DB07B del título de completadas
-    expect(box).toContain("\x1b[38;2;109;176;123m• \x1b[39m");
+    expect(colored).toContain("\x1b[38;2;143;179;217mSIN DUEÑO"); // azul pálido #8FB3D9
+    expect(box).toContain("\x1b[38;2;143;179;217m• \x1b[39m");
     expect(box).toContain("\x1b[38;5;245mRevisar el copy del onboarding\x1b[39m"); // gris de las completadas
     expect(box).toContain("\x1b[31m [dependencia]"); // el tag de bloqueo sigue en rojo
-    expect(box).not.toContain("\x1b[34m"); // ya no es azul
+    expect(box).not.toContain("\x1b[38;2;109;176;123m"); // ya no usa el verde de completadas
+    expect(box).not.toContain("\x1b[34m"); // ni el azul básico del terminal
   });
 
   test("sin colores no hay códigos ANSI y todo cabe en el ancho", () => {
