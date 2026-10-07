@@ -196,10 +196,22 @@ describe("render", () => {
   });
 
   test("pie según los controles disponibles", () => {
-    expect(screen("minimal", { controls: "keys" })).toContain("c compactar · f ocultar flechas · q o Ctrl+C salir · r redibujar");
-    expect(screen("minimal", { controls: "keys", compact: true, arrows: false })).toContain("c expandir · f mostrar flechas · q o Ctrl+C salir · r redibujar");
-    expect(screen("minimal")).toContain("Ctrl+C para salir");
+    expect(screen("minimal", { controls: "keys" })).toContain("[c] compactar - [f] ocultar flechas - [r] redibujar - [Ctrl+C o q] salir");
+    expect(screen("minimal", { controls: "keys", compact: true, arrows: false })).toContain("[c] expandir - [f] mostrar flechas - [r] redibujar - [Ctrl+C o q] salir");
+    expect(screen("minimal")).toContain("[Ctrl+C] salir");
     expect(screen("minimal", { controls: "none" })).not.toContain("Ctrl+C");
+  });
+
+  test("el pie se parte en más líneas si no entra, y «salir» nunca se recorta", () => {
+    const full = "[Esc o b] volver al equipo - [c] compactar - [f] ocultar flechas - [r] redibujar - [Ctrl+C o q] salir";
+    expect(screen("minimal", { controls: "keys", multiView: "operator", width: 120 })).toContain(full);
+    const narrow = screen("minimal", { controls: "keys", multiView: "operator", width: 60 }).split("\n");
+    const at = narrow.findIndex((l) => l.startsWith("[Esc o b]"));
+    const footer = narrow.slice(at).filter(Boolean);
+    expect(footer.length).toBeGreaterThan(1);
+    for (const line of footer) expect(visibleLength(line)).toBeLessThanOrEqual(60);
+    expect(footer.join(" - ").replace(/ - - /g, " - ")).toContain("[Ctrl+C o q] salir");
+    expect(footer.join(" ")).not.toContain("…");
   });
 
   test("colores: bordes en gris salvo en progreso, completadas (nombre y fecha) en su gris, título verde, secundarios en gris claro", () => {

@@ -56,6 +56,8 @@ Solo con una terminal interactiva (sin `--once` ni salida redirigida):
 | `Enter` | Abrir el panel del operador elegido |
 | `b`, `Esc` o `Retroceso` | Volver a la vista de equipo |
 
+El pie de la pantalla lista las teclas que valen en la vista actual como `[tecla] acción` (por ejemplo `[Esc o b] volver al equipo - [c] compactar - [f] ocultar flechas - [r] redibujar - [Ctrl+C o q] salir`); `c` y `f` dicen lo que harán según el estado (`[c] expandir`, `[f] mostrar flechas`), y si el pie no entra en el ancho se parte en dos líneas para que "salir" nunca quede recortado.
+
 ## Qué muestra
 
 ```

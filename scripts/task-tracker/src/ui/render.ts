@@ -77,16 +77,16 @@ function createCanvas(meta: RenderMeta, subtitle?: string) {
 type Canvas = ReturnType<typeof createCanvas>;
 
 /** Avisos, notas y pie con las teclas; cierra la pantalla y la devuelve como texto. */
-function finishCanvas({ out, line, blank, secondary, pc }: Canvas, meta: RenderMeta, model: { notes?: string[]; warnings: string[] }): string {
+function finishCanvas({ out, line, blank, secondary, pc, width }: Canvas, meta: RenderMeta, model: { notes?: string[]; warnings: string[] }): string {
   const notes = model.notes ?? [];
   if (notes.length || model.warnings.length) blank();
   for (const note of notes) line(0, `ℹ ${note}`, secondary);
   for (const warning of model.warnings) line(0, `! ${warning}`, pc.yellow);
 
-  const footer = footerText(meta);
-  if (footer) {
+  const footer = footerLines(meta, width);
+  if (footer.length) {
     blank();
-    line(0, footer, secondary);
+    for (const text of footer) line(0, text, secondary);
   }
   return out.join("\n") + "\n";
 }
@@ -331,19 +331,36 @@ export function triggerText(trigger: DrawTrigger): string {
   return trigger.file ? `se modificó ${trigger.file}` : "cambio detectado";
 }
 
-/** Pie con las teclas que valen en esta vista; `c` y `f` dicen lo que harán, según el estado actual. */
-function footerText(meta: RenderMeta): string | null {
+/**
+ * Pie con las teclas que valen en esta vista, como `[tecla] acción` separadas por ` - `; `c` y `f`
+ * dicen lo que harán según el estado actual. Si no entra en el ancho se parte en más líneas (así
+ * "salir", lo último, nunca queda recortado).
+ */
+function footerLines(meta: RenderMeta, width: number): string[] {
   const controls = meta.controls ?? "ctrl-c";
-  if (controls === "ctrl-c") return "Ctrl+C para salir";
-  if (controls !== "keys") return null;
+  if (controls === "ctrl-c") return ["[Ctrl+C] salir"];
+  if (controls !== "keys") return [];
   const parts: string[] = [];
-  if (meta.multiView === "team") parts.push("↑/↓ elegir", "Enter abrir");
-  if (meta.multiView === "operator") parts.push("b o Esc volver al equipo");
-  parts.push(meta.compact ? "c expandir" : "c compactar");
+  if (meta.multiView === "team") parts.push("[↑/↓] elegir", "[Enter] abrir");
+  if (meta.multiView === "operator") parts.push("[Esc o b] volver al equipo");
+  parts.push(meta.compact ? "[c] expandir" : "[c] compactar");
   // La vista de equipo no tiene flechas de flujo.
-  if (meta.multiView !== "team") parts.push(meta.arrows === false ? "f mostrar flechas" : "f ocultar flechas");
-  parts.push("q o Ctrl+C salir", "r redibujar");
-  return parts.join(" · ");
+  if (meta.multiView !== "team") parts.push(meta.arrows === false ? "[f] mostrar flechas" : "[f] ocultar flechas");
+  parts.push("[r] redibujar", "[Ctrl+C o q] salir");
+
+  const lines: string[] = [];
+  let current = "";
+  for (const part of parts) {
+    const joined = current ? `${current} - ${part}` : part;
+    if (current && visibleLength(joined) > width) {
+      lines.push(current);
+      current = part;
+    } else {
+      current = joined;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
 }
 
 /**
