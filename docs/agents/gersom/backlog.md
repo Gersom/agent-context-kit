@@ -62,22 +62,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** las normas salen de `skill/docs/template-architecture.md` ("Anclas de sección") y de las plantillas de `skill/template/agents/`; ante una diferencia, gana la plantilla (Regla 4).
 - **Agregada:** 2026-10-05.
 
-### Tarea 24 — Script para gestionar las tareas (handoff, backlog, history)
-
-- **Descripción:** script nuevo en `scripts/` (el task-tracker sigue siendo solo de lectura) con comandos que el agente ejecuta en vez de editar a mano `handoff.md`, `backlog.md` y `history.md`: agregar una tarea, empezarla, marcar el paso en que va, pausarla, bloquearla o desbloquearla y cerrarla (hecha o descartada). Al cerrar aplica lo mecánico de las Reglas 5 a 8: actualiza los tres archivos, "Próximo número de tarea" y las anclas, lista las bloqueadas a revisar y genera el reporte de cierre. Con comandos de lectura compactos (`next`, `show N`, `status`) para no leer `history.md` (~55 KB) ni todo el backlog.
-- **Decisiones/temas a definir antes de empezar:**
-  - **Ya decidido (2026-10-05):** edición quirúrgica del markdown; los `.md` siguen siendo la fuente de verdad y el diff de git muestra solo el cambio. Sin base de datos ni formato aparte.
-  - Nombre de la carpeta y del comando (ej. `scripts/task-manager/` y `bun run task ...`).
-  - Formato estructurado de los bloqueos para desbloquear solo (ej. `blocked-by: Tarea 12`); los de texto libre quedan para revisión manual.
-  - Cómo entra el texto libre (descripciones, `Detalles`): flags o stdin.
-  - Posiciones (línea/offset) de bloques y campos en el parser compartido de `scripts/_shared/`; se agregan en esta tarea.
-  - Reflejo en `rules.md` y en las plantillas: el script es opcional; sin él, el agente edita a mano como hoy (el kit sigue siendo markdown puro).
-  - Hacerlo por etapas: primero comandos de lectura, después los de escritura, empezando por los más mecánicos.
-- **Bloqueos:** `[Resuelto el 2026-10-06]` — era `[dependencia]` de la Tarea 23 (parser compartido, ya en `scripts/_shared/`); las posiciones línea/offset no se hicieron allí y se agregan acá. Debe respetar `docs/philosophy.md`.
-- **Disparador:** cuando el operador la priorice.
-- **Detalles:** surgió el 2026-10-05: busca bajar el consumo de tokens (menos lectura y reescritura) y evitar errores mecánicos (anclas olvidadas, números repetidos). La Tarea 15 (validador) sirve de red de seguridad.
-- **Agregada:** 2026-10-05.
-
 <!-- agent-context-kit:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
