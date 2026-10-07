@@ -130,3 +130,39 @@ export interface TeamRead {
   warnings: string[];
   needsRetry: boolean;
 }
+
+/** Fila del recuadro EQUIPO: un operador, lo que está haciendo y sus conteos. */
+export interface TeamRow {
+  folder: string;
+  /** `(solo team-backlog)`: no tiene carpeta propia, así que no se puede abrir. */
+  folderless: boolean;
+  /** `true` si su carpeta no tiene `handoff.md` legible (la fila lo indica). */
+  missing: boolean;
+  current: { label: string; number: number; title: string; done: number; total: number } | null;
+  counts: { free: number; blocked: number };
+  /** Última entrada de su `history.md` (las más nuevas van primero). */
+  lastCompleted: HistoryEntry | null;
+}
+
+/** Tarea del `team-backlog.md` lista para pintar (sin número). */
+export interface TeamBacklogTask {
+  title: string;
+  /** Tag y motivo del bloqueo vigente; `tag: null` si no está bloqueada. */
+  block: BlockInfo;
+}
+
+/** Tareas sin dueño: libres primero, después las bloqueadas. */
+export interface TeamBacklogModel {
+  /** `false` si no existe `team-backlog.md` (no se pinta el recuadro). */
+  present: boolean;
+  free: TeamBacklogTask[];
+  blocked: TeamBacklogTask[];
+  warnings: string[];
+}
+
+/** Modelo de la vista de equipo. */
+export interface TeamModel {
+  rows: TeamRow[];
+  teamBacklog: TeamBacklogModel;
+  warnings: string[];
+}
