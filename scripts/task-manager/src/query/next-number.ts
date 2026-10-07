@@ -8,6 +8,9 @@ export interface NextTaskNumber {
   value: number;
   /** Línea (1-based) donde está. */
   line: number;
+  /** Dónde están los dígitos del número en `text` (`[start, end)`), para reemplazarlos sin tocar el resto de la línea. */
+  start: number;
+  end: number;
 }
 
 const ANCHOR_RE = /^\s*<!--\s*agent-context-kit:section=[a-z-]+\s*-->\s*$/;
@@ -26,8 +29,11 @@ export function findNextTaskNumber(text: string): NextTaskNumber | null {
   const lines = text.split("\n");
   let inComment = false;
   let inFence = false;
+  let offset = 0; // offset de `text` en que empieza la línea `i`
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+    const lineStart = offset;
+    offset += line.length + 1;
     const startsInComment = inComment;
     inComment = commentStateAfter(line, inComment);
     if (startsInComment) continue;
@@ -38,7 +44,10 @@ export function findNextTaskNumber(text: string): NextTaskNumber | null {
     if (inFence) continue;
     if (ANCHOR_RE.test(line) || H2_RE.test(line)) return null;
     const match = line.match(NEXT_NUMBER_RE);
-    if (match) return { value: Number(match[1]), line: i + 1 };
+    if (match) {
+      const start = lineStart + line.lastIndexOf(match[1]);
+      return { value: Number(match[1]), line: i + 1, start, end: start + match[1].length };
+    }
   }
   return null;
 }

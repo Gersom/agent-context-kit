@@ -24,12 +24,13 @@ export function renderHelp(commands: Command[]): string[] {
     "Uso: bun run task <comando> [argumentos] [flags]",
     "",
     "Comandos:",
-    ...table([...commands.map((c): [string, string] => [c.name, c.summary]), ["help [comando]", "Muestra esta ayuda o la de un comando"]]),
+    ...table([...commands.map((c): [string, string] => [c.writes ? `${c.name} *` : c.name, c.summary]), ["help [comando]", "Muestra esta ayuda o la de un comando"]]),
     "",
     "Flags globales:",
     ...table(Object.entries(GLOBAL_FLAGS).map(([name, spec]) => flagLine(name, spec))),
     "",
     "Un flag de texto con valor `-` lee su contenido de la entrada estándar (ej. `--detalles -`).",
+    "Los comandos que escriben (marcados con *) no escriben nada sin --apply: solo muestran el diff.",
     "Para más detalle de un comando: bun run task <comando> --help",
   ];
 }
@@ -41,6 +42,12 @@ export function renderCommandHelp(command: Command): string[] {
     `Uso: bun run task ${command.usage}`,
     "",
     command.summary,
+    ...(command.writes
+      ? [
+          "",
+          "Este comando escribe archivos: sin --apply solo muestra el diff y avisa que no escribió nada. Con --apply escribe (con --dry-run no escribe aunque se pase). Solo edita tu carpeta y el team-backlog.md compartido.",
+        ]
+      : []),
     ...(own.length ? ["", "Flags del comando:", ...table(own)] : []),
     "",
     "Flags globales:",

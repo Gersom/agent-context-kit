@@ -28,6 +28,8 @@ export interface ResolvedOperator {
   /** Correo de git usado (o `null` si no se pudo leer). */
   email: string | null;
   ownership: Ownership;
+  /** `true` solo para un operador «solo team-backlog» admitido con `allowFolderless`: no tiene carpeta propia. */
+  folderless?: boolean;
 }
 
 export interface OperatorsInfo {
@@ -43,6 +45,11 @@ export interface OperatorOptions {
   direct?: string;
   /** Correo a buscar (`null` = no disponible); lo lee quien llama de `git config user.email`. */
   email: string | null;
+  /**
+   * Admitir al operador «solo team-backlog» (sin carpeta): se resuelve con `folderless: true` en vez
+   * de fallar, para los comandos que solo escriben en el `team-backlog.md` compartido.
+   */
+  allowFolderless?: boolean;
 }
 
 /** Lee y parsea `operators.md` de la raíz de agentes. */
@@ -79,6 +86,14 @@ export function resolveOperator(agentsRoot: string, info: OperatorsInfo, options
   const ownershipOf = (folder: string): Ownership =>
     !email ? "unverified" : ownFolder?.toLowerCase() === folder.toLowerCase() ? "own" : "other";
 
+  const folderlessOperator = (entry: OperatorEntry, source: OperatorSource): ResolvedOperator => ({
+    folder: entry.folder,
+    source,
+    email,
+    ownership: !email ? "unverified" : entry.emails.includes(email.toLowerCase()) ? "own" : "other",
+    folderless: true,
+  });
+
   const pick = (entry: OperatorEntry, source: OperatorSource): ResolvedOperator => {
     if (!existsSync(join(agentsRoot, entry.folder, "handoff.md"))) {
       fail(`La carpeta «${entry.folder}» figura en ${OPERATORS_FILE} pero no existe o no tiene handoff.md en ${agentsRoot}.`);
@@ -96,7 +111,10 @@ export function resolveOperator(agentsRoot: string, info: OperatorsInfo, options
         : "";
       return fail(`«${wanted}» no figura en ${OPERATORS_FILE}.${onDisk}`);
     }
-    if (entry.folderless) return fail(`«${entry.folder}» figura como «solo team-backlog»: no tiene carpeta propia.`);
+    if (entry.folderless) {
+      if (options.allowFolderless) return folderlessOperator(entry, source);
+      return fail(`«${entry.folder}» figura como «solo team-backlog»: no tiene carpeta propia.`);
+    }
     return pick(entry, source);
   }
 
@@ -104,6 +122,7 @@ export function resolveOperator(agentsRoot: string, info: OperatorsInfo, options
     return fail("No se pudo leer `git config user.email` para saber qué operador corresponde; indica uno con --operator <carpeta>.");
   }
   if (!mine) return fail(`${email} no figura en ${OPERATORS_FILE}; indica uno con --operator <carpeta> o regístralo primero.`);
+  if (mine.folderless && options.allowFolderless) return folderlessOperator(mine, "email");
   if (mine.folderless) {
     return fail(
       `${email} figura como «solo team-backlog» («${mine.folder}»): no tiene carpeta propia, así que no hay handoff, backlog ni history que editar.`,

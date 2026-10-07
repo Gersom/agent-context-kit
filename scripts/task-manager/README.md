@@ -1,6 +1,6 @@
 # task-manager
 
-Gestiona las tareas de un proyecto que usa el skill `agent-context-kit` editando de forma **quirúrgica** sus archivos (`handoff.md`, `backlog.md`, `history.md` y, en modo multi-operador, `team-backlog.md`), en lugar de que un agente o una persona los edite a mano. Los comandos de negocio se van sumando por etapas; hoy están la infraestructura, dos comandos de diagnóstico y los de lectura (`status`, `next`, `show`). Los de escritura (`add`, `start`, ...) vienen después.
+Gestiona las tareas de un proyecto que usa el skill `agent-context-kit` editando de forma **quirúrgica** sus archivos (`handoff.md`, `backlog.md`, `history.md` y, en modo multi-operador, `team-backlog.md`), en lugar de que un agente o una persona los edite a mano. Los comandos de negocio se van sumando por etapas; hoy están la infraestructura, dos comandos de diagnóstico, los de lectura (`status`, `next`, `show`) y los primeros de escritura (`add`, `start`). Los demás (`step`, `pause`, `close`, ...) vienen después.
 
 Es **opcional** y es una herramienta de este repo, no parte del skill: no se copia a los repos destino (principio 4 de [`docs/philosophy.md`](../../docs/philosophy.md)). Sin ella, los archivos se editan a mano igual.
 
@@ -22,11 +22,14 @@ bun run task status                   # foto compacta: en curso, pausadas, libre
 bun run task next                     # qué hacer ahora
 bun run task show 24                  # el bloque completo de la Tarea 24, viva donde esté
 bun run task status --json            # lo mismo, estructurado, para otros scripts
-bun run task <comando> --dry-run      # muestra el diff sin escribir nada
+bun run task add --titulo "..." --descripcion "..."          # muestra el diff; NO escribe
+bun run task add --titulo "..." --descripcion "..." --apply  # ahora sí escribe
+bun run task start 24 --plan - --apply < pasos.txt           # empieza la Tarea 24
+bun run task <comando> --dry-run      # muestra el diff sin escribir nada (también con --apply)
 bun run task <comando> --agents D:/proyectos/mi-app --operator ana
 ```
 
-**Comandos de hoy** (todos de solo lectura):
+**Comandos de hoy** (los marcados con `*` escriben, y solo con `--apply`; los demás son de solo lectura):
 
 | Comando | Qué hace |
 |---|---|
@@ -35,12 +38,15 @@ bun run task <comando> --agents D:/proyectos/mi-app --operator ana
 | `status` | Foto compacta del operador: tarea en curso, pausadas, libres, bloqueadas, últimas 3 cerradas, team-backlog. |
 | `next` | Qué hacer ahora: el siguiente paso de la tarea en curso o, sin ella, lo que se puede tomar. |
 | `show <N>` | El bloque completo de una tarea y de dónde salió. |
+| `add` `*` | Agrega una tarea a tu `backlog.md` (con el siguiente número) o, con `--team`, al `team-backlog.md`. |
+| `start <N>` `*` | Empieza una tarea: la saca del backlog y arma «Tarea en progreso» en el `handoff.md`. Con `--team "<título>"`, la toma del `team-backlog.md`. |
 
 **Flags globales** (valen para todos los comandos, antes o después de su nombre):
 
 - `--agents <ruta>`: raíz del proyecto, carpeta de agentes (`docs/agents/` o `agent-context/agents/`) o carpeta de un operador. Sin él, el repo git que contiene la carpeta desde la que lanzaste el comando. Las rutas relativas se resuelven desde esa carpeta y se pueden pegar con comillas.
 - `--operator <carpeta>`: operador a usar (modo multi-operador). Sin él, el de `git config user.email`.
-- `--dry-run`: muestra el diff de lo que se escribiría y no escribe nada.
+- `--apply`: aplica los cambios. **Un comando que escribe no escribe nada sin `--apply`**: solo muestra el diff y avisa («No se escribió nada; repite con --apply»). Los comandos de lectura no lo necesitan.
+- `--dry-run`: muestra el diff de lo que se escribiría y no escribe nada. Gana sobre `--apply`: con los dos, no escribe.
 - `-h`, `--help`: ayuda general o del comando.
 
 **Texto largo por stdin:** un flag de texto que lo admita acepta `-` como valor y lee su contenido de la entrada estándar (se normaliza a LF y se quita el salto de línea final):
@@ -142,13 +148,56 @@ La salida es un objeto con `schema` (versión del esquema, hoy `1`; sube si un c
 }
 ```
 
+## Comandos de escritura
+
+Reglas de seguridad que aplica el **núcleo** (no cada comando) a todo comando que escribe (`writes: true` en su definición):
+
+- **`--apply` obligatorio.** Sin él, el comando calcula todo, verifica el resultado y muestra el diff, pero no escribe. Con `--dry-run` tampoco escribe aunque se pase `--apply`.
+- **Solo la carpeta propia.** Si la carpeta resuelta no es la del correo de `git config user.email` (otro operador, o no se pudo verificar), el comando se niega con un error claro, sin escribir ni mostrar el diff: las carpetas de otros operadores son de solo lectura. En el repo plano no hay otros operadores. **Excepción:** lo que solo cambia el `team-backlog.md` (`add --team`) es un archivo compartido y no lo exige.
+- **Todo por `planChanges`/`commitChanges`:** verificación de legibilidad (anclas y secciones), detección de cambios concurrentes, escritura atómica, CRLF/LF respetados, todo o nada entre los archivos que toca un comando.
+- **Números sin repetir:** antes de numerar, «Próximo número de tarea» tiene que ser mayor que la tarea más alta que ya existe en handoff, backlog (con grupos) e history; si no, error que lo explica (no se elige otro número por cuenta propia).
+
+### `add`
+
+```sh
+bun run task add --titulo "Mi tarea" --descripcion "De qué trata" [--decisiones ...] [--bloqueo ...] [--disparador ...] [--detalles ...] [--team] [--apply]
+```
+
+Agrega una tarea al final de «Tareas libres» (o de «bloqueadas / pospuestas») de tu `backlog.md`:
+
+- `--titulo` y `--descripcion` son obligatorios. `--decisiones` y `--bloqueo` valen «Ninguno.» por defecto; `--disparador`, «cuando el operador pregunte por tareas pendientes.»; `--detalles` es opcional y, si no se pasa, el campo se omite. Todos admiten `-` para leer de la entrada estándar (un solo flag por ejecución).
+- Si `--bloqueo` empieza con `[dependencia]` o `[postergada]` (con o sin acentos graves), la tarea va a «bloqueadas»; si no, a «libres» (con un aviso si dice algo sin ninguno de los dos tags).
+- Recibe el número de «Próximo número de tarea», que pasa a N+1 **en la misma edición**. `Agregada`: la fecha de hoy (`YYYY-MM-DD.`, hora local).
+- Con `--team`: va al `team-backlog.md`, sin número ni contador, con `### <título único>` (error si el título ya existe, sin distinguir mayúsculas ni acentos) y `Agregada: <fecha> por <operador>`. No lleva `Disparador` (`--disparador` es un error). Para el operador, necesita saber quién eres: el de `git config user.email` o `--operator`; el **operador «solo team-backlog»** (sin carpeta) puede usarlo.
+
+### `start`
+
+```sh
+bun run task start 24 [--plan -] [--modo "uno a la vez"] [--force] [--apply]
+bun run task start --team "Migrar el CI" [--plan -] [--modo ...] [--force] [--apply]
+```
+
+Empieza una tarea, **en una sola operación** sobre todos los archivos (o ninguno):
+
+- Exige que **no haya otra tarea en curso** (si la hay, error que sugiere pausarla; `pause` llega en una etapa posterior) y que la elegida esté en «libres». Una **bloqueada** da error salvo con `--force` (queda constancia en la salida); una **pausada** o **cerrada**, error claro; una **agrupada**, error (sacarla de «Tareas agrupadas» todavía no está soportado). Repetir el mismo `start --apply` falla limpio: ya hay una tarea en curso.
+- Saca su bloque de `backlog.md` sin dejar huecos ni líneas en blanco dobles; si era la última, la sección queda con «Ninguna.» (`None.` en inglés).
+- Reescribe el cuerpo de «Tarea en progreso» de `handoff.md` según su plantilla, sin tocar el resto del archivo ni las anclas: la línea `Tarea N — título` antes de la primera subsección `###`, un párrafo con la descripción, **Plan** (solo con `--plan`: una línea por paso; se agrega siempre el último paso «Documentar cierre de tarea»; con `--modo`, la línea «Modo de ejecución acordado»), **Qué falta**, **Decisiones a medio camino** (con lo que la tarea traía en «decisiones», si no era «Ninguno») y **Próximo paso concreto** (el primer paso del plan, o «Empezar la tarea.»), en ese orden. Los campos de la tarea que el handoff no tiene dónde poner (`Detalles`, `Desbloquea`...) se copian tal cual, en líneas `- **Campo:** valor` tras la descripción, para que no se pierdan al sacarla del backlog.
+- Con `--team`: la tarea sale de `team-backlog.md` (por título, o una parte única), recibe el siguiente número de tu secuencia (el contador pasa a N+1) y el handoff lleva la línea `- **Origen:** team-backlog`. Los tres archivos cambian juntos.
+- La rama y el commit no son asunto del script.
+
+### Dónde y cómo escriben
+
+- **Ubicación:** al final de la sección, justo tras el último contenido y antes de las líneas en blanco que la separan de la siguiente. **Espaciado:** el que ya usa el archivo (lo que separa a sus dos últimas tareas; una línea en blanco si no hay dos). Si la sección solo tenía el texto de vacío («Ninguna.»), un placeholder de la plantilla o la tarea anterior, el bloque lo **reemplaza**; los comentarios HTML del principio de la sección se conservan. Las tareas agrupadas no se tocan: un grupo no recibe tareas nuevas.
+- **Idioma:** el header usa la palabra que ya usan las tareas del archivo (`Tarea`, `Task`...) y las etiquetas de campo salen de una tarea existente; si no hay de dónde copiar, una tabla mínima en **español** (por defecto) o **inglés** (si la palabra de header o las etiquetas lo son). No se inventan traducciones a otros idiomas: ante un idioma desconocido, o sin ninguna pista, escribe en español y lo avisa en la salida. Los títulos de subsección del handoff (Plan, Qué falta...) salen de la misma tabla.
+- **Finales de línea:** un archivo CRLF sigue siendo CRLF y uno LF, LF; lo escrito no reformatea nada de lo que no toca.
+
 ## Consulta reutilizable (`src/query/`)
 
 Los comandos de lectura son una capa fina sobre un módulo de consulta que los comandos que editan (`add`, `start`, `step`, `close`...) también usan, para no repetir cómo se interpreta cada archivo:
 
 - `query/find.ts`: `findTask(docs, n)` devuelve dónde vive la tarea `n` (lugar, título, grupo, archivo y rango sin líneas en blanco; más de uno si está repetida); `locationText(location)` el fragmento; `findTeamTasks(docs, query)` las del team-backlog por título; `parseTarget(arg)` interpreta `N`, `T-N@operador` o un título; `readOperatorDocs(workspace, folder)` lee (solo lectura) los archivos de otro operador; `describeKnownNumbers(docs)`.
 - `query/state.ts`: `buildState(docs)` arma el estado completo (lo que muestra `status`); `buildTaskIndex(docs)` y `knownNumbers(docs)`; `planProgress`, `nextConcreteStep` y `fieldValue` (campo por etiqueta) son sus piezas.
-- `query/next-number.ts`: `findNextTaskNumber(text)` devuelve el valor y la línea de «Próximo número de tarea».
+- `query/next-number.ts`: `findNextTaskNumber(text)` devuelve el valor, la línea y los offsets de los dígitos de «Próximo número de tarea».
 - `query/lines.ts`: `trimRange(text, range)` y `lineAt(text, offset)`.
 - `query/format.ts`: texto compacto y `emitJson`, compartidos por los comandos de lectura.
 
@@ -167,7 +216,8 @@ Sigue [`skill/docs/multi-operator.md`](../../skill/docs/multi-operator.md) y nun
   - `operators.md` no tiene operadores legibles (las líneas sin leer se avisan);
   - **falta `operators.md` pero hay carpetas de operador:** no se asume repo plano (es el «estado inconsistente» de `multi-operator.md`); hay que restaurarlo;
   - `--operator` en un repo plano.
-- **Carpeta de otro operador:** `--operator` permite apuntar a la de otro, pero esas carpetas son de solo lectura según las reglas del proyecto. `whoami` lo marca (`Carpeta propia: no`) y los comandos que escriban deben tenerlo en cuenta.
+- **Carpeta de otro operador:** `--operator` permite apuntar a la de otro, pero esas carpetas son de solo lectura según las reglas del proyecto. `whoami` lo marca (`Carpeta propia: no`) y los comandos que escriben se niegan (ver «Comandos de escritura»).
+- **Operador «solo team-backlog»:** los comandos que solo escriben en el `team-backlog.md` (`add --team`) lo resuelven igual (`ctx.workspace({ allowFolderless: true })`): trae su nombre pero no hay handoff, backlog ni history. Para todos los demás sigue siendo el error de arriba.
 
 ## Archivos que lee
 
@@ -186,10 +236,11 @@ Un archivo que se modifica no se reformatea: el diff muestra solo el cambio pedi
 - **Todo o nada al calcular:** un comando que toca varios archivos calcula todos antes de escribir el primero. Si uno falla, no se escribe ninguno.
 - **Escritura atómica y solo si cambió:** cada archivo se escribe a un temporal y se renombra sobre el original (con reintentos si Windows lo tiene abierto un instante); un archivo sin cambios no se toca (ni su fecha de modificación). Antes de escribir se comprueba que nadie lo haya modificado desde que se leyó.
 - **`--dry-run`:** muestra, por archivo, el diff (`-` quita, `+` agrega, con unas líneas de contexto) y no escribe nada.
+- **`--apply` en los comandos de escritura:** `ctx.commit()` lo decide en el núcleo: un comando con `writes: true` solo escribe con `--apply` (sin él hace lo mismo que `--dry-run`, con otro aviso final); uno sin `writes` escribe directamente.
 
 ## Agregar un comando
 
-Cada comando es un módulo de `src/commands/` que exporta un objeto con `name`, `summary`, `usage`, sus `flags` (opcionales) y `run(ctx)`; se importa y se suma a la lista de `src/commands/index.ts`. El despachador no se toca. Detalle del contrato (`ctx.args`, `ctx.flags`, `ctx.workspace()`, `ctx.docs()`, `ctx.commit()`): `src/cli/types.ts`.
+Cada comando es un módulo de `src/commands/` que exporta un objeto con `name`, `summary`, `usage`, sus `flags` (opcionales) y `run(ctx)`; se importa y se suma a la lista de `src/commands/index.ts`. El despachador no se toca. Un comando que escribe lleva además `writes: true`: así `--apply`, la ayuda y la regla de la carpeta propia valen sin que el comando haga nada. Detalle del contrato (`ctx.args`, `ctx.flags`, `ctx.workspace()`, `ctx.docs()`, `ctx.now()`, `ctx.commit()`): `src/cli/types.ts`.
 
 ## Estructura
 
@@ -201,7 +252,8 @@ scripts/task-manager/
 │   ├── commands/     # Un módulo por comando + index.ts (el registro)
 │   ├── query/        # Consulta reutilizable: dónde vive una tarea, estado del operador, próximo número, formato
 │   ├── workspace/    # Ruta de agentes, operador (operators.md + correo de git), espacio de trabajo y lectura de archivos
-│   └── edit/         # Ediciones por rango, verificación de legibilidad, diff, escritura atómica y cambios de varios archivos
+│   ├── edit/         # Ediciones por rango, ubicar/sacar un bloque en una sección (`layout.ts`), verificación de legibilidad, diff, escritura atómica y cambios de varios archivos
+│   └── write/        # Lo que escriben los comandos: idioma y etiquetas, formato de los bloques y del handoff, contador de número de tarea
 └── test/             # Tests de `bun test` en espejo de src/ + e2e/ (script entero); trabajan en directorios temporales
 ```
 

@@ -217,3 +217,167 @@ export const TEAM_RICH = `# Backlog del equipo
 
 - **Bloqueos:** \`[postergada]\` esperar al contrato.
 `;
+
+/** Backlog con una sola tarea libre y la sección de bloqueadas vacía (al empezarla, «libres» queda vacía). */
+export const BACKLOG_ONE = `# Backlog
+
+**Próximo número de tarea:** 8
+
+---
+
+<!-- agent-context-kit:section=free -->
+## Tareas libres
+
+### Tarea 7 — La única
+
+- **Descripción:** Hacer lo único.
+- **Decisiones/temas a definir antes de empezar:** Ninguno.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-01.
+
+<!-- agent-context-kit:section=blocked -->
+## Tareas bloqueadas / pospuestas
+
+Ninguna.
+
+<!-- agent-context-kit:section=grouped -->
+## Tareas agrupadas
+
+No aplica todavía — ningún grupo formado.
+`;
+
+/** Backlog recién generado por la plantilla: las secciones traen su placeholder en vez de «Ninguna.». */
+export const BACKLOG_TEMPLATE = `# Backlog
+
+**Próximo número de tarea:** 1
+
+---
+
+<!-- agent-context-kit:section=free -->
+## Tareas libres
+
+### Tarea [N] — [Placeholder — título corto de la tarea]
+
+- **Descripción:** [Placeholder]
+- **Decisiones/temas a definir antes de empezar:** [Placeholder]
+- **Bloqueos:** Ninguno.
+- **Disparador:** [Placeholder]
+- **Detalles:** [Placeholder]
+- **Agregada:** [Placeholder]
+
+<!-- agent-context-kit:section=blocked -->
+## Tareas bloqueadas / pospuestas
+
+### Tarea [N] — [Placeholder — título corto de la tarea]
+
+- **Descripción:** [Placeholder]
+- **Bloqueos:** [Placeholder — \`[dependencia]\` o \`[postergada]\` + motivo]
+
+<!-- agent-context-kit:section=grouped -->
+## Tareas agrupadas
+
+No aplica todavía — ningún grupo formado.
+`;
+
+/** team-backlog.md recién generado por la plantilla. */
+export const TEAM_TEMPLATE = `# Backlog del equipo
+
+---
+
+<!-- agent-context-kit:section=free -->
+## Tareas libres
+
+### [Placeholder — título único de la tarea]
+
+- **Descripción:** [Placeholder]
+- **Decisiones/temas a definir antes de empezar:** [Placeholder]
+- **Bloqueos:** Ninguno.
+- **Agregada:** [Placeholder — fecha y operador]
+
+<!-- agent-context-kit:section=blocked -->
+## Tareas bloqueadas / pospuestas
+
+[Placeholder — "Ninguna" si no hay]
+`;
+
+/** team-backlog.md con una libre y una bloqueada, con dos líneas en blanco entre sus tareas libres. */
+export const TEAM_TWO = `# Backlog del equipo
+
+<!-- agent-context-kit:section=free -->
+## Tareas libres
+
+### Revisar el copy del onboarding
+
+- **Descripción:** ajustar textos
+- **Bloqueos:** Ninguno.
+- **Agregada:** 2026-10-02 por gersom
+
+
+### Migrar el CI
+
+- **Descripción:** pasar a Actions
+- **Decisiones/temas a definir antes de empezar:** ¿Se migra todo?
+- **Bloqueos:** Ninguno.
+- **Detalles:** Ver la \`T-3@ana\`.
+- **Agregada:** 2026-10-03 por ana
+
+<!-- agent-context-kit:section=blocked -->
+## Tareas bloqueadas / pospuestas
+
+### Cambiar de proveedor
+
+- **Descripción:** otro proveedor
+- **Bloqueos:** \`[postergada]\` esperar al contrato.
+- **Agregada:** 2026-10-04 por ana
+`;
+
+/** Un proyecto en inglés: `Task`, etiquetas en inglés y «None.» como texto de vacío. */
+export const HANDOFF_IDLE_EN = `# Handoff
+
+<!-- agent-context-kit:section=in-progress -->
+## Task in progress
+
+No task in progress
+
+<!-- agent-context-kit:section=paused -->
+## Paused tasks
+
+None.
+`;
+
+export const BACKLOG_EN = `# Backlog
+
+**Next task number:** 6
+
+---
+
+<!-- agent-context-kit:section=free -->
+## Free tasks
+
+### Task 4 — Translate the glossary
+
+- **Description:** translate \`glossary.md\`.
+- **Blockers:** None.
+- **Trigger:** when the operator asks about pending tasks.
+- **Added:** 2026-10-01.
+
+<!-- agent-context-kit:section=blocked -->
+## Blocked / postponed tasks
+
+None.
+
+<!-- agent-context-kit:section=grouped -->
+## Grouped tasks
+
+Not applicable yet.
+`;
+
+export const HISTORY_EN = `# History
+
+---
+
+## 2026-10-02 — ✅ Task 5 — Done already
+
+- Closed.
+`;

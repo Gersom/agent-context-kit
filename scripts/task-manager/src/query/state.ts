@@ -300,7 +300,7 @@ export function buildState(docs: Docs): TaskState {
     recentHistory: docs.history.parsed.entries
       .slice(0, RECENT_HISTORY)
       .map((entry) => ({ date: entry.date, status: entry.status, number: entry.number, title: entry.title })),
-    nextTaskNumber,
+    nextTaskNumber: nextTaskNumber && { value: nextTaskNumber.value, line: nextTaskNumber.line },
     team,
     warnings,
   };

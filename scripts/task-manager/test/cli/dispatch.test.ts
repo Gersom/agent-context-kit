@@ -126,7 +126,7 @@ describe("contexto de un comando", () => {
     await exec(["probe", "a", "--titulo", "T", "b", "--fuerza", "--dry-run", "--operator", "gersom"], [probe(seen)]);
     expect(seen[0].args).toEqual(["a", "b"]);
     expect(seen[0].flags).toEqual({ titulo: "T", fuerza: true });
-    expect(seen[0].global).toEqual({ dryRun: true });
+    expect(seen[0].global).toEqual({ dryRun: true, apply: false });
   });
 
   test("flags globales antes del nombre del comando", async () => {

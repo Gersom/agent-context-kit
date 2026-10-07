@@ -76,13 +76,14 @@ function paint(line: string): string {
 
 /**
  * Escribe los cambios calculados, cada archivo de forma atómica y solo si cambió; o, con `dryRun`,
- * muestra el diff de cada uno sin escribir. Antes de escribir se comprueba que ningún archivo haya
+ * muestra el diff de cada uno sin escribir (con `notice`, ese aviso cierra el diff en vez del de
+ * `--dry-run`: es para decir por qué no se escribió). Antes de escribir se comprueba que ningún archivo haya
  * cambiado en disco desde que se leyó (ej. un agente o el operador lo estaban editando): si cambió
  * alguno, no se escribe ninguno.
  * @throws CliError archivo modificado por otro lado, o fallo de escritura
  */
-export function commitChanges(planned: PlannedFile[], options: { dryRun: boolean; io: Io }): ChangeResult {
-  const { dryRun, io } = options;
+export function commitChanges(planned: PlannedFile[], options: { dryRun: boolean; io: Io; notice?: string }): ChangeResult {
+  const { dryRun, io, notice } = options;
   const files = planned.map((file) => ({ path: file.path, fileName: file.fileName, changed: file.changed, written: false }));
 
   if (dryRun) {
@@ -94,7 +95,9 @@ export function commitChanges(planned: PlannedFile[], options: { dryRun: boolean
       io.out(pc.bold(`--- ${file.path}${file.existed ? "" : " (archivo nuevo)"}`));
       for (const line of unifiedDiff(file.before, file.after)) io.out(paint(line));
     }
-    io.out(pc.dim("--dry-run: no se escribió nada."));
+    // Con `notice` (ej. falta --apply) el aviso reemplaza al de --dry-run, y solo si había algo que escribir.
+    if (!notice) io.out(pc.dim("--dry-run: no se escribió nada."));
+    else if (planned.some((file) => file.changed)) io.out(pc.bold(notice));
     return { dryRun, files };
   }
 

@@ -78,7 +78,7 @@ export function findTask(docs: Docs, number: number): TaskLocation[] {
 }
 
 /** Quita acentos y mayúsculas y colapsa espacios, para comparar títulos. */
-function normalizeTitle(text: string): string {
+export function normalizeTitle(text: string): string {
   return text.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().replace(/\s+/g, " ").trim();
 }
 

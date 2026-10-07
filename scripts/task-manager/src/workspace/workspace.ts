@@ -3,7 +3,7 @@
 
 import { join } from "node:path";
 import { CliError } from "../cli/errors.ts";
-import { type OperatorSource, type Ownership, readOperators, resolveOperator } from "./operator.ts";
+import { readOperators, type ResolvedOperator, resolveOperator } from "./operator.ts";
 import { gitEmail, invocationDir, locateAgents, projectDirFor } from "./paths.ts";
 
 export interface WorkspaceFiles {
@@ -22,8 +22,12 @@ export interface Workspace {
   agentsRoot: string;
   /** Carpeta donde están handoff.md, backlog.md e history.md (la del operador; en plano, `agentsRoot`). */
   dir: string;
-  /** Operador resuelto; `null` en el repo plano. */
-  operator: { folder: string; source: OperatorSource; email: string | null; ownership: Ownership } | null;
+  /**
+   * Operador resuelto; `null` en el repo plano. Con `folderless` (operador «solo team-backlog»,
+   * solo si se pidió `allowFolderless`) `dir` y los tres archivos propios apuntan a una carpeta que
+   * no existe: solo `teamBacklog` es utilizable.
+   */
+  operator: ResolvedOperator | null;
   files: WorkspaceFiles;
   /** Avisos de lectura (ej. líneas de operators.md sin leer). */
   warnings: string[];
@@ -38,6 +42,8 @@ export interface ResolveWorkspaceOptions {
   baseDir?: string;
   /** Correo de git a usar (`null` = no disponible). Por defecto se lee de `git config user.email`. */
   email?: string | null;
+  /** Admitir al operador «solo team-backlog» (ver `OperatorOptions.allowFolderless`). */
+  allowFolderless?: boolean;
 }
 
 /**
@@ -69,7 +75,12 @@ export function resolveWorkspace(options: ResolveWorkspaceOptions = {}): Workspa
   const projectDir = projectDirFor(agentsRoot);
   const info = readOperators(agentsRoot);
   const email = options.email !== undefined ? options.email : gitEmail(projectDir);
-  const operator = resolveOperator(agentsRoot, info, { operator: options.operator, direct: located.direct, email });
+  const operator = resolveOperator(agentsRoot, info, {
+    operator: options.operator,
+    direct: located.direct,
+    email,
+    allowFolderless: options.allowFolderless,
+  });
   const dir = join(agentsRoot, operator.folder);
   return {
     mode: "multi",

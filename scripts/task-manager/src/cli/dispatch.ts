@@ -6,11 +6,12 @@
 import { COMMANDS } from "../commands/index.ts";
 import { commitChanges, planChanges } from "../edit/changes.ts";
 import { type Docs, readDocs } from "../workspace/docs.ts";
+import { requireOwnFolder } from "../workspace/ownership.ts";
 import { resolveWorkspace, type Workspace } from "../workspace/workspace.ts";
 import { GLOBAL_FLAGS, parseFlags, resolveStdinFlags, splitCommandLine } from "./args.ts";
 import { CliError, UsageError } from "./errors.ts";
 import { renderCommandHelp, renderHelp } from "./help.ts";
-import type { Command, CommandContext, Io } from "./types.ts";
+import type { Command, CommandContext, Io, WorkspaceRequest } from "./types.ts";
 
 export interface RunOptions {
   /** Registro de comandos; por defecto, el de `commands/index.ts`. */
@@ -22,7 +23,12 @@ export interface RunOptions {
   baseDir?: string;
   /** Correo de git a usar en vez de leer `git config user.email` (`null` = no disponible). */
   email?: string | null;
+  /** Reloj, para fijar la fecha en los tests (por defecto, la hora actual). */
+  now?: () => Date;
 }
+
+/** Aviso con el que termina el diff de un comando de escritura al que le falta `--apply`. */
+export const APPLY_NOTICE = "No se escribió nada; repite con --apply para aplicar estos cambios.";
 
 /** Salida por defecto: la terminal. */
 export const consoleIo: Io = {
@@ -112,22 +118,45 @@ async function dispatch(argv: string[], commands: Command[], options: RunOptions
   const { values, positionals } = parseFlags(rest, spec);
   const flags = await resolveStdinFlags(values, spec, options.readStdin ?? defaultReadStdin);
 
-  let workspace: Workspace | undefined;
-  let docs: Docs | undefined;
+  const dryRun = flags["dry-run"] === true;
+  const apply = flags.apply === true;
+  // Se resuelve una vez por tipo de pedido (con y sin admitir al operador sin carpeta).
+  const workspaces = new Map<boolean, Workspace>();
+  const docsByRequest = new Map<boolean, Docs>();
   const ctx: CommandContext = {
     args: positionals,
     flags: Object.fromEntries(Object.entries(flags).filter(([flag]) => !(flag in GLOBAL_FLAGS))),
-    global: { dryRun: flags["dry-run"] === true },
+    global: { dryRun, apply },
     io,
-    workspace: () =>
-      (workspace ??= resolveWorkspace({
-        agents: typeof flags.agents === "string" ? flags.agents : undefined,
-        operator: typeof flags.operator === "string" ? flags.operator : undefined,
-        baseDir: options.baseDir,
-        email: options.email,
-      })),
-    docs: () => (docs ??= readDocs(ctx.workspace())),
-    commit: (changes) => commitChanges(planChanges(changes), { dryRun: flags["dry-run"] === true, io }),
+    workspace: (request: WorkspaceRequest = {}) => {
+      const key = request.allowFolderless === true;
+      if (!workspaces.has(key)) {
+        workspaces.set(
+          key,
+          resolveWorkspace({
+            agents: typeof flags.agents === "string" ? flags.agents : undefined,
+            operator: typeof flags.operator === "string" ? flags.operator : undefined,
+            baseDir: options.baseDir,
+            email: options.email,
+            allowFolderless: key,
+          }),
+        );
+      }
+      return workspaces.get(key)!;
+    },
+    docs: (request: WorkspaceRequest = {}) => {
+      const key = request.allowFolderless === true;
+      if (!docsByRequest.has(key)) docsByRequest.set(key, readDocs(ctx.workspace(request)));
+      return docsByRequest.get(key)!;
+    },
+    now: options.now ?? (() => new Date()),
+    commit: (changes) => {
+      // Un comando de escritura solo toca la carpeta propia; el team-backlog.md, compartido, no lo exige.
+      if (command.writes && changes.some((change) => change.doc.kind !== "team-backlog")) requireOwnFolder(ctx.workspace());
+      // Sin --apply un comando de escritura solo muestra el diff; --dry-run gana sobre --apply.
+      const preview = command.writes === true && !apply && !dryRun;
+      return commitChanges(planChanges(changes), { dryRun: dryRun || preview, io, notice: preview ? APPLY_NOTICE : undefined });
+    },
   };
 
   const code = await command.run(ctx);

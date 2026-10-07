@@ -34,18 +34,36 @@ export interface CommandContext {
   /** Flags propios del comando, ya interpretados. */
   flags: Record<string, FlagValue>;
   /** Flags globales (valen para todos los comandos). */
-  global: { dryRun: boolean };
+  global: { dryRun: boolean; apply: boolean };
   io: Io;
   /** Operador y carpeta resueltos. Lanza `CliError` si no se pueden resolver; no escribe nada. */
-  workspace(): Workspace;
+  workspace(request?: WorkspaceRequest): Workspace;
   /** Lee y parsea los archivos del operador (una vez; después devuelve lo mismo). */
-  docs(): Docs;
+  docs(request?: WorkspaceRequest): Docs;
+  /** Ahora (inyectable en los tests para fijar la fecha). */
+  now(): Date;
   /**
    * Aplica ediciones a uno o más archivos: calcula todo, verifica que sigan legibles y recién
-   * entonces escribe (o, con `--dry-run`, muestra el diff sin escribir). Todo o nada a nivel de
-   * cálculo: si una edición es inválida no se escribe ningún archivo.
+   * entonces escribe. Todo o nada a nivel de cálculo: si una edición es inválida no se escribe
+   * ningún archivo.
+   *
+   * Qué se escribe lo decide el núcleo, no cada comando:
+   * - un comando de lectura (`writes` ausente) escribe directamente, salvo con `--dry-run`;
+   * - un comando de escritura (`writes: true`) solo escribe con `--apply`: sin él muestra el diff
+   *   y avisa que no escribió nada; `--dry-run` gana sobre `--apply`;
+   * - un comando de escritura se niega (sin escribir ni mostrar el diff) si algún cambio cae en la
+   *   carpeta de otro operador; los cambios del `team-backlog.md`, compartido, no lo exigen.
    */
   commit(changes: FileChange[]): ChangeResult;
+}
+
+/** Cómo resolver el operador para un comando. */
+export interface WorkspaceRequest {
+  /**
+   * Admitir al operador «solo team-backlog» (sin carpeta propia): el espacio resuelto trae su
+   * nombre y la ruta del `team-backlog.md`, pero no hay handoff, backlog ni history que editar.
+   */
+  allowFolderless?: boolean;
 }
 
 /** Un comando de `bun run task <nombre>`. Se registra en `commands/index.ts`. */
@@ -57,6 +75,11 @@ export interface Command {
   /** Forma de uso para `bun run task <nombre> --help`, ej. `show <N>`. */
   usage: string;
   flags?: Record<string, FlagSpec>;
+  /**
+   * `true` si el comando escribe archivos: sin `--apply` solo muestra el diff (ver `commit`) y su
+   * ayuda lo avisa. Los comandos de lectura no lo ponen.
+   */
+  writes?: boolean;
   /** Devuelve el código de salida (por defecto 0). Los errores esperables se lanzan como `CliError`. */
   run(ctx: CommandContext): number | void | Promise<number | void>;
 }

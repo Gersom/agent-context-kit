@@ -2,6 +2,7 @@
 
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { makeProject, type Project } from "../helpers.ts";
 
@@ -82,6 +83,36 @@ describe("index.ts", () => {
     const missing = await runCli(["show", "999"]);
     expect(missing.code).toBe(1);
     expect(missing.stderr).toContain("No existe la Tarea 999");
+  });
+
+  test("add: sin --apply solo muestra el diff; con --apply escribe en la carpeta propia (la del correo de git)", async () => {
+    if (!hasGit) return;
+    const backlog = join(project.agents, "ana", "backlog.md");
+    const before = readFileSync(backlog, "utf8");
+    const preview = await runCli(["add", "--titulo", "Probar el e2e", "--descripcion", "Desde el proceso"]);
+    expect(preview.code).toBe(0);
+    expect(preview.stdout).toContain("+### Tarea 20 — Probar el e2e");
+    expect(preview.stdout).toContain("No se escribió nada; repite con --apply");
+    expect(readFileSync(backlog, "utf8")).toBe(before);
+
+    const applied = await runCli(["add", "--titulo", "Probar el e2e", "--descripcion", "Desde el proceso", "--apply"]);
+    expect(applied.code).toBe(0);
+    expect(applied.stdout).toContain("Tarea 20 agregada");
+    const after = readFileSync(backlog, "utf8");
+    expect(after).toContain("### Tarea 20 — Probar el e2e");
+    expect(after).toContain("**Próximo número de tarea:** 21");
+
+    // la carpeta de otro operador es de solo lectura
+    const other = await runCli(["add", "--titulo", "X", "--descripcion", "Y", "--operator", "gersom", "--apply"]);
+    expect(other.code).toBe(1);
+    expect(other.stderr).toContain("«gersom» no es la tuya");
+  });
+
+  test("la ayuda de un comando de escritura avisa de --apply", async () => {
+    const { stdout, code } = await runCli(["start", "--help"]);
+    expect(code).toBe(0);
+    expect(stdout).toContain("sin --apply solo muestra el diff");
+    expect(stdout).toContain("--force");
   });
 
   test("comando desconocido: código distinto de 0 y mensaje en stderr", async () => {

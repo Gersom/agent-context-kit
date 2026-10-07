@@ -18,7 +18,11 @@ export const GLOBAL_FLAGS: Record<string, FlagSpec> = {
     valueName: "carpeta",
     description: "Carpeta del operador (modo multi-operador). Por defecto, el que corresponde a `git config user.email`.",
   },
-  "dry-run": { type: "boolean", description: "Muestra el diff de lo que se escribiría, sin escribir nada." },
+  apply: {
+    type: "boolean",
+    description: "Aplica los cambios: un comando que escribe, sin --apply, solo muestra el diff. Con --dry-run no escribe aunque se pase.",
+  },
+  "dry-run": { type: "boolean", description: "Muestra el diff de lo que se escribiría, sin escribir nada (gana sobre --apply)." },
   help: { type: "boolean", short: "h", description: "Muestra esta ayuda (o la del comando)." },
 };
 

@@ -3,10 +3,12 @@
 // se tocan.
 
 import type { Command } from "../cli/types.ts";
+import { add } from "./add.ts";
 import { anchors } from "./anchors.ts";
 import { next } from "./next.ts";
 import { show } from "./show.ts";
+import { start } from "./start.ts";
 import { status } from "./status.ts";
 import { whoami } from "./whoami.ts";
 
-export const COMMANDS: Command[] = [whoami, anchors, status, next, show];
+export const COMMANDS: Command[] = [whoami, anchors, status, next, show, add, start];
