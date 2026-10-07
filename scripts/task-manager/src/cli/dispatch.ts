@@ -36,6 +36,9 @@ export const consoleIo: Io = {
   err: (line = "") => process.stderr.write(`${line}\n`),
 };
 
+/** Salida que descarta todo (para `commit` con `quiet`). */
+const SILENT_IO: Io = { out: () => {}, err: () => {} };
+
 /** Entrada estándar por defecto; sin nada redirigido (terminal interactiva) falla en vez de quedarse esperando. */
 async function defaultReadStdin(): Promise<string> {
   if (process.stdin.isTTY) {
@@ -150,12 +153,12 @@ async function dispatch(argv: string[], commands: Command[], options: RunOptions
       return docsByRequest.get(key)!;
     },
     now: options.now ?? (() => new Date()),
-    commit: (changes) => {
+    commit: (changes, options = {}) => {
       // Un comando de escritura solo toca la carpeta propia; el team-backlog.md, compartido, no lo exige.
       if (command.writes && changes.some((change) => change.doc.kind !== "team-backlog")) requireOwnFolder(ctx.workspace());
       // Sin --apply un comando de escritura solo muestra el diff; --dry-run gana sobre --apply.
       const preview = command.writes === true && !apply && !dryRun;
-      return commitChanges(planChanges(changes), { dryRun: dryRun || preview, io, notice: preview ? APPLY_NOTICE : undefined });
+      return commitChanges(planChanges(changes), { dryRun: dryRun || preview, io: options.quiet ? SILENT_IO : io, notice: preview ? APPLY_NOTICE : undefined });
     },
   };
 

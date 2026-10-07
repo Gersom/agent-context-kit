@@ -5,7 +5,6 @@
 // haya otra tarea en curso y que la elegida esté libre. Sin `--apply` solo muestra el diff. La rama y
 // el commit no son asunto del script.
 
-import { stripComments } from "../../../_shared/parse/markdown.ts";
 import type { Field, Range } from "../../../_shared/types.ts";
 import { blockInfo } from "../../../_shared/tasks/block-info.ts";
 import { CliError, UsageError } from "../cli/errors.ts";
@@ -25,6 +24,7 @@ import { relFile } from "../query/format.ts";
 import { type Doc, requireDoc } from "../workspace/docs.ts";
 import { requireOwnFolder } from "../workspace/ownership.ts";
 import { singleLine, textFlag } from "../write/flags.ts";
+import { requireFreeInProgress } from "../write/handoff.ts";
 import { detectLanguage, findFieldOfKind, STRINGS } from "../write/language.ts";
 import { reserveNextNumber } from "../write/numbering.ts";
 import { carriedFields, fieldBody, meaningfulField, parsePlan, renderInProgress } from "../write/render.ts";
@@ -32,7 +32,7 @@ import { headerLabels } from "../write/samples.ts";
 
 const PLACE_LABEL: Partial<Record<Place, string>> = {
   "in-progress": "ya es la tarea en curso",
-  paused: "está pausada (retómala en vez de empezarla; `resume` llega en una etapa posterior)",
+  paused: "está pausada (retómala con `resume` en vez de empezarla)",
   history: "ya está cerrada (figura en history.md)",
 };
 
@@ -90,21 +90,7 @@ export const start: Command = {
     const handoff = requireDoc(docs.handoff, "handoff.md");
     const backlog = requireDoc(docs.backlog, "backlog.md");
 
-    const current = handoff.parsed.inProgress.task;
-    if (current) {
-      throw new CliError(
-        `Ya hay una tarea en curso (${current.label} ${current.number} — ${current.title}): pausa o cierra esa tarea antes de empezar otra (el comando \`pause\` llega en una etapa posterior; hasta entonces, a mano). No se escribió nada.`,
-      );
-    }
-    const section = handoff.parsed.sections["in-progress"];
-    if (!section) throw new CliError("handoff.md no tiene la sección «Tarea en progreso» (ancla `in-progress`). No se escribió nada.");
-    const { steps, subsections } = handoff.parsed.inProgress;
-    const sectionLines = stripComments(handoff.text.slice(section.bodyRange.start, section.bodyRange.end)).split("\n").filter((line) => line.trim());
-    if (steps.length || subsections.length || sectionLines.length > 2) {
-      throw new CliError(
-        "«Tarea en progreso» de handoff.md tiene contenido que no es «Sin tarea en curso» (subsecciones o texto que no reconozco como una tarea): revísalo a mano; no lo sobrescribo. No se escribió nada.",
-      );
-    }
+    const section = requireFreeInProgress(handoff, "empezar otra");
 
     const source = team ? findInTeam(ctx, ctx.args[0]) : findInBacklog(ctx, ctx.args[0]);
     if (source.blocked && flags.force !== true) {

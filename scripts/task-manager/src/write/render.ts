@@ -96,25 +96,62 @@ export interface InProgressInput {
   mode: string | null;
 }
 
+/** Un cuerpo de «Tarea en progreso» ya con todos sus textos decididos (ver `assembleInProgress`). */
+export interface InProgressParts {
+  strings: Strings;
+  label: string;
+  number: number;
+  title: string;
+  description: string | null;
+  extras: string[];
+  /** Líneas del plan tal cual (`- [ ] paso`, `- [x] paso`); `null` si la tarea va sin plan. */
+  planLines: string[] | null;
+  mode: string | null;
+  missing: string;
+  decisions: string;
+  next: string;
+}
+
 /**
  * Cuerpo de «Tarea en progreso» según la plantilla de handoff.md (sin salto de línea final): la
  * línea `Tarea N — título` antes de la primera subsección `###`, la descripción, y las subsecciones
- * Plan (solo con plan; termina siempre en «Documentar cierre de tarea»), Qué falta, Decisiones a
- * medio camino y Próximo paso concreto, en ese orden (el tracker y `status` las ubican por posición).
+ * Plan (solo con plan), Qué falta, Decisiones a medio camino y Próximo paso concreto, en ese orden
+ * (el tracker y `status` las ubican por posición).
  */
-export function renderInProgress(input: InProgressInput): string {
-  const { strings: S, plan } = input;
+export function assembleInProgress(input: InProgressParts): string {
+  const { strings: S } = input;
   const parts: string[] = [`${input.label} ${input.number} — ${input.title}`];
   if (input.description) parts.push(input.description);
   if (input.extras.length) parts.push(input.extras.join("\n"));
-  if (plan) {
-    const closing = new RegExp(`^(${S.closeStep}|documentar cierre|document task closure)`, "i");
-    const steps = [...plan, ...(plan.length && closing.test(plan[plan.length - 1]) ? [] : [S.closeStep])];
-    parts.push(`### ${S.plan}\n\n${steps.map((step) => `- [ ] ${step}`).join("\n")}`);
+  if (input.planLines) {
+    parts.push(`### ${S.plan}\n\n${input.planLines.join("\n")}`);
     if (input.mode) parts.push(`**${S.mode}:** ${input.mode}`);
   }
-  parts.push(`### ${S.missing}\n\n${plan ? S.missingWithPlan : S.missingNoPlan}`);
-  parts.push(`### ${S.decisions}\n\n${input.decisions ?? S.noDecisions}`);
-  parts.push(`### ${S.next}\n\n${plan?.length ? plan[0] : S.nextNoPlan}`);
+  parts.push(`### ${S.missing}\n\n${input.missing}`);
+  parts.push(`### ${S.decisions}\n\n${input.decisions}`);
+  parts.push(`### ${S.next}\n\n${input.next}`);
   return parts.join("\n\n");
+}
+
+/**
+ * «Tarea en progreso» de una tarea que recién empieza, con los textos por defecto de la plantilla.
+ * El plan termina siempre en «Documentar cierre de tarea».
+ */
+export function renderInProgress(input: InProgressInput): string {
+  const { strings: S, plan } = input;
+  const closing = new RegExp(`^(${S.closeStep}|documentar cierre|document task closure)`, "i");
+  const steps = plan && [...plan, ...(plan.length && closing.test(plan[plan.length - 1]) ? [] : [S.closeStep])];
+  return assembleInProgress({
+    strings: S,
+    label: input.label,
+    number: input.number,
+    title: input.title,
+    description: input.description,
+    extras: input.extras,
+    planLines: steps && steps.map((step) => `- [ ] ${step}`),
+    mode: input.mode,
+    missing: plan ? S.missingWithPlan : S.missingNoPlan,
+    decisions: input.decisions ?? S.noDecisions,
+    next: plan?.length ? plan[0] : S.nextNoPlan,
+  });
 }

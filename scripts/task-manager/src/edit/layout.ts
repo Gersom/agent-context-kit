@@ -44,7 +44,7 @@ export interface InsertBlockOptions {
  *   cuerpo es solo espacio, lo reemplaza dejando una línea en blanco a cada lado.
  * @param body `bodyRange` de la sección (desde la línea siguiente a su header hasta antes del ancla siguiente)
  */
-export function insertBlock(text: string, body: Range, block: string, options: InsertBlockOptions): Edit {
+export function insertBlock(text: string, body: Pick<Range, "start" | "end">, block: string, options: InsertBlockOptions): Edit {
   const bounds = contentBounds(text, body);
   if (bounds && options.hasBlocks) return insertAt(bounds.end, (options.separator ?? "\n\n") + block);
 
@@ -60,6 +60,29 @@ export function insertBlock(text: string, body: Range, block: string, options: I
   while (from < bounds.end && /\s/.test(text[from])) from++;
   if (from >= bounds.end) return insertAt(bounds.end, `\n\n${block}`); // solo comentarios
   return replaceRange({ start: from, end: bounds.end }, block);
+}
+
+/**
+ * Edición que cambia el texto de una subsección `###` (lo que sigue a su header) y deja intactos su
+ * header, los comentarios HTML con los que empieza el cuerpo y las líneas en blanco de alrededor.
+ * @param sub rango de la subsección completa (header incluido; `Subsection.range`)
+ * @param body texto nuevo, sin salto de línea final
+ */
+export function replaceSubsectionBody(text: string, sub: Pick<Range, "start" | "end">, body: string): Edit {
+  const headerEnd = text.indexOf("\n", sub.start);
+  const range = { start: headerEnd === -1 || headerEnd >= sub.end ? sub.end : headerEnd + 1, end: sub.end };
+  const bounds = contentBounds(text, range);
+  if (!bounds) return insertBlock(text, range, body, { hasBlocks: false });
+
+  // Los comentarios del principio del cuerpo (los de la plantilla) se conservan; lo demás se reemplaza.
+  let from = bounds.start;
+  for (const [start, end] of commentSpans(text.slice(bounds.start, bounds.end))) {
+    if (text.slice(from, bounds.start + start).trim()) break;
+    from = bounds.start + end;
+  }
+  while (from < bounds.end && /\s/.test(text[from])) from++;
+  if (from >= bounds.end) return insertAt(bounds.end, `\n\n${body}`);
+  return replaceRange({ start: from, end: bounds.end }, body);
 }
 
 /**

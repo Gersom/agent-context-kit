@@ -9,6 +9,7 @@ import { next } from "./next.ts";
 import { show } from "./show.ts";
 import { start } from "./start.ts";
 import { status } from "./status.ts";
+import { step } from "./step.ts";
 import { whoami } from "./whoami.ts";
 
-export const COMMANDS: Command[] = [whoami, anchors, status, next, show, add, start];
+export const COMMANDS: Command[] = [whoami, anchors, status, next, show, add, start, step];

@@ -4,7 +4,7 @@ import type { BlockInfo, Field } from "../types.ts";
 
 // Tag `[...]` con backticks (`[dependencia]`) o sin ellos, sin confundirlo con un link markdown
 // `[texto](url)`. LEADING_TAG_RE solo acepta el tag con el que empieza el valor del campo.
-const LEADING_TAG_RE = /^\s*(`?)\[([^\]\n]+)\]\1(?!\()/;
+export const LEADING_TAG_RE = /^\s*(`?)\[([^\]\n]+)\]\1(?!\()/;
 const TAG_RE = /(`?)\[([^\]\n]+)\]\1(?!\()/g;
 const RESOLVED_TAG_RE = /^(resuelto|resolved)\b/i;
 const PLACEHOLDER_TAG_RE = /^placeholder/i;

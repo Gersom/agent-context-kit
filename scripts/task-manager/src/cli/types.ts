@@ -53,8 +53,10 @@ export interface CommandContext {
    *   y avisa que no escribió nada; `--dry-run` gana sobre `--apply`;
    * - un comando de escritura se niega (sin escribir ni mostrar el diff) si algún cambio cae en la
    *   carpeta de otro operador; los cambios del `team-backlog.md`, compartido, no lo exigen.
+   *
+   * Con `quiet` no imprime el diff ni los avisos (para los comandos con `--json`, que informan ellos).
    */
-  commit(changes: FileChange[]): ChangeResult;
+  commit(changes: FileChange[], options?: { quiet?: boolean }): ChangeResult;
 }
 
 /** Cómo resolver el operador para un comando. */

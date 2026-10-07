@@ -1,10 +1,11 @@
 // Ayudas de los tests: proyectos temporales con docs/agents/ (nunca se tocan los docs reales) y
 // una salida capturada para el despachador.
 
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { requireFixture } from "../../_shared/test/helpers.ts";
+import { run } from "../src/cli/dispatch.ts";
 import type { Io } from "../src/cli/types.ts";
 import { type Docs, readDocs } from "../src/workspace/docs.ts";
 
@@ -115,3 +116,32 @@ export function loadDocs(p: Project, folder?: string, teamBacklog = false): Docs
     },
   });
 }
+
+/** Todos los archivos bajo `root` con su contenido (para comprobar que un comando no escribió nada). */
+export function snapshot(root: string): Record<string, string> {
+  const result: Record<string, string> = {};
+  for (const name of readdirSync(root, { recursive: true, encoding: "utf8" })) {
+    try {
+      result[name] = readFileSync(join(root, name), "utf8");
+    } catch {
+      // carpetas
+    }
+  }
+  return result;
+}
+
+/** Ejecuta el script contra un proyecto temporal como `gersom` (fecha fija: 2026-10-07 15:30). */
+export async function exec(argv: string[], p: Project, options: { email?: string | null; stdin?: string } = {}) {
+  const cap = captureIo();
+  const code = await run(argv, {
+    io: cap.io,
+    email: options.email === undefined ? "gersom@mail.com" : options.email,
+    baseDir: p.root,
+    now: () => new Date(2026, 9, 7, 15, 30),
+    readStdin: async () => options.stdin ?? "",
+  });
+  return { code, out: cap.text(), err: cap.err.join("\n") };
+}
+
+/** Texto de un archivo de la carpeta de un operador del proyecto temporal. */
+export const readIn = (p: Project, ...parts: string[]) => readFileSync(join(p.agents, ...parts), "utf8");

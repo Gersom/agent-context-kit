@@ -60,6 +60,18 @@ export interface Strings {
   missingNoPlan: string;
   nextNoPlan: string;
   noDecisions: string;
+  // Lo que escriben `pause`, `resume` y `step`.
+  /** Texto de «Tarea en progreso» sin tarea. */
+  noTask: string;
+  /** Campos de una tarea pausada que no son subsecciones del handoff. */
+  why: string;
+  waits: string;
+  /** Encabezado de la lista de pasos pendientes que `step` escribe en «Qué falta». */
+  pendingSteps: string;
+  /** «Qué falta» cuando ya no queda ningún paso pendiente. */
+  allDone: string;
+  /** «Próximo paso concreto» cuando ya no queda ningún paso pendiente. */
+  planDone: string;
 }
 
 export const STRINGS: Record<Lang, Strings> = {
@@ -88,6 +100,12 @@ export const STRINGS: Record<Lang, Strings> = {
     missingNoPlan: "Toda la tarea.",
     nextNoPlan: "Empezar la tarea.",
     noDecisions: "Ninguna.",
+    noTask: "Sin tarea en curso",
+    why: "Por qué se pausó",
+    waits: "Qué espera para retomarse",
+    pendingSteps: "Pasos pendientes:",
+    allDone: "Todos los pasos del plan están hechos; falta cerrar la tarea.",
+    planDone: "Plan completo: falta cerrar la tarea.",
   },
   en: {
     task: "Task",
@@ -114,6 +132,12 @@ export const STRINGS: Record<Lang, Strings> = {
     missingNoPlan: "The whole task.",
     nextNoPlan: "Start the task.",
     noDecisions: "None.",
+    noTask: "No task in progress",
+    why: "Why it was paused",
+    waits: "What it is waiting for",
+    pendingSteps: "Pending steps:",
+    allDone: "All the plan steps are done; the task is left to close.",
+    planDone: "Plan complete: the task is left to close.",
   },
 };
 
