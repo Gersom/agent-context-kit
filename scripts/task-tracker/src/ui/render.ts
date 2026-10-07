@@ -91,72 +91,120 @@ function finishCanvas({ out, line, blank, secondary, pc }: Canvas, meta: RenderM
   return out.join("\n") + "\n";
 }
 
-/** Panel de un operador (o del proyecto, en modo plano). Ver `RenderMeta`. */
+/** Etapas por las que pasa una tarea, de arriba abajo en la pantalla (ver `arrowText`). */
+export type Stage = "unowned" | "blocked" | "free" | "current" | "paused" | "completed";
+
+/** Lo que dice la flecha entre una etapa y la siguiente que se muestra. */
+const ARROWS: Partial<Record<`${Stage}>${Stage}`, string>> = {
+  "unowned>blocked": "↓ se toma",
+  "unowned>free": "↓ se toma",
+  "unowned>current": "↓ se toma",
+  "blocked>free": "↑ bloquea · ↓ desbloquea",
+  "free>current": "↓ empieza",
+  "current>paused": "↑ retoma · ↓ pausa",
+  "current>completed": "↓ se cierra",
+  "paused>completed": "↓ se cierra",
+};
+
+/** Texto de la flecha de `from` a `to`; sin una transición conocida entre esas etapas, solo `↓`. */
+export function arrowText(from: Stage, to: Stage): string {
+  return ARROWS[`${from}>${to}`] ?? "↓";
+}
+
+/**
+ * Panel de un operador (o del proyecto, en modo plano). Los recuadros van en el orden del flujo
+ * de una tarea, de arriba abajo: sin dueño → bloqueadas ⇅ libres → en progreso ⇅ pausadas →
+ * completadas, con una línea de flecha entre los que se muestran. Ver `RenderMeta`.
+ */
 export function render(model: Model, meta: RenderMeta): string {
   const canvas = createCanvas(meta, meta.operator);
-  const { pc, width, box, secondary, completedGreen } = canvas;
+  const { pc, width, box, line, secondary, completedGreen } = canvas;
 
-  // history.md (compacto)
-  if (model.hasHistory) {
-    box(`TAREAS COMPLETADAS (últimas ${model.completed.length})`, "history.md", completedGreen, (row) => {
-      if (!model.completed.length) row(0, { paint: secondary, text: "Ninguna" });
-      for (const entry of model.completed) row(0, ...completedSegments(entry, width, pc));
-    });
+  const stages: { id: Stage; shown: boolean; draw: () => void }[] = [
+    // team-backlog.md (modo multi-operador): las tareas sin dueño
+    { id: "unowned", shown: Boolean(meta.teamBacklog?.present), draw: () => meta.teamBacklog && teamBacklogBox(canvas, meta.teamBacklog) },
+
+    // backlog.md (compacto): bloqueadas solo si hay alguna
+    {
+      id: "blocked",
+      shown: model.hasBacklog && model.blocked.length > 0,
+      draw: () =>
+        box(`BLOQUEADAS (${model.counts.blocked})`, "backlog.md", pc.red, (row) => {
+          for (const task of model.blocked) blockedRows(task, row, pc);
+        }),
+    },
+    {
+      id: "free",
+      shown: model.hasBacklog,
+      draw: () =>
+        box(`LIBRES (${model.counts.free})`, "backlog.md", pc.cyan, (row) => {
+          if (!model.free.tasks.length && !model.free.groups.length) row(0, { paint: secondary, text: "Ninguna" });
+          for (const task of model.free.tasks) row(0, { paint: pc.cyan, text: shortTaskName(task.number, task.title) });
+          for (const group of model.free.groups) {
+            const refs = group.taskNumbers.map((n) => `T-${n}`).join(", ");
+            row(0, { paint: pc.cyan, text: `◇ Grupo: ${group.title} (${refs})` });
+            for (const task of group.tasks) {
+              if (task.title) row(2, { paint: secondary, text: `· ${shortTaskName(task.number, task.title)}` });
+            }
+          }
+        }),
+    },
+
+    // handoff.md (detallado): en progreso siempre; pausadas solo si hay alguna
+    {
+      id: "current",
+      shown: true,
+      draw: () =>
+        box("EN PROGRESO", "handoff.md", pc.green, (row) => {
+          const current = model.current;
+          if (!current) {
+            row(0, { paint: secondary, text: "Sin tarea en curso" });
+            return;
+          }
+          row(0, { paint: (s) => pc.bold(pc.green(s)), text: fullTaskName(current) });
+          planRows(current.plan, 0, row, pc);
+          for (const sub of current.details) {
+            const lines = sub.body.split("\n").map((l) => l.trim()).filter(Boolean);
+            const [first, ...rest] = lines;
+            if (first === undefined) continue;
+            row(0, { text: `${sub.title}: ${first}` });
+            for (const text of rest.slice(0, DETAIL_EXTRA_LINES)) row(2, { paint: secondary, text });
+            if (rest.length > DETAIL_EXTRA_LINES) row(2, { paint: secondary, text: "…" });
+          }
+        }, pc.green),
+    },
+    {
+      id: "paused",
+      shown: model.paused.length > 0,
+      draw: () =>
+        box(`PAUSADAS (${model.counts.paused})`, "handoff.md", pc.yellow, (row) => {
+          for (const task of model.paused) {
+            row(0, { paint: pc.yellow, text: `• ${fullTaskName(task)}` });
+            planRows(task.plan, 4, row, pc);
+            for (const field of task.fields) row(4, { paint: secondary, text: `${field.label}: ${field.value}` });
+          }
+        }),
+    },
+
+    // history.md (compacto)
+    {
+      id: "completed",
+      shown: model.hasHistory,
+      draw: () =>
+        box(`TAREAS COMPLETADAS (últimas ${model.completed.length})`, "history.md", completedGreen, (row) => {
+          if (!model.completed.length) row(0, { paint: secondary, text: "Ninguna" });
+          for (const entry of model.completed) row(0, ...completedSegments(entry, width, pc));
+        }),
+    },
+  ];
+
+  let previous: Stage | null = null;
+  for (const stage of stages) {
+    if (!stage.shown) continue;
+    if (previous) line(3, arrowText(previous, stage.id), secondary);
+    stage.draw();
+    previous = stage.id;
   }
-
-  // handoff.md (detallado)
-  box("EN PROGRESO", "handoff.md", pc.green, (row) => {
-    const current = model.current;
-    if (!current) {
-      row(0, { paint: secondary, text: "Sin tarea en curso" });
-      return;
-    }
-    row(0, { paint: (s) => pc.bold(pc.green(s)), text: fullTaskName(current) });
-    planRows(current.plan, 0, row, pc);
-    for (const sub of current.details) {
-      const lines = sub.body.split("\n").map((l) => l.trim()).filter(Boolean);
-      const [first, ...rest] = lines;
-      if (first === undefined) continue;
-      row(0, { text: `${sub.title}: ${first}` });
-      for (const text of rest.slice(0, DETAIL_EXTRA_LINES)) row(2, { paint: secondary, text });
-      if (rest.length > DETAIL_EXTRA_LINES) row(2, { paint: secondary, text: "…" });
-    }
-  }, pc.green);
-
-  // Pausadas y bloqueadas solo se muestran si hay alguna.
-  if (model.paused.length) {
-    box(`PAUSADAS (${model.counts.paused})`, "handoff.md", pc.yellow, (row) => {
-      for (const task of model.paused) {
-        row(0, { paint: pc.yellow, text: `• ${fullTaskName(task)}` });
-        planRows(task.plan, 4, row, pc);
-        for (const field of task.fields) row(4, { paint: secondary, text: `${field.label}: ${field.value}` });
-      }
-    });
-  }
-
-  // backlog.md (compacto)
-  if (model.hasBacklog) {
-    box(`LIBRES (${model.counts.free})`, "backlog.md", pc.cyan, (row) => {
-      if (!model.free.tasks.length && !model.free.groups.length) row(0, { paint: secondary, text: "Ninguna" });
-      for (const task of model.free.tasks) row(0, { paint: pc.cyan, text: shortTaskName(task.number, task.title) });
-      for (const group of model.free.groups) {
-        const refs = group.taskNumbers.map((n) => `T-${n}`).join(", ");
-        row(0, { paint: pc.cyan, text: `◇ Grupo: ${group.title} (${refs})` });
-        for (const task of group.tasks) {
-          if (task.title) row(2, { paint: secondary, text: `· ${shortTaskName(task.number, task.title)}` });
-        }
-      }
-    });
-
-    if (model.blocked.length) {
-      box(`BLOQUEADAS (${model.counts.blocked})`, "backlog.md", pc.red, (row) => {
-        for (const task of model.blocked) blockedRows(task, row, pc);
-      });
-    }
-  }
-
-  // team-backlog.md (modo multi-operador): las tareas sin dueño, debajo de las bloqueadas
-  if (meta.teamBacklog) teamBacklogBox(canvas, meta.teamBacklog);
 
   return finishCanvas(canvas, meta, { notes: model.notes, warnings: [...model.warnings, ...(meta.teamBacklog?.warnings ?? [])] });
 }

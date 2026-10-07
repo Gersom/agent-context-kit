@@ -60,9 +60,15 @@ Solo con una terminal interactiva (sin `--once` ni salida redirigida):
   D:\proyectos\mi-app
   Última actualización 18:42:10 · se modificó handoff.md
 
-╭─ TAREAS COMPLETADAS (últimas 5) ─────── history.md ─╮
-│ T-18: Migrar a TypeScript · 2026-10-05                │
+╭─ BLOQUEADAS (2) ─────────────────────── backlog.md ─╮
+│ T-4: Deploy en skills.sh [dependencia]                │
+│      → espera T-3: Exportar como skill utilizable…    │
 ╰───────────────────────────────────────────────────────╯
+   ↑ bloquea · ↓ desbloquea
+╭─ LIBRES (3) ─────────────────────────── backlog.md ─╮
+│ T-1: Probar el flujo completo end-to-end sobre un…    │
+╰───────────────────────────────────────────────────────╯
+   ↓ empieza
 ╭─ EN PROGRESO ────────────────────────── handoff.md ─╮
 │ Tarea 11 — Refinar script de seguimiento de tareas    │
 │ Plan [████░░░░░░░░] 2/7                               │
@@ -70,6 +76,7 @@ Solo con una terminal interactiva (sin `--once` ni salida redirigida):
 │   ▸ Paso 3 — …                                        │
 │ Qué falta: …                                          │
 ╰───────────────────────────────────────────────────────╯
+   ↑ retoma · ↓ pausa
 ╭─ PAUSADAS (1) ───────────────────────── handoff.md ─╮
 │ • Tarea 9 — Migrar setup.md                           │
 │     Plan [██████░░░░░░] 1/2                           │
@@ -77,17 +84,15 @@ Solo con una terminal interactiva (sin `--once` ni salida redirigida):
 │       ▸ Paso 2 — Revisar los links                    │
 │     Por qué se pausó: surgió una prioridad mayor      │
 ╰───────────────────────────────────────────────────────╯
-╭─ LIBRES (3) ─────────────────────────── backlog.md ─╮
-│ T-1: Probar el flujo completo end-to-end sobre un…    │
-╰───────────────────────────────────────────────────────╯
-╭─ BLOQUEADAS (2) ─────────────────────── backlog.md ─╮
-│ T-4: Deploy en skills.sh [dependencia]                │
-│      → espera T-3: Exportar como skill utilizable…    │
+   ↓ se cierra
+╭─ TAREAS COMPLETADAS (últimas 5) ─────── history.md ─╮
+│ T-18: Migrar a TypeScript · 2026-10-05                │
 ╰───────────────────────────────────────────────────────╯
 ```
 
 - **Encabezado:** el nombre de la carpeta del proyecto (en mayúsculas, con los guiones como espacios), su ruta y cuándo se redibujó la pantalla por última vez y por qué: "al iniciar", "se modificó <archivo>", "cambio detectado" (el sistema avisó un cambio sin decir en qué archivo) o "redibujado" (atajo `r`, cambio de tamaño de la terminal).
 - **Recuadros:** uno por tipo de tarea, con esquinas redondeadas, el tipo en el borde superior izquierdo y el archivo del que sale a la derecha. Todos tienen el ancho de la terminal (mínimo 40 columnas); sin terminal — salida redirigida o `--once` — se usa la variable `COLUMNS` si está definida, o 100. El texto que no entra se recorta con "…". Los bordes van en gris, salvo el de en progreso, que va en verde para destacar la tarea actual; el título de cada recuadro va del color de su tipo: verde `#6DB07B` completadas (y también sin dueño, que usa la misma paleta: título y viñeta en ese verde, texto en el gris de las completadas y solo el tag de bloqueo en rojo), verde en progreso, amarillo pausadas, cian libres y rojo bloqueadas. Las tareas completadas van en un gris un poco más claro que el de los bordes (nombre y fecha en el mismo color), con el prefijo `T-N` en el mismo verde del título, y los textos secundarios (rutas, archivo del borde, campos de las pausadas, pasos hechos, "Ninguna", pie) en gris claro.
+- **Orden y flechas:** los recuadros van de arriba abajo como el flujo de una tarea: sin dueño (solo en modo multi-operador) → bloqueadas ⇅ libres → en progreso ⇅ pausadas → completadas. Entre cada par de recuadros que se muestran hay una línea con la transición: `↓ se toma` (desde sin dueño), `↑ bloquea · ↓ desbloquea` (entre bloqueadas y libres), `↓ empieza` (libres → en progreso), `↑ retoma · ↓ pausa` (entre en progreso y pausadas) y `↓ se cierra` (hacia completadas). No hay flecha hacia un recuadro que no se muestra; con el set mínimo (solo `handoff.md`) no hay ninguna.
 - **`history.md`:** las 5 últimas tareas cerradas, con su fecha. Las descartadas se marcan con ✖.
 - **`handoff.md`, en detalle:** la tarea en progreso con el avance de su plan y el resto de sus subsecciones (ej. "Qué falta", "Próximo paso concreto"), y cada tarea pausada con su plan (si lo trae: el campo opcional `Plan` de la plantilla) y todos sus demás campos. En los planes, el texto de los pasos ya hechos sale **tachado** (las tareas no se tachan, solo los pasos). Las etiquetas se muestran tal como están escritas en el documento, así que funciona en cualquier idioma.
 - **`backlog.md`, compacto:** libres (y sus grupos) y bloqueadas como `T-N: título`. Cada bloqueada muestra su tag (`[dependencia]`, `[postergada]`…) y las tareas que menciona su motivo; si alguna ya está cerrada en `history.md`, lo marca en amarillo como recordatorio de la Regla 7 (moverla a libres).

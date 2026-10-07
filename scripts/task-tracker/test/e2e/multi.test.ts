@@ -80,13 +80,15 @@ describe("index.ts en modo multi-operador", () => {
     if (hasGit) expect(stdout).toContain("› ana (tú)");
   });
 
-  test("con operador como segundo argumento: abre su panel, con SIN DUEÑO debajo de BLOQUEADAS", async () => {
+  test("con operador como segundo argumento: abre su panel, con SIN DUEÑO encima de BLOQUEADAS", async () => {
     const { stdout, code } = await run([repo, "ana", "--once"]);
     expect(code).toBe(0);
     expect(stdout).toContain("· ana");
     expect(stdout).not.toContain("EQUIPO (");
     expect(stdout).toContain("╭─ EN PROGRESO");
-    expect(stdout.indexOf("╭─ SIN DUEÑO")).toBeGreaterThan(stdout.indexOf("╭─ BLOQUEADAS"));
+    expect(stdout.indexOf("╭─ SIN DUEÑO")).toBeLessThan(stdout.indexOf("╭─ BLOQUEADAS"));
+    expect(stdout.indexOf("╭─ BLOQUEADAS")).toBeLessThan(stdout.indexOf("╭─ EN PROGRESO"));
+    expect(stdout.indexOf("╭─ EN PROGRESO")).toBeLessThan(stdout.indexOf("─ history.md ─╮"));
   });
 
   test("--operator equivale al segundo argumento y no distingue mayúsculas", async () => {

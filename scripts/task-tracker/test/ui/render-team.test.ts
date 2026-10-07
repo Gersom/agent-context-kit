@@ -108,10 +108,12 @@ describe("render del panel de un operador en modo multi", () => {
   });
   const panel = (extra: Partial<TeamRenderMeta> = {}) => render(model, { ...meta, operator: "ana", teamBacklog, multiView: "operator", ...extra });
 
-  test("el recuadro SIN DUEÑO va debajo de BLOQUEADAS", () => {
+  test("el recuadro SIN DUEÑO abre el flujo: va encima de BLOQUEADAS, con la flecha «se toma»", () => {
     const out = panel();
     expect(out.indexOf("╭─ BLOQUEADAS")).toBeGreaterThan(-1);
-    expect(out.indexOf("╭─ SIN DUEÑO (2)")).toBeGreaterThan(out.indexOf("╭─ BLOQUEADAS"));
+    expect(out.indexOf("╭─ SIN DUEÑO (2)")).toBeGreaterThan(-1);
+    expect(out.indexOf("╭─ SIN DUEÑO (2)")).toBeLessThan(out.indexOf("╭─ BLOQUEADAS"));
+    expect(out).toContain("   ↓ se toma");
     expect(out).toContain("▣ DEMO APP · ana");
   });
 
