@@ -16,7 +16,7 @@ sesión: es un mapa mínimo, de ~1,5 KB como máximo. Se genera al final del flu
   ├── agents/
   │   ├── rules.md          # reglas del proyecto, de todos los operadores
   │   ├── operators.md      # operadores y sus correos de git
-  │   ├── backlog.md        # tareas sin dueño *
+  │   ├── team-backlog.md   # tareas sin dueño *
   │   └── <operador>/       # una carpeta por operador
   │       ├── handoff.md        # su tarea en curso
   │       ├── backlog.md        # las tareas que tomó

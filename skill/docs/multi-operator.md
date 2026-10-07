@@ -20,7 +20,7 @@ Un proyecto de una sola persona **no usa este modo**: sigue con la estructura pl
 docs/agents/
 ├── operators.md      # mapa carpeta ↔ correos de git (compartido)
 ├── rules.md          # reglas del proyecto (compartido)
-├── backlog.md        # tareas sin dueño, sin numeración (compartido)
+├── team-backlog.md   # tareas sin dueño, sin numeración (compartido)
 ├── roadmap.md        # compartido, si existe
 ├── known-issues.md   # compartido, si existe
 ├── gersom/           # un operador: nombre corto, minúsculas, sin espacios
@@ -44,12 +44,12 @@ docs/agents/
 ## Numeración y referencias
 
 - Cada carpeta tiene su propia secuencia ("Próximo número de tarea" en su `backlog.md`). Los números **se repiten entre operadores** a propósito: la carpeta (y el autor del commit) los distingue.
-- Dentro de la carpeta propia se escribe `Tarea N`, igual que hoy. En el backlog compartido y en cualquier referencia a la tarea de **otro** operador se escribe `T-N@operador`.
+- Dentro de la carpeta propia se escribe `Tarea N`, igual que hoy. En el `team-backlog.md` y en cualquier referencia a la tarea de **otro** operador se escribe `T-N@operador`.
 - Los commits siguen como `tipo(T-N): descripción`.
 
-## Backlog compartido
+## Backlog del equipo (`team-backlog.md`)
 
-`docs/agents/backlog.md` guarda las tareas **sin dueño**. No lleva numeración ni contador: dos operadores agregando a la vez tomarían el mismo número. Cada tarea se identifica por un título único y usa las secciones libres/bloqueadas (con sus anclas), sin agrupamiento:
+`docs/agents/team-backlog.md` guarda las tareas **sin dueño**. Se llama distinto del `backlog.md` de cada operador (el de las tareas que tomó, con numeración) para no confundirlos. No lleva numeración ni contador: dos operadores agregando a la vez tomarían el mismo número. Cada tarea se identifica por un título único y usa las secciones libres/bloqueadas (con sus anclas), sin agrupamiento:
 
 ```
 ### <título único>
@@ -59,7 +59,7 @@ docs/agents/
 - **Agregada:** <fecha> por <operador>
 ```
 
-- **Tomar una tarea:** el operador la quita del backlog compartido y la agrega al suyo con el siguiente número de su secuencia y un campo `Origen: backlog compartido`. Ambos cambios van en el mismo commit. **Una tarea vive en un solo backlog.**
+- **Tomar una tarea:** el operador la quita del `team-backlog.md` y la agrega al suyo con el siguiente número de su secuencia y un campo `Origen: team-backlog`. Ambos cambios van en el mismo commit. **Una tarea vive en un solo backlog.**
 - Si dos operadores toman la misma a la vez, el merge muestra un conflicto sobre ese bloque, en vez de dejar dos copias en silencio.
 - Antes de tomarse se la referencia por título; después, como `T-N@operador`.
 
@@ -67,7 +67,7 @@ docs/agents/
 
 | Compartido | De cada operador |
 |---|---|
-| `rules.md`, `operators.md`, `backlog.md` (sin dueño), `roadmap.md`, `known-issues.md`, `project/`, `external/`, `plans/` | `handoff.md`, `backlog.md` (tomadas), `history.md`, `preferences.md` |
+| `rules.md`, `operators.md`, `team-backlog.md` (sin dueño), `roadmap.md`, `known-issues.md`, `project/`, `external/`, `plans/` | `handoff.md`, `backlog.md` (tomadas), `history.md`, `preferences.md` |
 
 ## Reglas del proyecto y preferencias del operador
 
@@ -87,15 +87,15 @@ Ante la duda, si una preferencia cambia el código o los archivos compartidos, e
 ## Carpetas de otros operadores
 
 - Se leen solo si el operador lo pide o su tarea depende de ellas (ej. *"¿Ana terminó X?"* → su `handoff.md` e `history.md`), con la política de lectura de [`../SKILL.md`](../SKILL.md): por búsqueda, no enteros.
-- **Nunca se editan.** Si hace falta algo de otro operador, se deja como tarea en el backlog compartido, o el operador se lo pide en persona.
+- **Nunca se editan.** Si hace falta algo de otro operador, se deja como tarea en el `team-backlog.md`, o el operador se lo pide en persona.
 - Una dependencia de tareas ajenas se escribe `` `[dependencia]` espera T-N@ana ``.
 
 ## Sesión en modo multi (lo que dice `AGENTS.md`)
 
 1. `docs/README.md`, `docs/agents/rules.md` y `docs/agents/operators.md` (si falta, ver "Estado inconsistente").
 2. Resolver la carpeta propia y leer su `handoff.md` (y `preferences.md` si existe).
-3. Con una tarea en curso, no leer ningún backlog ni `history.md`. Sin tarea en curso: la lista de títulos de su `backlog.md`, y del compartido solo si no le pidieron algo concreto.
+3. Con una tarea en curso, no leer ningún backlog ni `history.md`. Sin tarea en curso: la lista de títulos de su `backlog.md`, y la del `team-backlog.md` solo si no le pidieron algo concreto.
 
 ## Pasar de plano a multi
 
-Lo hace el operador existente cuando se suma otra persona (detalle en [`migration-flow.md`](./migration-flow.md)): se crea su carpeta, se mueven con `git mv` su `handoff.md`, `backlog.md` e `history.md` (la numeración continúa) y se crea `operators.md` y un `backlog.md` compartido vacío. Las tareas que no sean suyas pueden pasar después al compartido.
+Lo hace el operador existente cuando se suma otra persona (detalle en [`migration-flow.md`](./migration-flow.md)): se crea su carpeta, se mueven con `git mv` su `handoff.md`, `backlog.md` e `history.md` (la numeración continúa) y se crea `operators.md` y un `team-backlog.md` vacío. Las tareas que no sean suyas pueden pasar después al `team-backlog.md`.
