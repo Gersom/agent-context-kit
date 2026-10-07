@@ -11,32 +11,16 @@
 import { CliError, UsageError } from "../cli/errors.ts";
 import type { Command } from "../cli/types.ts";
 import type { ChangeResult } from "../edit/changes.ts";
-import { blockSeparator, insertBlock } from "../edit/layout.ts";
 import { describeKnownNumbers, findTask, parseTarget } from "../query/find.ts";
 import { blockedText, relFile, taskLine } from "../query/format.ts";
-import { trimRange } from "../query/lines.ts";
 import { type BlockedInfo, buildState } from "../query/state.ts";
 import { requireDoc } from "../workspace/docs.ts";
 import { requireOwnFolder } from "../workspace/ownership.ts";
-import { currentBlockers, removeBlocks, resolvedValue, withBlockers } from "../write/blocking.ts";
 import { emitWriteJson, JSON_FLAG } from "../write/json.ts";
 import { detectLanguage, STRINGS } from "../write/language.ts";
 import { formatLocalDate } from "../write/render.ts";
 import { headerLabels } from "../write/samples.ts";
-
-// Una referencia `T-N@operador` es una tarea de OTRO operador: `findTaskRefs` solo ve `T-N` y la
-// confundiría con una propia, así que ese motivo se deja para revisión manual.
-const OTHER_OPERATOR_REF_RE = /(?<![\p{L}\p{N}])T-\d+@\S/u;
-
-type Verdict = "auto" | "stale" | "manual" | "waiting";
-
-/** Qué hacer con una bloqueada al revisarlas todas. */
-function judge(info: BlockedInfo): Verdict {
-  if (!info.tag) return "stale";
-  if (OTHER_OPERATOR_REF_RE.test(info.reason ?? "")) return "manual";
-  if (!info.refs.length) return "manual";
-  return info.refs.every((ref) => ref.state === "closed") ? "auto" : "waiting";
-}
+import { insertIntoFree, planUnblock, reviewBlocked, type Verdict } from "../write/unblocking.ts";
 
 export const unblock: Command = {
   name: "unblock",
@@ -57,7 +41,7 @@ export const unblock: Command = {
     const state = buildState(docs);
 
     // Qué tareas bloqueadas se desbloquean, y las que quedan para revisar.
-    const verdicts = new Map(state.blocked.map((info) => [info.number, judge(info)]));
+    const { verdicts } = reviewBlocked(state.blocked);
     let chosen: BlockedInfo[];
     if (wanted) {
       const found = findTask(docs, wanted.number);
@@ -74,30 +58,9 @@ export const unblock: Command = {
 
     let result: ChangeResult | null = null;
     if (chosen.length) {
-      const { blocked, free } = backlog.parsed;
-      const source = backlog.parsed.sections.blocked;
-      const destination = backlog.parsed.sections.free;
-      if (!source || !destination) {
-        throw new CliError("backlog.md no tiene las secciones «Tareas libres» y «Tareas bloqueadas / pospuestas» (anclas `free` y `blocked`). No se escribió nada.");
-      }
-      const text = backlog.text;
-      const { lang, notice } = detectLanguage([blocked[0]?.label, ...headerLabels(docs)].filter((label): label is string => !!label));
-      const S = STRINGS[lang];
-      const date = formatLocalDate(ctx.now());
-      const tasks = chosen.map((info) => blocked.find((task) => task.number === info.number)!);
-
-      // Cada bloque con su `Bloqueos` resuelto (los que ya no tenían bloqueo vigente se mueven tal cual).
-      const moved = tasks.map((task, i) => {
-        const range = trimRange(text, task.range!);
-        if (!chosen[i].tag) return text.slice(range.start, range.end);
-        const value = currentBlockers(text, task.fields);
-        if (!value) throw new CliError(`No encuentro el campo de bloqueos de la Tarea ${task.number}: edítalo a mano. No se escribió nada.`);
-        return withBlockers(text, range, task.fields, S.fields.blockers, resolvedValue(value, date, S));
-      });
-      const freeBlocks = [...free.tasks, ...free.groups];
-      const separator = blockSeparator(text, freeBlocks.flatMap((b) => (b.range ? [b.range] : [])));
-      const insert = insertBlock(text, destination.bodyRange, moved.join(separator), { hasBlocks: freeBlocks.length > 0, separator });
-      result = ctx.commit([{ doc: backlog, edits: [...removeBlocks(text, blocked, tasks, S.emptySection), insert] }], { quiet: flags.json === true });
+      const { lang, notice } = detectLanguage([backlog.parsed.blocked[0]?.label, ...headerLabels(docs)].filter((label): label is string => !!label));
+      const plan = planUnblock(backlog, chosen, formatLocalDate(ctx.now()), STRINGS[lang]);
+      result = ctx.commit([{ doc: backlog, edits: [...plan.removals, insertIntoFree(backlog, plan.blocks)] }], { quiet: flags.json === true });
       if (notice && flags.json !== true) io.out(`Aviso: ${notice}`);
     }
 
