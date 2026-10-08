@@ -238,6 +238,159 @@ describe("cerrar una pausada", () => {
   });
 });
 
+describe("descartar una tarea sin empezar (libre o bloqueada)", () => {
+  const DISCARD = (n: string, ...more: string[]) => ["close", n, "--discarded", "--motivo", "Ya no hace falta.", ...more, "--apply"];
+
+  test("una libre: entrada ❌ en history, bloque fuera de «libres», handoff intacto", async () => {
+    const p = project({ folders: ["gersom"], ...IDLE });
+    const handoffBefore = handoff(p);
+    const { code, err, out } = await exec(DISCARD("18"), p);
+    expect(err).toBe("");
+    expect(code).toBe(0);
+    expect(out).toContain("Tarea 18 descartada sin empezarla");
+    expect(out).toContain("**Tareas descartadas:**\n- Tarea 18 — Revisar los links — Ya no hace falta.");
+    expect(handoff(p)).toBe(handoffBefore);
+    expect(history(p)).toContain("## 2026-10-07 — ❌ Tarea 18 — Revisar los links\n\n- Ya no hace falta.\n\n## 2026-10-07 — ✅ Tarea 11");
+    expect(backlog(p)).not.toContain("### Tarea 18 — Revisar los links");
+    const status = JSON.parse((await exec(["status", "--json"], p)).out);
+    expect(status.free.map((t: { number: number }) => t.number)).not.toContain(18);
+    expect((await exec(["anchors"], p)).code).toBe(0);
+  });
+
+  test("una bloqueada: se saca de «bloqueadas» (las demás se quedan) y la Regla 7 cuenta la descartada como cerrada", async () => {
+    const p = project({ folders: ["gersom"], ...IDLE });
+    const { code, err, out } = await exec(DISCARD("17"), p);
+    expect(err).toBe("");
+    expect(code).toBe(0);
+    expect(out).toContain("**Tareas descartadas:**\n- Tarea 17 — Migrar a otro host — Ya no hace falta.");
+    const text = backlog(p);
+    expect(text).not.toContain("### Tarea 17 — Migrar a otro host");
+    expect(history(p)).toContain("❌ Tarea 17 — Migrar a otro host");
+    // Las 6 y 16 se desbloquean porque la 11 está cerrada; la 7 espera aún a la 3.
+    expect(out).toContain("**Tareas desbloqueadas:**\n- Tarea 6 — Publicar el sitio\n- Tarea 16 — Revisar la licencia");
+    expect(text).toContain("### Tarea 7 — Rehacer el README");
+    expect((await exec(["anchors"], p)).code).toBe(0);
+  });
+
+  test("una bloqueada de la que dependen otras: pasan a «libres» y ella sale de «bloqueadas»", async () => {
+    const p = project({ folders: ["gersom"], ...IDLE });
+    const { code, err, out } = await exec(DISCARD("3"), p);
+    expect(err).toBe("");
+    expect(code).toBe(0);
+    expect(out).toContain("**Tareas desbloqueadas:**\n- Tarea 6 — Publicar el sitio\n- Tarea 7 — Rehacer el README\n- Tarea 16 — Revisar la licencia");
+    const state = JSON.parse((await exec(["status", "--json"], p)).out);
+    expect(state.free.map((t: { number: number }) => t.number)).toEqual([1, 14, 15, 18, 6, 7, 16]);
+    expect(state.blocked.map((t: { number: number }) => t.number)).toEqual([17]);
+  });
+
+  test("la tarea en curso (si hay) queda exactamente como estaba", async () => {
+    const p = await started("1");
+    const handoffBefore = handoff(p);
+    const { code, err } = await exec(DISCARD("18"), p);
+    expect(err).toBe("");
+    expect(code).toBe(0);
+    expect(handoff(p)).toBe(handoffBefore);
+    expect(history(p)).toContain("❌ Tarea 18 — Revisar los links");
+    expect(JSON.parse((await exec(["status", "--json"], p)).out).current.number).toBe(1);
+  });
+
+  test("sin --apply solo muestra el diff y no escribe nada", async () => {
+    const p = project({ folders: ["gersom"], ...IDLE });
+    const before = snapshot(p.root);
+    const { code, out } = await exec(DISCARD("18").slice(0, -1), p);
+    expect(code).toBe(0);
+    expect(out).toContain("+## 2026-10-07 — ❌ Tarea 18 — Revisar los links");
+    expect(out).toContain(APPLY_NOTICE);
+    expect(snapshot(p.root)).toEqual(before);
+  });
+
+  test("--nueva con la descartada en «libres» (la última): las nuevas ocupan su lugar, sin ediciones solapadas", async () => {
+    const p = project({ folders: ["gersom"], ...IDLE });
+    const { code, err, out } = await exec(DISCARD("18", "--nueva", "Revisar el README"), p);
+    expect(err).toBe("");
+    expect(code).toBe(0);
+    expect(out).toContain("**Tareas nuevas:**\n- Tarea 20 — Revisar el README");
+    const text = backlog(p);
+    expect(text).not.toContain("### Tarea 18 — Revisar los links");
+    expect(text).toContain("**Próximo número de tarea:** 21");
+    expect(text).toContain("### Tarea 20 — Revisar el README\n\n- **Descripción:** Surgió al cerrar la Tarea 18; falta detallarla.");
+    expect(text.indexOf("### Tarea 3 — ")).toBeLessThan(text.indexOf("### Tarea 20 — "));
+    expect(text.indexOf("### Tarea 16 — ")).toBeLessThan(text.indexOf("<!-- agent-context-kit:section=blocked -->"));
+    expect((await exec(["anchors"], p)).code).toBe(0);
+  });
+
+  test("--nueva con la descartada en «libres» que no es la última: se borra y las nuevas van al final", async () => {
+    const p = project({ folders: ["gersom"], ...IDLE });
+    const { code, err } = await exec(DISCARD("1", "--nueva", "Una nueva"), p);
+    expect(err).toBe("");
+    expect(code).toBe(0);
+    const text = backlog(p);
+    expect(text).not.toContain("### Tarea 1 — Probar el flujo completo");
+    // Tras la 18 vienen las desbloqueadas (6 y 16) y, al final, la nueva.
+    expect(text).toContain("- **Disparador:** antes del release.\n\n### Tarea 6 — Publicar el sitio");
+    expect(text).toContain("### Tarea 16 — Revisar la licencia");
+    expect(text.indexOf("### Tarea 16 — ")).toBeLessThan(text.indexOf("### Tarea 20 — Una nueva"));
+    expect(text.indexOf("### Tarea 20 — ")).toBeLessThan(text.indexOf("<!-- agent-context-kit:section=blocked -->"));
+    expect((await exec(["anchors"], p)).code).toBe(0);
+  });
+
+  test("la única libre con --nueva: la nueva reemplaza a la descartada", async () => {
+    const p = project({ folders: ["gersom"], contents: { "handoff.md": HANDOFF_EMPTY, "backlog.md": BACKLOG_ONE, "history.md": "# History\n" } });
+    const { code, err } = await exec(DISCARD("7", "--nueva", "Otra"), p);
+    expect(err).toBe("");
+    expect(code).toBe(0);
+    const text = backlog(p);
+    expect(text).not.toContain("### Tarea 7 — La única");
+    expect(text).toContain("### Tarea 8 — Otra");
+    expect((await exec(["anchors"], p)).code).toBe(0);
+  });
+
+  test("--done sobre una del backlog: error que manda a `start`, sin escribir", async () => {
+    const p = project({ folders: ["gersom"], ...IDLE });
+    const before = snapshot(p.root);
+    for (const n of ["18", "17"]) {
+      const { code, err } = await exec(["close", n, "--done", "--resumen", "x", "--apply"], p);
+      expect(code).toBe(1);
+      expect(err).toContain("una tarea sin empezar no se puede dar por hecha");
+      expect(err).toContain(`start ${n}`);
+    }
+    expect(snapshot(p.root)).toEqual(before);
+  });
+
+  test("una agrupada sigue siendo un error, sin escribir", async () => {
+    const p = project({ folders: ["gersom"], ...IDLE });
+    const before = snapshot(p.root);
+    const { code, err } = await exec(DISCARD("14"), p);
+    expect(code).toBe(1);
+    expect(err).toContain("«Tareas agrupadas» (grupo «Documentar los planes»)");
+    expect(snapshot(p.root)).toEqual(before);
+  });
+
+  test("una tarea inexistente o ya cerrada: error, sin escribir", async () => {
+    const p = project({ folders: ["gersom"], ...IDLE });
+    const before = snapshot(p.root);
+    expect((await exec(DISCARD("99"), p)).err).toContain("No existe la Tarea 99");
+    expect((await exec(DISCARD("11"), p)).err).toContain("ya figura cerrada");
+    expect(snapshot(p.root)).toEqual(before);
+  });
+
+  test("falta --motivo: error de uso", async () => {
+    const p = project({ folders: ["gersom"], ...IDLE });
+    const before = snapshot(p.root);
+    const { code, err } = await exec(["close", "18", "--discarded", "--apply"], p);
+    expect(code).toBe(2);
+    expect(err).toContain("Falta --motivo");
+    expect(snapshot(p.root)).toEqual(before);
+  });
+
+  test("--json: from `backlog` y reporte de descartadas", async () => {
+    const p = project({ folders: ["gersom"], ...IDLE });
+    const out = JSON.parse((await exec(DISCARD("18", "--json"), p)).out);
+    expect(out.task).toMatchObject({ number: 18, outcome: "discarded", from: "backlog", origin: null });
+    expect(out.report.discarded).toEqual([{ number: 18, title: "Revisar los links", reason: "Ya no hace falta." }]);
+  });
+});
+
 describe("errores: no se escribe nada", () => {
   test("hay que indicar exactamente uno de --done y --discarded, con su texto", async () => {
     const p = await started();
@@ -275,10 +428,10 @@ describe("errores: no se escribe nada", () => {
     expect(snapshot(p.root)).toEqual(before);
   });
 
-  test("`close <N>` de una tarea que no se empezó, cerrada, o inexistente", async () => {
+  test("`close <N>` de una tarea que no se empezó (con --done), cerrada, o inexistente", async () => {
     const p = await started();
     const before = snapshot(p.root);
-    expect((await exec(["close", "18", "--done", "--resumen", "x", "--apply"], p)).err).toContain("no es la tarea en curso ni está pausada (está en: free)");
+    expect((await exec(["close", "18", "--done", "--resumen", "x", "--apply"], p)).err).toContain("una tarea sin empezar no se puede dar por hecha");
     expect((await exec(["close", "11", "--done", "--resumen", "x", "--apply"], p)).err).toContain("ya figura cerrada");
     expect((await exec(["close", "99", "--done", "--resumen", "x", "--apply"], p)).err).toContain("No existe la Tarea 99");
     expect((await exec(["close", "1@ana", "--done", "--resumen", "x", "--apply"], p)).err).toContain("de otro operador");

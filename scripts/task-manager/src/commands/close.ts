@@ -4,18 +4,22 @@
 //   arriba de las demás. Si la tarea traía `Origen: team-backlog`, la entrada lo conserva.
 // - `handoff.md`: la tarea en curso (o, con `close <N>`, una pausada) sale y «Tarea en progreso»
 //   queda en «Sin tarea en curso».
-// - `backlog.md`: si la tarea aún figura ahí, se saca; `--nueva "<título>"` (repetible) agrega tareas
+//   Con `close <N> --discarded` sobre una tarea que ni se empezó (está en «libres» o «bloqueadas» de
+//   backlog.md; las agrupadas no), `handoff.md` no se toca (la tarea en curso, si hay, sigue igual):
+//   solo se escribe la entrada ❌ y se saca su bloque del backlog. Una tarea sin empezar no se da por
+//   hecha: con `--done` es un error que manda a `start N`.
+// - `backlog.md`: si la tarea aún figura ahí (siempre, si es una tarea sin empezar), se saca; `--nueva "<título>"` (repetible) agrega tareas
 //   nuevas con los números de «Próximo número de tarea»; y se revisan las bloqueadas (Regla 7): las
 //   que dependían de tareas ya cerradas (contando esta) pasan a «Tareas libres» con `Bloqueos` →
 //   `[Resuelto el <fecha>] — <motivo original>`; las de texto libre se listan para revisar a mano.
 // Imprime el reporte de cierre (Regla 8). No cierra nada ambiguo: contenido ajeno en «Tarea en
 // progreso» es un error, como en `pause`. Sin `--apply` solo muestra el diff.
 
-import type { ParsedHandoff } from "../../../_shared/types.ts";
+import type { ParsedBacklog, ParsedHandoff } from "../../../_shared/types.ts";
 import { CliError, UsageError } from "../cli/errors.ts";
 import type { Command } from "../cli/types.ts";
 import { type Edit, replaceRange } from "../edit/edits.ts";
-import { removeBlock } from "../edit/layout.ts";
+import { blockSeparator, removeBlock } from "../edit/layout.ts";
 import { describeKnownNumbers, findTask, parseTarget, type TaskLocation } from "../query/find.ts";
 import { blockedText, relFile, shorten } from "../query/format.ts";
 import { trimRange } from "../query/lines.ts";
@@ -44,7 +48,7 @@ const STEP_RE = /^\s*[-*]\s+\[( |x|X)\]\s+(.*)$/;
 
 /** Lo que `close` necesita de la tarea que cierra, venga de «Tarea en progreso» o de «Tareas pausadas». */
 interface Closing {
-  kind: "current" | "paused";
+  kind: "current" | "paused" | "backlog";
   label: string;
   number: number;
   title: string;
@@ -52,15 +56,15 @@ interface Closing {
   origin: string | null;
   /** Textos de los pasos del plan que quedaban sin marcar (sin el de «Documentar cierre de tarea»). */
   pendingSteps: string[];
-  /** Cómo sale del handoff, dado el texto de «Sin tarea en curso» y el de una sección vacía. */
-  remove(noTask: string, emptySection: string): Edit;
+  /** Cómo sale del handoff, dado el texto de «Sin tarea en curso» y el de una sección vacía; `null` si no vive en handoff.md (tarea sin empezar). */
+  remove: ((noTask: string, emptySection: string) => Edit) | null;
 }
 
 export const close: Command = {
   name: "close",
-  summary: "Cierra la tarea en curso (o una pausada): entrada en history.md, «Sin tarea en curso», bloqueadas y reporte de cierre; escribe con --apply",
+  summary: "Cierra la tarea en curso, una pausada o (solo --discarded) una sin empezar del backlog: entrada en history.md, «Sin tarea en curso», bloqueadas y reporte de cierre; escribe con --apply",
   usage:
-    "close [<N | T-N>] --done --resumen <texto>   |   close [<N | T-N>] --discarded --motivo <texto>   [--nueva <título>]... [--json] [--apply]",
+    "close [<N | T-N>] --done --resumen <texto>   |   close [<N | T-N>] --discarded --motivo <texto>   (N puede ser una tarea libre o bloqueada, sin empezarla)   [--nueva <título>]... [--json] [--apply]",
   writes: true,
   flags: {
     done: { type: "boolean", description: "La tarea se hizo (entrada ✅ Hecha). Exactamente uno de --done y --discarded." },
@@ -87,7 +91,7 @@ export const close: Command = {
   },
   run(ctx) {
     const { flags, io } = ctx;
-    if (ctx.args.length > 1) throw new UsageError("`close` recibe a lo sumo una tarea: `close` (la en curso) o `close <N>` (una pausada).");
+    if (ctx.args.length > 1) throw new UsageError("`close` recibe a lo sumo una tarea: `close` (la en curso) o `close <N>` (una pausada, o una sin empezar con --discarded).");
     const done = flags.done === true;
     const discarded = flags.discarded === true;
     if (done === discarded) throw new UsageError("Indica cómo se cierra: `--done` (hecha) o `--discarded` (descartada), exactamente uno.");
@@ -115,26 +119,35 @@ export const close: Command = {
     // La tarea que se cierra.
     const current = handoff.parsed.inProgress.task;
     const pausedTasks = handoff.parsed.paused;
-    const kind = !wanted || wanted.number === current?.number ? "current" : pausedTasks.some((task) => task.number === wanted.number) ? "paused" : null;
-    if (!kind && wanted) throw new CliError(notClosable(docs, wanted.number));
+    let kind: Closing["kind"] | null = !wanted || wanted.number === current?.number ? "current" : pausedTasks.some((task) => task.number === wanted.number) ? "paused" : null;
+    // Ni en curso ni pausada: solo se puede descartar, y solo si vive una vez en «libres» o «bloqueadas».
+    let source: TaskLocation | null = null;
+    if (!kind && wanted) {
+      const places = findTask(docs, wanted.number);
+      source = places.length === 1 && ["free", "blocked"].includes(places[0].place) ? places[0] : null;
+      if (!source) throw new CliError(notClosable(docs, wanted.number, places));
+      if (!discarded) throw new CliError(notDoneable(wanted.number, source));
+      kind = "backlog";
+    }
     if (kind === "current" && !current) {
       const hint = pausedTasks.length ? ` Para cerrar una pausada indica su número: \`close <N>\` (pausadas: ${pausedTasks.map((task) => task.number).join(", ")}).` : "";
       throw new CliError(`No hay tarea en curso que cerrar: «Tarea en progreso» dice «Sin tarea en curso».${hint} No se escribió nada.`);
     }
-    const closing = kind === "current" ? closingCurrent(handoff) : closingPaused(handoff, wanted!.number);
+    const closing = kind === "current" ? closingCurrent(handoff) : kind === "paused" ? closingPaused(handoff, wanted!.number) : closingBacklog(backlog, source!);
     const { number } = closing;
 
     // Dónde más figura: en history.md no se duplica; en backlog.md se saca (Regla 5); lo demás es una anomalía.
     const places = findTask(docs, number);
-    const own = places.filter((place) => place.place === (closing.kind === "current" ? "in-progress" : "paused"));
+    const own = closing.kind === "backlog" ? [source!] : places.filter((place) => place.place === (closing.kind === "current" ? "in-progress" : "paused"));
     if (own.length > 1) throw new CliError(`La Tarea ${number} aparece ${own.length} veces en handoff.md: una tarea vive en un solo lugar; corrígelo a mano. No se escribió nada.`);
     const elsewhere = places.filter((place) => !own.includes(place));
     const closed = elsewhere.find((place) => place.place === "history");
     if (closed) throw new CliError(`La Tarea ${number} ya figura cerrada en history.md (${closed.outcome === "discarded" ? "descartada" : "hecha"}): no duplico su entrada. Si sigue en handoff.md, sácala a mano. No se escribió nada.`);
     const odd = elsewhere.find((place) => !["free", "blocked"].includes(place.place));
     if (odd) throw new CliError(`La Tarea ${number} figura además en ${odd.place === "grouped" ? `«Tareas agrupadas» (grupo «${odd.group}»)` : odd.place}: una tarea vive en un solo lugar; corrígelo a mano antes de cerrarla. No se escribió nada.`);
-    const leftoverFree = elsewhere.find((place) => place.place === "free");
-    const leftoverBlocked = elsewhere.some((place) => place.place === "blocked");
+    // Una tarea sin empezar no sale de handoff.md: su propio bloque del backlog es lo que se saca.
+    const leftoverFree = closing.kind === "backlog" ? (source!.place === "free" ? source! : undefined) : elsewhere.find((place) => place.place === "free");
+    const leftoverBlocked = closing.kind === "backlog" ? source!.place === "blocked" : elsewhere.some((place) => place.place === "blocked");
 
     const { lang, notice } = detectLanguage([closing.label, ...headerLabels(docs)]);
     const S = STRINGS[lang];
@@ -170,22 +183,37 @@ export const close: Command = {
       });
       backlogEdits.push(reserved.edit);
     }
+    let insertedInFree = false;
     if (leftoverFree) {
-      if (moved.length) {
+      if (moved.length && closing.kind !== "backlog") {
         throw new CliError(
           `La Tarea ${number} sigue en «Tareas libres» de backlog.md y a esa misma sección hay que agregar tareas (desbloqueadas o nuevas): sácala de «libres» a mano y vuelve a intentarlo. No se escribió nada.`,
         );
       }
       const blocks = [...backlog.parsed.free.tasks, ...backlog.parsed.free.groups];
-      backlogEdits.push(removeBlock(backlog.text, trimRange(backlog.text, leftoverFree.range), S.emptySection, blocks.length > 1));
+      const mine = trimRange(backlog.text, leftoverFree.range);
+      if (!moved.length) {
+        backlogEdits.push(removeBlock(backlog.text, mine, S.emptySection, blocks.length > 1));
+      } else {
+        // Sacar la tarea y agregar otras en la misma sección sin que las ediciones se pisen: si era el
+        // último bloque, las nuevas ocupan su lugar (borrar e insertar tocarían el mismo punto); si no,
+        // se borra (termina donde empieza el bloque siguiente) y se agrega al final, más adelante.
+        const ranges = blocks.flatMap((block) => (block.range ? [trimRange(backlog.text, block.range)] : []));
+        if (mine.end >= Math.max(...ranges.map((range) => range.end))) {
+          backlogEdits.push(replaceRange(mine, moved.join(blockSeparator(backlog.text, ranges))));
+        } else {
+          backlogEdits.push(removeBlock(backlog.text, mine, S.emptySection, true), insertIntoFree(backlog, moved));
+        }
+        insertedInFree = true;
+      }
     }
-    if (moved.length) backlogEdits.push(insertIntoFree(backlog, moved));
+    if (moved.length && !insertedInFree) backlogEdits.push(insertIntoFree(backlog, moved));
 
-    const handoffEdit = closing.remove(S.noTask, S.emptySection);
+    const handoffEdit = closing.remove ? closing.remove(S.noTask, S.emptySection) : null;
     const entry = renderHistoryEntry({ date, outcome, label: closing.label, number, title: closing.title, text, origin: closing.origin });
     const result = ctx.commit(
       [
-        { doc: handoff, edits: [handoffEdit] },
+        ...(handoffEdit ? [{ doc: handoff, edits: [handoffEdit] }] : []),
         { doc: history, edits: [insertHistoryEntry(history, entry)] },
         ...(backlogEdits.length ? [{ doc: backlog, edits: backlogEdits }] : []),
       ],
@@ -228,7 +256,9 @@ export const close: Command = {
 
     if (result.files.some((file) => file.written)) {
       io.out(
-        `Tarea ${number} cerrada (${outcome === "done" ? "hecha" : "descartada"}): entrada en ${relFile(ws, history.path)}, «${S.noTask}» en ${relFile(ws, handoff.path)}${backlogEdits.length ? `, backlog actualizado en ${relFile(ws, backlog.path)}` : ""}.`,
+        closing.kind === "backlog"
+          ? `Tarea ${number} descartada sin empezarla: entrada en ${relFile(ws, history.path)}, sacada de ${relFile(ws, backlog.path)}; ${relFile(ws, handoff.path)} no se toca.`
+          : `Tarea ${number} cerrada (${outcome === "done" ? "hecha" : "descartada"}): entrada en ${relFile(ws, history.path)}, «${S.noTask}» en ${relFile(ws, handoff.path)}${backlogEdits.length ? `, backlog actualizado en ${relFile(ws, backlog.path)}` : ""}.`,
       );
       io.out();
       for (const line of renderReport(S, report)) io.out(line);
@@ -264,13 +294,25 @@ function renderReport(
     .flatMap(([title, items], i) => [...(i ? [""] : []), `**${title}:**`, ...items.map((item) => `- ${item}`)]);
 }
 
-/** Por qué `close <N>` no puede cerrar la tarea N (no está ni en curso ni pausada). */
-function notClosable(docs: Docs, number: number): string {
-  const found: TaskLocation[] = findTask(docs, number);
+/** Por qué `close <N>` no puede cerrar la tarea N (no está en curso, ni pausada, ni una sola vez en «libres» / «bloqueadas»). */
+function notClosable(docs: Docs, number: number, found: TaskLocation[] = findTask(docs, number)): string {
   if (!found.length) return `No existe la Tarea ${number}. ${describeKnownNumbers(docs)}`;
-  const where = found.map((place) => place.place);
-  if (where.includes("history")) return `La Tarea ${number} ya figura cerrada en history.md. No se escribió nada.`;
-  return `La Tarea ${number} no es la tarea en curso ni está pausada (está en: ${where.join(", ")}): \`close\` solo cierra tareas que se empezaron; empiézala con \`start ${number}\` (o ábrela de nuevo con \`resume\`). No se escribió nada.`;
+  if (found.some((place) => place.place === "history")) return `La Tarea ${number} ya figura cerrada en history.md. No se escribió nada.`;
+  const grouped = found.find((place) => place.place === "grouped");
+  if (grouped) return `La Tarea ${number} está en «Tareas agrupadas» (grupo «${grouped.group}»): \`close\` no cierra tareas agrupadas; sácala del grupo a mano antes. No se escribió nada.`;
+  return `La Tarea ${number} figura en varios lugares (${found.map((place) => place.place).join(", ")}): una tarea vive en un solo lugar; corrígelo a mano antes de cerrarla. No se escribió nada.`;
+}
+
+/** `--done` sobre una tarea que ni se empezó: solo se puede descartar. */
+function notDoneable(number: number, source: TaskLocation): string {
+  const section = source.place === "free" ? "Tareas libres" : "Tareas bloqueadas / pospuestas";
+  return `La Tarea ${number} está en «${section}» de backlog.md y nunca se empezó: una tarea sin empezar no se puede dar por hecha; empiézala con \`start ${number}\` y ciérrala después. Para descartarla sin empezarla: \`close ${number} --discarded --motivo <texto>\`. No se escribió nada.`;
+}
+
+/** Una tarea sin empezar de «libres» o «bloqueadas»: no toca handoff.md ni trae `Origen` (el campo es de la tarea en curso). */
+function closingBacklog(backlog: Doc<ParsedBacklog>, source: TaskLocation): Closing {
+  const task = [...backlog.parsed.free.tasks, ...backlog.parsed.blocked].find((candidate) => candidate.number === source.number)!;
+  return { kind: "backlog", label: task.label, number: source.number, title: source.title, origin: null, pendingSteps: [], remove: null };
 }
 
 /** La tarea en curso, validada (`inspectCurrent` se niega ante contenido que no reconoce). */
