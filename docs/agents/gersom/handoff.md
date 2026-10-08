@@ -25,14 +25,14 @@ Script nuevo `scripts/task-manager/` (comando `bun run task`) que edita de forma
 - [x] Paso 4 — Etapa 2 (escritura mecánica): `add` (con "Próximo número de tarea") y `start` (con `Origen: team-backlog` si corresponde)
 - [x] Paso 5 — Etapa 3 (estado): `step`, `pause`, `resume`, `block`, `unblock`
 - [x] Paso 6 — Etapa 4 (cierre): `close --done|--discarded` con las Reglas 5 a 8 y el reporte de cierre
-- [ ] Paso 7 — Docs: README del script, `architecture.md`, reflejo en `rules.md` y plantillas (script opcional)
+- [x] Paso 7 — Docs: README del script, `architecture.md`, reflejo en `rules.md` y plantillas (script opcional)
 - [ ] Documentar cierre de tarea
 
 **Modo de ejecución acordado:** por etapas — pausa y resumen al terminar cada etapa (Etapa 1 a 4; los Pasos 1 y 2 son la base y van antes de la Etapa 1).
 
 ### Qué falta
 
-Paso 7 y el cierre. El Paso 6 (Etapa 4) está hecho y commiteado (`4189490`, `a5275b9`, `9ab555e`, `5310627`): `close --done --resumen | --discarded --motivo [--nueva "<título>"]... [N]`, todo-o-nada sobre handoff/history/backlog, con `--apply`/`--dry-run`/`--json`, Regla 7 (desbloqueo con `Bloqueos` → `[Resuelto el <fecha>] — era …`, aviso de >15 libres) y reporte de la Regla 8. `bun test` → 766 pasan; `bun run typecheck` limpio; los `docs/` reales quedaron intactos; ida y vuelta pause → start → step → close probada en copia. Módulos nuevos: `src/write/{unblocking,history,new-task}.ts`; `FlagSpec.multiple` en el CLI. `Origen: team-backlog` viaja a history como primera viñeta `- **Origen:** team-backlog` (ni rules ni plantillas lo fijaban). Decisiones de `close` confirmadas por el operador (2026-10-07): (1) una tarea descartada cuenta como cerrada para desbloquear; (2) `--nueva` crea tareas mínimas («Surgió al cerrar la Tarea N; falta detallarla.»); (3) `--resumen`/`--motivo` obligatorios; (4) `close --discarded N` descarta directo una tarea de «libres» o «bloqueadas» sin `start` (commits `d4c95ed`, `d396e07`; con `--done` sobre una sin empezar sigue pidiendo `start N`). Límites: la en curso o pausada que sigue en «Tareas libres» y requiere insertar ahí da error y pide sacarla a mano; agrupadas no soportadas. Para el Paso 7: README del script ya tiene `close`; `docs/architecture.md` debe mencionar `close` y los módulos nuevos; las Reglas 5 a 8 pueden citar `bun run task close` como forma opcional; si se oficializa la convención de `Origen`, agregarla en `skill/template/agents/history.md` (y su copia en `docs/`), `skill/docs/multi-operator.md` y `skill/template/multi/team-backlog.md`; mantener la Regla 1 (menciones con link, no copias). Pasos 1 a 5 (Etapas 1 a 3, base del parser y despachador) hechos: `status`, `next`, `show`, `add`, `start`, `step`, `pause`, `resume`, `block`, `unblock`; las escrituras exigen `--apply` y `ctx.commit()` se niega fuera de una carpeta `own`; `block`/`unblock` no soportan tareas agrupadas ni `team-backlog.md`; `add` y `start` aún no tienen `--json`; `start` de una tarea agrupada da error.
+Solo el cierre, cuando el operador lo pida. Pasos 1 a 7 hechos y commiteados. Paso 7: README raíz y `docs/architecture.md` mencionan el task-manager; sección «Si usas el script de tareas» en `docs/agents/rules.md` (el script no exime de las Reglas 5 a 8; las reglas fijas y la plantilla no se tocaron); `Origen: team-backlog` explícita en `skill/docs/multi-operator.md` y las dos `team-backlog.md` (la plantilla plana de history no la menciona: un test lo prohíbe). Decisiones de `close` confirmadas (2026-10-07): descartada desbloquea; `--nueva` mínima; `--resumen`/`--motivo` obligatorios; `close --discarded N` descarta directo del backlog (con `--done` pide `start N`). Límites: la en curso o pausada que sigue en «libres» y requiere insertar ahí da error; agrupadas no soportadas; `block`/`unblock` no soportan agrupadas ni `team-backlog.md`; `add` y `start` sin `--json`. `bun test` → 779 pasan; typecheck limpio. Pendiente del operador: tag/release (la T-32 subió `package.json` a 1.4.0).
 
 ### Decisiones a medio camino
 
@@ -48,7 +48,7 @@ Paso 7 y el cierre. El Paso 6 (Etapa 4) está hecho y commiteado (`4189490`, `a5
 
 ### Próximo paso concreto
 
-Empezar el Paso 7 (docs): README del script (ya al día con `close`), `docs/architecture.md` (`close` y módulos nuevos), reflejo en `rules.md` (Reglas 5 a 8) y plantillas como menciones con link, y la convención `Origen` si se oficializa (ver «Qué falta»). `bun test` → 779 pasan, typecheck limpio.
+Mandar el resumen al operador y esperar: si pide correcciones, se hacen; solo cuando pida cerrar, documentar el cierre (Reglas 5 y 7) y el reporte (Regla 8).
 
 <!-- agent-context-kit:section=paused -->
 ## Tareas pausadas

@@ -19,7 +19,7 @@ Los IDs coinciden con los pasos del plan de `handoff.md`.
 - [x] P4 — Etapa 2: `add`, `start` · ruta: delegada · commit en `feat/task-manager` tras `cd296b7` · checks: `bun test` 657 pass / 0 fail, `bun run typecheck` limpio, `add`/`start` sin `--apply` y con `--apply --dry-run` sobre los docs reales: diff mostrado, hashes de `docs/` sin cambios (orquestador) · revisión nativa: sin evaluar
 - [x] P5 — Etapa 3: `step`, `pause`, `resume`, `block`, `unblock` · ruta: delegada · commits `e199cb7`, `d667f89`, `c2e33d8`, `adcfec2` · checks: `bun test` 713 pass / 0 fail, `bun run typecheck` limpio (re-corridos por el orquestador) · revisión nativa: sin evaluar
 - [x] P6 — Etapa 4: `close --done|--discarded` (Reglas 5 a 8) · ruta: delegada · commits `4189490`, `a5275b9`, `9ab555e`, `5310627` · checks: `bun test` 766 pass / 0 fail, `bun run typecheck` limpio (re-corridos por el orquestador) · revisión nativa: sin evaluar
-- [ ] P7 — Docs: README del script, `architecture.md`, `rules.md`, plantillas
+- [x] P7 — Docs: README raíz y `architecture.md`, sección en `rules.md`, `Origen` en multi-operator y team-backlog · ruta: inline + delegada (close sobre backlog) · commits `d4c95ed`, `d396e07`, `277bd93`, `7cb163f`, `b0ae795`, `7b70451` · checks: `bun test` 779 pass / 0 fail, `bun run typecheck` limpio (orquestador) · revisión nativa: sin evaluar
 
 ## Progreso
 
