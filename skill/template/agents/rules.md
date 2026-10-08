@@ -8,7 +8,7 @@ Vienen con el skill y aplican a cualquier proyecto; las reglas de proceso adicio
 
 2. **El tamaño de la tarea decide el proceso:**
    - **Pequeña o muy pequeña** → se ejecuta directo, sin plan.
-   - **Mediana a grande** → primero un plan con los pasos; después, en una sola tanda de preguntas, preguntarle al operador (a) si los pasos están bien o hay que ajustarlos y (b) si prefiere ejecutarlos todos seguidos o uno a la vez, esperando su confirmación después de cada paso.
+   - **Mediana a grande** → primero un plan con los pasos; después, en una sola tanda de preguntas (con la herramienta `AskUserQuestion`, que muestra opciones seleccionables, no como texto en el chat; también las demás preguntas al operador), preguntarle al operador (a) si los pasos están bien o hay que ajustarlos y (b) si prefiere ejecutarlos todos seguidos o uno a la vez, esperando su confirmación después de cada paso.
 
 3. **Idioma de la documentación:** todo lo que un agente redacte acá (prosa y headers) va en el idioma registrado abajo, detectado una sola vez al generar esta documentación; no se vuelve a preguntar. Siempre en inglés: nombres de archivo/carpeta del catálogo y términos del kit o jerga técnica sin traducción asentada ("Handoff", "Backlog", "Placeholder", "linter", "commit", "deploy").
 
