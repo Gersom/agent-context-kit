@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-08 — ✅ Tarea 33 — Reevaluar las reglas de rules.md
+
+- Reglas reorganizadas: «Commits coherentes» pasa a regla por defecto (Regla 9) y «solo se cierra si el operador lo pide» entra en la Regla 5. Nueva cláusula «Con una herramienta de tareas» en «Al cerrar una tarea» y en el bloque multi-operador: lo que ya hace la herramienta no se repite a mano. Se eliminaron las repeticiones (nombres en inglés, número correlativo, plantillas por idioma, «fijas» duplicado, «no se copia literal»). Sin regla propia de AskUserQuestion: queda a criterio del agente y solo rige para las preguntas del skill. Plantillas alineadas y versión 1.5.0, sin tag ni release.
+
 ## 2026-10-08 — ✅ Tarea 24 — Script para gestionar las tareas (handoff, backlog, history)
 
 - Script `scripts/task-manager/` (`bun run task`) que edita de forma quirúrgica handoff, backlog, history y team-backlog, en vez de editarlos a mano. Comandos: status, next, show, add, start, step, pause, resume, block, unblock y close (Reglas 5 a 8 y reporte de cierre). Las escrituras exigen --apply; es opcional y no forma parte del skill. Documentado en su README, el README raíz, architecture.md y una sección de rules.md que aclara que no exime de las Reglas 5 a 8. close también descarta directo tareas del backlog. bun test 779 pasan y typecheck limpio. Rama feat/task-manager, sin mergear ni pushear.

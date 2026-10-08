@@ -62,15 +62,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** las normas salen de `skill/docs/template-architecture.md` ("Anclas de sección") y de las plantillas de `skill/template/agents/`; ante una diferencia, gana la plantilla (Regla 4).
 - **Agregada:** 2026-10-05.
 
-### Tarea 33 — Reevaluar las reglas de rules.md
-
-- **Descripción:** Revisar todas las reglas (por defecto, las que el script de tareas hace opcionales o ignorables, las específicas de este proyecto y las de modo multi) para detectar repeticiones, mover al bloque por defecto las específicas que lo merezcan, evaluar cuáles por defecto pasan a «se ignoran si usas el script», y ver si falta alguna.
-- **Decisiones/temas a definir antes de empezar:** Qué criterio decide que una regla sea por defecto (fija, viaja a los repos destino) o específica del proyecto; cuáles reglas cubre el script (task-manager) y por tanto pueden ignorarse al usarlo; recordar que rules.md y su plantilla aplican a todos los operadores.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Relacionada con la sección «Si usas el script de tareas» de docs/agents/rules.md (T-24). Tocar las Reglas por defecto o su plantilla (skill/template/agents/rules.md) requiere autorización explícita y puede implicar bump de versión.
-- **Agregada:** 2026-10-08.
-
 ### Tarea 34 — Reevaluar los comandos del task-manager
 
 - **Descripción:** Revisar los comandos del script scripts/task-manager/ para hacerlos más eficientes o cambiar su forma (flags, salida, cantidad de pasos por operación, comandos que se puedan fusionar o simplificar), según cómo los usa realmente el agente.
