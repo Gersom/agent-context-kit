@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-08 — ✅ Tarea 35 — Portar a las reglas del kit las prácticas de seguimiento de ODD
+
+- Tres prácticas de ODD portadas a las reglas del kit para que el seguimiento viva solo en el handoff: evidencia por paso como sufijo de la línea (checks y commit, solo mientras la tarea está en curso o pausada), cambios aceptados a mitad de trabajo (se conserva lo hecho y se reabre el invalidado con motivo) y cierre honesto (history guarda solo resultado, cómo y commits; el reporte de cierre suma «Checks pendientes» y «Próximo paso»). Reglas 5, 6 y 8 y los history.md en docs/agents y en las plantillas, nota del formato en los dos handoff, un test nuevo de pause/resume/step con el sufijo y versión 1.6.0 sin tag ni release. bun test 780 pasan y typecheck limpio. Commits: c258e83, 88dc566, 4e76872.
+
 ## 2026-10-08 — ✅ Tarea 36 — Optimizar el handoff: leer pausadas solo sin tarea en curso y editar solo lo que cambia
 
 - Dos cambios para ahorrar tokens: el agente lee del handoff solo «Tarea en progreso» (las pausadas solo si no hay tarea en curso o si le piden retomar una), y el handoff se actualiza editando solo lo que cambió en vez de reescribirse entero. Se ajustaron AGENTS.md y sus dos plantillas, los textos del handoff y su plantilla, template-architecture.md y la Regla 6 (con su plantilla). El script task-manager ya edita de forma puntual; lo que le falta (editar la nota de un paso, reabrirlo con motivo) quedó anotado en la Tarea 34. bun test 779 pasan y typecheck limpio. Commits: d0aac8d, 48d2877.
