@@ -185,6 +185,21 @@ describe("resume", () => {
     expect(handoff(p)).toBe(before);
   });
 
+  test("la evidencia al final de la línea de un paso (checks y commit) sobrevive a pause, resume y step", async () => {
+    const p = project({ folders: ["gersom"], ...IDLE });
+    const evidence = "Paso 1 — Escribir · bun test 779 pass · commit abc1234";
+    await exec(["start", "1", "--plan", "-", "--modo", "uno a la vez", "--apply"], p, { stdin: `${evidence}\nPaso 2 — Probar` });
+    await exec(["step", "escribir", "--apply"], p);
+    expect(handoff(p)).toContain(`- [x] ${evidence}`);
+    const before = handoff(p);
+    await exec([...PAUSE, "--apply"], p);
+    expect(handoff(p)).toContain(`  - [x] ${evidence}`);
+    await exec(["resume", "1", "--apply"], p);
+    expect(handoff(p)).toBe(before);
+    await exec(["step", "1", "--undo", "--apply"], p);
+    expect(handoff(p)).toContain(`- [ ] ${evidence}`);
+  });
+
   test("ida y vuelta con `Origen`, textos propios y la tarea en medio de varias pausadas", async () => {
     const p = project({ folders: ["gersom"], ...IDLE });
     await exec(["start", "--team", "Migrar el CI", "--plan", "-", "--apply"], p, { stdin: "Paso 1 — a\nPaso 2 — b" });
