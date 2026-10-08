@@ -32,12 +32,23 @@ bun run tasks <ruta-del-proyecto>
 
 Uso, atajos y cómo lee los archivos: [`scripts/task-tracker/README.md`](./scripts/task-tracker/README.md).
 
+## Gestión de tareas desde la terminal
+
+Una herramienta opcional para consultar y editar las tareas de un proyecto por comandos, sin tocar a mano `handoff.md`, `backlog.md` ni `history.md`; las escrituras exigen `--apply` (sin él muestra el diff):
+
+```sh
+bun run task status
+bun run task <comando> --help
+```
+
+Comandos, flags y cómo escribe: [`scripts/task-manager/README.md`](./scripts/task-manager/README.md).
+
 ## Estructura del repositorio
 
 ```
 agent-context-kit/
 ├── skill/           # El skill: SKILL.md, flujos de decisión (docs/) y catálogo de plantillas (template/)
-├── scripts/         # Herramientas del repo, no parte del skill: task-tracker y código compartido (_shared/)
+├── scripts/         # Herramientas del repo, no parte del skill: task-tracker, task-manager y código compartido (_shared/)
 ├── docs/            # Documentación del propio repo: filosofía, arquitectura, diseño y su estado (agents/)
 ├── package.json     # Versión del skill (SemVer) y comandos de los scripts
 └── tsconfig.json    # TypeScript (strict) para scripts/

@@ -18,6 +18,11 @@ agent-context-kit/
 │   │   ├── tasks/               # Tag de bloqueo vigente (block-info) y tareas mencionadas en un texto (task-refs)
 │   │   └── test/                # Tests en espejo de parse/ y tasks/ + fixtures/ (docs de ejemplo) + helpers.ts
 │   ├── skill-checks/          # Tests de contenido del skill (`reading-policy.test.ts`): fijan la política de lectura y la estructura de lo que se lee en cada sesión
+│   ├── task-manager/          # Gestión de tareas desde la terminal (`bun run task <comando>`): edita handoff/backlog/history/team-backlog de forma quirúrgica
+│   │   ├── README.md            # Uso: comandos, flags, `--apply` y qué escribe cada uno
+│   │   ├── index.ts             # Arranque: llama al despachador de comandos
+│   │   ├── src/                 # cli/ (args, despachador, ayuda), workspace/ (operador, carpeta, lectura), query/ (estado y búsqueda), edit/ (edición por rangos), write/ (lógica de escritura), commands/ (un archivo por comando)
+│   │   └── test/                # Tests de `bun test` en espejo de src/
 │   └── task-tracker/          # Seguimiento de tareas en la terminal (`bun run tasks [ruta]`)
 │       ├── README.md            # Uso: comandos, atajos, qué muestra y cómo lee los archivos
 │       ├── index.ts             # Arranque: argumentos, ruta a vigilar (o la pregunta) y llama a app
@@ -68,5 +73,6 @@ agent-context-kit/
 - **`docs/desing.md`** — registro histórico de la conversación de diseño original; no es el estado actual (para eso, este archivo).
 - **`docs/agents/`** — dogfooding: este repo usa el skill sobre sí mismo en modo multi-operador (`rules.md`, `operators.md` y `team-backlog.md` son compartidos; cada operador tiene su carpeta con `handoff.md`, `backlog.md` e `history.md`, con la estructura que el skill genera en un repo destino).
 - **`skill/`** — el skill: [`SKILL.md`](../skill/SKILL.md) es el punto de entrada (resuelve el caso "ya existe documentación"), [`docs/`](../skill/docs/) tiene los flujos (`questions-flow.md`, `migration-flow.md`, y `multi-operator.md` para el modo de varias personas, que solo se abre si se activa) y qué es cada plantilla ([`template-architecture.md`](../skill/docs/template-architecture.md)), y `template/` es el catálogo de plantillas.
-- **`scripts/_shared/`** — código compartido entre los scripts: parseo de `handoff.md`, `backlog.md`, `history.md`, `operators.md` y `team-backlog.md` (`parse/`), tag de bloqueo y referencias entre tareas (`tasks/`), tipos del dominio y fixtures. Lo usan el task-tracker y los scripts que vengan.
+- **`scripts/_shared/`** — código compartido entre los scripts: parseo de `handoff.md`, `backlog.md`, `history.md`, `operators.md` y `team-backlog.md` (`parse/`), tag de bloqueo y referencias entre tareas (`tasks/`), tipos del dominio y fixtures. Lo usan el task-tracker y el task-manager.
 - **`scripts/task-tracker/`** — herramienta de este repo (no del skill, no se copia a los repos destino) que muestra en la terminal el estado de las tareas de un proyecto y se redibuja sola; se lanza con `bun run tasks [ruta]`. Uso, formatos y estructura interna: [`scripts/task-tracker/README.md`](../scripts/task-tracker/README.md).
+- **`scripts/task-manager/`** — herramienta de este repo (no del skill, no se copia a los repos destino y opcional: sin ella los archivos se editan a mano) que gestiona las tareas por comandos (`status`, `next`, `show`, `add`, `start`, `step`, `pause`, `resume`, `block`, `unblock`, `close`) editando de forma quirúrgica `handoff.md`, `backlog.md`, `history.md` y `team-backlog.md`; las escrituras exigen `--apply`. Se lanza con `bun run task <comando>`. Comandos, flags y estructura interna: [`scripts/task-manager/README.md`](../scripts/task-manager/README.md).
