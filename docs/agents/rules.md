@@ -58,11 +58,11 @@ Varias personas trabajan a la vez, cada una con su agente. Estas reglas se suman
 
 ## Al cerrar una tarea (fijas — leer solo al cerrar)
 
-**Con una herramienta de tareas:** si el proyecto tiene una que edita `handoff.md`, `backlog.md` e `history.md`, lo que ella ya hace de las Reglas 5, 6, 7 y 8 no se repite a mano ni se vuelve a verificar; sigue valiendo todo lo demás (en particular, que la tarea solo se cierra si el operador lo pide).
+**Con una herramienta de tareas:** si el proyecto tiene una que edita `handoff.md`, `backlog.md` e `history.md`, lo que ella ya hace de las Reglas 5, 6, 7 y 8 no se repite a mano ni se vuelve a verificar; sigue valiendo todo lo demás (en particular, que la tarea solo se cierra si el operador lo pide, y la sección «Checks pendientes» del reporte de la Regla 8, que añade el agente).
 
-5. **Una tarea solo se cierra cuando el operador lo pide explícitamente** (también las chicas, sin plan): al terminar el trabajo se manda el resumen y se espera; si pide correcciones, se hacen y se vuelve a mandar. **Al cerrarla se actualizan, como mínimo:** `handoff.md` (estado actual, o "sin tarea en curso"), `history.md` (la entrada de la tarea, hecha o descartada) y `backlog.md` (se saca la tarea si venía de ahí y se agregan las nuevas; ver "Numeración" en ese archivo), aunque también hayan cambiado otros archivos.
+5. **Una tarea solo se cierra cuando el operador lo pide explícitamente** (también las chicas, sin plan): al terminar el trabajo se manda el resumen y se espera; si pide correcciones, se hacen y se vuelve a mandar. **Al cerrarla se actualizan, como mínimo:** `handoff.md` (estado actual, o "sin tarea en curso"), `history.md` (la entrada de la tarea, hecha o descartada) y `backlog.md` (se saca la tarea si venía de ahí y se agregan las nuevas; ver "Numeración" en ese archivo), aunque también hayan cambiado otros archivos. La entrada de `history.md` guarda solo el resultado: qué se hizo, una línea de cómo y qué commit(s) lo contienen, sin el recorrido de cambios y decisiones (ese vive en el handoff mientras la tarea está en curso).
 
-6. **`handoff.md` también se actualiza en cada paso del plan** (Regla 2): qué se hizo, qué falta y el próximo paso concreto, para que un chat nuevo retome exactamente ahí si la conversación se corta. Se edita solo lo que cambió (el checkbox y la nota de ese paso, "Qué falta" y "Próximo paso concreto"), no se reescribe el archivo entero.
+6. **`handoff.md` también se actualiza en cada paso del plan** (Regla 2): qué se hizo, qué falta y el próximo paso concreto, para que un chat nuevo retome exactamente ahí si la conversación se corta. Se edita solo lo que cambió (el checkbox y la nota de ese paso, "Qué falta" y "Próximo paso concreto"), no se reescribe el archivo entero. **Evidencia:** al marcar un paso se anota al final de su línea lo que ya se corrió y observó (ej. `- [x] Paso 3 — … · bun test 779 pass`), y `· commit abc1234` solo si ese paso cierra un grupo de cambios ya commiteado; no se corre nada extra solo para tener evidencia. **Cambios a mitad de trabajo:** si el operador pide un ajuste antes de cerrar, se conservan los pasos hechos que no cambian, el invalidado se reabre con el motivo (`- [ ] Paso 2 — … (reabierto: <motivo>)`) y los pasos nuevos se agregan. Esa evidencia vive solo en el handoff (en curso o pausada); al cerrar no pasa a `history.md`.
 
 7. **El último paso de todo plan es "documentar cierre de tarea":** la Regla 5 más revisar las tareas bloqueadas de `backlog.md` por si alguna dejó de estarlo. Al desbloquearla, su campo `Bloqueos` no se borra: pasa a `[Resuelto el <fecha>] — <motivo original>`. Se hace igual en tareas sin plan. También se evalúa si "Tareas libres" superó las 15 (ver "Agrupamiento" en `backlog.md`).
 
@@ -80,4 +80,11 @@ Varias personas trabajan a la vez, cada una con su agente. Estas reglas se suman
 
    **Tareas nuevas:**
    - Tarea N — título
+
+   **Checks pendientes:**
+   - check — fallido | omitido | pendiente — motivo breve
+
+   **Próximo paso:** <qué sigue>
    ```
+
+   «Checks pendientes» y «Próximo paso» solo se ponen si hay checks fallidos, omitidos o pendientes: nunca se dan por buenos sin decirlo.
