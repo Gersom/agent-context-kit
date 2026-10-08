@@ -19,6 +19,15 @@ Este skill se aplica una vez por repo (generar o migrar); en las sesiones siguie
 4. **Mover o copiar con `cp`/`mv`**, nunca leyendo y reescribiendo. Un archivo se lee solo para transformarlo.
 5. **De a un archivo, sin acarrear ni releer:** procesar uno, escribir su resultado y pasar al siguiente.
 
+## Cómo preguntarle al operador (obligatorio al aplicar el skill)
+
+Toda pregunta al operador —en este archivo y en los flujos que enlaza— se hace con la herramienta `AskUserQuestion` (recuadro con opciones seleccionables por clic o teclado), no como texto en el chat. Esta regla rige también para las preguntas abiertas.
+
+1. **Con opciones:** de 2 a 4 por pregunta, la recomendada primero y marcada «(Recomendado)». La herramienta agrega sola «Otro», donde el operador escribe libre: no se escribe como opción.
+2. **Abiertas:** la herramienta exige al menos 2 opciones, así que se ofrecen candidatos razonables (ej. el nombre que se detectó en `package.json` o en la carpeta); si no hay, dos genéricas («Lo escribo yo», «No aplica / omitir»). La respuesta va en «Otro». No mezclar texto y widget en una misma tanda.
+3. **Tandas:** hasta 4 preguntas por llamada, mostradas juntas. Las que dependen de una respuesta anterior van en llamadas separadas.
+4. **Respaldo:** solo si el cliente no tiene la herramienta, preguntar en texto con las mismas opciones numeradas.
+
 ## Paso 1 — ¿Ya existe documentación de este skill?
 
 Revisar si el repo destino tiene `docs/agents/` y/o `docs/project/` (o sus equivalentes bajo `agent-context/`, si `docs/` está ocupado por otra documentación).
