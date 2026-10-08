@@ -47,6 +47,10 @@ Varias personas trabajan a la vez, cada una con su agente. Estas reglas se suman
 - **Ninguna tarea se cierra sin que el operador lo pida explícitamente** (decisión del operador, 2026-10-05). Al terminar el trabajo se manda el resumen y se espera: si pide correcciones, se hacen y se vuelve a mandar; solo cuando diga que se cierre se hace el cierre (Reglas 5 y 7) y el reporte (Regla 8). Aplica también a las tareas chicas sin plan.
 - **Commits coherentes** (decisión del operador, 2026-10-06): cada commit representa un trabajo hecho. Una tarea puede tener varios; si toca varios módulos o también documentación, se separa por unidad coherente (ej. uno por módulo, otro para la documentación); si es chica, uno alcanza, a criterio del agente. Los commits del trabajo se hacen durante la tarea, a medida que cada unidad queda hecha. El título lleva el número de tarea como scope de Conventional Commits, `tipo(T-N): descripción` (ej. `feat(T-27): ocultar pausadas vacías`), también el de cierre (`docs(T-N): close task`); los commits esporádicos o extras van sin `(T-N)`. El commit de cierre pasa la tarea a completada (`handoff.md`, `backlog.md` y `history.md`, Reglas 5 y 7). Los commits de otros cambios (ej. agregar tareas al backlog) se hacen cuando el operador lo pide.
 
+### Si usas el script de tareas
+
+- El script `task-manager` (`bun run task`, [`scripts/task-manager/README.md`](../../scripts/task-manager/README.md)) es opcional y **no exime de las Reglas 5 a 8**: solo automatiza las ediciones de `handoff.md`, `backlog.md` e `history.md`. Con o sin él, el `handoff.md` se actualiza en cada paso del plan (Regla 6), la tarea solo se cierra cuando el operador lo pide y el cierre cubre lo de las Reglas 5 y 7, y se manda el reporte de la Regla 8. Revisa el diff antes de aplicar con `--apply`.
+
 ### Qué NO tocar sin autorización explícita
 
 - La estructura de carpetas de `skill/template/`: moverla o renombrar archivos rompe las referencias de `questions-flow.md` y `migration-flow.md` y requiere bump major.
