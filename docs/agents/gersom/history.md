@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-07 — ✅ Tarea 32 — Cambiar preguntas normales a widget
+
+- El skill pregunta al operador con AskUserQuestion: regla general en SKILL.md (abiertas con 2 opciones mínimas, hasta 4 preguntas por llamada, respaldo en texto), flujos questions-flow/migration-flow/multi-operator reexpresados como opciones, mención en la Regla 2 por defecto y versión 1.4.0. Commits: e68a9cb, 573817f, a91c5e4, 37c7dbe, 1530107.
+
 ## 2026-10-07 — ✅ Tarea 31 — Cambiar la organización del render
 
 - El panel del operador muestra los recuadros como el flujo de una tarea, de arriba abajo: SIN DUEÑO → LIBRES ⇅ BLOQUEADAS → EN PROGRESO ⇅ PAUSADAS → COMPLETADAS, con una línea de flecha que nombra cada transición (`↓ se toma`, `↓ bloquea · ↑ desbloquea`, `↓ empieza`, `↑ retoma · ↓ pausa`, `↓ se cierra`). Solo hay flecha entre recuadros que se muestran. La vista de equipo no cambió.
