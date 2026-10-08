@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-08 — ✅ Tarea 37 — Limpiar el seguimiento de ODD de las instrucciones globales
+
+- El seguimiento de tareas deja de estar duplicado en las instrucciones globales: el CLAUDE.md global pasó de 21,4 KB a 4,7 KB (unos 4.500 tokens menos por conversación) y conserva solo CodeGraph, operaciones remotas y una línea de validar premisas con evidencia. Salieron el protocolo y el seguimiento de ODD, rutas y triggers de delegación, revisión por recibos, TDD, presupuesto de líneas, estrategia de PR y la regla de rama y commit; la revisión por recibos quedó desactivada con gentle-ai review mode disable. Se borró la carpeta odd/ del repo. El archivo global está fuera del repo; su copia de seguridad queda en C:\Users\Gersom\.claude\CLAUDE.md.bak hasta resolver la Tarea 41 (gentle-ai puede restaurar el bloque con sync). Commit: 471ca4f.
+
 ## 2026-10-08 — ✅ Tarea 35 — Portar a las reglas del kit las prácticas de seguimiento de ODD
 
 - Tres prácticas de ODD portadas a las reglas del kit para que el seguimiento viva solo en el handoff: evidencia por paso como sufijo de la línea (checks y commit, solo mientras la tarea está en curso o pausada), cambios aceptados a mitad de trabajo (se conserva lo hecho y se reabre el invalidado con motivo) y cierre honesto (history guarda solo resultado, cómo y commits; el reporte de cierre suma «Checks pendientes» y «Próximo paso»). Reglas 5, 6 y 8 y los history.md en docs/agents y en las plantillas, nota del formato en los dos handoff, un test nuevo de pause/resume/step con el sufijo y versión 1.6.0 sin tag ni release. bun test 780 pasan y typecheck limpio. Commits: c258e83, 88dc566, 4e76872.
