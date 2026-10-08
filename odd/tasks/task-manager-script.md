@@ -49,3 +49,7 @@ Los IDs coinciden con los pasos del plan de `handoff.md`.
 ## Próximo paso
 
 P7 (docs), tras la confirmación del operador y sus respuestas a las 4 ambigüedades de `close`. Decisiones de P5 resueltas (2026-10-07): formato ampliado de tarea pausada aceptado; `pause` estricto.
+
+## Cierre
+
+- Tarea cerrada a pedido del operador. Cierre en `docs(T-24): close task`. Revisión nativa: sin evaluar. Mirror Engram: pendiente (sin herramientas `mem_*`). Rama `feat/task-manager` (incluye la T-32), sin push ni PR.

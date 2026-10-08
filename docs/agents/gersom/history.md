@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-08 — ✅ Tarea 24 — Script para gestionar las tareas (handoff, backlog, history)
+
+- Script `scripts/task-manager/` (`bun run task`) que edita de forma quirúrgica handoff, backlog, history y team-backlog, en vez de editarlos a mano. Comandos: status, next, show, add, start, step, pause, resume, block, unblock y close (Reglas 5 a 8 y reporte de cierre). Las escrituras exigen --apply; es opcional y no forma parte del skill. Documentado en su README, el README raíz, architecture.md y una sección de rules.md que aclara que no exime de las Reglas 5 a 8. close también descarta directo tareas del backlog. bun test 779 pasan y typecheck limpio. Rama feat/task-manager, sin mergear ni pushear.
+
 ## 2026-10-07 — ✅ Tarea 32 — Cambiar preguntas normales a widget
 
 - El skill pregunta al operador con AskUserQuestion: regla general en SKILL.md (abiertas con 2 opciones mínimas, hasta 4 preguntas por llamada, respaldo en texto), flujos questions-flow/migration-flow/multi-operator reexpresados como opciones, mención en la Regla 2 por defecto y versión 1.4.0. Commits: e68a9cb, 573817f, a91c5e4, 37c7dbe, 1530107.
