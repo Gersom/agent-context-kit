@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-08 — ✅ Tarea 40 — Pasar a las reglas de la skill: autorizar antes de escribir, explorar y resolver incertidumbre
+
+- Lo que solo vivía en el CLAUDE.md global pasó a la skill para que se cargue únicamente en los proyectos que la usan: la Regla 2 de rules.md (y su plantilla) tiene ahora el bloque «Antes de actuar, de cualquier tamaño» con tres ideas: pedir no es autorizar (una pregunta, investigación o propuesta es solo lectura hasta que el operador pida implementar), explorar antes de proponer y una sola pregunta concreta ante una duda real de producto. Va en rules.md y no en preferences.md para que valga para todos los operadores y agentes. Versión 1.7.0 sin tag ni release; bun test 780 pasan y typecheck limpio. Commits: a59d7b3, 35ba93c.
+
 ## 2026-10-08 — ✅ Tarea 41 — Evitar que gentle-ai restaure el bloque ODD del CLAUDE.md global
 
 - El bloque agent-routing del CLAUDE.md global lo gestiona gentle-ai (hace copia en ~/.gentle-ai/backups antes de escribir) y no documenta una forma de excluir el ODD. Hoy gentle-ai sync no toca ningún agente (installed_agents vacío), pero install o sync --agent claude-code podrían devolverlo. Solución elegida: conservar el recorte como CLAUDE.md.trimmed junto al original (y el .bak con ODD) y restaurarlo a mano con cp tras un install o sync, sin cambiar la configuración de gentle-ai; quedó anotado en la memoria del agente. No se ejecutó ningún sync real, solo --dry-run.

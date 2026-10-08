@@ -89,15 +89,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** Origen: al limpiar el CLAUDE.md global (Tarea 37) el operador decidió que ODD no viaje siempre en el contexto y que lo útil viva en la skill. Esta tarea recoge lo relativo a subagentes: rutas (directa, delegada, SDD opcional), Mandatory Delegation Triggers (mapeo con 4+ archivos, escritor con 2+ archivos no triviales, preparación, respaldo de sesión larga) y la investigación con un único reto de supuestos de solo lectura. Observación: en las Tareas 35 y 36 se editaron varios archivos importantes en línea, lo que esos triggers consideran un fallo de enrutado; conviene decidir si se quieren como obligatorios o como sugerencia. La línea de validar premisas con evidencia queda en lo global (Tarea 37).
 - **Agregada:** 2026-10-08.
 
-### Tarea 40 — Pasar a las reglas de la skill: autorizar antes de escribir, explorar y resolver incertidumbre
-
-- **Descripción:** Llevar a la skill lo que hoy solo está en el CLAUDE.md global (una pregunta o investigación no autoriza cambios; explorar antes de proponer; una pregunta concreta ante una duda), para que el contexto global no lo cargue en cualquier conversación.
-- **Decisiones/temas a definir antes de empezar:** Si va en la Regla 2 de rules.md (todos los operadores y agentes) o en el preferences.md de cada operador; cómo decirlo en pocas líneas; qué bump de versión corresponde.
-- **Bloqueos:** Ninguno
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Origen: Tarea 37. De lo global, «Clasificar» ya es la Regla 2; faltan tres cosas: (1) autorizar: investigación, explicación, revisión, comparación o proponer una solución son solo lectura hasta que el operador pida implementar; si la intención es ambigua, una sola aclaración; (2) explorar el código y los requisitos antes de proponer o escribir; (3) ante una duda real de producto, una sola pregunta concreta y esperar. Aplica solo a proyectos que usan la skill; fuera de ella no queda esa protección (decisión del operador). Cambia reglas fijas: actualizar docs/agents/rules.md y skill/template/agents/rules.md.
-- **Agregada:** 2026-10-08.
-
 <!-- agent-context-kit:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
