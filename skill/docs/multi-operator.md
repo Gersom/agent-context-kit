@@ -61,7 +61,7 @@ Un operador que solo agrega tareas no tiene carpeta (ver "Quién es el operador 
 - **Agregada:** <fecha> por <operador>
 ```
 
-- **Tomar una tarea:** el operador la quita del `team-backlog.md` y recibe el siguiente número de su secuencia. Va a su `backlog.md` si la deja en espera, o **directo a su `handoff.md`** si la empieza ya (ej. una tarea chica). En los dos casos lleva `Origen: team-backlog`, que viaja hasta su entrada de `history.md`. El cambio va en el mismo commit que la quita del `team-backlog.md`. **Una tarea vive en un solo lugar.**
+- **Tomar una tarea:** el operador la quita del `team-backlog.md` y recibe el siguiente número de su secuencia. Va a su `backlog.md` si la deja en espera, o **directo a su `handoff.md`** si la empieza ya (ej. una tarea chica). En los dos casos lleva `Origen: team-backlog` (línea `- **Origen:** team-backlog` en el `handoff.md`), que viaja hasta su entrada de `history.md` como primera viñeta (`- **Origen:** team-backlog`). El cambio va en el mismo commit que la quita del `team-backlog.md`. **Una tarea vive en un solo lugar.**
 - Si dos operadores toman la misma a la vez, el merge muestra un conflicto sobre ese bloque, en vez de dejar dos copias en silencio.
 - **Devolver una tarea** que no se puede seguir: se quita del `backlog.md` del operador y vuelve al `team-backlog.md`, sin número y con la nota `Devuelta por <operador> (antes T-N@operador)`. El número queda retirado y no se reutiliza.
 - **Quien solo recolecta tareas** completa como mínimo título y descripción; el desarrollador que la toma completa el resto.

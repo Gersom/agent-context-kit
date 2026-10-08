@@ -4,7 +4,7 @@ Tareas **sin dueño** del proyecto, visibles para todos los operadores. Las tare
 
 **No lleva numeración ni contador:** dos operadores agregando a la vez tomarían el mismo número. Cada tarea se identifica por un **título único**.
 
-**Tomar una tarea:** el operador la quita de este archivo y recibe el siguiente número de su secuencia. Va a su `backlog.md` si la deja en espera, o directo a su `handoff.md` si la empieza ya; en los dos casos lleva el campo `Origen: team-backlog` (que llega hasta su `history.md`), en el mismo commit. Una tarea vive en un solo lugar. Antes de tomarse se la referencia por título; después, como `T-N@operador`.
+**Tomar una tarea:** el operador la quita de este archivo y recibe el siguiente número de su secuencia. Va a su `backlog.md` si la deja en espera, o directo a su `handoff.md` si la empieza ya; en los dos casos lleva el campo `Origen: team-backlog` (línea `- **Origen:** team-backlog`, que llega hasta su `history.md` como primera viñeta), en el mismo commit. Una tarea vive en un solo lugar. Antes de tomarse se la referencia por título; después, como `T-N@operador`.
 
 **Devolver una tarea** que no se puede seguir: vuelve acá, sin número y con la nota `Devuelta por <operador> (antes T-N@operador)`. El número queda retirado y no se reutiliza.
 
