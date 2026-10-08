@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 38
+**Próximo número de tarea:** 42
 
 ---
 
@@ -85,6 +85,42 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
   - A decidir: resolución del modo TDD y el runner (el kit no lo porta, ver Tarea 35); presupuesto de entrega ~400 líneas y estrategia de PR (`ask-on-risk`, `chained-pr`, `work-unit-commits`); qué hacer con los términos «ODD», «feature document» y «tasks» que queden huérfanos en el texto restante; si el nombre ODD se conserva para lo que se queda.
   Pasos previstos: (1) copia de seguridad del archivo global; (2) leer la sección ODD completa y marcar cada párrafo como «sale», «se queda» o «decidir»; (3) mostrar el resultado al operador antes de editar; (4) editar; (5) añadir en lo global una línea que remita al repo: «si el repo tiene AGENTS.md, el seguimiento de tareas se rige por sus reglas, no por un documento aparte»; (6) borrar `odd/tasks/ask-user-question-widget.md` y `odd/tasks/task-manager-script.md` de este repo (su contenido ya vive en `history.md` y en git) y la carpeta `odd/` si queda vacía; (7) verificar que ya no quedan referencias a `odd/tasks` ni a Engram.
   Fuera de alcance: cambiar las reglas del skill (eso es la 35 y la 36); tocar la configuración de receipt-driven o de CodeGraph.
+- **Agregada:** 2026-10-08.
+
+### Tarea 38 — Revisar si el task-tracker necesita actualizarse por los últimos cambios
+
+- **Descripción:** Comprobar si el task-tracker (scripts/task-tracker/) sigue mostrando bien el handoff, el backlog y el history tras los cambios de las Tareas 35 y 36, y actualizarlo si hace falta.
+- **Decisiones/temas a definir antes de empezar:** Ninguno.
+- **Bloqueos:** Ninguno
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Cambios a revisar: (1) los pasos del plan pueden llevar al final de la línea evidencia y commit (· bun test 779 pass · commit abc1234, Tarea 35): ver si el tracker los corta, los desalinea o los muestra bien; (2) un paso reabierto se escribe como (reabierto: motivo); (3) el handoff ahora se edita solo en lo que cambia y las pausadas ya no se leen salvo sin tarea en curso: ver si el tracker asume que el archivo se reescribe entero (reintento de primera lectura en src/io/snapshot.ts); (4) la entrada de history.md ahora es más breve y lista los commits; (5) el reporte de cierre suma Checks pendientes y Próximo paso (no afecta al tracker, solo confirmarlo). Probar contra el handoff real con una tarea en curso, con evidencia en los pasos y con una pausada. Si no hay nada que cambiar, cerrarla con esa conclusión.
+- **Agregada:** 2026-10-08.
+
+### Tarea 39 — Extraer la funcionalidad de subagentes a esta skill
+
+- **Descripción:** Mover del CLAUDE.md global a las reglas de la skill lo que hoy hace ODD con subagentes (rutas inline/delegada/SDD, triggers de delegación, investigación y reto de supuestos), para que solo se cargue cuando se usa la skill y no viaje en el contexto de cualquier conversación.
+- **Decisiones/temas a definir antes de empezar:** Si se adopta tal cual (triggers de 4+ archivos, 2+ escritores, ~20 llamadas) o se adapta: el system prompt de Claude Code dice no lanzar subagentes salvo que el operador lo pida, y cada subagente arranca en frío; si va en rules.md (para todos los operadores y agentes) o en el preferences.md de cada operador; qué se hace con el flujo SDD.
+- **Bloqueos:** Ninguno
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Origen: al limpiar el CLAUDE.md global (Tarea 37) el operador decidió que ODD no viaje siempre en el contexto y que lo útil viva en la skill. Esta tarea recoge lo relativo a subagentes: rutas (directa, delegada, SDD opcional), Mandatory Delegation Triggers (mapeo con 4+ archivos, escritor con 2+ archivos no triviales, preparación, respaldo de sesión larga) y la investigación con un único reto de supuestos de solo lectura. Observación: en las Tareas 35 y 36 se editaron varios archivos importantes en línea, lo que esos triggers consideran un fallo de enrutado; conviene decidir si se quieren como obligatorios o como sugerencia. La línea de validar premisas con evidencia queda en lo global (Tarea 37).
+- **Agregada:** 2026-10-08.
+
+### Tarea 40 — Pasar a las reglas de la skill: autorizar antes de escribir, explorar y resolver incertidumbre
+
+- **Descripción:** Llevar a la skill lo que hoy solo está en el CLAUDE.md global (una pregunta o investigación no autoriza cambios; explorar antes de proponer; una pregunta concreta ante una duda), para que el contexto global no lo cargue en cualquier conversación.
+- **Decisiones/temas a definir antes de empezar:** Si va en la Regla 2 de rules.md (todos los operadores y agentes) o en el preferences.md de cada operador; cómo decirlo en pocas líneas; qué bump de versión corresponde.
+- **Bloqueos:** Ninguno
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Origen: Tarea 37. De lo global, «Clasificar» ya es la Regla 2; faltan tres cosas: (1) autorizar: investigación, explicación, revisión, comparación o proponer una solución son solo lectura hasta que el operador pida implementar; si la intención es ambigua, una sola aclaración; (2) explorar el código y los requisitos antes de proponer o escribir; (3) ante una duda real de producto, una sola pregunta concreta y esperar. Aplica solo a proyectos que usan la skill; fuera de ella no queda esa protección (decisión del operador). Cambia reglas fijas: actualizar docs/agents/rules.md y skill/template/agents/rules.md.
+- **Agregada:** 2026-10-08.
+
+### Tarea 41 — Evitar que gentle-ai restaure el bloque ODD del CLAUDE.md global
+
+- **Descripción:** Resolver que el bloque agent-routing del CLAUDE.md global lo gestiona gentle-ai: un gentle-ai sync, install o actualización puede regenerarlo y devolver el ODD que se quitó en la Tarea 37.
+- **Decisiones/temas a definir antes de empezar:** Cómo evitarlo: ver si gentle-ai permite desactivar o configurar ese bloque, sacar el contenido propio fuera de los marcadores, o aceptar re-editarlo tras cada sync.
+- **Bloqueos:** Ninguno
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Problema: C:\Users\Gersom\.claude\CLAUDE.md envuelve la sección ODD y la autorización de operaciones remotas entre los marcadores <!-- gentle-ai:agent-routing --> y <!-- /gentle-ai:agent-routing -->, y CodeGraph entre <!-- gentle-ai:codegraph-guidance --> y su cierre. gentle-ai sync ("sincroniza configuraciones y skills a la versión actual", gentle-ai 3.7.0) puede reescribir esos bloques y restaurar lo eliminado en la Tarea 37. Pasos previstos al tomarla: (1) leer la ayuda y la documentación de gentle-ai sobre sync, install y persona/agent-routing, y ver si hay un flag o configuración para omitir el bloque ODD; (2) probar qué hace sync sobre una copia del archivo, nunca sobre el real; (3) elegir: configuración de gentle-ai, contenido propio fuera de los marcadores o re-edición tras cada sync; (4) documentar la solución. No ejecutar uninstall. Relacionada: Tarea 37 (la limpieza se hace igualmente; este riesgo es la parte que queda por resolver).
 - **Agregada:** 2026-10-08.
 
 <!-- agent-context-kit:section=blocked -->
