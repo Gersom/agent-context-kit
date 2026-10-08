@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 37
+**Próximo número de tarea:** 38
 
 ---
 
@@ -68,7 +68,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Decisiones/temas a definir antes de empezar:** Qué fricciones se vieron al usarlos (flags largos, texto libre, `--apply`, pausar/empezar en varios pasos); si conviene fusionar o renombrar comandos; qué se mantiene por compatibilidad.
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Surgida al usar el script en las Tareas 24 y 32. Límites conocidos: block/unblock no soportan tareas agrupadas ni team-backlog.md; add y start sin --json.
+- **Detalles:** Surgida al usar el script en las Tareas 24 y 32. Límites conocidos: block/unblock no soportan tareas agrupadas ni team-backlog.md; add y start sin --json. Surgido al hacer la Tarea 36: `step` ya edita de forma puntual (marcar, desmarcar y reemplazar una subsección), pero no permite cambiar el texto o la nota de un paso, agregar o quitar pasos, ni reabrir uno con motivo (lo pide la Tarea 35), y admite solo una de `--falta`/`--decisiones`/`--proximo` por ejecución.
 - **Agregada:** 2026-10-08.
 
 ### Tarea 35 — Portar a las reglas del kit las prácticas de seguimiento de ODD
@@ -76,6 +76,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Descripción:** Incorporar a las reglas del skill (Reglas 5 a 8) tres prácticas que hoy solo hace ODD: evidencia por paso (solo en el handoff, que `history.md` resume al cerrar), conservar lo hecho al aceptar cambios y cerrar informando los checks pendientes.
 - **Decisiones/temas a definir antes de empezar:** Si la evidencia por paso va como sufijo de la línea del paso o en una subsección ###; si se añade step --evidencia al script o solo regla de redacción; qué bump de versión corresponde.
 - **Bloqueos:** Ninguno
+- **Desbloquea:** Tarea 37.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Detalles:** Origen: comparación entre el seguimiento de ODD (`odd/tasks/<feature>.md`, instrucciones globales del operador) y el `handoff.md`. El handoff gana como estructura (fuente única, en git, lo edita el script, foto del presente, pausa/reanudación); ODD aporta tres prácticas que conviene portar, sin crear archivos nuevos ni secciones `##` nuevas.
   Las tres prácticas:
@@ -85,21 +86,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
   Dónde se aplica (el skill distribuye reglas fijas): `skill/template/agents/rules.md` es la fuente (Regla 4) y `docs/agents/rules.md` se alinea con ella. Cambios previstos: Regla 6 (evidencia y cambios aceptados), Regla 8 (cierre honesto) y la nota en `docs/agents/gersom/handoff.md` y `skill/template/agents/handoff.md` sobre el formato de la línea de paso. Opcional: `step --evidencia "<texto>"` en `scripts/task-manager/` (ver Tarea 34 antes de añadir flags).
   Restricciones del parser (`scripts/_shared/parse/handoff.ts`): todo `- [ ]` dentro de «Tarea en progreso» cuenta como paso del plan (no usar checkboxes para otra cosa); el texto tras el checkbox es libre; no añadir secciones `##` (se absorben en la anterior); lo extra va en subsecciones `###`. Verificar antes que `step` no localice el paso por texto exacto, para que el sufijo de evidencia no lo rompa; y que `pause`/`resume` conserven el sufijo.
   Versionado: contenido nuevo que no rompe nada, bump minor.
-  Fuera de alcance: borrar el seguimiento ODD de las instrucciones globales del operador (lo indicará él después); las normas de comportamiento de ODD (autorización, delegación, RDD) no se portan.
-- **Agregada:** 2026-10-08.
-
-### Tarea 36 — Optimizar el handoff: leer pausadas solo sin tarea en curso y editar solo lo que cambia
-
-- **Descripción:** Que el agente lea las tareas pausadas del handoff solo cuando no hay tarea en progreso, y que el handoff no se reescriba completo en cada paso sino que se edite solo lo que cambia (ej. en el paso 3, solo el paso 3).
-- **Decisiones/temas a definir antes de empezar:** Cómo se limita la lectura (instrucción en AGENTS.md, vista de task status o mover las pausadas); si el script necesita un comando de edición parcial; qué bump de versión corresponde.
-- **Bloqueos:** Ninguno
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Pedido del operador: dos optimizaciones del handoff.
-  A) Lectura selectiva de pausadas: hoy `AGENTS.md` manda leer el `handoff.md` entero, así que el agente lee «Tareas pausadas» aunque haya una tarea en curso. Objetivo: con tarea en progreso, leer solo esa sección; las pausadas se miran únicamente si no hay tarea en curso (ahí sí sirven, para retomar una). Opciones a evaluar: (1) cambiar el paso 4 de `AGENTS.md` y la plantilla equivalente del skill para decir «lee la sección Tarea en progreso (por rango o grep -n de las anclas); si dice Sin tarea en curso, mira Tareas pausadas»; (2) que `bun run task status` ya entregue esa vista (revisar qué imprime hoy); (3) mover las pausadas a otro archivo (descartable: cambia la estructura y el parser).
-  B) Edición parcial en vez de reescritura completa: hoy el encabezado del handoff dice «Se sobrescribe completo» (y la Regla 6 pide actualizarlo en cada paso). Objetivo: editar solo lo que cambia (ej. en el paso 3, solo se toca el paso 3: su checkbox, su nota y el «próximo paso concreto»), sin regenerar el archivo. Ventajas: menos tokens de salida, no se pierden pasos ya hechos ni las anclas, y se facilita reabrir un paso con motivo (Tarea 35). Hay que redefinir qué se garantiza: el handoff sigue siendo la foto del presente y se mantiene al día, pero con ediciones puntuales; al cerrar se deja en «Sin tarea en curso» como hoy.
-  Dónde se aplica: texto del encabezado de `docs/agents/gersom/handoff.md` y `skill/template/agents/handoff.md`; Regla 6 de `docs/agents/rules.md` y `skill/template/agents/rules.md` (fuente, Regla 4); paso 4 de `AGENTS.md` y, si el skill distribuye un equivalente, su plantilla. El script `task-manager` ya edita de forma quirúrgica (`step`, `pause`, `resume`); comprobar que cubre las ediciones parciales que pida la regla y, si falta una (ej. actualizar la nota del paso o el próximo paso sin tocar el resto), valorarla junto con la Tarea 34.
-  Restricciones del parser (`scripts/_shared/parse/handoff.ts`): hay que seguir cumpliendo las anclas `in-progress` y `paused`, la línea `Tarea N — título` antes de la primera `###` y los checkboxes como pasos; una edición parcial no debe romperlas.
-  Relación con otras tareas: Tarea 35 (evidencia por paso y reabrir pasos) depende de poder editar un solo paso; conviene hacer esta primero o juntas. Versionado: cambio de redacción en plantillas, probablemente patch (o minor si cambia el flujo de lectura de AGENTS.md); decidir al hacerla.
+  Fuera de alcance: borrar el seguimiento ODD de las instrucciones globales del operador (es la Tarea 37, que depende de esta y de la 36); las normas de comportamiento de ODD (autorización, delegación, RDD) no se portan.
 - **Agregada:** 2026-10-08.
 
 <!-- agent-context-kit:section=blocked -->
@@ -113,6 +100,22 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador quiera hacer pública la skill, o priorice esta tarea explícitamente.
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
+
+### Tarea 37 — Limpiar el seguimiento de ODD de las instrucciones globales
+
+- **Descripción:** Quitar de ~/.claude/CLAUDE.md el seguimiento de tareas de ODD (odd/tasks, evidencia, reanudación) para no duplicar el handoff, dejando global solo lo que no depende del repo; y borrar la carpeta odd/ de este repo.
+- **Decisiones/temas a definir antes de empezar:** Qué párrafos de ODD salen, cuáles se quedan globales y cuáles se deciden (TDD, presupuesto de entrega y estrategia de PR); si el nombre ODD se conserva para lo que se queda; confirmar el reparto con el operador antes de editar el archivo global.
+- **Bloqueos:** [dependencia] Depende de la Tarea 35 (la 36 ya está cerrada): el skill tiene que cubrir primero evidencia por paso, cambios aceptados y cierre honesto; si no, esas prácticas quedan sin dueño.
+- **Disparador:** cuando la Tarea 35 esté cerrada.
+- **Detalles:** Origen: el seguimiento de ODD (instrucciones globales del operador, `C:\Users\Gersom\.claude\CLAUDE.md`, sección «Organic Driven Development») duplica el trabajo del handoff: el agente mantiene `odd/tasks/<feature>.md` además de `handoff.md`/`history.md`. Es una tarea distinta de la 35: la 35 y la 36 cambian el repo (reglas y plantillas del skill); esta cambia un archivo fuera del repo, que no se versiona acá. Depende de ellas: borrar el seguimiento de ODD antes de que el skill cubra evidencia por paso, cambios aceptados y cierre honesto dejaría esas prácticas sin dueño.
+  Objetivo: que el seguimiento de tareas lo gobierne solo el sistema del skill (AGENTS.md, rules.md, handoff, task-manager) y que las instrucciones globales conserven únicamente lo que no depende del repo.
+  Reparto propuesto (confirmar con el operador al empezar):
+  - Sale de lo global (lo cubre el skill): crear/mantener `odd/tasks/<feature>.md`, «Track before the first write», checklist con IDs, evidencia y marcado de pasos, reabrir pasos con motivo, registro de ruta y triggers por tarea, reanudación, cierre con checks pendientes, commits por unidad de trabajo registrados en el documento (la Regla 9 ya los cubre).
+  - Se queda global (comportamiento del agente, vale en cualquier repo): autorizar antes de escribir (investigación y propuestas son solo lectura), explorar antes de proponer, resolver incertidumbre con una pregunta enfocada, triggers de delegación (4+ archivos, 2+ writers, respaldo de sesión larga), un solo reto de supuestos, receipt-driven review (switch del operador), autorización de operaciones remotas, y la sección CodeGraph.
+  - A decidir: resolución del modo TDD y el runner (el kit no lo porta, ver Tarea 35); presupuesto de entrega ~400 líneas y estrategia de PR (`ask-on-risk`, `chained-pr`, `work-unit-commits`); qué hacer con los términos «ODD», «feature document» y «tasks» que queden huérfanos en el texto restante; si el nombre ODD se conserva para lo que se queda.
+  Pasos previstos: (1) copia de seguridad del archivo global; (2) leer la sección ODD completa y marcar cada párrafo como «sale», «se queda» o «decidir»; (3) mostrar el resultado al operador antes de editar; (4) editar; (5) añadir en lo global una línea que remita al repo: «si el repo tiene AGENTS.md, el seguimiento de tareas se rige por sus reglas, no por un documento aparte»; (6) borrar `odd/tasks/ask-user-question-widget.md` y `odd/tasks/task-manager-script.md` de este repo (su contenido ya vive en `history.md` y en git) y la carpeta `odd/` si queda vacía; (7) verificar que ya no quedan referencias a `odd/tasks` ni a Engram.
+  Fuera de alcance: cambiar las reglas del skill (eso es la 35 y la 36); tocar la configuración de receipt-driven o de CodeGraph.
+- **Agregada:** 2026-10-08.
 
 <!-- agent-context-kit:section=grouped -->
 ## Tareas agrupadas

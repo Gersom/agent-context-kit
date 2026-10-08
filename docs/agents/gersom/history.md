@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-08 — ✅ Tarea 36 — Optimizar el handoff: leer pausadas solo sin tarea en curso y editar solo lo que cambia
+
+- Dos cambios para ahorrar tokens: el agente lee del handoff solo «Tarea en progreso» (las pausadas solo si no hay tarea en curso o si le piden retomar una), y el handoff se actualiza editando solo lo que cambió en vez de reescribirse entero. Se ajustaron AGENTS.md y sus dos plantillas, los textos del handoff y su plantilla, template-architecture.md y la Regla 6 (con su plantilla). El script task-manager ya edita de forma puntual; lo que le falta (editar la nota de un paso, reabrirlo con motivo) quedó anotado en la Tarea 34. bun test 779 pasan y typecheck limpio. Commits: d0aac8d, 48d2877.
+
 ## 2026-10-08 — ✅ Tarea 33 — Reevaluar las reglas de rules.md
 
 - Reglas reorganizadas: «Commits coherentes» pasa a regla por defecto (Regla 9) y «solo se cierra si el operador lo pide» entra en la Regla 5. Nueva cláusula «Con una herramienta de tareas» en «Al cerrar una tarea» y en el bloque multi-operador: lo que ya hace la herramienta no se repite a mano. Se eliminaron las repeticiones (nombres en inglés, número correlativo, plantillas por idioma, «fijas» duplicado, «no se copia literal»). Sin regla propia de AskUserQuestion: queda a criterio del agente y solo rige para las preguntas del skill. Plantillas alineadas y versión 1.5.0, sin tag ni release.
