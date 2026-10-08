@@ -40,8 +40,8 @@ describe("política de lectura: migración", () => {
   });
 
   test("pregunta por docs-legacy y por condensar antes de tocar nada", () => {
-    expect(migration).toContain("¿Querés conservar la documentación vieja en `docs-legacy/`?");
-    expect(migration).toContain("¿Querés condensar el texto");
+    expect(migration).toContain("¿querés conservar la documentación vieja en `docs-legacy/`?");
+    expect(migration).toContain("¿querés condensar el texto");
   });
 
   test("copia con comandos de archivo y verifica el respaldo en git si no se conserva", () => {
