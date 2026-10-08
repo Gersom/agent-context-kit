@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-08 — ✅ Tarea 41 — Evitar que gentle-ai restaure el bloque ODD del CLAUDE.md global
+
+- El bloque agent-routing del CLAUDE.md global lo gestiona gentle-ai (hace copia en ~/.gentle-ai/backups antes de escribir) y no documenta una forma de excluir el ODD. Hoy gentle-ai sync no toca ningún agente (installed_agents vacío), pero install o sync --agent claude-code podrían devolverlo. Solución elegida: conservar el recorte como CLAUDE.md.trimmed junto al original (y el .bak con ODD) y restaurarlo a mano con cp tras un install o sync, sin cambiar la configuración de gentle-ai; quedó anotado en la memoria del agente. No se ejecutó ningún sync real, solo --dry-run.
+
 ## 2026-10-08 — ✅ Tarea 37 — Limpiar el seguimiento de ODD de las instrucciones globales
 
 - El seguimiento de tareas deja de estar duplicado en las instrucciones globales: el CLAUDE.md global pasó de 21,4 KB a 4,7 KB (unos 4.500 tokens menos por conversación) y conserva solo CodeGraph, operaciones remotas y una línea de validar premisas con evidencia. Salieron el protocolo y el seguimiento de ODD, rutas y triggers de delegación, revisión por recibos, TDD, presupuesto de líneas, estrategia de PR y la regla de rama y commit; la revisión por recibos quedó desactivada con gentle-ai review mode disable. Se borró la carpeta odd/ del repo. El archivo global está fuera del repo; su copia de seguridad queda en C:\Users\Gersom\.claude\CLAUDE.md.bak hasta resolver la Tarea 41 (gentle-ai puede restaurar el bloque con sync). Commit: 471ca4f.

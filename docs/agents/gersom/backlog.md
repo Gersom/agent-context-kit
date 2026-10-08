@@ -98,15 +98,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** Origen: Tarea 37. De lo global, «Clasificar» ya es la Regla 2; faltan tres cosas: (1) autorizar: investigación, explicación, revisión, comparación o proponer una solución son solo lectura hasta que el operador pida implementar; si la intención es ambigua, una sola aclaración; (2) explorar el código y los requisitos antes de proponer o escribir; (3) ante una duda real de producto, una sola pregunta concreta y esperar. Aplica solo a proyectos que usan la skill; fuera de ella no queda esa protección (decisión del operador). Cambia reglas fijas: actualizar docs/agents/rules.md y skill/template/agents/rules.md.
 - **Agregada:** 2026-10-08.
 
-### Tarea 41 — Evitar que gentle-ai restaure el bloque ODD del CLAUDE.md global
-
-- **Descripción:** Resolver que el bloque agent-routing del CLAUDE.md global lo gestiona gentle-ai: un gentle-ai sync, install o actualización puede regenerarlo y devolver el ODD que se quitó en la Tarea 37.
-- **Decisiones/temas a definir antes de empezar:** Cómo evitarlo: ver si gentle-ai permite desactivar o configurar ese bloque, sacar el contenido propio fuera de los marcadores, o aceptar re-editarlo tras cada sync.
-- **Bloqueos:** Ninguno
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Problema: C:\Users\Gersom\.claude\CLAUDE.md envuelve la sección ODD y la autorización de operaciones remotas entre los marcadores <!-- gentle-ai:agent-routing --> y <!-- /gentle-ai:agent-routing -->, y CodeGraph entre <!-- gentle-ai:codegraph-guidance --> y su cierre. gentle-ai sync ("sincroniza configuraciones y skills a la versión actual", gentle-ai 3.7.0) puede reescribir esos bloques y restaurar lo eliminado en la Tarea 37. Pasos previstos al tomarla: (1) leer la ayuda y la documentación de gentle-ai sobre sync, install y persona/agent-routing, y ver si hay un flag o configuración para omitir el bloque ODD; (2) probar qué hace sync sobre una copia del archivo, nunca sobre el real; (3) elegir: configuración de gentle-ai, contenido propio fuera de los marcadores o re-edición tras cada sync; (4) documentar la solución. No ejecutar uninstall. Relacionada: Tarea 37 (la limpieza se hace igualmente; este riesgo es la parte que queda por resolver).
-- **Agregada:** 2026-10-08.
-
 <!-- agent-context-kit:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
