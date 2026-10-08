@@ -19,7 +19,7 @@ Inmediatamente después del chequeo de "¿Existe `docs/agents/` y/o `docs/projec
 Si el operador pide explícitamente migrar (ej. *"usa la skill agent-context-kit y migra mi proyecto"*, o cualquier variante que declare esa intención — ver `README.md` raíz, sección "Cómo usar"), este flujo se dispara **sin depender de que la heurística encuentre una "proporción significativa" de coincidencias por sí sola.** La intención explícita reemplaza ese umbral.
 
 - La heurística de nombres sigue corriendo igual: sirve para construir la tabla de mapeo propuesta, no para decidir si el flujo se dispara.
-- Si no encuentra ningún archivo que matchee nada, no se asume en silencio que no hay nada para migrar: se muestra una tabla vacía (o con pocos matches) en la ronda de confirmación, y se pregunta explícitamente qué archivos del `docs/` existente corresponde migrar a mano.
+- Si no encuentra ningún archivo que matchee nada, no se asume en silencio que no hay nada para migrar: se muestra una tabla vacía (o con pocos matches) en la ronda de confirmación, y se pregunta explícitamente (abierta; candidatos: los archivos de `docs/` sin match, o «Lo escribo yo» y «No aplica / omitir») qué archivos del `docs/` existente corresponde migrar a mano.
 - Sin intención explícita, el umbral de "proporción significativa" sigue aplicando tal como se describe en "Cuándo se dispara" — evita que un `docs/` con un solo archivo de nombre coincidente por casualidad (ej. un `setup.md` genérico sin relación) dispare una migración completa que nadie pidió.
 
 ## Prioridad: firma de este skill sobre la heurística
@@ -64,12 +64,12 @@ Si un archivo **no matchea ningún patrón** → va a `docs/others/<nombre-origi
 
 ## Ronda de confirmación (siempre, antes de tocar nada)
 
-Antes de mover o escribir un solo archivo, mostrar al operador la tabla de mapeo propuesta completa (origen → destino, con tamaños), incluyendo qué archivos van a `docs/others/` por no tener match y cuáles quedarían fusionados. Preguntar en una sola tanda:
+Antes de mover o escribir un solo archivo, mostrar al operador la tabla de mapeo propuesta completa (origen → destino, con tamaños), incluyendo qué archivos van a `docs/others/` por no tener match y cuáles quedarían fusionados. La tabla se muestra como texto (es contenido a revisar, no una pregunta); las preguntas van después, en una sola llamada de `AskUserQuestion` (máximo 4, son independientes; regla general en [`../SKILL.md`](../SKILL.md#cómo-preguntarle-al-operador-obligatorio-al-aplicar-el-skill)), con la recomendada primero:
 
-1. ¿La tabla de mapeo está bien, o hay que corregir algún archivo puntual?
-2. Si hay fusiones propuestas, ¿corresponde fusionarlas tal cual, o deberían quedar separadas de otra forma?
-3. **¿Querés conservar la documentación vieja en `docs-legacy/`?** Si `docs-legacy/` ya existe (de una migración anterior), decirlo en la pregunta: se conserva tal cual y no se crea otro respaldo, o se reemplaza.
-4. **¿Querés condensar el texto para ahorrar tokens, o mantenerlo tal cual?** Condensar = quitar relleno y repeticiones, enlazar en vez de duplicar y fusionar lo redundante, conservando todos los hechos, decisiones, fechas y números; mantener = no se reescribe el texto, solo se adapta a la estructura y las anclas de este skill.
+1. Header `Mapeo`: ¿la tabla de mapeo está bien, o hay que corregir algún archivo puntual? Opciones: «Está bien (Recomendado)» y «Corregir archivos» (cuáles, por «Otro»).
+2. Header `Fusiones` (solo si hay fusiones propuestas): ¿corresponde fusionarlas tal cual, o deberían quedar separadas de otra forma? Opciones: «Fusionar tal cual (Recomendado)» y «Dejarlas separadas».
+3. Header `Legacy`: **¿querés conservar la documentación vieja en `docs-legacy/`?** Opciones: «Conservar (Recomendado)» y «No conservar». Si `docs-legacy/` ya existe (de una migración anterior), decirlo en la pregunta y ofrecer «Conservar la existente» (se conserva tal cual y no se crea otro respaldo) y «Reemplazarla».
+4. Header `Texto`: **¿querés condensar el texto para ahorrar tokens, o mantenerlo tal cual?** Opciones: «Mantener (Recomendado)» y «Condensar». Condensar = quitar relleno y repeticiones, enlazar en vez de duplicar y fusionar lo redundante, conservando todos los hechos, decisiones, fechas y números; mantener = no se reescribe el texto, solo se adapta a la estructura y las anclas de este skill.
 
 Solo después de la confirmación se ejecuta la migración — nunca se mueve o transforma contenido en base a una heurística sin confirmar.
 
@@ -98,11 +98,11 @@ Solo después de la confirmación se ejecuta la migración — nunca se mueve o 
 
 Caso distinto al de arriba: el repo **ya usa este skill** en estructura plana (`docs/agents/handoff.md`, etc.) y se suma otra persona. Se pasa al modo de [`multi-operator.md`](./multi-operator.md) sin perder nada. Se dispara solo si el operador lo pide (ej. *"usa agent-context-kit para pasar a multi-operador"*); la política de lectura de [`../SKILL.md`](../SKILL.md) rige igual.
 
-**Antes de tocar nada**, verificar con `git status --porcelain docs/agents` que no haya cambios sin commitear (si los hay, avisar y pedir que se commiteen) y preguntar en una sola tanda:
+**Antes de tocar nada**, verificar con `git status --porcelain docs/agents` que no haya cambios sin commitear (si los hay, avisar y pedir que se commiteen) y preguntar con `AskUserQuestion` (regla general en [`../SKILL.md`](../SKILL.md#cómo-preguntarle-al-operador-obligatorio-al-aplicar-el-skill); las 3 son independientes, van en una sola llamada; las abiertas ofrecen candidatos o «Lo escribo yo» y «No aplica / omitir»):
 
-1. ¿Con qué nombre corto y qué correo(s) de git se registra el operador actual? (propuesta: el correo de `git config user.email`)
-2. ¿Quiénes más van a trabajar? Su nombre corto y correo se agregan a `operators.md`; quien solo agregue tareas se registra como `(solo team-backlog)` y no tiene carpeta.
-3. ¿Alguna tarea del `backlog.md` actual debe pasar al `team-backlog.md` (sin dueño)? Se listan solo los títulos (`grep -n "^###"`). Por defecto ninguna: todas quedan con el operador actual y la numeración continúa.
+1. Header `Operador`: ¿con qué nombre corto y qué correo(s) de git se registra el operador actual? (candidato recomendado: el correo de `git config user.email`)
+2. Header `Otros`: ¿quiénes más van a trabajar? Su nombre corto y correo se agregan a `operators.md`; quien solo agregue tareas se registra como `(solo team-backlog)` y no tiene carpeta. Opciones: «Nadie más por ahora (Recomendado)» y «Lo escribo yo».
+3. Header `Team-backlog`: ¿alguna tarea del `backlog.md` actual debe pasar al `team-backlog.md` (sin dueño)? Los títulos (`grep -n "^###"`) se listan en el texto de la pregunta. Opciones: «Ninguna (Recomendado)» (todas quedan con el operador actual y la numeración continúa) y «Elegir tareas» (cuáles, por «Otro»).
 
 **Ejecución** (comandos de archivo, sin leer los archivos enteros):
 
@@ -113,6 +113,6 @@ Caso distinto al de arriba: el repo **ya usa este skill** en estructura plana (`
 5. `docs/agents/rules.md`: agregar, antes de "## Enlaces", el bloque "Trabajo en paralelo" de `template/multi/rules.md` (ver "Reglas en modo multi-operador" de [`multi-operator.md`](./multi-operator.md)); las Reglas por defecto no se tocan. En `docs/README.md`, pasar la definición de "operador" a plural.
 6. Dejar registro: una entrada ✅ Hecha en el `history.md` del operador (qué pasó a multi y quiénes quedaron registrados), sin número de tarea.
 
-Los demás operadores no hacen nada especial: al hacer `pull`, su agente no encuentra su correo (o lo encuentra, si se registró en la respuesta 2) y se lo pregunta.
+Los demás operadores no hacen nada especial: al hacer `pull`, su agente no encuentra su correo (o lo encuentra, si se registró en la respuesta 2) y se lo pregunta con `AskUserQuestion`.
 
 **No hace:** volver de multi a plano (se hace a mano: mover los tres archivos del único operador de vuelta a `docs/agents/` y borrar `operators.md` y `team-backlog.md`) ni tocar `docs/project/`, `external/` o `plans/`.
