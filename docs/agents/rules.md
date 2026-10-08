@@ -27,6 +27,7 @@ Varias personas trabajan a la vez, cada una con su agente. Estas reglas se suman
 - **Tareas:** se toman del `team-backlog.md` y el número lo asignas tú, en tu secuencia. Una tarea vive en un solo lugar. "Agrega una tarea" va a tu `backlog.md`, salvo que digan explícitamente que es para el equipo.
 - **`rules.md` es de todos:** antes de agregar una regla, recuérdale al operador que se aplicará a todo el proyecto y a los demás operadores, y confirma que no es solo suya; si lo es, va en su `preferences.md`.
 - **Plan de ejecución (Regla 2):** si tu `preferences.md` fija cómo prefieres ejecutar los planes, no se te vuelve a preguntar.
+- **Con una herramienta de tareas:** lo que ella ya garantiza de «Tus archivos» (solo escribe en tu carpeta) y de «Tareas» (número de tu secuencia, una tarea en un solo lugar) no se repite a mano. Siguen siendo tuyos: no tocar con otros medios carpetas ajenas, escribir bien las referencias, avisar que `rules.md` es de todos y respetar tu `preferences.md`.
 
 ## Enlaces (evitar duplicar contexto)
 
