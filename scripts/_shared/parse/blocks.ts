@@ -6,7 +6,7 @@ import { isPlaceholder } from "./markdown.ts";
 import type { BodyPos } from "./positions.ts";
 
 // `### Tarea 4 — título` / `#### Task 12 - title` (acepta —, – o -).
-const TASK_HEADING_RE = /^(#{3,4})\s+(\S+)\s+(\d+)\s*[—–-]\s*(.+?)\s*$/;
+export const TASK_HEADING_RE =/^(#{3,4})\s+(\S+)\s+(\d+)\s*[—–-]\s*(.+?)\s*$/;
 // `### Grupo — título (Tareas 10, 11)`: referencia a un grupo dentro de "Tareas libres".
 const GROUP_REF_RE = /^###\s+(\S+)\s*[—–-]\s*(.+?)\s*\(([^)]*\d[^)]*)\)\s*$/;
 // `### Grupo — título`: contenedor de un grupo dentro de "Tareas agrupadas".

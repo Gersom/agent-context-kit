@@ -10,7 +10,7 @@ import { BodyPos, LineIndex } from "./positions.ts";
 export const HANDOFF_SECTIONS: string[] = ["in-progress", "paused"];
 export const BACKLOG_SECTIONS: string[] = ["free", "blocked", "grouped"];
 
-const ANCHOR_RE = /^\s*<!--\s*agent-context-kit:section=([a-z-]+)\s*-->\s*$/;
+export const ANCHOR_RE =/^\s*<!--\s*agent-context-kit:section=([a-z-]+)\s*-->\s*$/;
 const H2_RE = /^##(?!#)\s+(.+?)\s*$/;
 const FENCE_RE = /^\s*(```|~~~)/;
 
