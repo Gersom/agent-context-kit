@@ -11,6 +11,13 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-09 — ✅ Tarea 15 — Crear script para validar si un proyecto cumple las normas del task-tracker
+
+- Se creó scripts/docs-check/ (bun run check <ruta>, con --operator, --json y --strict): revisa en otro repo, solo lectura, que su documentación de agentes sirva al skill, al task-tracker y al task-manager.
+- Detecta con archivo y línea: workspace/archivos faltantes, anclas (faltantes, sin ancla, duplicadas, mal ubicadas), placeholders, Próximo número de tarea, números repetidos, headers y campos de tarea, tags de bloqueo, tarea en curso y entradas de history.md; sale con código 1 si hay errores.
+- Reutiliza resolveWorkspace del task-manager y el parser de _shared/ (se exportaron TASK_HEADING_RE y ANCHOR_RE). 208 tests propios; bun test 988 pass y typecheck limpio. Sobre claude-mods y este repo da 0 errores y 0 avisos.
+- Commits: feat, test y docs de T-15 más el de cierre.
+
 ## 2026-10-09 — ✅ Tarea 1 — Probar el flujo completo end-to-end sobre un repo real
 
 - Se copió la skill en D:\personal\claude-mods (.claude/skills/agent-context-kit/) y se corrió el flujo de scaffolding en modo plano (un operador, Español).
