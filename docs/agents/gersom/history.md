@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-09 — ✅ Tarea 39 — Dejar la funcionalidad de subagentes en el CLAUDE.md global
+
+- Los subagentes no van en la skill, que debe servir a cualquier agente o harness, sino en el CLAUDE.md global de Claude Code. Se creó la sección «Subagentes» en ~/.claude/CLAUDE.md (fuera de los marcadores de gentle-ai) con triggers obligatorios de delegación (mapeo 4+ archivos, escritor 2+ archivos no triviales, preparación, respaldo de sesión larga), y seis agentes en ~/.claude/agents/ con modelo y esfuerzo fijos: explorador y ejecutor en Haiku, investigador, escritor y revisor en Sonnet, retador en Opus. SDD se descartó. CLAUDE.md.trimmed se refrescó para que restaurarlo no pierda el bloque. Nada de esto vive en el repo: no hubo cambios en rules.md ni bump de versión. Commit: solo el de cierre.
+
 ## 2026-10-08 — ✅ Tarea 40 — Pasar a las reglas de la skill: autorizar antes de escribir, explorar y resolver incertidumbre
 
 - Lo que solo vivía en el CLAUDE.md global pasó a la skill para que se cargue únicamente en los proyectos que la usan: la Regla 2 de rules.md (y su plantilla) tiene ahora el bloque «Antes de actuar, de cualquier tamaño» con tres ideas: pedir no es autorizar (una pregunta, investigación o propuesta es solo lectura hasta que el operador pida implementar), explorar antes de proponer y una sola pregunta concreta ante una duda real de producto. Va en rules.md y no en preferences.md para que valga para todos los operadores y agentes. Versión 1.7.0 sin tag ni release; bun test 780 pasan y typecheck limpio. Commits: a59d7b3, 35ba93c.
