@@ -11,6 +11,13 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-09 — ✅ Tarea 1 — Probar el flujo completo end-to-end sobre un repo real
+
+- Se copió la skill en D:\personal\claude-mods (.claude/skills/agent-context-kit/) y se corrió el flujo de scaffolding en modo plano (un operador, Español).
+- Resultado: se generaron AGENTS.md, CLAUDE.md, docs/README.md, docs/agents/ (rules, handoff, backlog, history) y docs/project/ (architecture, stack), con anclas de sección y sin placeholders sin completar.
+- Queda sin probar el flujo de migración sobre un repo con documentación propia.
+- Sin cambios de código en este repo: la tarea fue de verificación; el único commit es el de cierre.
+
 ## 2026-10-09 — ✅ Tarea 39 — Dejar la funcionalidad de subagentes en el CLAUDE.md global
 
 - Los subagentes no van en la skill, que debe servir a cualquier agente o harness, sino en el CLAUDE.md global de Claude Code. Se creó la sección «Subagentes» en ~/.claude/CLAUDE.md (fuera de los marcadores de gentle-ai) con triggers obligatorios de delegación (mapeo 4+ archivos, escritor 2+ archivos no triviales, preparación, respaldo de sesión larga), y seis agentes en ~/.claude/agents/ con modelo y esfuerzo fijos: explorador y ejecutor en Haiku, investigador, escritor y revisor en Sonnet, retador en Opus. SDD se descartó. CLAUDE.md.trimmed se refrescó para que restaurarlo no pierda el bloque. Nada de esto vive en el repo: no hubo cambios en rules.md ni bump de versión. Commit: solo el de cierre.
