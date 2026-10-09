@@ -43,12 +43,22 @@ bun run task <comando> --help
 
 Comandos, flags y cómo escribe: [`scripts/task-manager/README.md`](./scripts/task-manager/README.md).
 
+## Verificar un proyecto antes de trabajar en él
+
+Un verificador de solo lectura que revisa si la documentación de agentes de otro repo sirve al skill, al seguimiento y a la gestión de tareas, y lista errores y avisos con archivo y línea:
+
+```sh
+bun run check <ruta-del-proyecto>
+```
+
+Uso y códigos de hallazgo: [`scripts/docs-check/README.md`](./scripts/docs-check/README.md).
+
 ## Estructura del repositorio
 
 ```
 agent-context-kit/
 ├── skill/           # El skill: SKILL.md, flujos de decisión (docs/) y catálogo de plantillas (template/)
-├── scripts/         # Herramientas del repo, no parte del skill: task-tracker, task-manager y código compartido (_shared/)
+├── scripts/         # Herramientas del repo, no parte del skill: task-tracker, task-manager, docs-check y código compartido (_shared/)
 ├── docs/            # Documentación del propio repo: filosofía, arquitectura, diseño y su estado (agents/)
 ├── package.json     # Versión del skill (SemVer) y comandos de los scripts
 └── tsconfig.json    # TypeScript (strict) para scripts/

@@ -8,7 +8,7 @@ Este documento describe la estructura general del repo `agent-context-kit` y par
 agent-context-kit/
 ├── README.md              # Presentación del proyecto
 ├── CLAUDE.md               # Puntero para agentes: remite a docs/desing.md
-├── package.json            # Versión del skill (SemVer) + scripts (tasks, test, typecheck) y devDependencies de scripts/
+├── package.json            # Versión del skill (SemVer) + scripts (tasks, task, check, test, typecheck) y devDependencies de scripts/
 ├── tsconfig.json           # TypeScript (strict) para scripts/; `bun run typecheck` = tsc --noEmit
 │
 ├── scripts/                # Herramientas propias del repo (TypeScript con Bun); no forman parte del skill
@@ -17,6 +17,11 @@ agent-context-kit/
 │   │   ├── parse/               # Markdown → datos: secciones por ancla, bloques, handoff, backlog, history, operators, team-backlog
 │   │   ├── tasks/               # Tag de bloqueo vigente (block-info) y tareas mencionadas en un texto (task-refs)
 │   │   └── test/                # Tests en espejo de parse/ y tasks/ + fixtures/ (docs de ejemplo) + helpers.ts
+│   ├── docs-check/            # Verificador de otro repo (`bun run check <ruta>`): comprueba que su documentación de agentes sirva al skill, al tracker y al task-manager
+│   │   ├── README.md            # Uso, códigos de hallazgo y estructura
+│   │   ├── index.ts             # Arranque: llama a run()
+│   │   ├── src/                 # args, run, context, lines, report, types y checks/ (files, anchors, placeholders, tasks, handoff, history)
+│   │   └── test/                # Tests en espejo de src/ + e2e/ con proyectos en un directorio temporal
 │   ├── skill-checks/          # Tests de contenido del skill (`reading-policy.test.ts`): fijan la política de lectura y la estructura de lo que se lee en cada sesión
 │   ├── task-manager/          # Gestión de tareas desde la terminal (`bun run task <comando>`): edita handoff/backlog/history/team-backlog de forma quirúrgica
 │   │   ├── README.md            # Uso: comandos, flags, `--apply` y qué escribe cada uno
@@ -74,5 +79,6 @@ agent-context-kit/
 - **`docs/agents/`** — dogfooding: este repo usa el skill sobre sí mismo en modo multi-operador (`rules.md`, `operators.md` y `team-backlog.md` son compartidos; cada operador tiene su carpeta con `handoff.md`, `backlog.md` e `history.md`, con la estructura que el skill genera en un repo destino).
 - **`skill/`** — el skill: [`SKILL.md`](../skill/SKILL.md) es el punto de entrada (resuelve el caso "ya existe documentación"), [`docs/`](../skill/docs/) tiene los flujos (`questions-flow.md`, `migration-flow.md`, y `multi-operator.md` para el modo de varias personas, que solo se abre si se activa) y qué es cada plantilla ([`template-architecture.md`](../skill/docs/template-architecture.md)), y `template/` es el catálogo de plantillas.
 - **`scripts/_shared/`** — código compartido entre los scripts: parseo de `handoff.md`, `backlog.md`, `history.md`, `operators.md` y `team-backlog.md` (`parse/`), tag de bloqueo y referencias entre tareas (`tasks/`), tipos del dominio y fixtures. Lo usan el task-tracker y el task-manager.
+- **`scripts/docs-check/`** — herramienta de este repo (no del skill, no se copia a los repos destino) que se corre contra otro proyecto (`bun run check <ruta>`) y reporta, con archivo y línea, si su documentación de agentes cumple lo que necesitan el skill, el task-tracker y el task-manager (anclas, tareas, números, bloqueos, placeholders); solo lee, y sale con código distinto de 0 si hay errores. Reutiliza `resolveWorkspace` del task-manager y el parser de `_shared/`. Uso y códigos: [`scripts/docs-check/README.md`](../scripts/docs-check/README.md).
 - **`scripts/task-tracker/`** — herramienta de este repo (no del skill, no se copia a los repos destino) que muestra en la terminal el estado de las tareas de un proyecto y se redibuja sola; se lanza con `bun run tasks [ruta]`. Uso, formatos y estructura interna: [`scripts/task-tracker/README.md`](../scripts/task-tracker/README.md).
 - **`scripts/task-manager/`** — herramienta de este repo (no del skill, no se copia a los repos destino y opcional: sin ella los archivos se editan a mano) que gestiona las tareas por comandos (`status`, `next`, `show`, `add`, `start`, `step`, `pause`, `resume`, `block`, `unblock`, `close`) editando de forma quirúrgica `handoff.md`, `backlog.md`, `history.md` y `team-backlog.md`; las escrituras exigen `--apply`. Se lanza con `bun run task <comando>`. Comandos, flags y estructura interna: [`scripts/task-manager/README.md`](../scripts/task-manager/README.md).
