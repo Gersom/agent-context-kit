@@ -2,7 +2,7 @@
 
 ## Reglas por defecto (fijas — no se editan por proyecto)
 
-Vienen con el skill y aplican a cualquier proyecto; las reglas de proceso adicionales se agregan debajo, no en su reemplazo. Son fijas también en su plantilla (`skill/template/agents/rules.md`). Las Reglas 5 a 8 están al final, en "Al cerrar una tarea".
+Vienen con el skill y aplican a cualquier proyecto; las reglas de proceso adicionales se agregan debajo, no en su reemplazo. Son fijas también en su plantilla (`template/agents/rules.md`, en el repo de la skill). Las Reglas 5 a 8 están al final, en "Al cerrar una tarea".
 
 1. **Cada contenido vive en un único archivo, el de su tema** (una decisión en `decisions.md`, un bug en `known-issues.md`). Si otro archivo lo necesita, va una mención breve con link, no una copia.
 
@@ -35,26 +35,30 @@ Varias personas trabajan a la vez, cada una con su agente. Estas reglas se suman
 - Estructura de carpetas y por qué está organizado así → [`../architecture.md`](../architecture.md)
 - Razón de ser y principios de diseño → [`../philosophy.md`](../philosophy.md)
 - Historial de decisiones de diseño → [`../desing.md`](../desing.md) (registro histórico, no spec vigente — ver regla 4)
-- Catálogo de plantillas y para qué sirve cada una → `skill/docs/template-architecture.md` (en la skill, no en este repo)
+- Catálogo de plantillas y para qué sirve cada una → `docs/template-architecture.md` del repo de la skill ([Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill), clonado en `skill/`; no está en este repo)
 
 ## Reglas específicas de este proyecto
 
-- No hay linter/formatter. `skill/` (`SKILL.md`, flujos y plantillas `.md`) es markdown puro, sin código ni build. `scripts/` (TypeScript con Bun, ej. `scripts/task-tracker/`) son herramientas propias que **no forman parte del skill distribuido** ni se copian a los repos destino.
+- **Dos repos.** El kit (este repo) tiene las herramientas y su documentación; la skill (`SKILL.md`, flujos y plantillas `.md`, markdown puro, sin código ni build) vive en su propio repo, [Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill), clonado en `skill/` e ignorado por git en el kit (`.gitignore`). Quien clone el kit tiene que clonar también la skill en `skill/` (ver el README raíz); sin ella, los tests de `scripts/skill-checks/` se saltan.
+- **Commits en dos repos (complementa la Regla 9).** Un cambio en la skill se commitea en su repo, con `git -C skill commit` y el mismo formato `tipo(T-N): descripción`; uno en el kit, en el kit. Una tarea que toca ambos tiene commits en los dos. El commit de cierre (`docs(T-N): close task`) va siempre en el kit, porque ahí viven `handoff.md`, `backlog.md` e `history.md`. En `history.md`, la entrada indica el repo de cada commit (ver «Formato» en ese archivo).
+- No hay linter/formatter. `scripts/` (TypeScript con Bun, ej. `scripts/task-tracker/`) son herramientas propias del kit que **no forman parte del skill distribuido** ni se copian a los repos destino.
 - Dependencias de `scripts/`: solo en `devDependencies` del `package.json` raíz (no uno por script); `bun install` en la raíz; `node_modules/` no se commitea y `bun.lock` sí. Tests con `bun test` desde la raíz.
 - Los scripts nuevos se escriben en **TypeScript** (decisión del operador, 2026-10-05), con el `tsconfig.json` raíz (`strict`). Bun no revisa tipos: `bun run typecheck` (`tsc --noEmit`) tiene que pasar junto con `bun test`.
-- **Decisión no negociable —** versionado SemVer: `package.json` (`version`) + tags de git `vX.Y.Z`, con releases manuales en GitHub, no por CI (los releases son poco frecuentes y es un repo de documentación). Bump:
-  - **patch** — fixes/ajustes de redacción en plantillas existentes.
-  - **minor** — contenido nuevo que no rompe nada (nueva plantilla, nueva rama del árbol de preguntas).
-  - **major** — cambios que rompen algo que un repo destino ya pudiera usar (mover/renombrar archivos de `template/` referenciados desde `questions-flow.md`, cambiar la estructura generada en `docs/agents`/`docs/project`).
+- **Decisión no negociable —** versionado SemVer, con tags de git `vX.Y.Z` y releases manuales en GitHub, no por CI (los releases son poco frecuentes y son repos de documentación y herramientas chicas). Cada repo se versiona por separado:
+  - **El kit:** `package.json` (`version`) + tags en este repo. Versiona los scripts y la documentación del kit. Las versiones y tags `v1.x` que ya existen son anteriores a la separación y cubren también la skill, que entonces vivía acá.
+  - **La skill:** su propia versión y sus propios tags, en el repo [Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill); no se versiona desde el kit. Bump:
+    - **patch** — fixes/ajustes de redacción en plantillas existentes.
+    - **minor** — contenido nuevo que no rompe nada (nueva plantilla, nueva rama del árbol de preguntas).
+    - **major** — cambios que rompen algo que un repo destino ya pudiera usar (mover/renombrar archivos de `template/` referenciados desde `questions-flow.md`, cambiar la estructura generada en `docs/agents`/`docs/project`).
 
 ### Si usas el script de tareas
 
 - El script `task-manager` (`bun run task`, [`scripts/task-manager/README.md`](../../scripts/task-manager/README.md)) es la herramienta de tareas de este repo y es opcional: si lo usas, rige la cláusula de «Al cerrar una tarea» (`step` hace la Regla 6; `close`, las Reglas 5 y 7 y el reporte de la Regla 8). Revisa el diff antes de aplicar con `--apply`.
-- En este repo, entre `skill/template/` (el catálogo real) y `docs/desing.md` (registro histórico, no spec vigente) gana `skill/template/` (Regla 4).
+- En este repo, entre `skill/template/` (el catálogo real) y `docs/desing.md` (registro histórico, no spec vigente) gana `skill/template/` (Regla 4; está en el repo de la skill).
 
 ### Qué NO tocar sin autorización explícita
 
-- La estructura de carpetas de `skill/template/`: moverla o renombrar archivos rompe las referencias de `questions-flow.md` y `migration-flow.md` y requiere bump major.
+- La estructura de carpetas de `template/` en el repo de la skill (`skill/template/`): moverla o renombrar archivos rompe las referencias de `questions-flow.md` y `migration-flow.md` y requiere bump major de la skill.
 - `docs/desing.md`: registro histórico de la conversación de diseño original, no el estado actual (para eso, `docs/architecture.md`).
 
 ## Al cerrar una tarea (fijas — leer solo al cerrar)
