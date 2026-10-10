@@ -26,7 +26,7 @@ Cada hallazgo lleva archivo, línea (cuando aplica) y un código. **Error:** el 
 
 | Código | Severidad | Qué detecta |
 |---|---|---|
-| `workspace` | error | No se pudo ubicar la carpeta de agentes o el operador (mensaje del gestor de tareas). |
+| `workspace` | error | No se pudo ubicar la carpeta de agentes o el operador (mensaje del gestor de tareas). Aun así se revisan `AGENTS.md` y `CLAUDE.md` si la ruta es una carpeta que existe (aunque no tenga `docs/agents`). |
 | `file-missing` | error / aviso | Falta `handoff.md` o `backlog.md` (error); `history.md` o `team-backlog.md` (aviso). |
 | `operators-unreadable` | aviso | Líneas de `operators.md` que no se pudieron leer. |
 | `root-file` | aviso | Falta `AGENTS.md` o `CLAUDE.md`, o no llevan el bloque del skill ni mencionan `docs/agents`. |

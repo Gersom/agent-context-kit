@@ -6,7 +6,7 @@ import { isAbsolute, resolve } from "node:path";
 import { CliError, UsageError } from "../../task-manager/src/cli/errors.ts";
 import type { Io } from "../../task-manager/src/cli/types.ts";
 import { readRaw } from "../../task-manager/src/workspace/docs.ts";
-import { cleanPathInput, invocationDir, locateAgents, projectDirFor } from "../../task-manager/src/workspace/paths.ts";
+import { cleanPathInput, invocationDir, isDir, locateAgents, projectDirFor } from "../../task-manager/src/workspace/paths.ts";
 import { resolveWorkspace } from "../../task-manager/src/workspace/workspace.ts";
 import { HELP, parseCheckArgs } from "./args.ts";
 import { checkRootFiles, runChecks } from "./checks/index.ts";
@@ -41,21 +41,30 @@ function askForPath(message: string): string {
     .replace("--agents está vacío", "La ruta está vacía");
 }
 
-/** Lo que se sabe de dónde está el proyecto cuando el espacio de trabajo no se pudo resolver. */
-function locateProject(path: string, baseDir: string): { projectDir: string; mode: "flat" | "multi"; agentsDir: string } | null {
+/**
+ * Lo que se sabe de dónde está el proyecto cuando el espacio de trabajo no se pudo resolver. Si ni
+ * siquiera se ubica la documentación de agentes pero la ruta es una carpeta que existe, esa carpeta
+ * es la raíz del proyecto (o la del repo, si es una carpeta de agentes vacía): modo y carpeta de
+ * agentes quedan sin ubicar, pero AGENTS.md y CLAUDE.md se pueden revisar igual.
+ */
+function locateProject(path: string, baseDir: string): { projectDir: string; mode: "flat" | "multi" | null; agentsDir: string | null } | null {
   try {
     const located = locateAgents(path, baseDir);
     const agentsDir = located.mode === "flat" ? located.agentsDir : located.agentsRoot;
     return { projectDir: projectDirFor(agentsDir), mode: located.mode, agentsDir };
   } catch {
-    return null;
+    const input = cleanPathInput(path);
+    if (!input) return null;
+    const dir = isAbsolute(input) ? resolve(input) : resolve(baseDir, input);
+    return isDir(dir) ? { projectDir: projectDirFor(dir), mode: null, agentsDir: null } : null;
   }
 }
 
 /**
  * Revisa un proyecto: devuelve qué se revisó y los hallazgos. No imprime nada ni escribe en el
  * proyecto. Si el espacio de trabajo no se puede resolver, el motivo es un hallazgo `workspace` y
- * solo se revisan AGENTS.md y CLAUDE.md, si se pudo ubicar la raíz.
+ * solo se revisan AGENTS.md y CLAUDE.md, si se pudo ubicar la raíz (también cuando la carpeta
+ * indicada existe pero no tiene documentación de agentes).
  */
 export function inspect(path: string, operator: string | undefined, options: Pick<RunOptions, "baseDir" | "email"> = {}): Inspection {
   const baseDir = options.baseDir ?? invocationDir();
@@ -88,7 +97,7 @@ export function inspect(path: string, operator: string | undefined, options: Pic
       meta: {
         project: located?.projectDir ?? (isAbsolute(input) ? resolve(input) : resolve(baseDir, input)),
         mode: located?.mode ?? null,
-        agentsDir: located ? relativeTo(located.projectDir, located.agentsDir) : null,
+        agentsDir: located?.agentsDir ? relativeTo(located.projectDir, located.agentsDir) : null,
         operator: null,
       },
       findings: [workspaceError, ...rootFindings],

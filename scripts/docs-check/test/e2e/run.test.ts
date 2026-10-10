@@ -322,13 +322,37 @@ describe("ruta que no existe o sin documentación", () => {
     expect(out).toContain("[workspace]");
   });
 
-  test("carpeta sin docs/agents: solo el hallazgo workspace (no se pudo ubicar la raíz de la documentación)", async () => {
+  test("carpeta sin docs/agents: el hallazgo workspace y la revisión de AGENTS.md y CLAUDE.md de esa carpeta", async () => {
     const p = project({ "README.md": "# Hola\n" });
     const report = await checkJson([p.root]);
-    expect(report).toMatchObject({ code: 1, mode: null, agentsDir: null, project: resolve(p.root), errors: 1, warnings: 0 });
-    expect(report.findings.map((f) => [f.severity, f.code, f.file])).toEqual([["error", "workspace", "."]]);
+    expect(report).toMatchObject({ code: 1, mode: null, agentsDir: null, project: resolve(p.root), errors: 1, warnings: 2 });
+    expect(report.findings.map((f) => [f.severity, f.code, f.file])).toEqual([
+      ["error", "workspace", "."],
+      ["warning", "root-file", "AGENTS.md"],
+      ["warning", "root-file", "CLAUDE.md"],
+    ]);
     expect(report.findings[0].message).toContain("Indica la raíz del proyecto o su carpeta de agentes.");
     expect(report.findings[0].message).not.toContain("--agents");
+  });
+
+  test("carpeta sin docs/agents pero con AGENTS.md y CLAUDE.md correctos: solo workspace", async () => {
+    const p = project({
+      "AGENTS.md": "Lee docs/agents/rules.md\n",
+      "CLAUDE.md": "Antes de cualquier tarea, lee AGENTS.md\n",
+    });
+    const report = await checkJson([p.root]);
+    expect(report.findings.map((f) => [f.severity, f.code, f.file])).toEqual([["error", "workspace", "."]]);
+  });
+
+  test("carpeta de agentes vacía: AGENTS.md y CLAUDE.md se buscan en la raíz del repo, no dentro de ella", async () => {
+    const p = project({ "docs/agents/.gitkeep": "" });
+    const report = await checkJson([join(p.root, "docs", "agents")]);
+    expect(report.project).toBe(resolve(p.root));
+    expect(report.findings.map((f) => [f.code, f.file])).toEqual([
+      ["workspace", "."],
+      ["root-file", "AGENTS.md"],
+      ["root-file", "CLAUDE.md"],
+    ]);
   });
 
   test("si la documentación se ubica pero el operador no se resuelve, igual se revisan AGENTS.md y CLAUDE.md", async () => {
