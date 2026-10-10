@@ -32,7 +32,7 @@ bun run tasks D:/proyectos/mi-app --compact --no-arrows   # arranca compacto y s
 
 ### Modo multi-operador
 
-Si la carpeta de agentes tiene `operators.md` (varias personas trabajando en paralelo, ver `skill/docs/multi-operator.md`), el script lo detecta solo y vigila toda la carpeta: cada operador con carpeta, `operators.md` y `team-backlog.md`. Sin `operators.md`, todo funciona como antes.
+Si la carpeta de agentes tiene `operators.md` (varias personas trabajando en paralelo, ver `docs/multi-operator.md` de la skill), el script lo detecta solo y vigila toda la carpeta: cada operador con carpeta, `operators.md` y `team-backlog.md`. Sin `operators.md`, todo funciona como antes.
 
 - **Vista de equipo** (la inicial, sin operador): el recuadro EQUIPO es un selector con una fila por operador (su tarea en curso con el avance del plan; debajo, sus libres, bloqueadas y la última tarea que cerró) y, debajo, el recuadro SIN DUEÑO con las tareas de `team-backlog.md`. El operador de `git config user.email` queda marcado `(tú)` y preseleccionado; los `(solo team-backlog)` aparecen pero no se pueden abrir.
 - **Panel de un operador:** la pantalla de siempre (completadas, en progreso, pausadas, libres y bloqueadas) con el recuadro SIN DUEÑO debajo de BLOQUEADAS. El título muestra el operador (`▣ MI APP · ana`).
@@ -111,7 +111,7 @@ El tachado usa el código de tachado de la terminal: Windows Terminal, VS Code y
 
 ## Cómo lee los archivos
 
-El script no depende del idioma de la documentación (los headers se traducen por proyecto). Lo que usa está descrito en [`skill/docs/template-architecture.md`](../../skill/docs/template-architecture.md), sección "Anclas de sección":
+El script no depende del idioma de la documentación (los headers se traducen por proyecto). Lo que usa está descrito en `docs/template-architecture.md` de la skill, sección "Anclas de sección":
 
 - **Anclas de sección** en `handoff.md` y `backlog.md`: comentarios `<!-- agent-context-kit:section=<id> -->` antes de cada sección (`in-progress`, `paused`, `free`, `blocked`, `grouped`). Si un archivo no tiene ninguna, el script usa un **plan B**: toma las secciones `##` por orden de aparición y lo avisa en pantalla.
 - **Tareas:** headers `### Tarea N — título` (`####` dentro de un grupo), con `—`, `–` o `-`. La tarea en progreso es la primera línea `Tarea N — título` de su sección, antes de la primera subsección.

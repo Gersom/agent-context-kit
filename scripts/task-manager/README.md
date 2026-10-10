@@ -293,7 +293,7 @@ La lógica de interpretación (bloqueos, tareas que menciona un motivo, plan y s
 
 ## Qué operador y qué carpeta usa
 
-Sigue [`skill/docs/multi-operator.md`](../../skill/docs/multi-operator.md) y nunca escribe al resolver:
+Sigue `docs/multi-operator.md` de la skill y nunca escribe al resolver:
 
 - **Multi-operador** si la carpeta de agentes tiene `operators.md`; **plano** si no, y trae `handoff.md` directamente (en ese caso no hay operador ni `team-backlog.md`).
 - **Operador:** `--operator <carpeta>` si se indicó (sin distinguir mayúsculas); si no, el que figura en `operators.md` con el correo de `git config user.email`. Pasar directamente la carpeta de un operador como `--agents` también sirve.

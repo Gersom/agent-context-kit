@@ -1,12 +1,16 @@
-// Documentos válidos para los tests de docs-check. La introducción de cada archivo se lee de las
-// plantillas reales (skill/template/) y las secciones se completan como lo haría un proyecto, así
-// que «válido» significa válido contra la plantilla vigente. Los tests rompen estos textos con
-// `replace` para producir un solo problema a la vez.
+// Documentos válidos para los tests de docs-check. La introducción de cada archivo se lee de
+// test/fixtures/template/, una copia congelada de las plantillas de la skill (repo
+// agent-context-skill), y las secciones se completan como lo haría un proyecto. Los tests rompen
+// estos textos con `replace` para producir un solo problema a la vez.
+//
+// skill-checks compara este snapshot contra la skill (SKILL_DIR/template) cuando está presente,
+// así que avisa si se desfasa. Para regenerarlo, copia los archivos desde SKILL_DIR/template/ a
+// test/fixtures/template/ conservando el mismo path relativo.
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-const TEMPLATE = join(import.meta.dir, "..", "..", "..", "skill", "template");
+const TEMPLATE = join(import.meta.dir, "fixtures", "template");
 
 /** Una plantilla con saltos de línea LF. */
 function template(...parts: string[]): string {

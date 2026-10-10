@@ -1,4 +1,4 @@
-// Modo multi-operador (ver skill/docs/multi-operator.md): con `operators.md` en la carpeta de
+// Modo multi-operador (ver docs/multi-operator.md de la skill): con `operators.md` en la carpeta de
 // agentes, cada operador tiene su carpeta con handoff.md, backlog.md e history.md. Acá se ubica
 // la del operador a vigilar: la indicada con `--operator` o, si no, la que corresponde al
 // correo de `git config user.email` del repo.

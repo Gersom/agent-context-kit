@@ -1,4 +1,4 @@
-// Interpretación de team-backlog.md (modo multi-operador, ver skill/docs/multi-operator.md):
+// Interpretación de team-backlog.md (modo multi-operador, ver docs/multi-operator.md de la skill):
 // las tareas sin dueño, `### <título único>` sin número, en las secciones libres y bloqueadas
 // (anclas `free` y `blocked`, con plan B por orden).
 

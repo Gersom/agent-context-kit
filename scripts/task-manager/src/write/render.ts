@@ -1,6 +1,6 @@
 // Texto que el script escribe: bloques de tarea de backlog.md y team-backlog.md y el cuerpo de
 // «Tarea en progreso» de handoff.md, con el formato exacto de las plantillas de
-// skill/template/agents/. Funciones puras (sin leer ni escribir archivos).
+// template/agents/ de la skill. Funciones puras (sin leer ni escribir archivos).
 
 import type { Field } from "../../../_shared/types.ts";
 import { findFieldOfKind, NONE_RE, type FieldKind, type Strings } from "./language.ts";

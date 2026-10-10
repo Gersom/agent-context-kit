@@ -95,7 +95,7 @@ export type Located =
 /**
  * Ubica la carpeta de agentes a partir de lo que pasó el operador (`--agents`) o, sin él, del repo
  * de `baseDir`. Acepta la raíz del proyecto (busca `docs/agents/` o `agent-context/agents/`), la
- * carpeta de agentes o la carpeta de un operador. Reglas (ver `skill/docs/multi-operator.md`):
+ * carpeta de agentes o la carpeta de un operador. Reglas (ver `docs/multi-operator.md` de la skill):
  *
  * - **Multi** si la carpeta de agentes tiene `operators.md`; **plano** si no, y trae `handoff.md`.
  * - Sin `operators.md` pero con carpetas de operador: error, no se asume plano en silencio.

@@ -1,4 +1,4 @@
-// Operador actual en modo multi-operador (ver skill/docs/multi-operator.md, «Quién es el operador
+// Operador actual en modo multi-operador (ver docs/multi-operator.md de la skill, «Quién es el operador
 // actual»): `--operator <carpeta>` si se indicó o, si no, el que corresponde al correo de
 // `git config user.email` según `operators.md`. Ante lo ambiguo falla diciendo qué falta; nunca
 // escribe (ni crea carpetas ni registra operadores).

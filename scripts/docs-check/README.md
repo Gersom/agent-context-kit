@@ -44,7 +44,7 @@ Cada hallazgo lleva archivo, línea (cuando aplica) y un código. **Error:** el 
 | `current-no-plan` | aviso | Tarea en curso sin ningún checkbox de plan. |
 | `history-entry` | aviso | Header `## ` de `history.md` que no es una entrada reconocible (sin ✅ / ❌). |
 
-Las normas salen de `skill/docs/template-architecture.md` y de las plantillas de `skill/template/agents/`; ante una diferencia gana la plantilla.
+Las normas salen de la documentación de arquitectura de las plantillas y de las plantillas de agentes de la skill (repo agent-context-skill); ante una diferencia gana la plantilla. Los tests usan una copia congelada de esas plantillas en `test/fixtures/template/`.
 
 ## Estructura
 
