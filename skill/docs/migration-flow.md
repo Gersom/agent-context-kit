@@ -16,7 +16,7 @@ Inmediatamente después del chequeo de "¿Existe `docs/agents/` y/o `docs/projec
 
 ## Intención explícita del operador
 
-Si el operador pide explícitamente migrar (ej. *"usa la skill agent-context-kit y migra mi proyecto"*, o cualquier variante que declare esa intención — ver `README.md` raíz, sección "Cómo usar"), este flujo se dispara **sin depender de que la heurística encuentre una "proporción significativa" de coincidencias por sí sola.** La intención explícita reemplaza ese umbral.
+Si el operador pide explícitamente migrar (ej. *"usa la skill agent-context-kit y migra mi proyecto"*, o cualquier variante que declare esa intención — ver la sección «Cuándo se dispara» de [`../SKILL.md`](../SKILL.md)), este flujo se dispara **sin depender de que la heurística encuentre una "proporción significativa" de coincidencias por sí sola.** La intención explícita reemplaza ese umbral.
 
 - La heurística de nombres sigue corriendo igual: sirve para construir la tabla de mapeo propuesta, no para decidir si el flujo se dispara.
 - Si no encuentra ningún archivo que matchee nada, no se asume en silencio que no hay nada para migrar: se muestra una tabla vacía (o con pocos matches) en la ronda de confirmación, y se pregunta explícitamente (abierta; candidatos: los archivos de `docs/` sin match, o «Lo escribo yo» y «No aplica / omitir») qué archivos del `docs/` existente corresponde migrar a mano.
