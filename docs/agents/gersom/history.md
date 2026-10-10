@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-10 — ✅ Tarea 44 — Crear el repo agent-context-skill con el historial de skill/
+
+- Se extrajo el historial de skill/ (33 commits, git subtree split) a un repo propio: https://github.com/Gersom/agent-context-skill (público, rama main), clonado en skill/ e ignorado por el kit (.gitignore).
+- La raíz del repo de la skill solo tiene SKILL.md, docs/ y template/. Los commits de la skill ahora se hacen con git -C skill.
+- Commit en el kit: 105cb48. bun test 993 pass, typecheck ok.
+
 ## 2026-10-10 — ✅ Tarea 43 — Desacoplar el kit de la carpeta skill/
 
 - Los scripts y tests del kit ya no dependen de la carpeta skill/: skill-checks lee la skill desde SKILL_DIR y salta sus tests si no está; docs-check usa un snapshot de plantillas que skill-checks compara con la skill; se quitaron los enlaces a skill/ de docs/, README y scripts.
