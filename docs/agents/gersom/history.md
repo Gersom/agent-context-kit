@@ -11,6 +11,13 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-10 — ✅ Tarea 3 — Exportar como skill utilizable por Claude
+
+- La skill quedó empaquetada como plugin de Claude Code en su propio repo, para poder instalarla con /plugin en vez de copiarla a mano.
+- Se agregaron .claude-plugin/plugin.json y marketplace.json (SKILL.md sigue en la raíz, con "skills": ["./"]) y un README con instalación, uso y versionado; versión 1.8.0 con tag v1.8.0 local, sin publicar.
+- Validado con claude plugin validate --strict y cargado en un clon temporal con --plugin-dir; la instalación real desde el marketplace y la caché quedan sin probar hasta publicar el repo.
+- Commits (skill): 9f48c40 y 2204656 (aún sin push). Commits (kit): d618651, más el de cierre.
+
 ## 2026-10-10 — ✅ Tarea 45 — Actualizar proceso y documentación por la separación en dos repos
 
 - Las reglas y la documentación del kit pasaron a tratar la skill como un repo aparte (Gersom/agent-context-skill, clonado e ignorado en skill/), para que quien lea el kit no suponga que skill/ es suyo ni que package.json versiona la skill.

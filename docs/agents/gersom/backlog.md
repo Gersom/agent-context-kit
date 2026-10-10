@@ -55,17 +55,17 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Agregada:** 2026-10-10.
 
-<!-- agent-context-kit:section=blocked -->
-## Tareas bloqueadas / pospuestas
-
 ### Tarea 4 — Deploy en skills.sh
 
 - **Descripción:** publicar `agent-context-kit` en https://www.skills.sh/ para que esté disponible en el catálogo público de skills.
 - **Decisiones/temas a definir antes de empezar:** revisar los requisitos de publicación de skills.sh (formato esperado, metadata, proceso de submit) antes de armar el paquete final.
-- **Bloqueos:** `[dependencia]` depende de que la Tarea 3 (Exportar como skill utilizable por Claude) esté resuelta — el paquete a publicar en skills.sh probablemente sea el mismo artefacto exportado ahí. (La Tarea 3 ya no está bloqueada, pero sigue sin hacerse — ver "Tareas libres".)
+- **Bloqueos:** `[Resuelto el 2026-10-10]` — era `[dependencia]` depende de que la Tarea 3 (Exportar como skill utilizable por Claude) esté resuelta — el paquete a publicar en skills.sh probablemente sea el mismo artefacto exportado ahí. (La Tarea 3 ya no está bloqueada, pero sigue sin hacerse — ver "Tareas libres".)
 - **Disparador:** cuando el operador quiera hacer pública la skill, o priorice esta tarea explícitamente.
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
+
+<!-- agent-context-kit:section=blocked -->
+## Tareas bloqueadas / pospuestas
 
 ### Tarea 38 — Revisar si el task-tracker necesita actualizarse por los últimos cambios
 
