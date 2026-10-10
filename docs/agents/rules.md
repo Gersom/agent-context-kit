@@ -35,7 +35,7 @@ Varias personas trabajan a la vez, cada una con su agente. Estas reglas se suman
 - Estructura de carpetas y por qué está organizado así → [`../architecture.md`](../architecture.md)
 - Razón de ser y principios de diseño → [`../philosophy.md`](../philosophy.md)
 - Historial de decisiones de diseño → [`../desing.md`](../desing.md) (registro histórico, no spec vigente — ver regla 4)
-- Catálogo de plantillas y para qué sirve cada una → [`../../skill/docs/template-architecture.md`](../../skill/docs/template-architecture.md)
+- Catálogo de plantillas y para qué sirve cada una → `skill/docs/template-architecture.md` (en la skill, no en este repo)
 
 ## Reglas específicas de este proyecto
 
