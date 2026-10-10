@@ -1,6 +1,6 @@
 # agent-context-kit
 
-Kit de herramientas para trabajar con la skill [agent-context-skill](https://github.com/Gersom/agent-context-skill), que genera documentación de contexto de proyecto para que **cualquier agente de IA** (Claude Code, Cursor, Copilot, etc.) entienda en qué momento está un proyecto, qué falta, qué se hizo y por qué — sin depender de la memoria de una sola conversación. La skill vive en su propio repo; este repo tiene las herramientas (seguimiento, gestión y verificación de tareas) y la documentación del proyecto.
+Kit de herramientas para trabajar con la skill [agent-context-skill](https://github.com/Gersom/agent-context-skill), que genera documentación de contexto de proyecto para que **cualquier agente de IA** (Claude Code, Cursor, Copilot, etc.) entienda en qué momento está un proyecto, qué falta, qué se hizo y por qué — sin depender de la memoria de una sola conversación. La skill vive en su propio repo (el repo se llama `agent-context-skill`, pero la skill se invoca por el nombre de su `SKILL.md`, `agent-context-kit`); este repo tiene las herramientas (seguimiento, gestión y verificación de tareas) y la documentación del proyecto.
 
 La razón de ser del kit y sus principios de diseño (markdown plano como fuente de verdad, herramientas opcionales, el código gana ante un conflicto) están en [`docs/philosophy.md`](./docs/philosophy.md).
 
@@ -16,7 +16,7 @@ Al ejecutarse sobre un repositorio, el skill:
 
 ## Cómo usar
 
-Invocar el skill explícitamente, pidiéndoselo al agente:
+Invocar el skill explícitamente, pidiéndoselo al agente (se llama `agent-context-kit` aunque su repo sea `agent-context-skill`):
 
 - **"Usa la skill agent-context-kit"** — dispara la detección automática normal: si el repo ya tiene documentación de este skill, sigue el flujo de proyecto existente; si no, evalúa si hay contenido de otro sistema para migrar, o dispara el scaffolding normal según el alcance de la tarea.
 - **"Usa la skill agent-context-kit y migra mi proyecto"** — misma detección, pero fuerza el chequeo de migración aunque la heurística de nombres de archivo no encuentre por sí sola suficientes coincidencias como para dispararse (ver "Intención explícita del operador" en `docs/migration-flow.md` del [repo de la skill](https://github.com/Gersom/agent-context-skill)).
