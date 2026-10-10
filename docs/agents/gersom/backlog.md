@@ -55,15 +55,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Agregada:** 2026-10-10.
 
-### Tarea 45 — Actualizar proceso y documentación por la separación en dos repos
-
-- **Descripción:** Adaptar reglas, formato de history.md, versionado y docs a que la skill vive en otro repo.
-- **Decisiones/temas a definir antes de empezar:** Ninguno.
-- **Bloqueos:** `[Resuelto el 2026-10-10]` — era `[dependencia]` depende de la Tarea 44 (Crear el repo agent-context-skill con el historial de skill/).
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** (1) Regla 9 de rules.md: los commits de la skill van en skill/ y el de cierre en el kit; rules.md es de todos, avisar al operador. (2) Las entradas de history.md indican en qué repo está cada commit. (3) SemVer: package.json queda solo para el kit y la skill tiene su propia versión y tags. (4) Actualizar architecture.md, philosophy.md, README raíz, AGENTS.md y el mapa de docs/README.md. (5) Documentar el clon de la skill en skill/ para quien clone el kit.
-- **Agregada:** 2026-10-10.
-
 <!-- agent-context-kit:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 

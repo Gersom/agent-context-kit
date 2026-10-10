@@ -11,6 +11,13 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-10 — ✅ Tarea 45 — Actualizar proceso y documentación por la separación en dos repos
+
+- Las reglas y la documentación del kit pasaron a tratar la skill como un repo aparte (Gersom/agent-context-skill, clonado e ignorado en skill/), para que quien lea el kit no suponga que skill/ es suyo ni que package.json versiona la skill.
+- En rules.md se agregaron las reglas específicas «Dos repos» y «Commits en dos repos» (la Regla 9 y la 5, fijas, no se tocaron) y el versionado quedó separado: el kit con package.json y tags, la skill con los suyos en su repo.
+- La cabecera de history.md pide anotar los commits por repo (Commits (kit) / Commits (skill)); architecture.md, philosophy.md, README raíz (con la sección «Clonar la skill»), docs/README.md y package.json se actualizaron en consecuencia.
+- Commits (kit): 07a8a32 y 9b7f025. bun test 993 pass, typecheck ok, bun run check . sin errores.
+
 ## 2026-10-10 — ✅ Tarea 44 — Crear el repo agent-context-skill con el historial de skill/
 
 - Se extrajo el historial de skill/ (33 commits, git subtree split) a un repo propio: https://github.com/Gersom/agent-context-skill (público, rama main), clonado en skill/ e ignorado por el kit (.gitignore).
