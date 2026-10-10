@@ -7,3 +7,6 @@ node_modules/
 
 # Índice local de CodeGraph
 .codegraph/
+
+# La skill vive en su propio repo (Gersom/agent-context-skill), clonado acá
+skill/
