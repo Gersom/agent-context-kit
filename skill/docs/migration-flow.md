@@ -1,6 +1,6 @@
 # migration-flow
 
-Flujo que se dispara cuando, durante la detección automática de [`./questions-flow.md`](./questions-flow.md), se determina que el repo destino **ya tiene documentación de contexto para agentes, pero en un formato o convención distinto** al de este skill (no `docs/agents/` + `docs/project/`). En vez de tratarla como contenido ajeno y usar `agent-context/` como respaldo (el camino descrito en `docs/desing.md`, sección 4.1, para conflicto genuino), se **migra**: se lee el contenido real, se transforma para encajar en la estructura de este skill, reusando `template/` como formato de destino.
+Flujo que se dispara cuando, durante la detección automática de [`./questions-flow.md`](./questions-flow.md), se determina que el repo destino **ya tiene documentación de contexto para agentes, pero en un formato o convención distinto** al de este skill (no `docs/agents/` + `docs/project/`). En vez de tratarla como contenido ajeno y usar `agent-context/` como respaldo (el camino de «Carpeta destino» en [`questions-flow.md`](./questions-flow.md), para conflicto genuino), se **migra**: se lee el contenido real, se transforma para encajar en la estructura de este skill, reusando `template/` como formato de destino.
 
 No inventa un flujo nuevo de scaffolding — una vez resuelta la migración, se apoya en `questions-flow.md` para completar lo que falte.
 
@@ -12,7 +12,7 @@ Inmediatamente después del chequeo de "¿Existe `docs/agents/` y/o `docs/projec
 
 - **Existen** → flujo de proyecto existente normal (ya cubierto en `../SKILL.md`, no cambia nada acá).
 - **No existen, pero `docs/` (o la carpeta que cumpla ese rol) tiene archivos cuyo nombre matchea el catálogo de este skill** (ver heurística abajo) en una proporción significativa → se dispara **este** flujo, en vez de continuar directo con `ALCANCE`.
-- **No existen y tampoco hay coincidencias** → sigue el flujo normal de `questions-flow.md` sin cambios (crear `docs/` nuevo, o usar `agent-context/` si hay conflicto real con contenido no relacionado — ver `docs/desing.md` 4.1).
+- **No existen y tampoco hay coincidencias** → sigue el flujo normal de `questions-flow.md` sin cambios (crear `docs/` nuevo, o usar `agent-context/` si hay conflicto real con contenido no relacionado — ver «Carpeta destino» en `questions-flow.md`).
 
 ## Intención explícita del operador
 

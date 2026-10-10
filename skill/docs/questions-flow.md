@@ -8,7 +8,17 @@ Este archivo se abre solo cuando **no** existe documentación de este skill en e
 
 Rige la política de lectura de [`../SKILL.md`](../SKILL.md): de `template/` se lee solo cada plantilla que se va a completar, y lo que se copia sin cambios (`CLAUDE.md`, `external/_example-service.md`) se copia con `cp`, sin leerlo.
 
-Convención de rutas: `template/X` se refiere a la plantilla en este skill; `docs/X` se refiere al destino en el repo del operador (o `agent-context/X` si aplica el conflicto descrito en el punto 4.1 del documento de diseño).
+Convención de rutas: `template/X` se refiere a la plantilla en este skill; `docs/X` se refiere al destino en el repo del operador (o `agent-context/X` si aplica el conflicto descrito en «Carpeta destino» más abajo).
+
+## Carpeta destino: `docs/` o `agent-context/`
+
+Se decide mirando el repo destino, en este orden:
+
+1. **Existe `docs/agents/` o `docs/project/`** → el skill ya se inicializó acá: no se repite el scaffolding, se sigue el flujo de proyecto existente (ver [`../SKILL.md`](../SKILL.md), Paso 1).
+2. **Existe `docs/` pero sin esas subcarpetas** (documentación de otra naturaleza: guía de usuario, Docusaurus, etc.) → **conflicto**: no se toca esa carpeta y se usa `agent-context/` en la raíz como respaldo.
+3. **No existe `docs/`** → se crea `docs/` con la estructura del catálogo.
+
+El puntero en la raíz (`AGENTS.md`/`CLAUDE.md`) deja explícito cuál se usó; ver la Ronda final.
 
 **Convención de interacción — rondas:** las preguntas se agrupan en rondas. Dentro de una misma ronda las preguntas son independientes entre sí (ninguna depende de la respuesta de otra de la misma ronda), así que se hacen juntas en una llamada a `AskUserQuestion` (máximo 4 por llamada; si una ronda tiene más, se parte en llamadas consecutivas de hasta 4). Solo se avanza a la siguiente ronda una vez respondida la anterior, porque su resultado puede condicionar qué se pregunta después.
 
@@ -48,7 +58,7 @@ Guardar la respuesta como `ALCANCE`.
 
 El agente ya revisó en [`../SKILL.md`](../SKILL.md) (paso 1) si existe `docs/agents/` y/o `docs/project/` (o sus equivalentes bajo `agent-context/`); si existen, el flujo terminó allá. Acá solo se llega si **no** existen. Falta distinguir:
 
-- **No existen, pero `docs/` (o carpeta equivalente) tiene archivos cuyo nombre matchea el catálogo de este skill en una proporción significativa** → hay documentación de contexto previa, pero de otro formato/convención. No se trata como conflicto genuino (eso sería `agent-context/`, ver `docs/desing.md` 4.1): se dispara el **flujo de migración** — ver [`./migration-flow.md`](./migration-flow.md). `ALCANCE` deja de ser relevante hasta que ese flujo termine (internamente se comporta como `ALCANCE = d`).
+- **No existen, pero `docs/` (o carpeta equivalente) tiene archivos cuyo nombre matchea el catálogo de este skill en una proporción significativa** → hay documentación de contexto previa, pero de otro formato/convención. No se trata como conflicto genuino (eso sería `agent-context/`, ver «Carpeta destino» más arriba): se dispara el **flujo de migración** — ver [`./migration-flow.md`](./migration-flow.md). `ALCANCE` deja de ser relevante hasta que ese flujo termine (internamente se comporta como `ALCANCE = d`).
 
 - **NO** → no hay documentación previa de este skill ni nada reconocible para migrar. Continuar según `ALCANCE`:
 
@@ -185,7 +195,7 @@ Las reglas del modo están en [`multi-operator.md`](./multi-operator.md) (abrirl
 
 1. **Generar `docs/README.md`** (no copiar `template/README.md` literal): usando ese archivo solo como guía, armar el mapa mínimo (~1,5 KB como máximo) con la descripción del proyecto, la definición de "operador" y el árbol de `docs/` con solo los archivos que existen tras esta ejecución (si no se copió `glossary.md`, no aparece; si se crearon 3 `external/*.md`, los 3 quedan listados). Este paso se omite en el set mínimo (no hay README en ese set); en ese caso, el paso 3 tampoco enlaza a `docs/README.md`.
    - **Descripción del proyecto:** si `docs/README.md` no existe todavía, o existe pero no la tiene, preguntar (abierta, header `Descripción`): *"¿Podés describir en 1-2 frases qué es este proyecto (qué hace, para quién)?"*, con como candidato una frase propuesta a partir del `README.md` o `package.json` si existen, o «Lo escribo yo» y «No aplica / omitir»; la descripción real llega por «Otro». Escribirla justo debajo del título. Si ya existe, preservarla tal cual al regenerar el resto — no se vuelve a preguntar.
-2. Determinar si se usó `docs/` o `agent-context/` (según lógica de detección de conflicto, punto 4.1 del documento de diseño).
+2. Determinar si se usó `docs/` o `agent-context/` (según «Carpeta destino», más arriba).
 3. **`AGENTS.md` (fuente de verdad — se asegura siempre, en cualquier set, incluso el mínimo):**
    - No existe → crear a partir de `template/AGENTS.md` (o `template/multi/AGENTS.md` en modo multi), ajustando la ruta `docs/`/`agent-context/` y quitando las líneas de los archivos que no se generaron (en el set mínimo: `docs/README.md`, `backlog.md` e `history.md`).
    - Existe con otro contenido del operador → no se sobrescribe: se agrega la sección delimitada `<!-- agent-docs-skill:start -->` ... `<!-- agent-docs-skill:end -->` de `template/AGENTS.md` al final, solo si el marcador no está ya presente.

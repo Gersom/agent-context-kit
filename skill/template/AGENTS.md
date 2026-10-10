@@ -1,6 +1,6 @@
 <!--
 GUÍA para el agente, no se copia literal palabra por palabra: ajustar la ruta `docs/`
-(puede ser `agent-context/`, ver `docs/desing.md` 4.1) y quitar las líneas de archivos que no
+(puede ser `agent-context/`, ver «Carpeta destino» en `docs/questions-flow.md` del skill) y quitar las líneas de archivos que no
 se generaron (en el set mínimo no hay `docs/README.md` ni `backlog.md`/`history.md`).
 
 Se asegura siempre en la raíz del repo destino, en cualquier set. AGENTS.md es la fuente de

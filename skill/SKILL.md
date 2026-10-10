@@ -7,7 +7,7 @@ description: Genera o actualiza la documentación de contexto de un proyecto (re
 
 ## Cuándo se dispara
 
-Al empezar a trabajar sobre un repositorio, antes de tocar código. También se puede invocar explícitamente — ver "Cómo usar" en el `README.md` raíz; pedir explícitamente migrar (ej. *"...y migra mi proyecto"*) fuerza el chequeo de [`docs/migration-flow.md`](./docs/migration-flow.md) aunque la heurística automática no encuentre suficientes coincidencias.
+Al empezar a trabajar sobre un repositorio, antes de tocar código. También se puede invocar explícitamente — pedir explícitamente migrar (ej. *"...y migra mi proyecto"*) fuerza el chequeo de [`docs/migration-flow.md`](./docs/migration-flow.md) aunque la heurística automática no encuentre suficientes coincidencias.
 
 ## Política de lectura (obligatoria al aplicar el skill)
 
@@ -42,4 +42,4 @@ Seguir el `AGENTS.md` del repo (qué leer y en qué orden; el idioma de la docum
 - **Migración desde otro sistema de documentación** → [`docs/migration-flow.md`](./docs/migration-flow.md)
 - **Varias personas trabajando en paralelo (modo multi-operador, opcional)** → [`docs/multi-operator.md`](./docs/multi-operator.md); solo se abre si el operador lo activa
 - **Catálogo de plantillas y para qué sirve cada una** → [`docs/template-architecture.md`](./docs/template-architecture.md); plantillas en [`template/`](./template/)
-- **Lógica de detección de conflicto `docs/` vs. `agent-context/` y de los archivos puntero `CLAUDE.md`/`AGENTS.md`** → sección 4 de [`../docs/desing.md`](../docs/desing.md)
+- **Lógica de detección de conflicto `docs/` vs. `agent-context/` y de los archivos puntero `CLAUDE.md`/`AGENTS.md`** → «Carpeta destino» y Ronda final de [`docs/questions-flow.md`](./docs/questions-flow.md)
