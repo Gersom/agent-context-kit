@@ -6,7 +6,7 @@ El "por qué" del kit y lo que debe respetar cualquier cambio nuevo. El "qué" (
 
 ## Para qué existe el kit
 
-`agent-context-kit` empezó como un skill; hoy es un **kit de herramientas** (el skill más los scripts de [`scripts/`](../scripts/)). Mantiene documentación que sirve de **contexto para cualquier agente de IA y para las personas del proyecto**:
+`agent-context-kit` empezó como un skill; hoy es un **kit de herramientas** (los scripts de [`scripts/`](../scripts/)) que acompañan a la skill, que vive en su propio repo, [Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill). Mantiene documentación que sirve de **contexto para cualquier agente de IA y para las personas del proyecto**:
 
 - el **estado** del trabajo y el **historial de cambios**;
 - los **datos importantes y las decisiones ya tomadas**, para no volver a discutirlas ni inventar lo ya definido.

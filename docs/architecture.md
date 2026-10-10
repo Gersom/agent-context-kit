@@ -8,7 +8,7 @@ Este documento describe la estructura general del repo `agent-context-kit` y par
 agent-context-kit/
 ├── README.md              # Presentación del proyecto
 ├── CLAUDE.md               # Puntero para agentes: remite a docs/desing.md
-├── package.json            # Versión del skill (SemVer) + scripts (tasks, task, check, test, typecheck) y devDependencies de scripts/
+├── package.json            # Versión del kit (SemVer) + scripts (tasks, task, check, test, typecheck) y devDependencies de scripts/
 ├── tsconfig.json           # TypeScript (strict) para scripts/; `bun run typecheck` = tsc --noEmit
 │
 ├── scripts/                # Herramientas propias del repo (TypeScript con Bun); no forman parte del skill
@@ -22,7 +22,7 @@ agent-context-kit/
 │   │   ├── index.ts             # Arranque: llama a run()
 │   │   ├── src/                 # args, run, context, lines, report, types y checks/ (files, anchors, placeholders, tasks, handoff, history)
 │   │   └── test/                # Tests en espejo de src/ + e2e/ con proyectos en un directorio temporal
-│   ├── skill-checks/          # Tests de contenido del skill (`reading-policy.test.ts`): fijan la política de lectura y la estructura de lo que se lee en cada sesión
+│   ├── skill-checks/          # Tests de contenido de la skill clonada en `skill/` (`reading-policy`, `multi-operator`, `snapshot`): fijan la política de lectura y la estructura de lo que se lee en cada sesión; se saltan si `skill/` no está
 │   ├── task-manager/          # Gestión de tareas desde la terminal (`bun run task <comando>`): edita handoff/backlog/history/team-backlog de forma quirúrgica
 │   │   ├── README.md            # Uso: comandos, flags, `--apply` y qué escribe cada uno
 │   │   ├── index.ts             # Arranque: llama al despachador de comandos
@@ -54,22 +54,10 @@ agent-context-kit/
 │           ├── backlog.md        # Sus tareas pendientes (libres / bloqueadas-pospuestas)
 │           └── history.md        # Sus tareas resueltas (hechas ✅ / descartadas ❌)
 │
-└── skill/
-    ├── SKILL.md              # Trigger + instrucciones de alto nivel del skill
-    │
-    ├── docs/
-    │   ├── questions-flow.md           # Árbol de decisión (rondas de preguntas) que ejecuta el skill
-    │   ├── migration-flow.md           # Flujo para migrar documentación previa en otro formato y pasar de plano a multi-operador
-    │   ├── multi-operator.md           # Modo opcional para varias personas en paralelo: carpeta por operador, team-backlog, flujos
-    │   └── template-architecture.md   # Detalle de qué es y para qué sirve cada archivo de template/
-    │
-    └── template/              # Catálogo maestro de plantillas que el skill copia al repo destino
-        ├── README.md
-        ├── agents/
-        ├── project/
-        ├── external/
-        ├── plans/
-        └── multi/             # Solo modo multi-operador: AGENTS.md, operators.md, team-backlog.md, preferences.md y bloque de rules.md
+└── skill/                  # NO es parte de este repo: clon de Gersom/agent-context-skill, ignorado por git (.gitignore)
+    ├── SKILL.md              # Trigger + instrucciones de alto nivel de la skill
+    ├── docs/                 # Flujos (questions-flow, migration-flow, multi-operator) y template-architecture.md
+    └── template/             # Catálogo maestro de plantillas que la skill copia al repo destino: agents/, project/, external/, plans/ y multi/ (solo modo multi-operador)
 ```
 
 ## Qué es cada parte
@@ -77,7 +65,7 @@ agent-context-kit/
 - **`docs/philosophy.md`** — la razón de ser del kit y sus principios de diseño.
 - **`docs/desing.md`** — registro histórico de la conversación de diseño original; no es el estado actual (para eso, este archivo).
 - **`docs/agents/`** — dogfooding: este repo usa el skill sobre sí mismo en modo multi-operador (`rules.md`, `operators.md` y `team-backlog.md` son compartidos; cada operador tiene su carpeta con `handoff.md`, `backlog.md` e `history.md`, con la estructura que el skill genera en un repo destino).
-- **`skill/`** — el skill: `SKILL.md` es el punto de entrada (resuelve el caso "ya existe documentación"), `docs/` tiene los flujos (`questions-flow.md`, `migration-flow.md`, y `multi-operator.md` para el modo de varias personas, que solo se abre si se activa) y qué es cada plantilla (`template-architecture.md`), y `template/` es el catálogo de plantillas.
+- **`skill/`** — la skill, que vive en su propio repo ([Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill)) con su propia versión y tags; acá solo se clona (ignorada por git) para que los tests de `scripts/skill-checks/` la lean. `SKILL.md` es el punto de entrada (resuelve el caso "ya existe documentación"), `docs/` tiene los flujos (`questions-flow.md`, `migration-flow.md`, y `multi-operator.md` para el modo de varias personas, que solo se abre si se activa) y qué es cada plantilla (`template-architecture.md`), y `template/` es el catálogo de plantillas. Cómo clonarla: [README raíz](../README.md#clonar-la-skill).
 - **`scripts/_shared/`** — código compartido entre los scripts: parseo de `handoff.md`, `backlog.md`, `history.md`, `operators.md` y `team-backlog.md` (`parse/`), tag de bloqueo y referencias entre tareas (`tasks/`), tipos del dominio y fixtures. Lo usan el task-tracker y el task-manager.
 - **`scripts/docs-check/`** — herramienta de este repo (no del skill, no se copia a los repos destino) que se corre contra otro proyecto (`bun run check <ruta>`) y reporta, con archivo y línea, si su documentación de agentes cumple lo que necesitan el skill, el task-tracker y el task-manager (anclas, tareas, números, bloqueos, placeholders); solo lee, y sale con código distinto de 0 si hay errores. Reutiliza `resolveWorkspace` del task-manager y el parser de `_shared/`. Uso y códigos: [`scripts/docs-check/README.md`](../scripts/docs-check/README.md).
 - **`scripts/task-tracker/`** — herramienta de este repo (no del skill, no se copia a los repos destino) que muestra en la terminal el estado de las tareas de un proyecto y se redibuja sola; se lanza con `bun run tasks [ruta]`. Uso, formatos y estructura interna: [`scripts/task-tracker/README.md`](../scripts/task-tracker/README.md).

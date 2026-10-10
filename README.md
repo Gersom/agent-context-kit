@@ -1,6 +1,6 @@
 # agent-context-kit
 
-Skill reutilizable que genera documentación de contexto de proyecto para que **cualquier agente de IA** (Claude Code, Cursor, Copilot, etc.) entienda en qué momento está un proyecto, qué falta, qué se hizo y por qué — sin depender de la memoria de una sola conversación.
+Kit de herramientas para trabajar con la skill [agent-context-skill](https://github.com/Gersom/agent-context-skill), que genera documentación de contexto de proyecto para que **cualquier agente de IA** (Claude Code, Cursor, Copilot, etc.) entienda en qué momento está un proyecto, qué falta, qué se hizo y por qué — sin depender de la memoria de una sola conversación. La skill vive en su propio repo; este repo tiene las herramientas (seguimiento, gestión y verificación de tareas) y la documentación del proyecto.
 
 La razón de ser del kit y sus principios de diseño (markdown plano como fuente de verdad, herramientas opcionales, el código gana ante un conflicto) están en [`docs/philosophy.md`](./docs/philosophy.md).
 
@@ -19,7 +19,17 @@ Al ejecutarse sobre un repositorio, el skill:
 Invocar el skill explícitamente, pidiéndoselo al agente:
 
 - **"Usa la skill agent-context-kit"** — dispara la detección automática normal: si el repo ya tiene documentación de este skill, sigue el flujo de proyecto existente; si no, evalúa si hay contenido de otro sistema para migrar, o dispara el scaffolding normal según el alcance de la tarea.
-- **"Usa la skill agent-context-kit y migra mi proyecto"** — misma detección, pero fuerza el chequeo de migración aunque la heurística de nombres de archivo no encuentre por sí sola suficientes coincidencias como para dispararse (ver "Intención explícita del operador" en `skill/docs/migration-flow.md`).
+- **"Usa la skill agent-context-kit y migra mi proyecto"** — misma detección, pero fuerza el chequeo de migración aunque la heurística de nombres de archivo no encuentre por sí sola suficientes coincidencias como para dispararse (ver "Intención explícita del operador" en `docs/migration-flow.md` del [repo de la skill](https://github.com/Gersom/agent-context-skill)).
+
+## Clonar la skill
+
+La skill no está en este repo: vive en [Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill) y se clona dentro del kit, en `skill/` (ya está en `.gitignore`):
+
+```sh
+git clone https://github.com/Gersom/agent-context-skill skill
+```
+
+Sin ese clon todo lo demás funciona, pero los tests de `scripts/skill-checks/` se saltan, y con ellos la comparación del snapshot de plantillas que usa `docs-check` (`scripts/docs-check/test/fixtures/template/`), así que ese snapshot no se valida. Los cambios en la skill se commitean allí (`git -C skill ...`), no en el kit. Si la clonas en otra carpeta, indícala con la variable de entorno `SKILL_DIR`.
 
 ## Seguimiento de tareas en la terminal
 
@@ -57,14 +67,14 @@ Uso y códigos de hallazgo: [`scripts/docs-check/README.md`](./scripts/docs-chec
 
 ```
 agent-context-kit/
-├── skill/           # El skill: SKILL.md, flujos de decisión (docs/) y catálogo de plantillas (template/)
-├── scripts/         # Herramientas del repo, no parte del skill: task-tracker, task-manager, docs-check y código compartido (_shared/)
+├── skill/           # Clon de Gersom/agent-context-skill (otro repo, ignorado por git): SKILL.md, flujos (docs/) y plantillas (template/)
+├── scripts/         # Herramientas del kit, no parte de la skill: task-tracker, task-manager, docs-check y código compartido (_shared/)
 ├── docs/            # Documentación del propio repo: filosofía, arquitectura, diseño y su estado (agents/)
-├── package.json     # Versión del skill (SemVer) y comandos de los scripts
+├── package.json     # Versión del kit (SemVer) y comandos de los scripts
 └── tsconfig.json    # TypeScript (strict) para scripts/
 ```
 
-El árbol completo y para qué sirve cada parte están en [`docs/architecture.md`](./docs/architecture.md); qué es cada plantilla del catálogo, en `skill/docs/template-architecture.md` (en la skill).
+El árbol completo y para qué sirve cada parte están en [`docs/architecture.md`](./docs/architecture.md); qué es cada plantilla del catálogo, en `docs/template-architecture.md` del [repo de la skill](https://github.com/Gersom/agent-context-skill).
 
 ## Estado
 
