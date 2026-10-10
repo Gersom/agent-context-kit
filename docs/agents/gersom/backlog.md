@@ -23,22 +23,12 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 43
+**Próximo número de tarea:** 47
 
 ---
 
 <!-- agent-context-kit:section=free -->
 ## Tareas libres
-
-### Tarea 3 — Exportar como skill utilizable por Claude
-
-- **Descripción:** empaquetar `agent-context-kit` en el formato de skill que Claude (Claude Code / claude.ai) pueda invocar directamente — con su `SKILL.md` como punto de entrada y las plantillas accesibles — en vez de ser solo un repo de referencia que hay que copiar manualmente.
-- **Decisiones/temas a definir antes de empezar:** confirmar el formato/estructura esperada por Claude para skills instalables (naming, metadata, empaquetado) y cómo se distribuye (repo instalable directo, paquete, etc.).
-- **Bloqueos:** `[Resuelto el 2026-09-24]` — era `[postergada]` conviene tener el contenido de `SKILL.md` y las plantillas de `example/`/`template/` terminadas antes de empaquetar. Confirmado al cerrar la Tarea 5: `SKILL.md` no tiene placeholders y el catálogo de `template/` está completo desde el 2026-09-22 (ver `history.md`).
-- **Desbloquea:** Tarea 4.
-- **Disparador:** cuando el operador quiera distribuir el skill para uso directo en Claude, o priorice esta tarea explícitamente.
-- **Detalles:** ver pendientes relacionados en [`../../desing.md`](../../desing.md).
-- **Agregada:** 2026-09-24.
 
 ### Tarea 34 — Reevaluar los comandos del task-manager
 
@@ -56,6 +46,23 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Agregada:** 2026-10-09.
+
+### Tarea 44 — Crear el repo agent-context-skill con el historial de skill/
+
+- **Descripción:** Extraer skill/ a un repo propio conservando sus commits, dejarlo clonado en skill/ e ignorado por el kit.
+- **Decisiones/temas a definir antes de empezar:** Ninguno.
+- **Bloqueos:** `[Resuelto el 2026-10-10]` — era `[dependencia]` depende de la Tarea 43 (Desacoplar el kit de la carpeta skill/): hay que desacoplar antes de ignorar skill/.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Decidido con el operador: carpeta skill/ ignorada en el .gitignore del kit con su propio .git (no submodule); los commits se hacen con git -C skill. Hay 31 commits que tocan skill/ y se conservan (git filter-repo o git subtree split). Crear el repo en GitHub, clonarlo en skill/, agregar skill/ al .gitignore del kit y verificar que el repo de la skill queda limpio (solo SKILL.md, docs/ y template/).
+- **Agregada:** 2026-10-10.
+
+### Tarea 46 — Hacer template-architecture.md de la skill independiente del repo kit
+
+- **Descripción:** Surgió al cerrar la Tarea 43; falta detallarla.
+- **Decisiones/temas a definir antes de empezar:** Ninguno.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-10.
 
 <!-- agent-context-kit:section=blocked -->
 ## Tareas bloqueadas / pospuestas
@@ -77,6 +84,15 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Detalles:** Cambios a revisar: (1) los pasos del plan pueden llevar al final de la línea evidencia y commit (· bun test 779 pass · commit abc1234, Tarea 35): ver si el tracker los corta, los desalinea o los muestra bien; (2) un paso reabierto se escribe como (reabierto: motivo); (3) el handoff ahora se edita solo en lo que cambia y las pausadas ya no se leen salvo sin tarea en curso: ver si el tracker asume que el archivo se reescribe entero (reintento de primera lectura en src/io/snapshot.ts); (4) la entrada de history.md ahora es más breve y lista los commits; (5) el reporte de cierre suma Checks pendientes y Próximo paso (no afecta al tracker, solo confirmarlo). Probar contra el handoff real con una tarea en curso, con evidencia en los pasos y con una pausada. Si no hay nada que cambiar, cerrarla con esa conclusión.
 - **Agregada:** 2026-10-08.
+
+### Tarea 45 — Actualizar proceso y documentación por la separación en dos repos
+
+- **Descripción:** Adaptar reglas, formato de history.md, versionado y docs a que la skill vive en otro repo.
+- **Decisiones/temas a definir antes de empezar:** Ninguno.
+- **Bloqueos:** [dependencia] depende de la Tarea 44 (Crear el repo agent-context-skill con el historial de skill/).
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** (1) Regla 9 de rules.md: los commits de la skill van en skill/ y el de cierre en el kit; rules.md es de todos, avisar al operador. (2) Las entradas de history.md indican en qué repo está cada commit. (3) SemVer: package.json queda solo para el kit y la skill tiene su propia versión y tags. (4) Actualizar architecture.md, philosophy.md, README raíz, AGENTS.md y el mapa de docs/README.md. (5) Documentar el clon de la skill en skill/ para quien clone el kit.
+- **Agregada:** 2026-10-10.
 
 <!-- agent-context-kit:section=grouped -->
 ## Tareas agrupadas

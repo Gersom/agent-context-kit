@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-10 — ✅ Tarea 43 — Desacoplar el kit de la carpeta skill/
+
+- Los scripts y tests del kit ya no dependen de la carpeta skill/: skill-checks lee la skill desde SKILL_DIR y salta sus tests si no está; docs-check usa un snapshot de plantillas que skill-checks compara con la skill; se quitaron los enlaces a skill/ de docs/, README y scripts.
+- La skill quedó autocontenida: la regla docs/ vs agent-context/ pasó de docs/desing.md a questions-flow.md («Carpeta destino») y se quitaron las referencias al README raíz y a desing.md.
+- Commits: 85a000c, 6d29130, c0d96d6 y los dos de corrección tras la revisión. bun test 964 pass, 28 skip sin skill/.
+
 ## 2026-10-09 — ✅ Tarea 15 — Crear script para validar si un proyecto cumple las normas del task-tracker
 
 - Se creó scripts/docs-check/ (bun run check <ruta>, con --operator, --json y --strict): revisa en otro repo, solo lectura, que su documentación de agentes sirva al skill, al task-tracker y al task-manager.
