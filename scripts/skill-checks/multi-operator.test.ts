@@ -196,6 +196,15 @@ describe.skipIf(!hasSkill)("enlaces relativos de la documentación de la skill",
     }
     expect(escaping, "la skill debe ser autocontenida: sus enlaces no pueden salir de su carpeta").toEqual([]);
   });
+
+  test("no menciona (ni en texto plano) el README raíz ni docs/desing.md del kit", () => {
+    const mentions: string[] = [];
+    for (const file of skillFiles()) {
+      const text = readFileSync(file, "utf8");
+      if (/desing.md|`README.md` raíz|README.md raíz/.test(text)) mentions.push(rel(file));
+    }
+    expect(mentions, "la skill no debe depender de archivos del repo kit").toEqual([]);
+  });
 });
 
 describe("docs/architecture.md refleja el modo multi", () => {

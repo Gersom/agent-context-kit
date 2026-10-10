@@ -20,11 +20,7 @@ function walkFiles(dir: string): string[] {
 
 describe.skipIf(!hasSkill)("snapshot de docs-check coincide con la plantilla de la skill", () => {
   test("cada archivo de fixtures/template/ es idéntico al de SKILL_DIR/template/", () => {
-    if (!existsSync(FIXTURE)) {
-      // Aún no existe el snapshot: no hay nada que comparar.
-      expect(true).toBe(true);
-      return;
-    }
+    expect(existsSync(FIXTURE), "falta el snapshot scripts/docs-check/test/fixtures/template/").toBe(true);
     const differing: string[] = [];
     for (const file of walkFiles(FIXTURE)) {
       const rel = relative(FIXTURE, file).split(sep).join("/");
