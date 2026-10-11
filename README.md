@@ -76,6 +76,10 @@ agent-context-kit/
 
 El árbol completo y para qué sirve cada parte están en [`docs/architecture.md`](./docs/architecture.md); qué es cada plantilla del catálogo, en `docs/template-architecture.md` del [repo de la skill](https://github.com/Gersom/agent-context-skill).
 
+## Apoyar el proyecto
+
+Si el kit o la skill te sirven y quieres apoyar su desarrollo, puedes hacer una donación por PayPal: [paypal.me/gersomalaja](https://paypal.me/gersomalaja).
+
 ## Estado
 
 Proyecto en diseño. Ver [`docs/desing.md`](./docs/desing.md) para el documento de diseño completo (estructura, lógica de detección, flujo de preguntas) y los pendientes actuales.
