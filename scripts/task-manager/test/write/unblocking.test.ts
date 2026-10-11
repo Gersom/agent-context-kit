@@ -57,7 +57,7 @@ describe("planUnblock / insertIntoFree", () => {
 
     const out = applyEdits(docs.backlog.raw, docs.backlog.eol, [...plan.removals, insertIntoFree(docs.backlog, plan.blocks)]);
     expect(out).toContain("### Tarea 18 — Revisar los links\n\n- **Disparador:** antes del release.\n\n### Tarea 6 — Publicar el sitio\n\n- **Bloqueos:** `[Resuelto el 2026-10-07]`");
-    expect(out).not.toContain("<!-- agent-context-kit:section=blocked -->\n## Tareas bloqueadas / pospuestas\n\n### Tarea 6");
+    expect(out).not.toContain("<!-- agent-context-skill:section=blocked -->\n## Tareas bloqueadas / pospuestas\n\n### Tarea 6");
   });
 
   test("`extraPicked` saca de «bloqueadas» otra tarea en la misma edición", () => {
@@ -75,11 +75,11 @@ describe("planUnblock / insertIntoFree", () => {
   test("sin tareas libres, el bloque reemplaza el «Ninguna.»", () => {
     const docs = docsOf(BACKLOG_EMPTY);
     const out = applyEdits(docs.backlog.raw, docs.backlog.eol, [insertIntoFree(docs.backlog, ["### Tarea 9 — X\n\n- **Descripción:** x"])]);
-    expect(out).toContain("## Tareas libres\n\n### Tarea 9 — X\n\n- **Descripción:** x\n\n<!-- agent-context-kit:section=blocked -->");
+    expect(out).toContain("## Tareas libres\n\n### Tarea 9 — X\n\n- **Descripción:** x\n\n<!-- agent-context-skill:section=blocked -->");
   });
 
   test("falta la sección «bloqueadas» o «libres»: error que no escribe nada", () => {
-    const noBlocked = docsOf("# Backlog\n\n**Próximo número de tarea:** 5\n\n<!-- agent-context-kit:section=free -->\n## Tareas libres\n\nNinguna.\n");
+    const noBlocked = docsOf("# Backlog\n\n**Próximo número de tarea:** 5\n\n<!-- agent-context-skill:section=free -->\n## Tareas libres\n\nNinguna.\n");
     const chosen = [{ number: 1, title: "x", tag: "dependencia", reason: null, refs: [], unblockCandidate: false }];
     expect(() => planUnblock(noBlocked.backlog, chosen, "2026-10-07", STRINGS.es)).toThrow(CliError);
   });

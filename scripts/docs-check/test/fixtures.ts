@@ -24,7 +24,7 @@ function until(text: string, marker: string): string {
   return text.slice(0, at);
 }
 
-export const ANCHOR = (id: string) => `<!-- agent-context-kit:section=${id} -->`;
+export const ANCHOR = (id: string) => `<!-- agent-context-skill:section=${id} -->`;
 
 /** Línea (1-based) donde aparece `needle` por primera vez en `text`. */
 export function lineOf(text: string, needle: string): number {
@@ -224,7 +224,7 @@ export const OPERATORS = `${OPERATORS_INTRO}- gersom: gersom@mail.com, g@work.co
 /** El bloque delimitado del skill de una plantilla, sin la guía para el agente que la precede. */
 function rootBlock(name: string): string {
   const text = template(name);
-  return text.slice(text.indexOf("<!-- agent-docs-skill:start -->"));
+  return text.slice(text.indexOf("<!-- agent-context-skill:start -->"));
 }
 
 export const ROOT_AGENTS = `# Mi proyecto\n\n${rootBlock("AGENTS.md")}`;

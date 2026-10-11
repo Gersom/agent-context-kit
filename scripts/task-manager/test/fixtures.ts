@@ -6,7 +6,7 @@
 /** Con tarea en curso; el «Próximo paso concreto» es la última subsección, con un título que no se busca por nombre. */
 export const HANDOFF_CURRENT = `# Handoff
 
-<!-- agent-context-kit:section=in-progress -->
+<!-- agent-context-skill:section=in-progress -->
 ## Tarea en progreso
 
 Tarea 12 — Implementar el parser
@@ -33,7 +33,7 @@ Lo que falta.
 Paso 3 — correr los tests.
 Segunda línea del paso.
 
-<!-- agent-context-kit:section=paused -->
+<!-- agent-context-skill:section=paused -->
 ## Tareas pausadas
 
 ### Tarea 8 — Migrar la documentación vieja
@@ -51,12 +51,12 @@ Segunda línea del paso.
 /** Sin tarea en curso y con una pausada. */
 export const HANDOFF_IDLE = `# Handoff
 
-<!-- agent-context-kit:section=in-progress -->
+<!-- agent-context-skill:section=in-progress -->
 ## Tarea en progreso
 
 Sin tarea en curso
 
-<!-- agent-context-kit:section=paused -->
+<!-- agent-context-skill:section=paused -->
 ## Tareas pausadas
 
 ### Tarea 8 — Migrar la documentación vieja
@@ -70,12 +70,12 @@ Sin tarea en curso
 /** Sin tarea en curso ni pausadas. */
 export const HANDOFF_EMPTY = `# Handoff
 
-<!-- agent-context-kit:section=in-progress -->
+<!-- agent-context-skill:section=in-progress -->
 ## Tarea en progreso
 
 Sin tarea en curso
 
-<!-- agent-context-kit:section=paused -->
+<!-- agent-context-skill:section=paused -->
 ## Tareas pausadas
 
 Ninguna.
@@ -92,7 +92,7 @@ export const BACKLOG_RICH = `# Backlog
 
 ---
 
-<!-- agent-context-kit:section=free -->
+<!-- agent-context-skill:section=free -->
 ## Tareas libres
 
 ### Tarea 1 — Probar el flujo completo
@@ -114,7 +114,7 @@ export const BACKLOG_RICH = `# Backlog
 
 - **Disparador:** antes del release.
 
-<!-- agent-context-kit:section=blocked -->
+<!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
 ### Tarea 6 — Publicar el sitio
@@ -133,7 +133,7 @@ export const BACKLOG_RICH = `# Backlog
 
 - **Bloqueos:** \`[postergada]\` hasta nuevo aviso del operador.
 
-<!-- agent-context-kit:section=grouped -->
+<!-- agent-context-skill:section=grouped -->
 ## Tareas agrupadas
 
 ### Grupo — Documentar los planes
@@ -153,17 +153,17 @@ export const BACKLOG_EMPTY = `# Backlog
 
 **Próximo número de tarea:** 5
 
-<!-- agent-context-kit:section=free -->
+<!-- agent-context-skill:section=free -->
 ## Tareas libres
 
 Ninguna.
 
-<!-- agent-context-kit:section=blocked -->
+<!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
 Ninguna.
 
-<!-- agent-context-kit:section=grouped -->
+<!-- agent-context-skill:section=grouped -->
 ## Tareas agrupadas
 
 No aplica todavía — ningún grupo formado.
@@ -198,7 +198,7 @@ export const HISTORY_RICH = `# History
 /** team-backlog con libres (una con disparador) y una bloqueada. */
 export const TEAM_RICH = `# Backlog del equipo
 
-<!-- agent-context-kit:section=free -->
+<!-- agent-context-skill:section=free -->
 ## Tareas libres
 
 ### Revisar el copy del onboarding
@@ -210,7 +210,7 @@ export const TEAM_RICH = `# Backlog del equipo
 
 - **Descripción:** CUERPO-TEAM-2
 
-<!-- agent-context-kit:section=blocked -->
+<!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
 ### Cambiar de proveedor
@@ -225,7 +225,7 @@ export const BACKLOG_ONE = `# Backlog
 
 ---
 
-<!-- agent-context-kit:section=free -->
+<!-- agent-context-skill:section=free -->
 ## Tareas libres
 
 ### Tarea 7 — La única
@@ -236,12 +236,12 @@ export const BACKLOG_ONE = `# Backlog
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Agregada:** 2026-10-01.
 
-<!-- agent-context-kit:section=blocked -->
+<!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
 Ninguna.
 
-<!-- agent-context-kit:section=grouped -->
+<!-- agent-context-skill:section=grouped -->
 ## Tareas agrupadas
 
 No aplica todavía — ningún grupo formado.
@@ -254,7 +254,7 @@ export const BACKLOG_TEMPLATE = `# Backlog
 
 ---
 
-<!-- agent-context-kit:section=free -->
+<!-- agent-context-skill:section=free -->
 ## Tareas libres
 
 ### Tarea [N] — [Placeholder — título corto de la tarea]
@@ -266,7 +266,7 @@ export const BACKLOG_TEMPLATE = `# Backlog
 - **Detalles:** [Placeholder]
 - **Agregada:** [Placeholder]
 
-<!-- agent-context-kit:section=blocked -->
+<!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
 ### Tarea [N] — [Placeholder — título corto de la tarea]
@@ -274,7 +274,7 @@ export const BACKLOG_TEMPLATE = `# Backlog
 - **Descripción:** [Placeholder]
 - **Bloqueos:** [Placeholder — \`[dependencia]\` o \`[postergada]\` + motivo]
 
-<!-- agent-context-kit:section=grouped -->
+<!-- agent-context-skill:section=grouped -->
 ## Tareas agrupadas
 
 No aplica todavía — ningún grupo formado.
@@ -285,7 +285,7 @@ export const TEAM_TEMPLATE = `# Backlog del equipo
 
 ---
 
-<!-- agent-context-kit:section=free -->
+<!-- agent-context-skill:section=free -->
 ## Tareas libres
 
 ### [Placeholder — título único de la tarea]
@@ -295,7 +295,7 @@ export const TEAM_TEMPLATE = `# Backlog del equipo
 - **Bloqueos:** Ninguno.
 - **Agregada:** [Placeholder — fecha y operador]
 
-<!-- agent-context-kit:section=blocked -->
+<!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
 [Placeholder — "Ninguna" si no hay]
@@ -304,7 +304,7 @@ export const TEAM_TEMPLATE = `# Backlog del equipo
 /** team-backlog.md con una libre y una bloqueada, con dos líneas en blanco entre sus tareas libres. */
 export const TEAM_TWO = `# Backlog del equipo
 
-<!-- agent-context-kit:section=free -->
+<!-- agent-context-skill:section=free -->
 ## Tareas libres
 
 ### Revisar el copy del onboarding
@@ -322,7 +322,7 @@ export const TEAM_TWO = `# Backlog del equipo
 - **Detalles:** Ver la \`T-3@ana\`.
 - **Agregada:** 2026-10-03 por ana
 
-<!-- agent-context-kit:section=blocked -->
+<!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
 ### Cambiar de proveedor
@@ -335,12 +335,12 @@ export const TEAM_TWO = `# Backlog del equipo
 /** Un proyecto en inglés: `Task`, etiquetas en inglés y «None.» como texto de vacío. */
 export const HANDOFF_IDLE_EN = `# Handoff
 
-<!-- agent-context-kit:section=in-progress -->
+<!-- agent-context-skill:section=in-progress -->
 ## Task in progress
 
 No task in progress
 
-<!-- agent-context-kit:section=paused -->
+<!-- agent-context-skill:section=paused -->
 ## Paused tasks
 
 None.
@@ -352,7 +352,7 @@ export const BACKLOG_EN = `# Backlog
 
 ---
 
-<!-- agent-context-kit:section=free -->
+<!-- agent-context-skill:section=free -->
 ## Free tasks
 
 ### Task 4 — Translate the glossary
@@ -362,12 +362,12 @@ export const BACKLOG_EN = `# Backlog
 - **Trigger:** when the operator asks about pending tasks.
 - **Added:** 2026-10-01.
 
-<!-- agent-context-kit:section=blocked -->
+<!-- agent-context-skill:section=blocked -->
 ## Blocked / postponed tasks
 
 None.
 
-<!-- agent-context-kit:section=grouped -->
+<!-- agent-context-skill:section=grouped -->
 ## Grouped tasks
 
 Not applicable yet.

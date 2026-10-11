@@ -1,4 +1,4 @@
-<!-- agent-context-kit:signature — firma de prueba -->
+<!-- agent-context-skill:signature — firma de prueba -->
 
 # Handoff
 
@@ -6,7 +6,7 @@ Texto introductorio que menciona la Tarea 99 — no es la tarea en curso.
 
 ---
 
-<!-- agent-context-kit:section=in-progress -->
+<!-- agent-context-skill:section=in-progress -->
 ## Tarea en progreso
 
 <!-- Ejemplo de la plantilla: **Tarea:** Tarea 77 — ejemplo dentro de un comentario -->
@@ -34,7 +34,7 @@ Pasos 3 y 4.
 Paso 3 — escribir `model.js`.
 Segunda línea del próximo paso.
 
-<!-- agent-context-kit:section=paused -->
+<!-- agent-context-skill:section=paused -->
 ## Tareas pausadas
 
 <!--

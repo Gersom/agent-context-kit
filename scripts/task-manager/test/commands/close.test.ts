@@ -74,7 +74,7 @@ describe("close --done", () => {
       ].join("\n"),
     );
     expect(history(p)).toBe(HISTORY_RICH.replace("## 2026-10-07 — ✅ Tarea 11", "## 2026-10-07 — ✅ Tarea 1 — Probar el flujo completo\n\n- Se hizo lo pedido.\n\n## 2026-10-07 — ✅ Tarea 11"));
-    expect(handoff(p)).toContain("<!-- agent-context-kit:section=in-progress -->\n## Tarea en progreso\n\nSin tarea en curso\n\n<!-- agent-context-kit:section=paused -->");
+    expect(handoff(p)).toContain("<!-- agent-context-skill:section=in-progress -->\n## Tarea en progreso\n\nSin tarea en curso\n\n<!-- agent-context-skill:section=paused -->");
     const status = JSON.parse((await exec(["status", "--json"], p)).out);
     expect(status.current).toBeNull();
     expect(status.recentHistory[0]).toMatchObject({ number: 1, status: "done" });
@@ -156,7 +156,7 @@ describe("--nueva", () => {
     );
     // Después de las desbloqueadas, al final de «libres».
     expect(text.indexOf("### Tarea 16 — ")).toBeLessThan(text.indexOf("### Tarea 20 — "));
-    expect(text.indexOf("### Tarea 21 — ")).toBeLessThan(text.indexOf("<!-- agent-context-kit:section=blocked -->"));
+    expect(text.indexOf("### Tarea 21 — ")).toBeLessThan(text.indexOf("<!-- agent-context-skill:section=blocked -->"));
   });
 
   test("un título vacío o de varias líneas es un error de uso", async () => {
@@ -232,7 +232,7 @@ describe("cerrar una pausada", () => {
   test("con otra tarea en curso, `close <N>` cierra la pausada y deja la en curso como estaba", async () => {
     const p = await paused();
     await exec(["start", "3", "--apply"], p);
-    const inProgress = handoff(p).slice(handoff(p).indexOf("## Tarea en progreso"), handoff(p).indexOf("<!-- agent-context-kit:section=paused -->"));
+    const inProgress = handoff(p).slice(handoff(p).indexOf("## Tarea en progreso"), handoff(p).indexOf("<!-- agent-context-skill:section=paused -->"));
     expect((await exec(["close", "1", "--done", "--resumen", "Hecha.", "--apply"], p)).code).toBe(0);
     expect(handoff(p)).toContain(inProgress);
   });
@@ -315,7 +315,7 @@ describe("descartar una tarea sin empezar (libre o bloqueada)", () => {
     expect(text).toContain("**Próximo número de tarea:** 21");
     expect(text).toContain("### Tarea 20 — Revisar el README\n\n- **Descripción:** Surgió al cerrar la Tarea 18; falta detallarla.");
     expect(text.indexOf("### Tarea 3 — ")).toBeLessThan(text.indexOf("### Tarea 20 — "));
-    expect(text.indexOf("### Tarea 16 — ")).toBeLessThan(text.indexOf("<!-- agent-context-kit:section=blocked -->"));
+    expect(text.indexOf("### Tarea 16 — ")).toBeLessThan(text.indexOf("<!-- agent-context-skill:section=blocked -->"));
     expect((await exec(["anchors"], p)).code).toBe(0);
   });
 
@@ -330,7 +330,7 @@ describe("descartar una tarea sin empezar (libre o bloqueada)", () => {
     expect(text).toContain("- **Disparador:** antes del release.\n\n### Tarea 6 — Publicar el sitio");
     expect(text).toContain("### Tarea 16 — Revisar la licencia");
     expect(text.indexOf("### Tarea 16 — ")).toBeLessThan(text.indexOf("### Tarea 20 — Una nueva"));
-    expect(text.indexOf("### Tarea 20 — ")).toBeLessThan(text.indexOf("<!-- agent-context-kit:section=blocked -->"));
+    expect(text.indexOf("### Tarea 20 — ")).toBeLessThan(text.indexOf("<!-- agent-context-skill:section=blocked -->"));
     expect((await exec(["anchors"], p)).code).toBe(0);
   });
 
@@ -468,7 +468,7 @@ describe("errores: no se escribe nada", () => {
 });
 
 describe("la tarea cerrada sigue en backlog.md", () => {
-  const UNIQUE_BLOCK = /### Tarea 7 — La única[^]*?(?=<!-- agent-context-kit:section=blocked)/;
+  const UNIQUE_BLOCK = /### Tarea 7 — La única[^]*?(?=<!-- agent-context-skill:section=blocked)/;
 
   /** La Tarea 7 empezada a mano: figura en el handoff y, por un descuido, también quedó en el backlog que se pasa. */
   async function leftover(backlogText: string): Promise<Project> {
@@ -515,7 +515,7 @@ describe("la tarea cerrada sigue en backlog.md", () => {
     const text = backlog(p);
     expect(text).not.toContain("### Tarea 7 — La única");
     expect(text).toContain(
-      "## Tareas libres\n\n### Tarea 9 — Depende de la 7\n\n- **Bloqueos:** `[Resuelto el 2026-10-07]` — era `[dependencia]` espera a la Tarea 7.\n\n<!-- agent-context-kit:section=blocked -->\n## Tareas bloqueadas / pospuestas\n\nNinguna.",
+      "## Tareas libres\n\n### Tarea 9 — Depende de la 7\n\n- **Bloqueos:** `[Resuelto el 2026-10-07]` — era `[dependencia]` espera a la Tarea 7.\n\n<!-- agent-context-skill:section=blocked -->\n## Tareas bloqueadas / pospuestas\n\nNinguna.",
     );
   });
 

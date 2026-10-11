@@ -26,12 +26,12 @@ describe("parseHandoff", () => {
 
   test("pausada sin plan, y campo con texto además de checkboxes que se conserva", () => {
     const text = [
-      "<!-- agent-context-kit:section=in-progress -->",
+      "<!-- agent-context-skill:section=in-progress -->",
       "## En progreso",
       "",
       "Sin tarea.",
       "",
-      "<!-- agent-context-kit:section=paused -->",
+      "<!-- agent-context-skill:section=paused -->",
       "## Pausadas",
       "",
       "### Task 3 — Sin plan",
@@ -57,7 +57,7 @@ describe("parseHandoff", () => {
   });
 
   test("no toma un paso de una subsección como tarea en curso", () => {
-    const text = "<!-- agent-context-kit:section=in-progress -->\n## En progreso\n\nSin tarea.\n\n### Próximo\n\nPaso 4 — algo\n";
+    const text = "<!-- agent-context-skill:section=in-progress -->\n## En progreso\n\nSin tarea.\n\n### Próximo\n\nPaso 4 — algo\n";
     expect(parseHandoff(text).inProgress.task).toBeNull();
   });
 
@@ -73,7 +73,7 @@ describe("parseHandoff: posiciones en el texto original", () => {
   const DOC = [
     "# Handoff", // 1
     "", // 2
-    "<!-- agent-context-kit:section=in-progress -->", // 3
+    "<!-- agent-context-skill:section=in-progress -->", // 3
     "## Tarea en progreso", // 4
     "", // 5
     "<!-- Ejemplo: **Tarea:** Tarea 77 — dentro de un comentario -->", // 6
@@ -93,7 +93,7 @@ describe("parseHandoff: posiciones en el texto original", () => {
     "", // 20
     "Hacer X.", // 21
     "", // 22
-    "<!-- agent-context-kit:section=paused -->", // 23
+    "<!-- agent-context-skill:section=paused -->", // 23
     "## Tareas pausadas", // 24
     "", // 25
     "<!--", // 26
@@ -145,7 +145,7 @@ describe("parseHandoff: posiciones en el texto original", () => {
     expect(plan.title).toBe("Plan");
     expect(sliceRange(DOC, plan.range!)).toBe(DOC.split("\n").slice(9, 18).join("\n") + "\n");
     expect(sliceRange(DOC, next.range!)).toBe("### Próximo paso concreto\n\nHacer X.\n\n");
-    expect(next.range!.end).toBe(DOC.indexOf("<!-- agent-context-kit:section=paused"));
+    expect(next.range!.end).toBe(DOC.indexOf("<!-- agent-context-skill:section=paused"));
   });
 
   test("bloques de tareas pausadas, sin el ejemplo comentado, y sus pasos", () => {
@@ -162,7 +162,7 @@ describe("parseHandoff: posiciones en el texto original", () => {
 
   test("secciones: header, ancla y cuerpo de cada una", () => {
     const { sections } = parseHandoff(DOC);
-    expect(sliceRange(DOC, sections["in-progress"].anchorRange!)).toBe("<!-- agent-context-kit:section=in-progress -->");
+    expect(sliceRange(DOC, sections["in-progress"].anchorRange!)).toBe("<!-- agent-context-skill:section=in-progress -->");
     expect(sliceRange(DOC, sections.paused.headerRange)).toBe("## Tareas pausadas");
     expect(sections["in-progress"].bodyRange.end).toBe(sections.paused.anchorRange!.start);
   });

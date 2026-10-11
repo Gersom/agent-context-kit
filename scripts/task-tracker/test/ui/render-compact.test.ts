@@ -70,7 +70,7 @@ describe("modo compacto del panel", () => {
   test("con una sola tarea no hay contador", () => {
     const one = buildModel({
       handoffText: "# H\n",
-      backlogText: "<!-- agent-context-kit:section=free -->\n## Tareas libres\n\n### Tarea 7 — Única\n\n- **Bloqueos:** Ninguno.\n\n<!-- agent-context-kit:section=blocked -->\n## Tareas bloqueadas\n\n<!-- agent-context-kit:section=grouped -->\n## Tareas agrupadas\n",
+      backlogText: "<!-- agent-context-skill:section=free -->\n## Tareas libres\n\n### Tarea 7 — Única\n\n- **Bloqueos:** Ninguno.\n\n<!-- agent-context-skill:section=blocked -->\n## Tareas bloqueadas\n\n<!-- agent-context-skill:section=grouped -->\n## Tareas agrupadas\n",
       historyText: null,
     });
     expect(rowsOf(render(one, { ...meta, compact: true }), "LIBRES (1)")).toEqual(["T-7: Única"]);
@@ -79,7 +79,7 @@ describe("modo compacto del panel", () => {
   test("sin tareas sigue diciendo «Ninguna»", () => {
     const empty = buildModel({
       handoffText: "# H\n",
-      backlogText: "<!-- agent-context-kit:section=free -->\n## Tareas libres\n\n<!-- agent-context-kit:section=blocked -->\n## Tareas bloqueadas\n\n<!-- agent-context-kit:section=grouped -->\n## Tareas agrupadas\n",
+      backlogText: "<!-- agent-context-skill:section=free -->\n## Tareas libres\n\n<!-- agent-context-skill:section=blocked -->\n## Tareas bloqueadas\n\n<!-- agent-context-skill:section=grouped -->\n## Tareas agrupadas\n",
       historyText: null,
     });
     expect(rowsOf(render(empty, { ...meta, compact: true }), "LIBRES (0)")).toEqual(["Ninguna"]);

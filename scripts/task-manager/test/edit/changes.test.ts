@@ -65,7 +65,7 @@ describe("planChanges", () => {
   });
 
   test("un archivo que ya estaba sin anclas se puede seguir editando (solo cuentan las regresiones)", () => {
-    const stripped = original.backlog.replace(/<!-- agent-context-kit:section=[a-z-]+ -->\n/g, "");
+    const stripped = original.backlog.replace(/<!-- agent-context-skill:section=[a-z-]+ -->\n/g, "");
     writeFileSync(backlogPath, stripped);
     const bare = readDocs(resolveWorkspace({ agents: project.root, operator: "gersom", email: null }));
     expect(() => planChanges([{ doc: bare.backlog, edits: [insertAt(0, "nota\n")] }])).not.toThrow();

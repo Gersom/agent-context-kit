@@ -1,15 +1,15 @@
-<!-- agent-context-kit:signature — firma de prueba -->
+<!-- agent-context-skill:signature — firma de prueba -->
 
 # Handoff
 
 ---
 
-<!-- agent-context-kit:section=in-progress -->
+<!-- agent-context-skill:section=in-progress -->
 ## Tarea en progreso
 
 Sin tarea en curso.
 
-<!-- agent-context-kit:section=paused -->
+<!-- agent-context-skill:section=paused -->
 ## Tareas pausadas
 
 Ninguna.

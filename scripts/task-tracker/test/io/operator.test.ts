@@ -11,7 +11,7 @@ const OPERATORS = `# Operadores
 
 ---
 
-<!-- agent-context-kit:section=operators -->
+<!-- agent-context-skill:section=operators -->
 ## Lista
 
 - gersom: Gersom@Mail.com, g@work.com

@@ -2,6 +2,7 @@
 // archivo (antes de la primera sección). La etiqueta está traducida, así que no se busca por su
 // texto sino por su forma: un campo en negrita cuyo valor es solo un número.
 
+import { ANCHOR_PREFIX_PATTERN } from "../../../_shared/markers.ts";
 import { commentStateAfter } from "../../../_shared/parse/markdown.ts";
 
 export interface NextTaskNumber {
@@ -13,7 +14,7 @@ export interface NextTaskNumber {
   end: number;
 }
 
-const ANCHOR_RE = /^\s*<!--\s*agent-context-kit:section=[a-z-]+\s*-->\s*$/;
+const ANCHOR_RE = new RegExp(`^\\s*<!--\\s*${ANCHOR_PREFIX_PATTERN}:section=[a-z-]+\\s*-->\\s*$`);
 const H2_RE = /^##(?!#)\s/;
 const FENCE_RE = /^\s*(```|~~~)/;
 // `**Próximo número de tarea:** 32` (acepta también `**Etiqueta**: 32`).

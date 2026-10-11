@@ -70,7 +70,7 @@ describe("parseBacklog: posiciones en el texto original", () => {
 
   test("secciones: anclas, headers y cuerpos del archivo real", () => {
     const { sections } = parseBacklog(text);
-    expect(sliceRange(text, sections.free.anchorRange!)).toBe("<!-- agent-context-kit:section=free -->");
+    expect(sliceRange(text, sections.free.anchorRange!)).toBe("<!-- agent-context-skill:section=free -->");
     expect(sliceRange(text, sections.free.headerRange)).toBe("## Tareas libres");
     expect(sliceRange(text, sections.grouped.bodyRange)).toStartWith("\n### Grupo — Documentar los planes");
   });

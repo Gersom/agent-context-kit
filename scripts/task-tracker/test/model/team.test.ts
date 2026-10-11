@@ -12,7 +12,7 @@ const snap = (name: string, overrides: Partial<SnapshotRead> = {}): SnapshotRead
   ...overrides,
 });
 
-const TEAM_BACKLOG = `<!-- agent-context-kit:section=free -->
+const TEAM_BACKLOG = `<!-- agent-context-skill:section=free -->
 ## Tareas libres
 
 ### Revisar el copy
@@ -20,7 +20,7 @@ const TEAM_BACKLOG = `<!-- agent-context-kit:section=free -->
 - **Descripción:** x
 - **Bloqueos:** Ninguno.
 
-<!-- agent-context-kit:section=blocked -->
+<!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
 ### Integrar la pasarela
@@ -88,7 +88,7 @@ describe("buildTeamBacklog", () => {
   });
 
   test("ignora las tareas placeholder de la plantilla y avisa", () => {
-    const text = "<!-- agent-context-kit:section=free -->\n## Tareas libres\n\n### [Placeholder — título]\n\n- **Descripción:** [Placeholder]\n\n<!-- agent-context-kit:section=blocked -->\n## Tareas bloqueadas\n";
+    const text = "<!-- agent-context-skill:section=free -->\n## Tareas libres\n\n### [Placeholder — título]\n\n- **Descripción:** [Placeholder]\n\n<!-- agent-context-skill:section=blocked -->\n## Tareas bloqueadas\n";
     const backlog = buildTeamBacklog(text);
     expect(backlog.free).toEqual([]);
     expect(backlog.warnings).toContain("team-backlog.md tiene placeholders sin completar.");

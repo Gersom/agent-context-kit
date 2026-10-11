@@ -1,13 +1,14 @@
 // Marcador de versión de la skill en la línea 1 de rules.md (lo escribe la skill desde la 1.9.0 y le
 // sirve para detectar versiones más nuevas). Es solo un aviso: un proyecto anterior no lo tiene.
 
+import { ANCHOR_PREFIX_PATTERN, LEGACY_MARKER_PREFIX, MARKER_PREFIX } from "../../../_shared/markers.ts";
 import type { Check, Finding } from "../types.ts";
 
-/** Marcador de versión de la skill; el grupo 1 es la versión. Mismo formato que en la plantilla de la skill. */
-export const VERSION_MARKER_RE = /<!-- agent-context-kit:version (\d+\.\d+\.\d+)[^>]*-->/;
+/** Marcador de versión de la skill (también con el prefijo anterior a la 2.0.0); el grupo 1 es la versión. Mismo formato que en la plantilla de la skill. */
+export const VERSION_MARKER_RE = new RegExp(`<!-- ${ANCHOR_PREFIX_PATTERN}:version (\\d+\\.\\d+\\.\\d+)[^>]*-->`);
 
 /** Texto que identifica el marcador aunque su versión esté mal formada. */
-export const VERSION_MARKER_NAME = "agent-context-kit:version";
+export const VERSION_MARKER_NAME = `${MARKER_PREFIX}:version`;
 
 /** `rules.md` lleva el marcador de versión en sus primeras líneas y bien formado. Si no existe, no dice nada. */
 export const checkSkillVersion: Check = ({ rules }) => {
@@ -15,7 +16,7 @@ export const checkSkillVersion: Check = ({ rules }) => {
   const lines = rules.head.split("\n");
   if (lines.some((line) => VERSION_MARKER_RE.test(line))) return [];
   const findings: Finding[] = [];
-  const malformed = lines.findIndex((line) => line.includes(VERSION_MARKER_NAME));
+  const malformed = lines.findIndex((line) => line.includes(VERSION_MARKER_NAME) || line.includes(`${LEGACY_MARKER_PREFIX}:version`));
   if (malformed >= 0) {
     findings.push({
       severity: "warning",

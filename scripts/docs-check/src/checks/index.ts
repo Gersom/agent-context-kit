@@ -6,6 +6,7 @@ import { checkAnchors } from "./anchors.ts";
 import { checkFilesExist, checkOperatorsReadable, checkRootFiles } from "./files.ts";
 import { checkCurrentTask } from "./handoff.ts";
 import { checkHistoryEntries } from "./history.ts";
+import { checkLegacyMarkers } from "./legacy-marker.ts";
 import { checkPlaceholders } from "./placeholders.ts";
 import { checkSkillVersion } from "./skill-version.ts";
 import { checkBlockTags, checkDuplicateNumbers, checkNextNumber, checkTaskFields, checkTaskHeadings } from "./tasks.ts";
@@ -15,6 +16,7 @@ export const CHECKS: Check[] = [
   checkOperatorsReadable,
   checkRootFiles,
   checkSkillVersion,
+  checkLegacyMarkers,
   checkAnchors,
   checkPlaceholders,
   checkNextNumber,

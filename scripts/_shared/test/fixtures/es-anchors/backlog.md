@@ -14,7 +14,7 @@ Un bloque por tarea, con este formato:
 ## Tarea 66 — Ejemplo con número dentro de un comentario
 -->
 
-<!-- agent-context-kit:section=free -->
+<!-- agent-context-skill:section=free -->
 ## Tareas libres
 
 ### Tarea 1 — Probar el flujo completo
@@ -31,7 +31,7 @@ Un bloque por tarea, con este formato:
 
 - **Bloqueos:** `[Resuelto el 2026-09-24]` — era `[postergada]` esperar el catálogo.
 
-<!-- agent-context-kit:section=blocked -->
+<!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
 ### Tarea 4 — Deploy en skills.sh
@@ -45,7 +45,7 @@ Un bloque por tarea, con este formato:
 - **Bloqueos:** `[postergada]` se va a re-trabajar después de la Tarea 4.
   - Sublista de detalle del bloqueo.
 
-<!-- agent-context-kit:section=grouped -->
+<!-- agent-context-skill:section=grouped -->
 ## Tareas agrupadas
 
 ### Grupo — Documentar los planes

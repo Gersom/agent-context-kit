@@ -52,9 +52,9 @@ describe("buildModel", () => {
 
   test("bloqueadas: marca la dependencia que ya está cerrada en history.md", () => {
     const backlog = [
-      "<!-- agent-context-kit:section=free -->",
+      "<!-- agent-context-skill:section=free -->",
       "## Libres",
-      "<!-- agent-context-kit:section=blocked -->",
+      "<!-- agent-context-skill:section=blocked -->",
       "## Bloqueadas",
       "",
       "### Tarea 8 — Esperando una ya cerrada",
@@ -111,9 +111,9 @@ describe("buildModel", () => {
 
   test("avisa una tarea en bloqueadas sin bloqueo vigente", () => {
     const backlog = [
-      "<!-- agent-context-kit:section=free -->",
+      "<!-- agent-context-skill:section=free -->",
       "## Libres",
-      "<!-- agent-context-kit:section=blocked -->",
+      "<!-- agent-context-skill:section=blocked -->",
       "## Bloqueadas",
       "",
       "### Tarea 8 — Ya desbloqueada",
@@ -122,7 +122,7 @@ describe("buildModel", () => {
       "- **Descripción:** revisar el caso [algo] del diseño.",
       "- **Bloqueos:** `[Resuelto el 2026-10-05]` — era `[dependencia]` esperaba la Tarea 7.",
       "",
-      "<!-- agent-context-kit:section=grouped -->",
+      "<!-- agent-context-skill:section=grouped -->",
       "## Agrupadas",
     ].join("\n");
     const model = buildModel({ handoffText: fixture("minimal", "handoff.md"), backlogText: backlog });
@@ -132,7 +132,7 @@ describe("buildModel", () => {
 
   test("avisa placeholders sin completar", () => {
     const handoff =
-      "<!-- agent-context-kit:section=in-progress -->\n## X\n\n**Tarea:** [Placeholder]\n\n<!-- agent-context-kit:section=paused -->\n## Y\n";
+      "<!-- agent-context-skill:section=in-progress -->\n## X\n\n**Tarea:** [Placeholder]\n\n<!-- agent-context-skill:section=paused -->\n## Y\n";
     expect(buildModel({ handoffText: handoff, backlogText: null }).warnings).toEqual(["handoff.md tiene placeholders sin completar."]);
   });
 });

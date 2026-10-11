@@ -46,7 +46,7 @@ describe.skipIf(!hasSkill)("política de lectura: migración", () => {
 describe("política de lectura: AGENTS.md de este repo (modo multi-operador)", () => {
   test.skipIf(!hasSkill)("coincide con la variante multi de la plantilla, sin su título", () => {
     const template = readSkill("template/multi/AGENTS.md");
-    const block = template.slice(template.indexOf("<!-- agent-docs-skill:start -->"), template.indexOf("<!-- agent-docs-skill:end -->"));
+    const block = template.slice(template.indexOf("<!-- agent-context-skill:start -->"), template.indexOf("<!-- agent-context-skill:end -->"));
     const body = block.split("\n").slice(2).join("\n").trim(); // sin el marcador ni el título de la sección
     expect(readRoot("AGENTS.md")).toContain(body);
   });

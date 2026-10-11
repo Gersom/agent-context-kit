@@ -112,7 +112,7 @@ describe("status", () => {
   test("sin team-backlog.md o con uno vacío: no imprime la sección", async () => {
     const without = await exec(["status"], project({ folders: ["gersom"], ...RICH, teamBacklogText: undefined }));
     expect(without.out).not.toContain("Team-backlog");
-    const empty = project({ folders: ["gersom"], ...RICH, teamBacklogText: "# Equipo\n\n<!-- agent-context-kit:section=free -->\n## Libres\n\nNinguna.\n\n<!-- agent-context-kit:section=blocked -->\n## Bloqueadas\n\nNinguna.\n" });
+    const empty = project({ folders: ["gersom"], ...RICH, teamBacklogText: "# Equipo\n\n<!-- agent-context-skill:section=free -->\n## Libres\n\nNinguna.\n\n<!-- agent-context-skill:section=blocked -->\n## Bloqueadas\n\nNinguna.\n" });
     expect((await exec(["status"], empty)).out).not.toContain("Team-backlog");
   });
 

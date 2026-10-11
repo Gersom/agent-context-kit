@@ -1,6 +1,6 @@
 // Interpretación de operators.md (modo multi-operador, ver docs/multi-operator.md de la skill): una
 // línea por operador, `- <carpeta>[ (solo team-backlog)]: <correo>, <correo>`, dentro de la
-// sección con el ancla `<!-- agent-context-kit:section=operators -->` (plan B: la primera `## `).
+// sección con el ancla `<!-- agent-context-skill:section=operators -->` (plan B: la primera `## `).
 
 import type { OperatorEntry, ParsedOperators } from "../types.ts";
 import { isPlaceholder, stripComments } from "./markdown.ts";

@@ -1,10 +1,14 @@
 // Archivos que tienen que existir: los del operador (handoff y backlog son imprescindibles),
 // los avisos de operators.md y los AGENTS.md / CLAUDE.md de la raíz con el bloque del skill.
 
+import { LEGACY_ROOT_PREFIX, MARKER_PREFIX } from "../../../_shared/markers.ts";
 import type { Check, CheckContext, Finding } from "../types.ts";
 
 /** Marca con la que el skill delimita su bloque en AGENTS.md y CLAUDE.md. */
-export const ROOT_MARKER = "agent-docs-skill:start";
+export const ROOT_MARKER = `${MARKER_PREFIX}:start`;
+
+/** Marca anterior a la 2.0.0: se sigue aceptando (el check `legacy-marker` avisa que hay que actualizarla). */
+const LEGACY_ROOT_MARKER = `${LEGACY_ROOT_PREFIX}:start`;
 
 /** Handoff y backlog son imprescindibles (error); history y team-backlog, no (aviso). */
 export const checkFilesExist: Check = ({ docs }) => {
@@ -52,13 +56,13 @@ export const checkRootFiles = ({ rootFiles }: Pick<CheckContext, "rootFiles">): 
         line: null,
         message: `Falta ${root.file} en la raíz del proyecto: es lo primero que lee el agente. Créalo desde la plantilla del skill.`,
       });
-    } else if (!root.text.includes(ROOT_MARKER) && !root.text.includes("docs/agents") && !root.text.includes("AGENTS.md")) {
+    } else if (!root.text.includes(ROOT_MARKER) && !root.text.includes(LEGACY_ROOT_MARKER) && !root.text.includes("docs/agents") && !root.text.includes("AGENTS.md")) {
       findings.push({
         severity: "warning",
         code: "root-file",
         file: root.file,
         line: null,
-        message: `${root.file} no contiene el marcador \`<!-- ${ROOT_MARKER} -->\`: el agente no sabrá que debe leer docs/agents. Agrega el bloque del skill entre \`${ROOT_MARKER}\` y \`agent-docs-skill:end\`.`,
+        message: `${root.file} no contiene el marcador \`<!-- ${ROOT_MARKER} -->\`: el agente no sabrá que debe leer docs/agents. Agrega el bloque del skill entre \`${ROOT_MARKER}\` y \`${MARKER_PREFIX}:end\`.`,
       });
     }
   }

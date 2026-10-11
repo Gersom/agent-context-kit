@@ -1,7 +1,8 @@
-// Anclas de sección `<!-- agent-context-kit:section=<id> -->`: que estén todas, que no se haya
+// Anclas de sección `<!-- agent-context-skill:section=<id> -->`: que estén todas, que no se haya
 // caído al plan B por orden, que no se repitan (el parseo descarta la segunda en silencio) y que
 // vayan justo antes del header `## ` de su sección.
 
+import { MARKER_PREFIX } from "../../../_shared/markers.ts";
 import { ANCHOR_RE } from "../../../_shared/parse/sections.ts";
 import type { Section } from "../../../_shared/types.ts";
 import { DOC_SECTIONS } from "../../../task-manager/src/workspace/docs.ts";
@@ -26,7 +27,7 @@ export const checkAnchors: Check = ({ docs }) => {
   for (const doc of anchored(docs)) {
     const { sections, missing } = doc.parsed;
     for (const id of DOC_SECTIONS[doc.kind]) {
-      const anchor = `<!-- agent-context-kit:section=${id} -->`;
+      const anchor = `<!-- ${MARKER_PREFIX}:section=${id} -->`;
       if (missing.includes(id)) {
         findings.push({
           severity: "error",

@@ -10,7 +10,7 @@ Reglas de ejemplo.
 
 ---
 
-<!-- agent-context-kit:section=free -->
+<!-- agent-context-skill:section=free -->
 ## Tareas libres
 
 ### Revisar el copy del onboarding
@@ -19,7 +19,7 @@ Reglas de ejemplo.
 - **Bloqueos:** Ninguno.
 - **Agregada:** 2026-10-06 por ana
 
-<!-- agent-context-kit:section=blocked -->
+<!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
 ### Integrar la pasarela de pago
@@ -44,7 +44,7 @@ describe("parseTeamBacklog", () => {
   });
 
   test("la plantilla vacía: tarea placeholder marcada y aviso de placeholders", () => {
-    const text = `${DOC.split("<!-- agent-context-kit:section=free -->")[0]}<!-- agent-context-kit:section=free -->\n## Tareas libres\n\n### [Placeholder — título único de la tarea]\n\n- **Descripción:** [Placeholder]\n\n<!-- agent-context-kit:section=blocked -->\n## Tareas bloqueadas / pospuestas\n\n[Placeholder — "Ninguna" si no hay]\n`;
+    const text = `${DOC.split("<!-- agent-context-skill:section=free -->")[0]}<!-- agent-context-skill:section=free -->\n## Tareas libres\n\n### [Placeholder — título único de la tarea]\n\n- **Descripción:** [Placeholder]\n\n<!-- agent-context-skill:section=blocked -->\n## Tareas bloqueadas / pospuestas\n\n[Placeholder — "Ninguna" si no hay]\n`;
     const parsed = parseTeamBacklog(text);
     expect(parsed.free).toHaveLength(1);
     expect(parsed.free[0].isPlaceholder).toBe(true);
@@ -53,12 +53,12 @@ describe("parseTeamBacklog", () => {
   });
 
   test("ignora comentarios HTML y headers dentro de bloques de código", () => {
-    const text = `<!-- agent-context-kit:section=free -->\n## Tareas libres\n\n<!-- ### oculta -->\n### Real\n\n\`\`\`\n### de ejemplo\n\`\`\`\n\n<!-- agent-context-kit:section=blocked -->\n## Tareas bloqueadas\n`;
+    const text = `<!-- agent-context-skill:section=free -->\n## Tareas libres\n\n<!-- ### oculta -->\n### Real\n\n\`\`\`\n### de ejemplo\n\`\`\`\n\n<!-- agent-context-skill:section=blocked -->\n## Tareas bloqueadas\n`;
     expect(parseTeamBacklog(text).free.map((t) => t.title)).toEqual(["Real"]);
   });
 
   test("sin anclas usa el orden de las secciones (plan B)", () => {
-    const text = DOC.replace(/<!-- agent-context-kit:section=\w+ -->\n/g, "");
+    const text = DOC.replace(/<!-- agent-context-skill:section=\w+ -->\n/g, "");
     const parsed = parseTeamBacklog(text);
     expect(parsed.usedFallback).toBe(true);
     expect(parsed.free).toHaveLength(1);
@@ -74,7 +74,7 @@ describe("parseTeamBacklog: posiciones en el texto original", () => {
   const POS_DOC = [
     "# Backlog del equipo", // 1
     "", // 2
-    "<!-- agent-context-kit:section=free -->", // 3
+    "<!-- agent-context-skill:section=free -->", // 3
     "## Tareas libres", // 4
     "", // 5
     "<!--", // 6
@@ -94,7 +94,7 @@ describe("parseTeamBacklog: posiciones en el texto original", () => {
     "", // 20
     "- **Bloqueos:** Ninguno.", // 21
     "", // 22
-    "<!-- agent-context-kit:section=blocked -->", // 23
+    "<!-- agent-context-skill:section=blocked -->", // 23
     "## Tareas bloqueadas", // 24
     "", // 25
     "### Integrar la pasarela", // 26
@@ -125,7 +125,7 @@ describe("parseTeamBacklog: posiciones en el texto original", () => {
 
   test("secciones: anchor y cuerpo de cada una", () => {
     const { sections } = parseTeamBacklog(POS_DOC);
-    expect(sliceRange(POS_DOC, sections.blocked.anchorRange!)).toBe("<!-- agent-context-kit:section=blocked -->");
+    expect(sliceRange(POS_DOC, sections.blocked.anchorRange!)).toBe("<!-- agent-context-skill:section=blocked -->");
     expect(sliceRange(POS_DOC, sections.free.headerRange)).toBe("## Tareas libres");
     expect(sections.free.bodyRange.end).toBe(sections.blocked.anchorRange!.start);
   });

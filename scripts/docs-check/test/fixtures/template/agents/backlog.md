@@ -19,13 +19,13 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 **Agrupamiento (solo en "Tareas libres"):** si superan las 15 tareas (Regla 8), se evalúa agrupar 2 o más que compartan un objetivo real — el grupo entero tiene que caber en una frase de objetivo compartido, sin forzar con "y". El grupo aparece en libres como un bloque `### Grupo — título (Tareas N, M)` con un `Resumen` de una frase; el detalle de cada tarea (`#### Tarea N — título`, mismo formato) se mueve a "Tareas agrupadas", que no hace falta leer salvo para tomar una. Un grupo que queda con una sola tarea se desarma.
 
-**Anclas de sección:** no borres ni muevas los comentarios `<!-- agent-context-kit:section=... -->` (`free`, `blocked`, `grouped`) que preceden a cada sección: los usa el script de seguimiento de tareas de agent-context-kit.
+**Anclas de sección:** no borres ni muevas los comentarios `<!-- agent-context-skill:section=... -->` (`free`, `blocked`, `grouped`) que preceden a cada sección: los usa el script de seguimiento de tareas de agent-context-kit.
 
 **Próximo número de tarea:** 1
 
 ---
 
-<!-- agent-context-kit:section=free -->
+<!-- agent-context-skill:section=free -->
 ## Tareas libres
 
 ### Tarea [N] — [Placeholder — título corto de la tarea]
@@ -37,7 +37,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** [Placeholder]
 - **Agregada:** [Placeholder]
 
-<!-- agent-context-kit:section=blocked -->
+<!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
 ### Tarea [N] — [Placeholder — título corto de la tarea]
@@ -50,7 +50,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** [Placeholder]
 - **Agregada:** [Placeholder]
 
-<!-- agent-context-kit:section=grouped -->
+<!-- agent-context-skill:section=grouped -->
 ## Tareas agrupadas
 
 No aplica todavía — ningún grupo formado.

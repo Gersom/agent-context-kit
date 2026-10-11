@@ -45,17 +45,17 @@ describe("blockSeparator", () => {
 });
 
 describe("insertBlock", () => {
-  const section = (id: string, body: string) => `<!-- agent-context-kit:section=${id} -->\n## Sección\n${body}`;
+  const section = (id: string, body: string) => `<!-- agent-context-skill:section=${id} -->\n## Sección\n${body}`;
 
   function bodyOf(text: string): Range {
     return parseBacklog(text).sections.free.bodyRange;
   }
 
   test("al final de las tareas, con una línea en blanco de separación y antes de la sección siguiente", () => {
-    const text = `# B\n\n${section("free", "\n### Tarea 1 — a\n\n- x\n")}\n<!-- agent-context-kit:section=blocked -->\n## Otra\n`;
+    const text = `# B\n\n${section("free", "\n### Tarea 1 — a\n\n- x\n")}\n<!-- agent-context-skill:section=blocked -->\n## Otra\n`;
     const edit = insertBlock(text, bodyOf(text), NEW, { hasBlocks: true });
     expect(apply(text, edit)).toBe(
-      `# B\n\n${section("free", "\n### Tarea 1 — a\n\n- x\n\n" + NEW + "\n")}\n<!-- agent-context-kit:section=blocked -->\n## Otra\n`,
+      `# B\n\n${section("free", "\n### Tarea 1 — a\n\n- x\n\n" + NEW + "\n")}\n<!-- agent-context-skill:section=blocked -->\n## Otra\n`,
     );
   });
 
@@ -74,9 +74,9 @@ describe("insertBlock", () => {
   });
 
   test("sin tareas: reemplaza «Ninguna.» dejando las líneas en blanco de alrededor", () => {
-    const text = `${section("free", "\nNinguna.\n")}\n<!-- agent-context-kit:section=blocked -->\n## Otra\n`;
+    const text = `${section("free", "\nNinguna.\n")}\n<!-- agent-context-skill:section=blocked -->\n## Otra\n`;
     expect(apply(text, insertBlock(text, bodyOf(text), NEW, { hasBlocks: false }))).toBe(
-      `${section("free", "\n" + NEW + "\n")}\n<!-- agent-context-kit:section=blocked -->\n## Otra\n`,
+      `${section("free", "\n" + NEW + "\n")}\n<!-- agent-context-skill:section=blocked -->\n## Otra\n`,
     );
   });
 
@@ -98,7 +98,7 @@ describe("insertBlock", () => {
   });
 
   test("cuerpo en blanco: una línea en blanco a cada lado, con ancla siguiente o al final", () => {
-    const next = "<!-- agent-context-kit:section=blocked -->\n## Otra\n";
+    const next = "<!-- agent-context-skill:section=blocked -->\n## Otra\n";
     const text = `${section("free", "")}${next}`;
     expect(apply(text, insertBlock(text, bodyOf(text), NEW, { hasBlocks: false }))).toBe(`${section("free", "\n" + NEW + "\n")}\n${next}`);
     const last = section("free", "\n");
@@ -106,7 +106,7 @@ describe("insertBlock", () => {
   });
 
   test("handoff: reemplaza «Sin tarea en curso» sin tocar el ancla ni las pausadas", () => {
-    const text = "<!-- agent-context-kit:section=in-progress -->\n## Tarea en progreso\n\nSin tarea en curso\n\n<!-- agent-context-kit:section=paused -->\n## Tareas pausadas\n\nNinguna.\n";
+    const text = "<!-- agent-context-skill:section=in-progress -->\n## Tarea en progreso\n\nSin tarea en curso\n\n<!-- agent-context-skill:section=paused -->\n## Tareas pausadas\n\nNinguna.\n";
     const body = parseHandoff(text).sections["in-progress"].bodyRange;
     expect(apply(text, insertBlock(text, body, "Tarea 1 — x", { hasBlocks: false }))).toBe(text.replace("Sin tarea en curso", "Tarea 1 — x"));
   });
@@ -117,7 +117,7 @@ describe("removeBlock", () => {
     const task = parseBacklog(text).free.tasks.find((t) => t.number === n)!;
     return trimRange(text, task.range!);
   };
-  const text = "<!-- agent-context-kit:section=free -->\n## L\n\n### Tarea 1 — a\n\n- x\n\n### Tarea 2 — b\n\n- y\n\n### Tarea 3 — c\n\n- z\n\n<!-- agent-context-kit:section=blocked -->\n## B\n";
+  const text = "<!-- agent-context-skill:section=free -->\n## L\n\n### Tarea 1 — a\n\n- x\n\n### Tarea 2 — b\n\n- y\n\n### Tarea 3 — c\n\n- z\n\n<!-- agent-context-skill:section=blocked -->\n## B\n";
 
   test("el del medio: no deja huecos ni líneas en blanco dobles", () => {
     expect(apply(text, removeBlock(text, rangeOf(text, 2), "Ninguna.", true))).toBe(text.replace("### Tarea 2 — b\n\n- y\n\n", ""));
@@ -129,8 +129,8 @@ describe("removeBlock", () => {
   });
 
   test("el único: la sección queda con el texto de vacío", () => {
-    const single = "<!-- agent-context-kit:section=free -->\n## L\n\n### Tarea 1 — a\n\n- x\n\n<!-- agent-context-kit:section=blocked -->\n## B\n";
-    expect(apply(single, removeBlock(single, rangeOf(single, 1), "Ninguna.", false))).toBe("<!-- agent-context-kit:section=free -->\n## L\n\nNinguna.\n\n<!-- agent-context-kit:section=blocked -->\n## B\n");
+    const single = "<!-- agent-context-skill:section=free -->\n## L\n\n### Tarea 1 — a\n\n- x\n\n<!-- agent-context-skill:section=blocked -->\n## B\n";
+    expect(apply(single, removeBlock(single, rangeOf(single, 1), "Ninguna.", false))).toBe("<!-- agent-context-skill:section=free -->\n## L\n\nNinguna.\n\n<!-- agent-context-skill:section=blocked -->\n## B\n");
   });
 
   test("lo último del archivo: quita también la separación previa y conserva el final de línea", () => {

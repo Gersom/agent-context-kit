@@ -6,8 +6,8 @@ Se asegura siempre en la raíz del repo destino, en cualquier set — incluso el
 CLAUDE.md nunca duplica contenido: solo redirige a AGENTS.md, que es la fuente de verdad.
 -->
 
-<!-- agent-docs-skill:start -->
+<!-- agent-context-skill:start -->
 ## Documentación de contexto para agentes
 
 Antes de cualquier tarea, lee [`AGENTS.md`](./AGENTS.md).
-<!-- agent-docs-skill:end -->
+<!-- agent-context-skill:end -->

@@ -178,7 +178,7 @@ describe("history, número, team y avisos", () => {
   });
 
   test("anclas que faltan en el backlog: avisa (plan B)", () => {
-    const backlog = BACKLOG_RICH.replace(/<!-- agent-context-kit:section=[a-z-]+ -->\n/g, "");
+    const backlog = BACKLOG_RICH.replace(/<!-- agent-context-skill:section=[a-z-]+ -->\n/g, "");
     expect(stateOf(withBacklog(backlog)).warnings.some((w) => w.includes("no tiene anclas"))).toBe(true);
   });
 

@@ -4,7 +4,7 @@ Una línea por operador: `- <carpeta>: <correo>, <correo>`. La carpeta es un nom
 
 ---
 
-<!-- agent-context-kit:section=operators -->
+<!-- agent-context-skill:section=operators -->
 ## Lista
 
 - [Placeholder — carpeta]: [Placeholder — correo]

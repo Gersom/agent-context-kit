@@ -55,7 +55,7 @@ describe("pause", () => {
     expect(code).toBe(0);
     expect(out).toBe("Tarea 1 pausada: pasó de «Tarea en progreso» a «Tareas pausadas» de docs/agents/gersom/handoff.md.");
     const text = handoff(p);
-    expect(text).toContain("<!-- agent-context-kit:section=in-progress -->\n## Tarea en progreso\n\nSin tarea en curso\n\n<!-- agent-context-kit:section=paused -->\n## Tareas pausadas");
+    expect(text).toContain("<!-- agent-context-skill:section=in-progress -->\n## Tarea en progreso\n\nSin tarea en curso\n\n<!-- agent-context-skill:section=paused -->\n## Tareas pausadas");
     expect(text).toContain(
       [
         "### Tarea 8 — Migrar la documentación vieja",
@@ -112,7 +112,7 @@ describe("pause", () => {
     const original = handoff(p).replace("## Tarea en progreso\n\n", "## Tarea en progreso\n\n<!-- La única tarea que se trabaja ahora. -->\n\n");
     writeFileSync(join(p.agents, "gersom", "handoff.md"), original);
     await exec([...PAUSE, "--apply"], p);
-    expect(handoff(p)).toContain("## Tarea en progreso\n\n<!-- La única tarea que se trabaja ahora. -->\n\nSin tarea en curso\n\n<!-- agent-context-kit:section=paused -->");
+    expect(handoff(p)).toContain("## Tarea en progreso\n\n<!-- La única tarea que se trabaja ahora. -->\n\nSin tarea en curso\n\n<!-- agent-context-skill:section=paused -->");
   });
 
   test("lleva `Origen`, `Detalles` y una descripción de varios párrafos", async () => {

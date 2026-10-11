@@ -1,7 +1,8 @@
 // Secciones `## ` de handoff.md y backlog.md, ubicadas por las anclas
-// `<!-- agent-context-kit:section=<id> -->` (ver src/docs/template-architecture.md, sección
+// `<!-- agent-context-skill:section=<id> -->` (ver src/docs/template-architecture.md, sección
 // "Anclas de sección"), con plan B por orden de aparición. No depende del idioma.
 
+import { ANCHOR_PREFIX_PATTERN } from "../markers.ts";
 import type { Range, Section, SectionsResult } from "../types.ts";
 import { commentStateAfter } from "./markdown.ts";
 import { BodyPos, LineIndex } from "./positions.ts";
@@ -10,7 +11,7 @@ import { BodyPos, LineIndex } from "./positions.ts";
 export const HANDOFF_SECTIONS: string[] = ["in-progress", "paused"];
 export const BACKLOG_SECTIONS: string[] = ["free", "blocked", "grouped"];
 
-export const ANCHOR_RE =/^\s*<!--\s*agent-context-kit:section=([a-z-]+)\s*-->\s*$/;
+export const ANCHOR_RE = new RegExp(`^\\s*<!--\\s*${ANCHOR_PREFIX_PATTERN}:section=([a-z-]+)\\s*-->\\s*$`);
 const H2_RE = /^##(?!#)\s+(.+?)\s*$/;
 const FENCE_RE = /^\s*(```|~~~)/;
 

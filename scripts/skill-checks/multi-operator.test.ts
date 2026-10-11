@@ -29,15 +29,15 @@ describe.skipIf(!hasSkill)("modo multi-operador: plantillas", () => {
 
   test("operators.md: la plantilla se interpreta sin operadores y con el ancla de la lista", () => {
     const text = readSkill("template/multi/operators.md");
-    expect(text).toContain("<!-- agent-context-kit:section=operators -->");
+    expect(text).toContain("<!-- agent-context-skill:section=operators -->");
     expect(parseOperators(text)).toEqual({ operators: [], unreadable: [] });
     expect(bytes(withoutComments(text))).toBeLessThanOrEqual(700);
   });
 
   test("team-backlog.md: anclas libres/bloqueadas, sin contador, y reglas de tomar y devolver", () => {
     const text = readSkill("template/multi/team-backlog.md");
-    expect(text).toContain("<!-- agent-context-kit:section=free -->");
-    expect(text).toContain("<!-- agent-context-kit:section=blocked -->");
+    expect(text).toContain("<!-- agent-context-skill:section=free -->");
+    expect(text).toContain("<!-- agent-context-skill:section=blocked -->");
     expect(text).not.toContain("Próximo número");
     expect(text).toContain("Origen: team-backlog");
     expect(text).toContain("Devuelta por");

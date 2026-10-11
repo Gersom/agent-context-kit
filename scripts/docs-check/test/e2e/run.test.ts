@@ -220,7 +220,7 @@ describe("marcador de versión de la skill en rules.md", () => {
 
   test("marcador mal formado: aviso con su línea", async () => {
     const tree = flatTree();
-    tree[RULES_FILE] = "# Reglas del proyecto\n<!-- agent-context-kit:version 1.9 -->\n";
+    tree[RULES_FILE] = "# Reglas del proyecto\n<!-- agent-context-skill:version 1.9 -->\n";
     const report = await checkJson([project(tree).root]);
     expect(report.findings).toMatchObject([{ severity: "warning", code: "skill-version", file: RULES_FILE, line: 2 }]);
   });

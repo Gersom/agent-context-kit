@@ -13,7 +13,7 @@ export const OPERATORS_MD = `# Operadores
 
 ---
 
-<!-- agent-context-kit:section=operators -->
+<!-- agent-context-skill:section=operators -->
 ## Lista
 
 - gersom: Gersom@Mail.com, g@work.com
@@ -24,14 +24,14 @@ export const OPERATORS_MD = `# Operadores
 
 export const TEAM_BACKLOG_MD = `# Backlog del equipo
 
-<!-- agent-context-kit:section=free -->
+<!-- agent-context-skill:section=free -->
 ## Tareas libres
 
 ### Revisar el copy del onboarding
 
 - **Descripción:** ajustar textos
 
-<!-- agent-context-kit:section=blocked -->
+<!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
 Ninguna.

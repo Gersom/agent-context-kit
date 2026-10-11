@@ -34,7 +34,7 @@ beforeAll(() => {
   mkdirSync(join(multi, "ana"), { recursive: true });
   writeFileSync(
     join(multi, "operators.md"),
-    "# Operadores\n\n<!-- agent-context-kit:section=operators -->\n## Lista\n\n- ana: ana@mail.com\n- luis (solo team-backlog): luis@mail.com\n",
+    "# Operadores\n\n<!-- agent-context-skill:section=operators -->\n## Lista\n\n- ana: ana@mail.com\n- luis (solo team-backlog): luis@mail.com\n",
   );
   writeFileSync(join(multi, "ana", "handoff.md"), "# Handoff\n");
   // Carpetas de operador sin operators.md: estado inconsistente.

@@ -5,7 +5,7 @@ import { makeRules } from "../../src/context.ts";
 import { RULES } from "../fixtures.ts";
 import { brief, makeCtx, PATHS, withCode } from "../helpers.ts";
 
-const MARKER = "<!-- agent-context-kit:version 1.9.0 — ignorar al leer, no es contenido. -->";
+const MARKER = "<!-- agent-context-skill:version 1.9.0 — ignorar al leer, no es contenido. -->";
 
 describe("skill-version", () => {
   test("el rules.md de la plantilla trae el marcador: sin hallazgos", () => {
@@ -20,7 +20,7 @@ describe("skill-version", () => {
   });
 
   test("marcador solo con la versión, sin texto después: sin hallazgos", () => {
-    expect(checkSkillVersion(makeCtx({ rules: "<!-- agent-context-kit:version 2.10.3-->\n# Reglas\n" }))).toEqual([]);
+    expect(checkSkillVersion(makeCtx({ rules: "<!-- agent-context-skill:version 2.10.3-->\n# Reglas\n" }))).toEqual([]);
   });
 
   test("rules.md sin marcador: aviso sobre el archivo entero", () => {
@@ -43,14 +43,14 @@ describe("skill-version", () => {
 
   test("versión mal formada: aviso de formato inválido con la línea", () => {
     for (const bad of ["1.9", "1.9.x", "v1.9.0"]) {
-      const findings = checkSkillVersion(makeCtx({ rules: `# Reglas\n<!-- agent-context-kit:version ${bad} -->\n` }));
+      const findings = checkSkillVersion(makeCtx({ rules: `# Reglas\n<!-- agent-context-skill:version ${bad} -->\n` }));
       expect(findings.map(brief)).toEqual([{ severity: "warning", code: "skill-version", file: `${PATHS.flat}/rules.md`, line: 2 }]);
       expect(findings[0].message).toContain("formato");
     }
   });
 
   test("comentario sin cerrar: aviso de formato inválido", () => {
-    const findings = checkSkillVersion(makeCtx({ rules: "<!-- agent-context-kit:version 1.9.0\n# Reglas\n" }));
+    const findings = checkSkillVersion(makeCtx({ rules: "<!-- agent-context-skill:version 1.9.0\n# Reglas\n" }));
     expect(findings.map(brief)).toEqual([{ severity: "warning", code: "skill-version", file: `${PATHS.flat}/rules.md`, line: 1 }]);
     expect(findings[0].message).toContain("formato");
   });

@@ -145,6 +145,8 @@ describe.skipIf(!hasSkill)("changelog de la skill (docs/changelog/)", () => {
     const text = change.blocks.get("Texto nuevo") ?? "";
     expect(text).toContain("agent-context-kit:version {{versión}}");
     const template = readSkill("template/agents/rules.md").split("\n")[0];
-    expect(template.replace(/version \d+\.\d+\.\d+/, "version {{versión}}")).toBe(text.trim());
+    // La 1.9 insertó el marcador con el prefijo de entonces; la 2.0 lo renombra (changelog/2.0.md).
+    const current = template.replace(/version \d+\.\d+\.\d+/, "version {{versión}}").replace("agent-context-skill:", "agent-context-kit:");
+    expect(current).toBe(text.trim());
   });
 });

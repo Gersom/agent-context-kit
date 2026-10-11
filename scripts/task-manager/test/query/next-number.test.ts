@@ -34,7 +34,7 @@ describe("findNextTaskNumber", () => {
   });
 
   test("solo mira la introducción: se detiene en la primera ancla o sección", () => {
-    expect(findNextTaskNumber("# B\n\n<!-- agent-context-kit:section=free -->\n## Libres\n\n**Próximo número de tarea:** 5\n")).toBeNull();
+    expect(findNextTaskNumber("# B\n\n<!-- agent-context-skill:section=free -->\n## Libres\n\n**Próximo número de tarea:** 5\n")).toBeNull();
     expect(findNextTaskNumber("# B\n\n## Libres\n\n**Próximo número de tarea:** 5\n")).toBeNull();
   });
 

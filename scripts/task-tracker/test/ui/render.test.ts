@@ -174,7 +174,7 @@ describe("render", () => {
   });
 
   test("pausadas y bloqueadas no aparecen cuando no hay ninguna", () => {
-    const backlogText = "<!-- agent-context-kit:section=free -->\n## Tareas libres\n\n### Tarea 1 — Algo libre\n\n- **Descripción:** x\n";
+    const backlogText = "<!-- agent-context-skill:section=free -->\n## Tareas libres\n\n### Tarea 1 — Algo libre\n\n- **Descripción:** x\n";
     const out = render(buildModel({ handoffText: fixture("minimal", "handoff.md"), backlogText }), meta);
     expect(out).toContain("╭─ LIBRES (1)");
     expect(out).not.toContain("PAUSADAS");

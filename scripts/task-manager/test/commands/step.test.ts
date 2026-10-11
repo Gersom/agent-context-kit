@@ -51,7 +51,7 @@ describe("step", () => {
     expect(text).toContain(
       "### Qué falta\n\nPasos pendientes:\n- Paso 2 — Probar\n- Paso 3 — Cerrar el hilo\n- Documentar cierre de tarea\n\n### Decisiones a medio camino",
     );
-    expect(text).toContain("### Próximo paso concreto\n\nPaso 2 — Probar\n\n<!-- agent-context-kit:section=paused -->");
+    expect(text).toContain("### Próximo paso concreto\n\nPaso 2 — Probar\n\n<!-- agent-context-skill:section=paused -->");
     expect(readIn(p, "gersom", "backlog.md")).not.toContain("Paso");
   });
 
@@ -125,8 +125,8 @@ describe("step", () => {
     await exec(["step", "1", "--apply"], p);
     const after = handoff(p);
     expect(after).toContain("### Qué falta\n\n<!-- Lo que falta de ESTA tarea. -->\n\nPasos pendientes:\n- Paso 2 — Probar");
-    expect(after).toContain("<!-- agent-context-kit:section=in-progress -->");
-    expect(after).toContain("<!-- agent-context-kit:section=paused -->\n## Tareas pausadas");
+    expect(after).toContain("<!-- agent-context-skill:section=in-progress -->");
+    expect(after).toContain("<!-- agent-context-skill:section=paused -->\n## Tareas pausadas");
   });
 
   test("--json: dice qué cambió y no imprime el diff", async () => {

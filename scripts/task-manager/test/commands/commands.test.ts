@@ -112,7 +112,7 @@ describe("anchors", () => {
   test("archivo sin anclas (plan B): lo marca y sale con código 1, sin escribir", async () => {
     const p = project({ folders: ["gersom"] });
     const path = join(p.agents, "gersom", "backlog.md");
-    writeFileSync(path, readFileSync(path, "utf8").replace(/<!-- agent-context-kit:section=[a-z-]+ -->\n/g, ""));
+    writeFileSync(path, readFileSync(path, "utf8").replace(/<!-- agent-context-skill:section=[a-z-]+ -->\n/g, ""));
     const before = snapshot(p.root);
     const { code, out } = await exec(["anchors"], p);
     expect(code).toBe(1);
@@ -125,7 +125,7 @@ describe("anchors", () => {
   test("sección que falta", async () => {
     const p = project({ folders: ["gersom"] });
     const path = join(p.agents, "gersom", "handoff.md");
-    writeFileSync(path, "# Handoff\n\n<!-- agent-context-kit:section=in-progress -->\n## Tarea en progreso\n\nSin tarea en curso\n");
+    writeFileSync(path, "# Handoff\n\n<!-- agent-context-skill:section=in-progress -->\n## Tarea en progreso\n\nSin tarea en curso\n");
     const { code, out } = await exec(["anchors"], p);
     expect(code).toBe(1);
     expect(out).toMatch(/paused\s+NO SE ENCONTRÓ/);

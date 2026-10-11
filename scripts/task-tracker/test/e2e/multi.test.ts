@@ -13,7 +13,7 @@ const OPERATORS = `# Operadores
 
 ---
 
-<!-- agent-context-kit:section=operators -->
+<!-- agent-context-skill:section=operators -->
 ## Lista
 
 - gersom: gersom@mail.com
@@ -21,14 +21,14 @@ const OPERATORS = `# Operadores
 - luis (solo team-backlog): luis@mail.com
 `;
 
-const TEAM_BACKLOG = `<!-- agent-context-kit:section=free -->
+const TEAM_BACKLOG = `<!-- agent-context-skill:section=free -->
 ## Tareas libres
 
 ### Revisar el copy del onboarding
 
 - **Descripción:** ajustar textos
 
-<!-- agent-context-kit:section=blocked -->
+<!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
 ### Integrar la pasarela

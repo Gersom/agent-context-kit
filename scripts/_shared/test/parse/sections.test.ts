@@ -21,13 +21,13 @@ describe("findSections", () => {
   });
 
   test("ignora headers dentro de bloques de código", () => {
-    const text = "```md\n## Falso\n```\n<!-- agent-context-kit:section=free -->\n## Libres\n";
+    const text = "```md\n## Falso\n```\n<!-- agent-context-skill:section=free -->\n## Libres\n";
     const { sections } = findSections(text, BACKLOG_SECTIONS);
     expect(sections.free.header).toBe("Libres");
   });
 
   test("un ancla seguida de otro contenido no se aplica al header siguiente", () => {
-    const text = "<!-- agent-context-kit:section=free -->\ntexto\n## Libres\n<!-- agent-context-kit:section=blocked -->\n## Bloqueadas\n";
+    const text = "<!-- agent-context-skill:section=free -->\ntexto\n## Libres\n<!-- agent-context-skill:section=blocked -->\n## Bloqueadas\n";
     const { sections, missing, usedFallback } = findSections(text, BACKLOG_SECTIONS);
     expect(usedFallback).toBe(false);
     expect(sections.free).toBeUndefined();
@@ -36,7 +36,7 @@ describe("findSections", () => {
   });
 
   test("reporta las secciones con ancla faltante", () => {
-    const text = "<!-- agent-context-kit:section=free -->\n## Libres\n\n## Otra\n";
+    const text = "<!-- agent-context-skill:section=free -->\n## Libres\n\n## Otra\n";
     expect(findSections(text, BACKLOG_SECTIONS).missing).toEqual(["blocked", "grouped"]);
   });
 });
@@ -49,7 +49,7 @@ describe("findSections: posiciones en el texto original", () => {
     "## Falso dentro de un comentario", // 4
     "-->", // 5
     "", // 6
-    "<!-- agent-context-kit:section=free -->", // 7
+    "<!-- agent-context-skill:section=free -->", // 7
     "## Tareas libres", // 8
     "", // 9
     "### Tarea 1 — a", // 10
@@ -57,7 +57,7 @@ describe("findSections: posiciones en el texto original", () => {
     "## Falso en un bloque de código", // 12
     "```", // 13
     "", // 14
-    "<!-- agent-context-kit:section=blocked -->", // 15
+    "<!-- agent-context-skill:section=blocked -->", // 15
     "## Tareas bloqueadas", // 16
     "", // 17
     "### Tarea 2 — b", // 18
@@ -69,10 +69,10 @@ describe("findSections: posiciones en el texto original", () => {
     const { free, blocked } = sections;
     expect(sliceRange(TEXT, free.headerRange)).toBe("## Tareas libres");
     expect(free.headerRange).toMatchObject({ startLine: 8, endLine: 8 });
-    expect(sliceRange(TEXT, free.anchorRange!)).toBe("<!-- agent-context-kit:section=free -->");
+    expect(sliceRange(TEXT, free.anchorRange!)).toBe("<!-- agent-context-skill:section=free -->");
     expect(free.anchorRange).toMatchObject({ startLine: 7, endLine: 7 });
     expect(sliceRange(TEXT, blocked.headerRange)).toBe("## Tareas bloqueadas");
-    expect(sliceRange(TEXT, blocked.anchorRange!)).toBe("<!-- agent-context-kit:section=blocked -->");
+    expect(sliceRange(TEXT, blocked.anchorRange!)).toBe("<!-- agent-context-skill:section=blocked -->");
   });
 
   test("el cuerpo llega hasta antes del ancla de la sección siguiente, o hasta el fin del texto", () => {
@@ -103,7 +103,7 @@ describe("findSections: posiciones en el texto original", () => {
   });
 
   test("un header sin ancla en un documento con anclas no es sección; ids desconocidos se descartan", () => {
-    const text = "<!-- agent-context-kit:section=free -->\n## Libres\n\n## Otra\ntexto\n";
+    const text = "<!-- agent-context-skill:section=free -->\n## Libres\n\n## Otra\ntexto\n";
     const { sections } = findSections(text, ["free", "blocked"]);
     expect(Object.keys(sections)).toEqual(["free"]);
     // Sin ancla en la siguiente, el cuerpo llega hasta su header.

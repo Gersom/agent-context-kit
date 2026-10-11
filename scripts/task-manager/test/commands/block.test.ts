@@ -70,9 +70,9 @@ describe("block", () => {
     const p = project({ folders: ["gersom"], contents: { "handoff.md": HANDOFF_EMPTY, "backlog.md": BACKLOG_ONE, "history.md": "# History\n" } });
     await exec(["block", "7", "--tag", "dependencia", "--motivo", "falta la API", "--apply"], p);
     const text = backlog(p);
-    expect(text).toContain("## Tareas libres\n\nNinguna.\n\n<!-- agent-context-kit:section=blocked -->\n## Tareas bloqueadas / pospuestas\n\n### Tarea 7 — La única");
+    expect(text).toContain("## Tareas libres\n\nNinguna.\n\n<!-- agent-context-skill:section=blocked -->\n## Tareas bloqueadas / pospuestas\n\n### Tarea 7 — La única");
     expect(text).toContain("- **Bloqueos:** `[dependencia]` falta la API");
-    expect(text).toContain("<!-- agent-context-kit:section=grouped -->");
+    expect(text).toContain("<!-- agent-context-skill:section=grouped -->");
   });
 
   test("--json", async () => {
@@ -151,7 +151,7 @@ describe("unblock", () => {
     const text = backlog(p);
     // Al final de «libres», con el `Bloqueos` resuelto sin perder el motivo; la 16 ya estaba resuelta y no cambia.
     expect(text).toContain(
-      "### Tarea 18 — Revisar los links\n\n- **Disparador:** antes del release.\n\n### Tarea 6 — Publicar el sitio\n\n- **Bloqueos:** `[Resuelto el 2026-10-07]` — era `[dependencia]` depende de la Tarea 11.\n\n### Tarea 16 — Revisar la licencia\n\n- **Bloqueos:** `[Resuelto el 2026-10-01]` — era `[dependencia]` la Tarea 11.\n\n<!-- agent-context-kit:section=blocked -->",
+      "### Tarea 18 — Revisar los links\n\n- **Disparador:** antes del release.\n\n### Tarea 6 — Publicar el sitio\n\n- **Bloqueos:** `[Resuelto el 2026-10-07]` — era `[dependencia]` depende de la Tarea 11.\n\n### Tarea 16 — Revisar la licencia\n\n- **Bloqueos:** `[Resuelto el 2026-10-01]` — era `[dependencia]` la Tarea 11.\n\n<!-- agent-context-skill:section=blocked -->",
     );
     expect(text).toContain("## Tareas bloqueadas / pospuestas\n\n### Tarea 7 — Rehacer el README\n\n- **Bloqueos:** `[postergada]` esperar a la Tarea 11 y a la Tarea 3.\n\n### Tarea 17 — Migrar a otro host");
     expect(text).not.toMatch(/\n\n\n/);
@@ -168,7 +168,7 @@ describe("unblock", () => {
     const p = project({ folders: ["gersom"], ...IDLE });
     const { out } = await exec(["unblock", "17", "--apply"], p);
     expect(out).toContain("Tarea 17 — Migrar a otro host — decidido por quien lo pidió");
-    expect(backlog(p)).toContain("- **Bloqueos:** `[Resuelto el 2026-10-07]` — era `[postergada]` hasta nuevo aviso del operador.\n\n<!-- agent-context-kit:section=blocked -->");
+    expect(backlog(p)).toContain("- **Bloqueos:** `[Resuelto el 2026-10-07]` — era `[postergada]` hasta nuevo aviso del operador.\n\n<!-- agent-context-skill:section=blocked -->");
     expect(backlog(p)).toContain("## Tareas bloqueadas / pospuestas\n\n### Tarea 6 —");
     // Las demás bloqueadas no se tocan ni se listan.
     expect(out).not.toContain("Para revisar a mano");
@@ -192,7 +192,7 @@ describe("unblock", () => {
     await exec(["unblock", "--apply"], p);
     const text = backlog(p);
     expect(text).toContain("## Tareas libres\n\n### Tarea 7 — La única");
-    expect(text).toContain("## Tareas bloqueadas / pospuestas\n\nNinguna.\n\n<!-- agent-context-kit:section=grouped -->");
+    expect(text).toContain("## Tareas bloqueadas / pospuestas\n\nNinguna.\n\n<!-- agent-context-skill:section=grouped -->");
     expect(text).toContain("- **Bloqueos:** `[Resuelto el 2026-10-07]` — era `[dependencia]` depende de la Tarea 11.");
   });
 

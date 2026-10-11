@@ -1,5 +1,5 @@
 // `anchors`: comprueba que cada archivo tenga las anclas de sección que necesita el parseo
-// (`<!-- agent-context-kit:section=... -->`), que es lo que permite editar sin depender del idioma
+// (`<!-- agent-context-skill:section=... -->`), que es lo que permite editar sin depender del idioma
 // de los headers. No escribe nada. Sale con código 1 si falta alguna ancla o sección.
 
 import type { Section } from "../../../_shared/types.ts";

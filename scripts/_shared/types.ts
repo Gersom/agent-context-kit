@@ -86,7 +86,7 @@ export interface Section {
    */
   bodyRange: Range;
   /**
-   * Línea del ancla `<!-- agent-context-kit:section=... -->` (una línea). `null` si la sección
+   * Línea del ancla `<!-- agent-context-skill:section=... -->` (una línea). `null` si la sección
    * se ubicó por orden (plan B, sin anclas) o su header no tiene ancla: no se inventa.
    */
   anchorRange: Range | null;

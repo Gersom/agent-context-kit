@@ -16,11 +16,11 @@ Tareas **sin dueño** del proyecto, visibles para todos los operadores. Las tare
 - **Bloqueos:** "Ninguno", o un valor que **empieza** con `[dependencia]` (no se puede empezar técnicamente) o `[postergada]` (conviene esperar) y el motivo. Con bloqueo va en "bloqueadas / pospuestas"; si no, en "libres".
 - **Agregada:** fecha y operador.
 
-**Anclas de sección:** no borres ni muevas los comentarios `<!-- agent-context-kit:section=... -->` (`free`, `blocked`) que preceden a cada sección: los usa el script de seguimiento de tareas.
+**Anclas de sección:** no borres ni muevas los comentarios `<!-- agent-context-skill:section=... -->` (`free`, `blocked`) que preceden a cada sección: los usa el script de seguimiento de tareas.
 
 ---
 
-<!-- agent-context-kit:section=free -->
+<!-- agent-context-skill:section=free -->
 ## Tareas libres
 
 ### [Placeholder — título único de la tarea]
@@ -30,7 +30,7 @@ Tareas **sin dueño** del proyecto, visibles para todos los operadores. Las tare
 - **Bloqueos:** Ninguno.
 - **Agregada:** [Placeholder — fecha y operador]
 
-<!-- agent-context-kit:section=blocked -->
+<!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
 [Placeholder — "Ninguna" si no hay]

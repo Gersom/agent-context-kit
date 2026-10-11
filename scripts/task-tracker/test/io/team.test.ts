@@ -6,7 +6,7 @@ import type { ReadResult } from "../../src/shared/types.ts";
 const ROOT = "/agents";
 const OPERATORS = `# Operadores
 
-<!-- agent-context-kit:section=operators -->
+<!-- agent-context-skill:section=operators -->
 ## Lista
 
 - gersom: g@mail.com

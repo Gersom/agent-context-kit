@@ -134,7 +134,7 @@ describe("start <N>", () => {
     );
     expect(handoff).toContain("### Próximo paso concreto\n\nPaso 1 — Escribir\n");
     expect(handoff.indexOf("### Plan")).toBeGreaterThan(handoff.indexOf("Tarea 3 — Exportar como skill"));
-    expect(handoff).toContain("<!-- agent-context-kit:section=paused -->\n## Tareas pausadas");
+    expect(handoff).toContain("<!-- agent-context-skill:section=paused -->\n## Tareas pausadas");
     expect(handoff).toContain("### Tarea 8 — Migrar la documentación vieja"); // las pausadas, intactas
   });
 
@@ -353,7 +353,7 @@ describe("start <N>", () => {
           ].join("\n"),
         ),
       );
-      expect(read(p, "gersom", "backlog.md")).toContain("## Free tasks\n\nNone.\n\n<!-- agent-context-kit:section=blocked -->");
+      expect(read(p, "gersom", "backlog.md")).toContain("## Free tasks\n\nNone.\n\n<!-- agent-context-skill:section=blocked -->");
     });
   });
 
@@ -407,7 +407,7 @@ describe("start --team", () => {
     const team = TEAM_RICH.replace(/### Revisar el copy del onboarding[^]*?### Migrar el CI/, "### Migrar el CI");
     const p = project({ folders: ["gersom"], ...IDLE, teamBacklogText: team });
     await exec(["start", "--team", "Migrar el CI", "--apply"], p);
-    expect(read(p, "team-backlog.md")).toContain("## Tareas libres\n\nNinguna.\n\n<!-- agent-context-kit:section=blocked -->");
+    expect(read(p, "team-backlog.md")).toContain("## Tareas libres\n\nNinguna.\n\n<!-- agent-context-skill:section=blocked -->");
   });
 
   test("una bloqueada del team-backlog necesita --force", async () => {

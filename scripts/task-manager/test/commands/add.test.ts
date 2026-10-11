@@ -119,7 +119,7 @@ describe("add — backlog propio", () => {
     );
     const text = read(p, "gersom", "backlog.md");
     expect(text).toContain(
-      "### Tarea 20 — Completa\n\n- **Descripción:** D\n- **Decisiones/temas a definir antes de empezar:** ¿A o B?\n- **Bloqueos:** Ninguno.\n- **Disparador:** cuando haya tiempo\n- **Detalles:** Más contexto\n- **Agregada:** 2026-10-07.\n\n<!-- agent-context-kit:section=blocked -->",
+      "### Tarea 20 — Completa\n\n- **Descripción:** D\n- **Decisiones/temas a definir antes de empezar:** ¿A o B?\n- **Bloqueos:** Ninguno.\n- **Disparador:** cuando haya tiempo\n- **Detalles:** Más contexto\n- **Agregada:** 2026-10-07.\n\n<!-- agent-context-skill:section=blocked -->",
     );
   });
 
@@ -149,14 +149,14 @@ describe("add — backlog propio", () => {
     await exec(["add", "--titulo", "Primera", "--descripcion", "D", "--apply"], p);
     const text = read(p, "gersom", "backlog.md");
     expect(text).toContain("## Tareas libres\n\n### Tarea 5 — Primera\n\n- **Descripción:** D");
-    expect(text).toContain("- **Agregada:** 2026-10-07.\n\n<!-- agent-context-kit:section=blocked -->\n## Tareas bloqueadas / pospuestas\n\nNinguna.\n");
+    expect(text).toContain("- **Agregada:** 2026-10-07.\n\n<!-- agent-context-skill:section=blocked -->\n## Tareas bloqueadas / pospuestas\n\nNinguna.\n");
     expect(text).toContain("**Próximo número de tarea:** 6");
-    expect(text).not.toContain("Ninguna.\n\n<!-- agent-context-kit:section=blocked -->");
+    expect(text).not.toContain("Ninguna.\n\n<!-- agent-context-skill:section=blocked -->");
     // una bloqueada en la sección vacía de bloqueadas: reemplaza el «Ninguna.» de esa sección
     await exec(["add", "--titulo", "Esperando", "--descripcion", "D", "--bloqueo", "`[postergada]` luego", "--apply"], p);
     const after = read(p, "gersom", "backlog.md");
     expect(after).toContain("## Tareas bloqueadas / pospuestas\n\n### Tarea 6 — Esperando");
-    expect(after).toContain("<!-- agent-context-kit:section=grouped -->\n## Tareas agrupadas\n\nNo aplica todavía");
+    expect(after).toContain("<!-- agent-context-skill:section=grouped -->\n## Tareas agrupadas\n\nNo aplica todavía");
     expect(after).toContain("**Próximo número de tarea:** 7");
   });
 
@@ -172,7 +172,7 @@ describe("add — backlog propio", () => {
   });
 
   test("respeta el espaciado del archivo: si separa las tareas con dos líneas en blanco, usa dos", async () => {
-    const backlog = BACKLOG_ONE.replace("<!-- agent-context-kit:section=blocked -->", "### Tarea 6 — Otra\n\n- **Descripción:** x\n\n<!-- agent-context-kit:section=blocked -->").replace(
+    const backlog = BACKLOG_ONE.replace("<!-- agent-context-skill:section=blocked -->", "### Tarea 6 — Otra\n\n- **Descripción:** x\n\n<!-- agent-context-skill:section=blocked -->").replace(
       "### Tarea 6 — Otra",
       "\n### Tarea 6 — Otra",
     );
@@ -235,7 +235,7 @@ describe("add — backlog propio", () => {
     test("backlog sin la línea del contador, o sin la sección", async () => {
       const noCounter = project(own(BACKLOG_EMPTY.replace("**Próximo número de tarea:** 5\n", "")));
       expect((await exec(["add", "--titulo", "T", "--descripcion", "D", "--apply"], noCounter)).err).toContain("Próximo número de tarea");
-      const noSection = project(own(BACKLOG_EMPTY.replace("<!-- agent-context-kit:section=blocked -->", "<!-- otro -->")));
+      const noSection = project(own(BACKLOG_EMPTY.replace("<!-- agent-context-skill:section=blocked -->", "<!-- otro -->")));
       const { code, err } = await exec(["add", "--titulo", "T", "--descripcion", "D", "--bloqueo", "`[dependencia]` x", "--apply"], noSection);
       expect(code).toBe(1);
       expect(err).toContain("no tiene la sección «blocked»");

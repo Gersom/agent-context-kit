@@ -98,12 +98,12 @@ describe("resolveWorkspace — modo multi-operador", () => {
   });
 
   test("operators.md sin operadores legibles", () => {
-    const p = project({ folders: ["gersom"], operators: "# Operadores\n\n<!-- agent-context-kit:section=operators -->\n## Lista\n\nnada\n" });
+    const p = project({ folders: ["gersom"], operators: "# Operadores\n\n<!-- agent-context-skill:section=operators -->\n## Lista\n\nnada\n" });
     expect(errorOf(() => resolveWorkspace({ agents: p.root, email: "gersom@mail.com" }))).toContain("no tiene operadores legibles");
   });
 
   test("líneas de operators.md sin leer: aviso (si se resuelve) o dato en el error", () => {
-    const operators = "<!-- agent-context-kit:section=operators -->\n## Lista\n\n- gersom: g@mail.com\n- esto no se entiende\n";
+    const operators = "<!-- agent-context-skill:section=operators -->\n## Lista\n\n- gersom: g@mail.com\n- esto no se entiende\n";
     const p = project({ folders: ["gersom"], operators });
     const ws = resolveWorkspace({ agents: p.root, email: "g@mail.com" });
     expect(ws.warnings).toEqual(["operators.md: línea sin leer: esto no se entiende"]);

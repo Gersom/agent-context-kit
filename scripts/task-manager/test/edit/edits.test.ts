@@ -121,7 +121,7 @@ describe("applyEdits — CRLF", () => {
   });
 
   test("sobre un handoff real parseado: el reemplazo por rango da un diff de una sola línea", () => {
-    const raw = "# Handoff\r\n\r\n<!-- agent-context-kit:section=in-progress -->\r\n## Tarea en progreso\r\n\r\nTarea 3 — viejo\r\n\r\n### Plan\r\n\r\n- [ ] Paso 1 — a\r\n\r\n<!-- agent-context-kit:section=paused -->\r\n## Tareas pausadas\r\n\r\nNinguna.\r\n";
+    const raw = "# Handoff\r\n\r\n<!-- agent-context-skill:section=in-progress -->\r\n## Tarea en progreso\r\n\r\nTarea 3 — viejo\r\n\r\n### Plan\r\n\r\n- [ ] Paso 1 — a\r\n\r\n<!-- agent-context-skill:section=paused -->\r\n## Tareas pausadas\r\n\r\nNinguna.\r\n";
     const eol = normalizeEol(raw);
     const handoff = parseHandoff(eol.text);
     const mark = handoff.inProgress.steps[0].markRange!;
