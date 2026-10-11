@@ -170,6 +170,8 @@ docs/
 
 ## 7. Estado actual / pendientes
 
+> Lista del diseño original, toda resuelta. Las tareas pendientes de hoy viven en `docs/agents/<operador>/backlog.md` y `team-backlog.md`; la estructura vigente, en [`architecture.md`](./architecture.md).
+
 - [x] Estructura de carpetas y archivos del skill definida
 - [x] Nombre del proyecto decidido: `agent-context-kit`
 - [x] Lógica de detección de conflicto `docs/` vs `agent-context/` definida
@@ -177,6 +179,6 @@ docs/
 - [x] Flujo completo de preguntas definido (Paso -1 a Paso 5)
 - [x] Redactar el contenido real de `questions-flow.md` en formato que un agente pueda seguir paso a paso
 - [x] Redactar el contenido real de `SKILL.md`
-- [x] Redactar el contenido/plantilla de cada archivo dentro de `example/` (ahora vive en `src/template/`)
-- [x] Decidir si se agrega `known-issues.md` al catálogo — sí, se agregó (`src/template/agents/known-issues.md`)
-- [x] Crear el repositorio en GitHub y subir esta estructura de archivos — versionado con releases `v0.1.0` a `v0.3.1`
+- [x] Redactar el contenido/plantilla de cada archivo dentro de `example/` (hoy vive en `template/`, en el repo de la skill)
+- [x] Decidir si se agrega `known-issues.md` al catálogo — sí, se agregó (`template/agents/known-issues.md`, en el repo de la skill)
+- [x] Crear el repositorio en GitHub y subir esta estructura de archivos — versionado con SemVer; hoy el kit y la skill se versionan por separado (ver `docs/agents/rules.md`)
