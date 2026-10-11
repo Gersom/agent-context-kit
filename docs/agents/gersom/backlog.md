@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 58
+**Próximo número de tarea:** 59
 
 ---
 
@@ -48,7 +48,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 56 — Unificar voseo y tuteo en los flujos y plantillas de la skill
+### Tarea 57 — Aclarar o unificar los dos prefijos de marcador (agent-docs-skill y agent-context-kit)
 
 - **Descripción:** Surgió al cerrar la Tarea 50; falta detallarla.
 - **Decisiones/temas a definir antes de empezar:** Ninguno.
@@ -56,12 +56,13 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Agregada:** 2026-10-11.
 
-### Tarea 57 — Aclarar o unificar los dos prefijos de marcador (agent-docs-skill y agent-context-kit)
+### Tarea 58 — Publicar la skill 2.0.0 y un release del kit
 
-- **Descripción:** Surgió al cerrar la Tarea 50; falta detallarla.
-- **Decisiones/temas a definir antes de empezar:** Ninguno.
+- **Descripción:** Taggear v2.0.0 en el repo de la skill y subir sus commits y el tag; subir package.json del kit a 1.8.0 (docs-check, skill fuera del kit, reglas renumeradas), taggear y subir. Los releases de GitHub los hace el operador.
+- **Decisiones/temas a definir antes de empezar:** Confirmar el destino (origin de cada repo), los números de versión y si se publican releases de GitHub.
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Surgida al cerrar las Tareas 54 y 55: la skill quedó en 2.0.0 sin tag ni push, y package.json del kit sigue en 1.7.0 con más de 40 commits posteriores.
 - **Agregada:** 2026-10-11.
 
 <!-- agent-context-kit:section=blocked -->

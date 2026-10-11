@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-11 — ✅ Tarea 56 — Unificar voseo y tuteo en los flujos y plantillas de la skill
+
+- Commits: skill 2c6d7ba y 96c291c; kit e304cc2 y 716e368.
+
 ## 2026-10-11 — ✅ Tarea 55 — Unificar el orden de las reglas en la plantilla rules.md (Regla 9 entre la 4 y la 5)
 
 - Commits: skill bf8369f y 0df184c; kit 5678bb1.
