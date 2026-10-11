@@ -11,6 +11,13 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-10 — ✅ Tarea 47 — Revisar el versionado de la skill y registrar su versión en la documentación generada
+
+- La skill ahora deja su versión en la documentación que genera y detecta cuando un proyecto se creó con una versión distinta, para poder avisar al reusarla con una versión más reciente.
+- La versión va como comentario en la línea 1 de rules.md; el nuevo docs/version-check.md la compara con la de la skill, avisa y, si el operador acepta, muestra qué reglas fijas difieren de la plantilla, sin editar nada por su cuenta. docs-check avisa si el marcador falta o está mal formado, y un test exige que plugin.json, SKILL.md, el marcador y los tags coincidan. Se corrigió además la URL de la firma de handoff.md.
+- Publicada como 1.9.0 (tag v1.9.0). Actualizar los proyectos automáticamente queda para la Tarea 48.
+- Commits (skill): e733e40 y 98fad18. Commits (kit): c6a36ec, e9e468a y 64c141c. bun test 1018 pass, typecheck ok.
+
 ## 2026-10-10 — ✅ Tarea 46 — Hacer template-architecture.md de la skill independiente del repo kit
 
 - template-architecture.md de la skill dejó de depender del kit: ya no se presenta como documentación de «este repo (agent-context-kit)» ni nombra los scripts del kit (task-tracker), para que la skill se pueda usar y publicar sola.

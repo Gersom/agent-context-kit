@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 48
+**Próximo número de tarea:** 49
 
 ---
 
@@ -48,13 +48,13 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 47 — Revisar el versionado de la skill y registrar su versión en la documentación generada
+### Tarea 48 — Actualizar la documentación de un proyecto al cambiar de versión de la skill (changelog y migración)
 
-- **Descripción:** Revisar cómo se versiona la skill (versión en plugin.json, tags vX.Y.Z, bump patch/minor/major) y hacer que, al generar o actualizar la documentación de un proyecto, la skill escriba su versión dentro de docs/, para detectar cuando se vuelve a usar con una versión más reciente.
-- **Decisiones/temas a definir antes de empezar:** Dónde va la versión dentro de docs/ (¿un archivo propio, el README de docs/, un comentario ancla en AGENTS.md o rules.md?); qué hace la skill al detectar una versión más nueva (avisar, proponer migrar, actualizar plantillas); de dónde lee su versión (plugin.json) y cómo se mantiene sincronizada con el tag; qué valida docs-check; qué pasa con los proyectos ya generados, que no tienen versión.
-- **Bloqueos:** Ninguno.
+- **Descripción:** Hacer que la skill, al detectar que el proyecto tiene una versión más vieja, aplique los cambios de las partes fijas con confirmación del operador, en vez de solo avisar y mostrar las diferencias.
+- **Decisiones/temas a definir antes de empezar:** Formato y ubicación del changelog por versión; cómo se describe cada cambio para poder aplicarlo (qué reescribir y cómo); qué hacer con las partes fijas que el proyecto adaptó a mano (pisar, fusionar o preguntar); cómo migrar saltos de varias versiones (de 1.6 a 1.9); cómo se prueba con proyectos de versiones anteriores.
+- **Bloqueos:** `[Resuelto el 2026-10-10]` — era `[dependencia]` depende de la Tarea 47 (marcador de versión en la documentación generada y aviso de versión más vieja).
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Surgió al cerrar la Tarea 3 (plugin 1.8.0, tag v1.8.0 en Gersom/agent-context-skill). Relacionada con la Tarea 46 (template-architecture.md independiente del kit) y con la migración entre versiones (migration-flow.md). Afecta al repo de la skill y, si docs-check valida la versión, al kit.
+- **Detalles:** Surgió al diseñar la Tarea 47: allí la skill solo avisa y ofrece revisar comparando las reglas fijas con la plantilla; acá se agrega la actualización con confirmación sobre el mismo marcador. Afecta al repo de la skill y, si docs-check valida el changelog, al kit.
 - **Agregada:** 2026-10-10.
 
 <!-- agent-context-kit:section=blocked -->
