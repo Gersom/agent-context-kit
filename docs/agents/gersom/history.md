@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-11 — ✅ Tarea 55 — Unificar el orden de las reglas en la plantilla rules.md (Regla 9 entre la 4 y la 5)
+
+- Commits: skill bf8369f y 0df184c; kit 5678bb1.
+
 ## 2026-10-11 — ✅ Tarea 54 — Confirmar si falta publicar el release del kit (package.json 1.7.0, último tag v1.5.0)
 
 - Sin commits de contenido: solo tags v1.6.0 (3021dd5) y v1.7.0 (2970f5b).
