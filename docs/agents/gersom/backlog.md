@@ -48,14 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 54 — Confirmar si falta publicar el release del kit (package.json 1.7.0, último tag v1.5.0)
-
-- **Descripción:** Surgió al cerrar la Tarea 50; falta detallarla.
-- **Decisiones/temas a definir antes de empezar:** Ninguno.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Agregada:** 2026-10-11.
-
 ### Tarea 55 — Unificar el orden de las reglas en la plantilla rules.md (Regla 9 entre la 4 y la 5)
 
 - **Descripción:** Surgió al cerrar la Tarea 50; falta detallarla.
