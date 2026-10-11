@@ -11,6 +11,13 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-10 — ✅ Tarea 49 — Corregir los huecos pendientes de migration-flow.md
+
+- Se corrigieron los huecos de migration-flow.md que la auditoría de la Tarea 48 había encontrado, para que migrar documentación de otro sistema sea verificable y no deje duplicados.
+- El umbral pasa a 3 archivos o 30 %, se buscan docs/, doc/, documentation/ y archivos sueltos de la raíz (sin .claude/), hay una sola precondición de git limpio, un paso para retirar los originales con confirmación, subrutas en docs/others/ y avisos de punteros viejos; «Pasar de plano a multi-operador» se movió a multi-operator.md con tres correcciones, y el chequeo «ya existe» ahora exige firma o marcador y, si faltan, pregunta de quién es la documentación.
+- Publicada como 1.11.0 (tag v1.11.0). Probado con claude -p sobre un repo con documentación de otro sistema y sobre uno con carpetas sin firma ni marcador.
+- Commits (skill): ef7e151, 379a5e2, 34c642d y f960c64. Commits (kit): b5a81a8 y 11f8f4e. bun test 1025 pass, typecheck ok.
+
 ## 2026-10-10 — ✅ Tarea 48 — Actualizar la documentación de un proyecto al cambiar de versión de la skill (changelog y migración)
 
 - La skill ahora puede actualizar un proyecto ya generado cuando se vuelve a usar con una versión más reciente, en vez de solo avisar.
