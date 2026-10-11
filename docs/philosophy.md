@@ -43,7 +43,7 @@ Los scripts de `scripts/` (el task-tracker y los que vengan) son un atajo, nunca
 
 Como los archivos se editan a mano, las herramientas tienen que convivir con eso:
 
-- Los parsers aceptan ediciones razonables (espacios, orden de campos, texto libre) y usan anclas de máquina (`<!-- agent-context-kit:section=... -->`) en vez de depender del idioma de los headers.
+- Los parsers aceptan ediciones razonables (espacios, orden de campos, texto libre) y usan anclas de máquina (`<!-- agent-context-skill:section=... -->`) en vez de depender del idioma de los headers.
 - Lo que no puedan leer se avisa con archivo y línea; no se ignora en silencio.
 - Una herramienta que modifica un archivo hace edición quirúrgica: no reformatea lo que no toca y el diff muestra solo el cambio pedido.
 

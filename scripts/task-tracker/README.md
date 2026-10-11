@@ -113,7 +113,7 @@ El tachado usa el código de tachado de la terminal: Windows Terminal, VS Code y
 
 El script no depende del idioma de la documentación (los headers se traducen por proyecto). Lo que usa está descrito en `docs/template-architecture.md` de la skill, sección "Anclas de sección":
 
-- **Anclas de sección** en `handoff.md` y `backlog.md`: comentarios `<!-- agent-context-kit:section=<id> -->` antes de cada sección (`in-progress`, `paused`, `free`, `blocked`, `grouped`). Si un archivo no tiene ninguna, el script usa un **plan B**: toma las secciones `##` por orden de aparición y lo avisa en pantalla.
+- **Anclas de sección** en `handoff.md` y `backlog.md`: comentarios `<!-- agent-context-skill:section=<id> -->` antes de cada sección (`in-progress`, `paused`, `free`, `blocked`, `grouped`). Si un archivo no tiene ninguna, el script usa un **plan B**: toma las secciones `##` por orden de aparición y lo avisa en pantalla.
 - **Tareas:** headers `### Tarea N — título` (`####` dentro de un grupo), con `—`, `–` o `-`. La tarea en progreso es la primera línea `Tarea N — título` de su sección, antes de la primera subsección.
 - **Bloqueos:** el tag con el que **empieza** el campo. Si empieza con `[Resuelto…]`, es historial y no cuenta; por eso, cuando una tarea se vuelve a bloquear, el bloqueo vigente va primero y el historial después.
 - **`history.md`:** entradas `## <fecha> — ✅|❌ [Tarea N —] título`, las nuevas arriba. No lleva anclas.

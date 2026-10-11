@@ -16,11 +16,11 @@ Tareas **sin dueño** del proyecto, visibles para todos los operadores. Las tare
 - **Bloqueos:** "Ninguno", o un valor que **empieza** con `[dependencia]` (no se puede empezar técnicamente) o `[postergada]` (conviene esperar) y el motivo. Con bloqueo va en "bloqueadas / pospuestas"; si no, en "libres".
 - **Agregada:** fecha y operador.
 
-**Anclas de sección:** no borres ni muevas los comentarios `<!-- agent-context-kit:section=... -->` (`free`, `blocked`) que preceden a cada sección: los usa el script de seguimiento de tareas.
+**Anclas de sección:** no borres ni muevas los comentarios `<!-- agent-context-skill:section=... -->` (`free`, `blocked`) que preceden a cada sección: los usa el script de seguimiento de tareas.
 
 ---
 
-<!-- agent-context-kit:section=free -->
+<!-- agent-context-skill:section=free -->
 ## Tareas libres
 
 ### Prompt de normalización para repos que ya adoptaron el skill
@@ -31,7 +31,7 @@ Tareas **sin dueño** del proyecto, visibles para todos los operadores. Las tare
 - **Detalles:** antes estaba dentro de la `T-11@gersom`. La `T-15@gersom` (validador) puede servir para verificar el resultado del prompt en cada repo. Era la Tarea 19 de gersom; ese número queda retirado.
 - **Agregada:** 2026-10-05 por gersom
 
-<!-- agent-context-kit:section=blocked -->
+<!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
 Ninguna.
