@@ -10,7 +10,7 @@ import { normalizeEol } from "../../_shared/parse/positions.ts";
 import { parseTeamBacklog } from "../../_shared/parse/team-backlog.ts";
 import type { DocKind } from "../../task-manager/src/workspace/docs.ts";
 import type { Workspace } from "../../task-manager/src/workspace/workspace.ts";
-import type { CheckContext, DocInfo, RootFileInfo } from "./types.ts";
+import type { CheckContext, DocInfo, RootFileInfo, RulesInfo } from "./types.ts";
 
 /** Archivos de la raíz que llevan el bloque del skill. */
 export const ROOT_FILES = ["AGENTS.md", "CLAUDE.md"];
@@ -37,10 +37,20 @@ export function readRootFiles(projectDir: string, read: ReadFile): RootFileInfo[
   });
 }
 
+/** Cuántas líneas de `rules.md` se conservan: el marcador de versión va en las primeras. */
+export const RULES_HEAD_LINES = 3;
+
+/** `rules.md` de la carpeta de agentes: su cabecera, o vacía si no existe. */
+export function makeRules(file: string, raw: string | null): RulesInfo {
+  const text = normalizeEol(raw ?? "").text;
+  return { file, exists: raw !== null, head: text.split("\n").slice(0, RULES_HEAD_LINES).join("\n") };
+}
+
 /** Contexto completo de un espacio de trabajo resuelto. */
 export function buildContext(workspace: Workspace, read: ReadFile): CheckContext {
   const { projectDir, files } = workspace;
   const rel = (path: string) => relativeTo(projectDir, path);
+  const rulesFile = join(workspace.agentsRoot, "rules.md");
   return {
     mode: workspace.mode,
     docs: {
@@ -49,6 +59,7 @@ export function buildContext(workspace: Workspace, read: ReadFile): CheckContext
       history: makeDoc("history", rel(files.history), read(files.history), parseHistory),
       teamBacklog: files.teamBacklog ? makeDoc("team-backlog", rel(files.teamBacklog), read(files.teamBacklog), parseTeamBacklog) : null,
     },
+    rules: makeRules(rel(rulesFile), read(rulesFile)),
     rootFiles: readRootFiles(projectDir, read),
     operatorsFile: workspace.mode === "multi" ? rel(join(workspace.agentsRoot, "operators.md")) : null,
     operatorWarnings: workspace.warnings,

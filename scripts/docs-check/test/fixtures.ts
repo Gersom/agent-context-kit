@@ -230,6 +230,11 @@ function rootBlock(name: string): string {
 export const ROOT_AGENTS = `# Mi proyecto\n\n${rootBlock("AGENTS.md")}`;
 export const ROOT_CLAUDE = rootBlock("CLAUDE.md");
 
+// -- rules.md de la carpeta de agentes -------------------------------------------------------------
+
+/** rules.md de la plantilla: lleva el marcador de versión de la skill en la línea 1. */
+export const RULES = template("agents", "rules.md");
+
 // -- Variantes ----------------------------------------------------------------------------------
 
 /** Backlog válido sin tareas, con «Próximo número de tarea» en `next`. */

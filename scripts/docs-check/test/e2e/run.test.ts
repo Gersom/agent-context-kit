@@ -61,6 +61,7 @@ function brokenTree(): Tree {
     .replace("unificar el tono.", "[Placeholder]")
     .replace("- **Bloqueos:** Ninguno.\n- **Disparador:**", "- **Bloqueos:** `[dependencia]` falta algo.\n- **Disparador:**");
   tree["docs/agents/history.md"] = HISTORY.replace("❌ Tarea 2", "Tarea 2");
+  tree["docs/agents/rules.md"] = "# Reglas del proyecto\n";
   return tree;
 }
 
@@ -72,6 +73,7 @@ const BROKEN_CODES = [
   "next-number",
   "placeholder",
   "root-file",
+  "skill-version",
   "task-duplicate",
   "task-heading",
 ];
@@ -194,6 +196,45 @@ describe("repo multi-operador válido", () => {
     const ana = await checkJson([q.root], { email: "ana@mail.com" });
     expect(ana.code).toBe(1);
     expect(ana.findings.map((f) => [f.code, f.file])).toEqual([["next-number", "docs/agents/ana/backlog.md"]]);
+  });
+});
+
+describe("marcador de versión de la skill en rules.md", () => {
+  const RULES_FILE = "docs/agents/rules.md";
+
+  test("repo plano sin rules.md: no se reporta nada", async () => {
+    const tree = flatTree();
+    delete tree[RULES_FILE];
+    expect((await checkJson([project(tree).root])).findings).toEqual([]);
+  });
+
+  test("repo plano sin marcador: aviso skill-version, código 0 y 1 con --strict", async () => {
+    const tree = flatTree();
+    tree[RULES_FILE] = "# Reglas del proyecto\n";
+    const q = project(tree);
+    const report = await checkJson([q.root]);
+    expect(report).toMatchObject({ code: 0, ok: true, errors: 0, warnings: 1 });
+    expect(report.findings).toMatchObject([{ severity: "warning", code: "skill-version", file: RULES_FILE, line: null }]);
+    expect((await check([q.root, "--strict"])).code).toBe(1);
+  });
+
+  test("marcador mal formado: aviso con su línea", async () => {
+    const tree = flatTree();
+    tree[RULES_FILE] = "# Reglas del proyecto\n<!-- agent-context-kit:version 1.9 -->\n";
+    const report = await checkJson([project(tree).root]);
+    expect(report.findings).toMatchObject([{ severity: "warning", code: "skill-version", file: RULES_FILE, line: 2 }]);
+  });
+
+  test("multi-operador: se revisa el rules.md compartido de la carpeta de agentes", async () => {
+    const tree = multiTree();
+    tree[RULES_FILE] = "# Reglas del proyecto\n";
+    const report = await checkJson([project(tree).root], { email: "ana@mail.com" });
+    expect(report.findings).toMatchObject([{ severity: "warning", code: "skill-version", file: RULES_FILE }]);
+  });
+
+  test("con CRLF el marcador se reconoce", async () => {
+    const report = await checkJson([project(toCrlf(flatTree())).root]);
+    expect(report.findings).toEqual([]);
   });
 });
 

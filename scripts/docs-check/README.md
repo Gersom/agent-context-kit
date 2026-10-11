@@ -30,6 +30,7 @@ Cada hallazgo lleva archivo, línea (cuando aplica) y un código. **Error:** el 
 | `file-missing` | error / aviso | Falta `handoff.md` o `backlog.md` (error); `history.md` o `team-backlog.md` (aviso). |
 | `operators-unreadable` | aviso | Líneas de `operators.md` que no se pudieron leer. |
 | `root-file` | aviso | Falta `AGENTS.md` o `CLAUDE.md`, o no llevan el bloque del skill ni mencionan `docs/agents`. |
+| `skill-version` | aviso | `rules.md` de la carpeta de agentes sin el marcador de versión de la skill (`<!-- agent-context-kit:version X.Y.Z … -->`) en sus primeras 3 líneas, o con la versión mal formada. Los proyectos generados antes de la 1.9.0 no lo tienen. Si no hay `rules.md`, no dice nada. |
 | `anchor-missing` | error | Falta una sección esperada (`in-progress`, `paused`, `free`, `blocked`, `grouped`). |
 | `anchor-fallback` | aviso | La sección no tiene ancla y se ubicó por orden (plan B). |
 | `anchor-duplicate` | aviso | Una misma ancla repetida (el parseo descarta el segundo en silencio). |
@@ -58,7 +59,7 @@ scripts/docs-check/
 │   ├── lines.ts        # Recorre líneas ignorando comentarios HTML y bloques de código
 │   ├── report.ts       # Informe de texto y JSON
 │   ├── types.ts        # Finding, CheckContext
-│   └── checks/         # Un archivo por familia: files, anchors, placeholders, tasks, handoff, history
+│   └── checks/         # Un archivo por familia: files, skill-version, anchors, placeholders, tasks, handoff, history
 └── test/             # Espejo de src/ + e2e/ con proyectos reales en un directorio temporal
 ```
 

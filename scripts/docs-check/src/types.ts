@@ -45,9 +45,19 @@ export interface RootFileInfo {
   text: string;
 }
 
+/** `rules.md` de la carpeta de agentes compartida: solo se lee su cabecera (donde va el marcador de versión). */
+export interface RulesInfo {
+  /** Ruta relativa a la raíz del proyecto, con `/` (también si no existe: dónde debería estar). */
+  file: string;
+  exists: boolean;
+  /** Las primeras líneas del archivo (LF); vacío si no existe. */
+  head: string;
+}
+
 export interface CheckContext {
   mode: "flat" | "multi";
   docs: DocSet;
+  rules: RulesInfo;
   rootFiles: RootFileInfo[];
   /** Ruta relativa de `operators.md`; `null` en el repo plano. */
   operatorsFile: string | null;

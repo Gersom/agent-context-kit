@@ -11,8 +11,9 @@ import { normalizeEol } from "../../_shared/parse/positions.ts";
 import { parseTeamBacklog } from "../../_shared/parse/team-backlog.ts";
 import type { Io } from "../../task-manager/src/cli/types.ts";
 import type { DocKind } from "../../task-manager/src/workspace/docs.ts";
+import { makeRules } from "../src/context.ts";
 import type { CheckContext, DocInfo, Finding, RootFileInfo } from "../src/types.ts";
-import { BACKLOG, HANDOFF, HISTORY, OPERATORS, ROOT_AGENTS, ROOT_CLAUDE, TEAM_BACKLOG } from "./fixtures.ts";
+import { BACKLOG, HANDOFF, HISTORY, OPERATORS, ROOT_AGENTS, ROOT_CLAUDE, RULES, TEAM_BACKLOG } from "./fixtures.ts";
 
 export interface ContextOptions {
   /** Modo del repo; por defecto `flat`, o `multi` si se pasa `teamBacklog`. */
@@ -23,6 +24,8 @@ export interface ContextOptions {
   history?: string | null;
   /** Solo en multi (se asume `multi` si se pasa); `null` = no existe. En multi, por defecto el fixture válido. */
   teamBacklog?: string | null;
+  /** rules.md de la carpeta de agentes (compartida); `null` = no existe. Por defecto, el de la plantilla con su marcador. */
+  rules?: string | null;
   /** AGENTS.md y CLAUDE.md de la raíz; `null` = no existen. */
   agentsMd?: string | null;
   claudeMd?: string | null;
@@ -61,6 +64,7 @@ export function makeCtx(options: ContextOptions = {}): CheckContext {
       history: doc("history", `${dir}/history.md`, options.history, HISTORY, parseHistory),
       teamBacklog: team,
     },
+    rules: makeRules(`${PATHS.flat}/rules.md`, options.rules === undefined ? RULES : options.rules),
     rootFiles: [rootFile("AGENTS.md", options.agentsMd, ROOT_AGENTS), rootFile("CLAUDE.md", options.claudeMd, ROOT_CLAUDE)],
     operatorsFile: mode === "multi" ? PATHS.operators : null,
     operatorWarnings: options.operatorWarnings ?? [],
@@ -129,6 +133,7 @@ export function flatTree(): Tree {
   return {
     "AGENTS.md": ROOT_AGENTS,
     "CLAUDE.md": ROOT_CLAUDE,
+    "docs/agents/rules.md": RULES,
     "docs/agents/handoff.md": HANDOFF,
     "docs/agents/backlog.md": BACKLOG,
     "docs/agents/history.md": HISTORY,
@@ -140,6 +145,7 @@ export function multiTree(): Tree {
   return {
     "AGENTS.md": ROOT_AGENTS,
     "CLAUDE.md": ROOT_CLAUDE,
+    "docs/agents/rules.md": RULES,
     "docs/agents/operators.md": OPERATORS,
     "docs/agents/team-backlog.md": TEAM_BACKLOG,
     "docs/agents/gersom/handoff.md": HANDOFF,

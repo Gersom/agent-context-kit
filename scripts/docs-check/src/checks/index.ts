@@ -7,12 +7,14 @@ import { checkFilesExist, checkOperatorsReadable, checkRootFiles } from "./files
 import { checkCurrentTask } from "./handoff.ts";
 import { checkHistoryEntries } from "./history.ts";
 import { checkPlaceholders } from "./placeholders.ts";
+import { checkSkillVersion } from "./skill-version.ts";
 import { checkBlockTags, checkDuplicateNumbers, checkNextNumber, checkTaskFields, checkTaskHeadings } from "./tasks.ts";
 
 export const CHECKS: Check[] = [
   checkFilesExist,
   checkOperatorsReadable,
   checkRootFiles,
+  checkSkillVersion,
   checkAnchors,
   checkPlaceholders,
   checkNextNumber,
