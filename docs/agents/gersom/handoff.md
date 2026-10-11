@@ -14,21 +14,7 @@ Estado "en caliente": en qué se está ahora. **Se actualiza editando solo lo qu
 <!-- agent-context-kit:section=in-progress -->
 ## Tarea en progreso
 
-Tarea 53 — Actualizar los pendientes desactualizados de docs/desing.md
-
-Surgió al cerrar la Tarea 50; falta detallarla.
-
-### Qué falta
-
-Toda la tarea.
-
-### Decisiones a medio camino
-
-Ninguna.
-
-### Próximo paso concreto
-
-Empezar la tarea.
+Sin tarea en curso
 
 <!-- agent-context-kit:section=paused -->
 ## Tareas pausadas
