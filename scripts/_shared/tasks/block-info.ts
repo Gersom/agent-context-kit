@@ -14,7 +14,7 @@ const PLACEHOLDER_TAG_RE = /^placeholder/i;
  * en cualquier campo porque las etiquetas están traducidas, pero un tag solo cuenta si es el
  * **inicio** del valor del campo (así un `[algo]` en medio de una descripción no se toma como
  * bloqueo):
- * - Si el tag inicial es `[Resuelto…]`, el campo entero es historial (Regla 7) y se salta.
+ * - Si el tag inicial es `[Resuelto…]`, el campo entero es historial (Regla 8) y se salta.
  * - Si no, es el bloqueo vigente. Por convención, cuando una tarea se vuelve a bloquear, el
  *   bloqueo vigente va primero y el historial resuelto después (ver "Anclas de sección" en
  *   src/docs/template-architecture.md), así que el motivo se corta donde empieza ese historial.

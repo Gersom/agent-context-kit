@@ -86,26 +86,26 @@ describe.skipIf(!hasSkill)("política de lectura: AGENTS.md", () => {
 });
 
 describe("política de lectura: rules.md", () => {
-  // Las Reglas 5 a 8 van en la sección final de cierre, tanto en la plantilla de la skill como en el rules.md del kit.
+  // Las Reglas 6 a 9 van en la sección final de cierre, tanto en la plantilla de la skill como en el rules.md del kit.
   const checkRules = (text: string) => {
     const closing = text.indexOf("## Al cerrar una tarea");
     expect(closing).toBeGreaterThan(0);
-    for (const n of [1, 2, 3, 4]) {
+    for (const n of [1, 2, 3, 4, 5]) {
       const at = text.indexOf(`\n${n}. **`);
       expect(at).toBeGreaterThan(0);
       expect(at).toBeLessThan(closing);
     }
-    for (const n of [5, 6, 7, 8]) {
+    for (const n of [6, 7, 8, 9]) {
       expect(text.indexOf(`\n${n}. **`)).toBeGreaterThan(closing);
     }
     expect(text.slice(closing + 1)).not.toMatch(/\n## /);
   };
 
-  test.skipIf(!hasSkill)("skill/template/agents/rules.md deja las Reglas 5 a 8 en la sección final de cierre", () => {
+  test.skipIf(!hasSkill)("skill/template/agents/rules.md deja las Reglas 6 a 9 en la sección final de cierre", () => {
     checkRules(readSkill("template/agents/rules.md"));
   });
 
-  test("docs/agents/rules.md deja las Reglas 5 a 8 en la sección final de cierre", () => {
+  test("docs/agents/rules.md deja las Reglas 6 a 9 en la sección final de cierre", () => {
     checkRules(readRoot("docs/agents/rules.md"));
   });
 });

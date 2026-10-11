@@ -1,4 +1,4 @@
-// Lo que comparten `unblock` y `close` (Regla 7 de rules.md): decidir qué tareas bloqueadas dejaron
+// Lo que comparten `unblock` y `close` (Regla 8 de rules.md): decidir qué tareas bloqueadas dejaron
 // de estarlo y moverlas al final de «Tareas libres» con su `Bloqueos` resuelto. `unblock` mira lo que
 // `history.md` ya dice; `close` además cuenta como cerrada la tarea que está cerrando (todavía no
 // figura en `history.md` cuando se calcula).

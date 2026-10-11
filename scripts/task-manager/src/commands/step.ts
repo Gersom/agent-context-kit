@@ -1,5 +1,5 @@
 // `step`: marca (o con `--undo` desmarca) pasos del «Plan» de la tarea en curso y pone al día los
-// textos de handoff.md que dependen del avance (Regla 6 de rules.md): «Qué falta» y «Próximo paso
+// textos de handoff.md que dependen del avance (Regla 7 de rules.md): «Qué falta» y «Próximo paso
 // concreto». Esos dos se reescriben solos únicamente si siguen con el texto que dejó el script
 // (el de `start` o el que `step` mismo generó); un texto que alguien escribió no se toca sin el flag
 // correspondiente (`--falta`, `--proximo`; `--decisiones` nunca es automático). Sin `--apply` solo
@@ -132,6 +132,6 @@ export const step: Command = {
       if (steps.length) io.out(`Plan ${done}/${steps.length}${pendingAfter[0] ? ` — siguiente: ${pendingAfter[0]}` : " — completo"} (${relFile(ws, handoff.path)}).`);
       if (updated.length) io.out(`Actualizado: ${updated.join(", ")}.`);
     }
-    for (const { label, flag } of stale) io.out(`Aviso: «${label}» tiene un texto propio y no lo toqué; si ya no vale, actualízalo con ${flag} (Regla 6).`);
+    for (const { label, flag } of stale) io.out(`Aviso: «${label}» tiene un texto propio y no lo toqué; si ya no vale, actualízalo con ${flag} (Regla 7).`);
   },
 };

@@ -246,7 +246,7 @@ describe("helpers del render", () => {
     expect(triggerText({ kind: "redraw" })).toBe("redibujado");
   });
 
-  test("dependencyText con la pista de la Regla 7 si ya está cerrada", () => {
+  test("dependencyText con la pista de la Regla 8 si ya está cerrada", () => {
     expect(dependencyText({ number: 3, title: "Exportar", closed: false })).toBe("→ espera T-3: Exportar");
     expect(dependencyText({ number: 9, title: null, closed: true })).toBe("→ espera T-9 (cerrada ✔ — ¿moverla a libres?)");
   });

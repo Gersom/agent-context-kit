@@ -167,7 +167,7 @@ export interface TaskRef {
   number: number;
   /** Título si se encontró en backlog, handoff o history; `null` si no. */
   title: string | null;
-  /** `true` si la tarea ya figura cerrada en history.md (pista para la Regla 7). */
+  /** `true` si la tarea ya figura cerrada en history.md (pista para la Regla 8). */
   closed: boolean;
 }
 

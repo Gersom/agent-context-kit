@@ -70,9 +70,9 @@ describe("status", () => {
   test("bloqueadas: tag, tareas que menciona (con su estado) y candidatas a desbloquear", async () => {
     const p = project({ folders: ["gersom"], ...RICH });
     const { out } = await exec(["status"], p);
-    expect(out).toContain("  - Tarea 6 — Publicar el sitio [dependencia] → Tarea 11 (cerrada) ⇒ candidata a desbloquear (Regla 7)");
+    expect(out).toContain("  - Tarea 6 — Publicar el sitio [dependencia] → Tarea 11 (cerrada) ⇒ candidata a desbloquear (Regla 8)");
     expect(out).toContain("  - Tarea 7 — Rehacer el README [postergada] → Tarea 11 (cerrada), Tarea 3 (libre)\n");
-    expect(out).toContain("  - Tarea 16 — Revisar la licencia ⇒ candidata a desbloquear (Regla 7)");
+    expect(out).toContain("  - Tarea 16 — Revisar la licencia ⇒ candidata a desbloquear (Regla 8)");
     expect(out).toContain("  - Tarea 17 — Migrar a otro host [postergada] → hasta nuevo aviso del operador.\n");
   });
 
@@ -211,7 +211,7 @@ describe("next", () => {
     expect(out).toContain("Pausadas (retomables):\n  - Tarea 8 — Migrar la documentación vieja (plan 1/2)");
     const free = lines.slice(lines.indexOf("Libres (en el orden del archivo):") + 1, lines.indexOf("Libres del team-backlog (se toman por título):"));
     expect(free.map((l) => l.match(/Tarea (\d+)/)?.[1])).toEqual(["1", "14", "15", "3", "18"]);
-    expect(out).toContain("Bloqueadas que podrían desbloquearse (Regla 7):");
+    expect(out).toContain("Bloqueadas que podrían desbloquearse (Regla 8):");
     expect(out).toContain("Tarea 6 — Publicar el sitio [dependencia] → Tarea 11 (cerrada) ⇒ candidata");
     expect(out).toContain("Tarea 16 — Revisar la licencia");
     expect(out).not.toContain("Tarea 7 —");

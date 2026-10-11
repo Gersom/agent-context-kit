@@ -127,7 +127,7 @@ describe("buildModel", () => {
     ].join("\n");
     const model = buildModel({ handoffText: fixture("minimal", "handoff.md"), backlogText: backlog });
     expect(model.blocked[0].block.tag).toBeNull();
-    expect(model.warnings).toEqual(['Tarea 8 está en "bloqueadas" sin bloqueo vigente: ¿moverla a libres? (Regla 7)']);
+    expect(model.warnings).toEqual(['Tarea 8 está en "bloqueadas" sin bloqueo vigente: ¿moverla a libres? (Regla 8)']);
   });
 
   test("avisa placeholders sin completar", () => {

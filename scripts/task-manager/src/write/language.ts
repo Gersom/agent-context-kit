@@ -78,7 +78,7 @@ export interface Strings {
   // Lo que escribe `close`.
   /** Descripción de una tarea nueva que surgió al cerrar otra. */
   raisedWhenClosing(task: string, number: number): string;
-  /** Títulos del reporte de cierre (Regla 8 de rules.md). */
+  /** Títulos del reporte de cierre (Regla 9 de rules.md). */
   report: { done: string; discarded: string; unblocked: string; created: string };
 }
 

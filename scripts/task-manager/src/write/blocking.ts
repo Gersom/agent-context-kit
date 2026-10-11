@@ -1,6 +1,6 @@
 // Lo que comparten `block` y `unblock`: reescribir el campo `Bloqueos` de una tarea del backlog y
 // mover su bloque entre «Tareas libres» y «Tareas bloqueadas / pospuestas». Sin formato nuevo: el
-// campo sigue las convenciones de backlog.md y de la Regla 7 de rules.md (`` `[dependencia]` motivo ``
+// campo sigue las convenciones de backlog.md y de la Regla 8 de rules.md (`` `[dependencia]` motivo ``
 // al bloquear; `` `[Resuelto el <fecha>]` — era `[tag]` motivo `` al desbloquear, sin borrar el motivo).
 
 import { LEADING_TAG_RE } from "../../../_shared/tasks/block-info.ts";

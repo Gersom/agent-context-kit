@@ -48,7 +48,7 @@ export function blockedText(task: BlockedInfo): string {
   if (task.tag) parts.push(`[${task.tag}]`);
   if (task.refs.length) parts.push(`→ ${task.refs.map(refText).join(", ")}`);
   else if (task.reason) parts.push(`→ ${shorten(task.reason, 70)}`);
-  if (task.unblockCandidate) parts.push("⇒ candidata a desbloquear (Regla 7)");
+  if (task.unblockCandidate) parts.push("⇒ candidata a desbloquear (Regla 8)");
   return parts.join(" ");
 }
 

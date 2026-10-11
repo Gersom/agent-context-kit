@@ -1,5 +1,5 @@
 // `close`: cierra una tarea, hecha (`--done --resumen`) o descartada (`--discarded --motivo`), con las
-// Reglas 5 a 8 de rules.md en una sola operación sobre todos los archivos (o ninguno):
+// Reglas 6 a 9 de rules.md en una sola operación sobre todos los archivos (o ninguno):
 // - `history.md`: la entrada `## <fecha> — ✅|❌ Tarea N — título` con el resumen o el motivo,
 //   arriba de las demás. Si la tarea traía `Origen: team-backlog`, la entrada lo conserva.
 // - `handoff.md`: la tarea en curso (o, con `close <N>`, una pausada) sale y «Tarea en progreso»
@@ -9,10 +9,10 @@
 //   solo se escribe la entrada ❌ y se saca su bloque del backlog. Una tarea sin empezar no se da por
 //   hecha: con `--done` es un error que manda a `start N`.
 // - `backlog.md`: si la tarea aún figura ahí (siempre, si es una tarea sin empezar), se saca; `--nueva "<título>"` (repetible) agrega tareas
-//   nuevas con los números de «Próximo número de tarea»; y se revisan las bloqueadas (Regla 7): las
+//   nuevas con los números de «Próximo número de tarea»; y se revisan las bloqueadas (Regla 8): las
 //   que dependían de tareas ya cerradas (contando esta) pasan a «Tareas libres» con `Bloqueos` →
 //   `[Resuelto el <fecha>] — <motivo original>`; las de texto libre se listan para revisar a mano.
-// Imprime el reporte de cierre (Regla 8). No cierra nada ambiguo: contenido ajeno en «Tarea en
+// Imprime el reporte de cierre (Regla 9). No cierra nada ambiguo: contenido ajeno en «Tarea en
 // progreso» es un error, como en `pause`. Sin `--apply` solo muestra el diff.
 
 import type { ParsedBacklog, ParsedHandoff } from "../../../_shared/types.ts";
@@ -136,7 +136,7 @@ export const close: Command = {
     const closing = kind === "current" ? closingCurrent(handoff) : kind === "paused" ? closingPaused(handoff, wanted!.number) : closingBacklog(backlog, source!);
     const { number } = closing;
 
-    // Dónde más figura: en history.md no se duplica; en backlog.md se saca (Regla 5); lo demás es una anomalía.
+    // Dónde más figura: en history.md no se duplica; en backlog.md se saca (Regla 6); lo demás es una anomalía.
     const places = findTask(docs, number);
     const own = closing.kind === "backlog" ? [source!] : places.filter((place) => place.place === (closing.kind === "current" ? "in-progress" : "paused"));
     if (own.length > 1) throw new CliError(`La Tarea ${number} aparece ${own.length} veces en handoff.md: una tarea vive en un solo lugar; corrígelo a mano. No se escribió nada.`);
@@ -153,7 +153,7 @@ export const close: Command = {
     const S = STRINGS[lang];
     const date = formatLocalDate(ctx.now());
 
-    // Regla 7: las bloqueadas que dependían de esta (y de otras ya cerradas).
+    // Regla 8: las bloqueadas que dependían de esta (y de otras ya cerradas).
     const state = buildState(docs);
     const review = reviewBlocked(state.blocked.filter((info) => info.number !== number), [number]);
     const withVerdict = (...verdicts: string[]) => review.infos.filter((info) => verdicts.includes(review.verdicts.get(info.number)!));
@@ -227,7 +227,7 @@ export const close: Command = {
     }
     const freeAfter = state.free.length - (leftoverFree ? 1 : 0) + unblocked.length + created.length;
     if (freeAfter > GROUPING_LIMIT) {
-      warnings.push(`«Tareas libres» queda con ${freeAfter} tareas (más de ${GROUPING_LIMIT}): evalúa agruparlas (Agrupamiento en backlog.md, Regla 7). No agrupo automáticamente.`);
+      warnings.push(`«Tareas libres» queda con ${freeAfter} tareas (más de ${GROUPING_LIMIT}): evalúa agruparlas (Agrupamiento en backlog.md, Regla 8). No agrupo automáticamente.`);
     }
     if (notice) warnings.push(notice);
 
@@ -277,7 +277,7 @@ function shortReason(text: string): string {
   return shorten(first.replace(/^\s*[-*]\s+/, ""), REASON_MAX);
 }
 
-/** El reporte de cierre de la Regla 8: cuatro secciones, las vacías se omiten. */
+/** El reporte de cierre de la Regla 9: cuatro secciones, las vacías se omiten. */
 function renderReport(
   { task: word, report: titles }: Pick<Strings, "task" | "report">,
   report: { resolved: Array<{ number: number; title: string }>; discarded: Array<{ number: number; title: string; reason: string }>; unblocked: Array<{ number: number; title: string }>; created: Array<{ number: number; title: string }> },

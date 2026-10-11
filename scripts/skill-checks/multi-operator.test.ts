@@ -53,7 +53,7 @@ describe.skipIf(!hasSkill)("modo multi-operador: plantillas", () => {
   test("el bloque de reglas no redefine las Reglas por defecto y se coloca antes de «Enlaces»", () => {
     const text = readSkill("template/multi/rules.md");
     expect(text).toContain("## Trabajo en paralelo (modo multi-operador)");
-    expect(text).toContain("Reglas 2 a 8");
+    expect(text).toContain("Reglas 2 a 9");
     expect(text).toContain("T-N@operador");
     expect(text).not.toMatch(/\n\d+\. \*\*/);
     expect(text).toContain("antes de \"## Enlaces\"");

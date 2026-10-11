@@ -91,7 +91,7 @@ export function buildModel({
   });
   for (const task of blocked) {
     if (!task.block.tag) {
-      warnings.push(`${task.label} ${task.number} está en "bloqueadas" sin bloqueo vigente: ¿moverla a libres? (Regla 7)`);
+      warnings.push(`${task.label} ${task.number} está en "bloqueadas" sin bloqueo vigente: ¿moverla a libres? (Regla 8)`);
     }
   }
 

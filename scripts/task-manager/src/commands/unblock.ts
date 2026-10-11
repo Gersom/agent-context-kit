@@ -1,5 +1,5 @@
 // `unblock [<N>]`: saca tareas de «Tareas bloqueadas / pospuestas» y las pone al final de «Tareas
-// libres» de tu `backlog.md` (Regla 7: `Bloqueos` no se borra, pasa a `` `[Resuelto el <fecha>]` — era
+// libres» de tu `backlog.md` (Regla 8: `Bloqueos` no se borra, pasa a `` `[Resuelto el <fecha>]` — era
 // `[tag]` motivo ``).
 // - Con `<N>`: desbloquea esa tarea, sin más condiciones (la decisión ya la tomó quien lo pide).
 // - Sin argumento: revisa todas las bloqueadas y desbloquea solas las que el motivo condiciona a

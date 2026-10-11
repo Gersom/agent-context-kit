@@ -61,7 +61,7 @@ export const next: Command = {
       withTrigger(team, (i) => team[i].title);
     }
     if (candidates.length) {
-      io.out("Bloqueadas que podrían desbloquearse (Regla 7):");
+      io.out("Bloqueadas que podrían desbloquearse (Regla 8):");
       for (const task of candidates) io.out(`  - ${blockedText(task)}`);
     }
     io.out(suggestion(mode, state.paused.length > 0));

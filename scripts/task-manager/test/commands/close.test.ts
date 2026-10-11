@@ -1,4 +1,4 @@
-// `close`: cierra una tarea (hecha o descartada) con las Reglas 5 a 8. Contra proyectos temporales:
+// `close`: cierra una tarea (hecha o descartada) con las Reglas 6 a 9. Contra proyectos temporales:
 // nunca se tocan los docs reales.
 
 import { afterAll, describe, expect, test } from "bun:test";
@@ -129,7 +129,7 @@ describe("close --discarded", () => {
     expect(out).toContain("**Tareas descartadas:**\n- Tarea 1 — Probar el flujo completo — Ya no hace falta.\n");
     expect(out).not.toContain("**Tareas resueltas:**");
     expect(history(p)).toContain("## 2026-10-07 — ❌ Tarea 1 — Probar el flujo completo\n\n- Ya no hace falta.\n- Lo cubre la Tarea 15.\n\n## 2026-10-07 — ✅ Tarea 11");
-    // Una descartada también cuenta como cerrada para la Regla 7.
+    // Una descartada también cuenta como cerrada para la Regla 8.
     expect(out).toContain("**Tareas desbloqueadas:**");
   });
 
@@ -172,7 +172,7 @@ describe("--nueva", () => {
     const titles = Array.from({ length: 10 }, (_, i) => ["--nueva", `Tarea extra ${i + 1}`]).flat();
     const { out } = await exec([...DONE, ...titles, "--apply"], p);
     // 4 libres tras empezar la 1 (incluidas las 2 del grupo) + 2 desbloqueadas (6 y 16) + 10 nuevas.
-    expect(out).toContain("Aviso: «Tareas libres» queda con 16 tareas (más de 15): evalúa agruparlas (Agrupamiento en backlog.md, Regla 7). No agrupo automáticamente.");
+    expect(out).toContain("Aviso: «Tareas libres» queda con 16 tareas (más de 15): evalúa agruparlas (Agrupamiento en backlog.md, Regla 8). No agrupo automáticamente.");
     expect(backlog(p)).not.toContain("### Grupo — Tareas extra");
   });
 });
@@ -257,7 +257,7 @@ describe("descartar una tarea sin empezar (libre o bloqueada)", () => {
     expect((await exec(["anchors"], p)).code).toBe(0);
   });
 
-  test("una bloqueada: se saca de «bloqueadas» (las demás se quedan) y la Regla 7 cuenta la descartada como cerrada", async () => {
+  test("una bloqueada: se saca de «bloqueadas» (las demás se quedan) y la Regla 8 cuenta la descartada como cerrada", async () => {
     const p = project({ folders: ["gersom"], ...IDLE });
     const { code, err, out } = await exec(DISCARD("17"), p);
     expect(err).toBe("");
@@ -478,7 +478,7 @@ describe("la tarea cerrada sigue en backlog.md", () => {
     return p;
   }
 
-  test("se saca de «libres» (Regla 5) y la sección queda con «Ninguna.»", async () => {
+  test("se saca de «libres» (Regla 6) y la sección queda con «Ninguna.»", async () => {
     const p = await leftover(BACKLOG_ONE);
     const { code, err } = await exec([...DONE, "--apply"], p);
     expect(err).toBe("");

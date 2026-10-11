@@ -102,7 +102,7 @@ El pie de la pantalla lista las teclas que valen en la vista actual como `[tecla
 - **Orden y flechas:** los recuadros van de arriba abajo como el flujo de una tarea: sin dueño (solo en modo multi-operador) → libres ⇅ bloqueadas → en progreso ⇅ pausadas → completadas. Entre cada par de recuadros que se muestran hay una línea con la transición: `↓ se toma` (desde sin dueño), `↓ bloquea · ↑ desbloquea` (entre libres y bloqueadas), `↓ empieza` (libres → en progreso) o `↓ empieza (desde libres)` (si hay bloqueadas entre medio: una bloqueada no empieza directo, primero se desbloquea), `↑ retoma · ↓ pausa` (entre en progreso y pausadas) y `↓ se cierra` (hacia completadas). No hay flecha hacia un recuadro que no se muestra; con el set mínimo (solo `handoff.md`) no hay ninguna.
 - **`history.md`:** las 5 últimas tareas cerradas, con su fecha. Las descartadas se marcan con ✖.
 - **`handoff.md`, en detalle:** la tarea en progreso con el avance de su plan y el resto de sus subsecciones (ej. "Qué falta", "Próximo paso concreto"), y cada tarea pausada con su plan (si lo trae: el campo opcional `Plan` de la plantilla) y todos sus demás campos. En los planes, el texto de los pasos ya hechos sale **tachado** (las tareas no se tachan, solo los pasos). Las etiquetas se muestran tal como están escritas en el documento, así que funciona en cualquier idioma.
-- **`backlog.md`, compacto:** libres (y sus grupos) y bloqueadas como `T-N: título`. Cada bloqueada muestra su tag (`[dependencia]`, `[postergada]`…) y las tareas que menciona su motivo; si alguna ya está cerrada en `history.md`, lo marca en amarillo como recordatorio de la Regla 7 (moverla a libres).
+- **`backlog.md`, compacto:** libres (y sus grupos) y bloqueadas como `T-N: título`. Cada bloqueada muestra su tag (`[dependencia]`, `[postergada]`…) y las tareas que menciona su motivo; si alguna ya está cerrada en `history.md`, lo marca en amarillo como recordatorio de la Regla 8 (moverla a libres).
 - **Avisos:** al final, fuera de los recuadros, lo que no se pudo leer o interpretar (ver abajo).
 
 `backlog.md` e `history.md` son opcionales: el set mínimo del skill solo genera `handoff.md`, y en ese caso sus recuadros no aparecen. Los recuadros PAUSADAS y BLOQUEADAS tampoco aparecen cuando no hay tareas de ese tipo (los demás se muestran siempre, con "Sin tarea en curso" o "Ninguna" si están vacíos).
@@ -126,7 +126,7 @@ El script no depende del idioma de la documentación (los headers se traducen po
 |---|---|
 | `… no tiene anclas de sección: se ubicaron las secciones por orden (plan B).` | El archivo es anterior a las anclas. Funciona, pero conviene agregarlas (el skill lo hace solo al actualizar el archivo). |
 | `… no se pudo leer (…): mostrando la versión de las HH:MM:SS.` | El archivo falló justo al leerlo (normalmente, un agente reescribiéndolo). Se corrige solo con el próximo cambio. |
-| `Tarea N está en "bloqueadas" sin bloqueo vigente: ¿moverla a libres? (Regla 7)` | Su campo `Bloqueos` solo tiene historial resuelto. |
+| `Tarea N está en "bloqueadas" sin bloqueo vigente: ¿moverla a libres? (Regla 8)` | Su campo `Bloqueos` solo tiene historial resuelto. |
 | `… tiene placeholders sin completar.` | Quedó texto `[Placeholder…]` de la plantilla. |
 | `Sin backlog.md (set mínimo del skill)…` | El proyecto usa el set mínimo; no es un error. |
 

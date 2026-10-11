@@ -80,12 +80,12 @@ export interface RefInfo {
 export interface BlockedInfo {
   number: number;
   title: string;
-  /** Tag vigente (`dependencia`, `postergada`...); `null` si el bloqueo ya no tiene (Regla 7). */
+  /** Tag vigente (`dependencia`, `postergada`...); `null` si el bloqueo ya no tiene (Regla 8). */
   tag: string | null;
   reason: string | null;
   /** Tareas que menciona el motivo. */
   refs: RefInfo[];
-  /** Candidata a desbloquear (Regla 7): todas las tareas que menciona están cerradas, o ya no tiene bloqueo vigente. */
+  /** Candidata a desbloquear (Regla 8): todas las tareas que menciona están cerradas, o ya no tiene bloqueo vigente. */
   unblockCandidate: boolean;
 }
 
@@ -285,7 +285,7 @@ export function buildState(docs: Docs): TaskState {
 
   const blocked = blockedInfos(docs);
   for (const task of blocked) {
-    if (!task.tag) warnings.push(`Tarea ${task.number} está en «bloqueadas» sin bloqueo vigente: ¿moverla a libres? (Regla 7)`);
+    if (!task.tag) warnings.push(`Tarea ${task.number} está en «bloqueadas» sin bloqueo vigente: ¿moverla a libres? (Regla 8)`);
   }
 
   const team = docs.teamBacklog?.exists

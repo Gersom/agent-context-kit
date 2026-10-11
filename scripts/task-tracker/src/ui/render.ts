@@ -441,7 +441,7 @@ function blockedRows(task: BlockedTask, row: Row, pc: Colors): void {
   for (const ref of task.dependsOn) row(5, { paint: ref.closed ? pc.yellow : secondary, text: dependencyText(ref) });
 }
 
-/** `→ espera T-3: título`, con la pista de la Regla 7 si esa tarea ya se cerró. */
+/** `→ espera T-3: título`, con la pista de la Regla 8 si esa tarea ya se cerró. */
 export function dependencyText(ref: TaskRef): string {
   const base = `→ espera ${shortTaskName(ref.number, ref.title)}`;
   return ref.closed ? `${base} (cerrada ✔ — ¿moverla a libres?)` : base;
