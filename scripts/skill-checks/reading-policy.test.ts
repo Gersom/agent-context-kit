@@ -32,8 +32,8 @@ describe.skipIf(!hasSkill)("política de lectura: migración", () => {
 
   test("pregunta por docs-legacy y por condensar antes de tocar nada", () => {
     const migration = readSkill("docs/migration-flow.md");
-    expect(migration).toContain("¿querés conservar la documentación vieja en `docs-legacy/`?");
-    expect(migration).toContain("¿querés condensar el texto");
+    expect(migration).toContain("¿quieres conservar la documentación vieja en `docs-legacy/`?");
+    expect(migration).toContain("¿quieres condensar el texto");
   });
 
   test("copia con comandos de archivo y verifica el respaldo en git si no se conserva", () => {
