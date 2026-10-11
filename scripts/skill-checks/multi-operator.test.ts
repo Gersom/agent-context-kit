@@ -68,11 +68,15 @@ describe.skipIf(!hasSkill)("modo multi-operador: flujos", () => {
     for (const name of MULTI_TEMPLATES) expect(flow).toContain(`template/multi/${name}`);
   });
 
-  test("migration-flow pasa de plano a multi con git mv y verifica el árbol limpio", () => {
+  test("multi-operator pasa de plano a multi con git mv y enlaza la precondición de árbol limpio de migration-flow", () => {
+    const multi = readSkill("docs/multi-operator.md");
+    expect(multi).toContain("## Pasar de plano a multi-operador");
+    expect(multi).toContain("`git mv`");
+    expect(multi).toContain("Precondición: git limpio");
     const flow = readSkill("docs/migration-flow.md");
-    expect(flow).toContain("## Pasar de plano a multi-operador");
-    expect(flow).toContain("git status --porcelain docs/agents");
-    expect(flow).toContain("`git mv`");
+    expect(flow).toContain("## Precondición: git limpio");
+    expect(flow).toContain("git status --porcelain");
+    expect(flow).not.toContain("## Pasar de plano a multi-operador");
   });
 
   test("SKILL.md enlaza el modo multi y el paso de plano a multi", () => {

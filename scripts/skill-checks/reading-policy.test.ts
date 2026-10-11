@@ -38,7 +38,7 @@ describe.skipIf(!hasSkill)("política de lectura: migración", () => {
 
   test("copia con comandos de archivo y verifica el respaldo en git si no se conserva", () => {
     const migration = readSkill("docs/migration-flow.md");
-    expect(migration).toContain("cp -r");
+    expect(migration).toContain("cp --parents");
     expect(migration).toContain("git status --porcelain");
   });
 });
