@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-11 — ✅ Tarea 57 — Aclarar o unificar los dos prefijos de marcador (agent-docs-skill y agent-context-kit)
+
+- Commits: skill 59465d4; kit d2ae1c2, 601d6be y a7765c0.
+
 ## 2026-10-11 — ✅ Tarea 56 — Unificar voseo y tuteo en los flujos y plantillas de la skill
 
 - Commits: skill 2c6d7ba y 96c291c; kit e304cc2 y 716e368.

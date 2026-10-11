@@ -19,7 +19,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 **Agrupamiento (solo en "Tareas libres"):** si superan las 15 tareas (Regla 8), se evalúa agrupar 2 o más que compartan un objetivo real — el grupo entero tiene que caber en una frase de objetivo compartido, sin forzar con "y". El grupo aparece en libres como un bloque `### Grupo — título (Tareas N, M)` con un `Resumen` de una frase; el detalle de cada tarea (`#### Tarea N — título`, mismo formato) se mueve a "Tareas agrupadas", que no hace falta leer salvo para tomar una. Un grupo que queda con una sola tarea se desarma.
 
-**Anclas de sección:** no borres ni muevas los comentarios `<!-- agent-context-kit:section=... -->` (`free`, `blocked`, `grouped`) que preceden a cada sección: los usa el script de seguimiento de tareas de agent-context-kit.
+**Anclas de sección:** no borres ni muevas los comentarios `<!-- agent-context-skill:section=... -->` (`free`, `blocked`, `grouped`) que preceden a cada sección: los usa el script de seguimiento de tareas de agent-context-kit.
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
@@ -27,7 +27,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 ---
 
-<!-- agent-context-kit:section=free -->
+<!-- agent-context-skill:section=free -->
 ## Tareas libres
 
 ### Tarea 34 — Reevaluar los comandos del task-manager
@@ -48,14 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 57 — Aclarar o unificar los dos prefijos de marcador (agent-docs-skill y agent-context-kit)
-
-- **Descripción:** Surgió al cerrar la Tarea 50; falta detallarla.
-- **Decisiones/temas a definir antes de empezar:** Ninguno.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Agregada:** 2026-10-11.
-
 ### Tarea 58 — Publicar la skill 2.0.0 y un release del kit
 
 - **Descripción:** Taggear v2.0.0 en el repo de la skill y subir sus commits y el tag; subir package.json del kit a 1.8.0 (docs-check, skill fuera del kit, reglas renumeradas), taggear y subir. Los releases de GitHub los hace el operador.
@@ -65,7 +57,15 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** Surgida al cerrar las Tareas 54 y 55: la skill quedó en 2.0.0 sin tag ni push, y package.json del kit sigue en 1.7.0 con más de 40 commits posteriores.
 - **Agregada:** 2026-10-11.
 
-<!-- agent-context-kit:section=blocked -->
+### Tarea 51 — Reevaluación de determinismo
+
+- **Descripción:** Ver qué tan fiel y estricto termina el repo en el que se usa la skill en comparación con el template: qué se respeta, qué se desvía y qué parte del resultado depende del criterio del agente.
+- **Decisiones/temas a definir antes de empezar:** Cómo medirlo (repos de prueba generados con la skill, comparación contra el template) y qué nivel de desvío se acepta.
+- **Bloqueos:** `[Resuelto el 2026-10-11]` — era `[dependencia]` Depende de las Tareas 53, 54, 55, 56 y 57: el determinismo se reevalúa después de resolver los hallazgos de consistencia.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-11.
+
+<!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
 ### Tarea 38 — Revisar si el task-tracker necesita actualizarse por los últimos cambios
@@ -85,15 +85,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Agregada:** 2026-10-11.
 
-### Tarea 51 — Reevaluación de determinismo
-
-- **Descripción:** Ver qué tan fiel y estricto termina el repo en el que se usa la skill en comparación con el template: qué se respeta, qué se desvía y qué parte del resultado depende del criterio del agente.
-- **Decisiones/temas a definir antes de empezar:** Cómo medirlo (repos de prueba generados con la skill, comparación contra el template) y qué nivel de desvío se acepta.
-- **Bloqueos:** `[dependencia]` Depende de las Tareas 53, 54, 55, 56 y 57: el determinismo se reevalúa después de resolver los hallazgos de consistencia.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Agregada:** 2026-10-11.
-
-<!-- agent-context-kit:section=grouped -->
+<!-- agent-context-skill:section=grouped -->
 ## Tareas agrupadas
 
 No aplica todavía — ningún grupo formado.
