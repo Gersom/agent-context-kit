@@ -7,7 +7,8 @@ Este documento describe la estructura general del repo `agent-context-kit` y par
 ```
 agent-context-kit/
 ├── README.md              # Presentación del proyecto
-├── CLAUDE.md               # Puntero para agentes: remite a docs/desing.md
+├── CLAUDE.md               # Puntero para agentes: remite a AGENTS.md
+├── AGENTS.md               # Orden de lectura de la documentación de contexto (docs/README.md, rules, operators, handoff)
 ├── package.json            # Versión del kit (SemVer) + scripts (tasks, task, check, test, typecheck) y devDependencies de scripts/
 ├── tsconfig.json           # TypeScript (strict) para scripts/; `bun run typecheck` = tsc --noEmit
 │
@@ -20,9 +21,9 @@ agent-context-kit/
 │   ├── docs-check/            # Verificador de otro repo (`bun run check <ruta>`): comprueba que su documentación de agentes sirva al skill, al tracker y al task-manager
 │   │   ├── README.md            # Uso, códigos de hallazgo y estructura
 │   │   ├── index.ts             # Arranque: llama a run()
-│   │   ├── src/                 # args, run, context, lines, report, types y checks/ (files, anchors, placeholders, tasks, handoff, history)
+│   │   ├── src/                 # args, run, context, lines, report, types y checks/ (files, anchors, placeholders, tasks, handoff, history, skill-version)
 │   │   └── test/                # Tests en espejo de src/ + e2e/ con proyectos en un directorio temporal
-│   ├── skill-checks/          # Tests de contenido de la skill clonada en `skill/` (`reading-policy`, `multi-operator`, `snapshot`, `version`): fijan la política de lectura, la estructura de lo que se lee en cada sesión y que la versión de la skill coincida en `plugin.json`, `SKILL.md` y la plantilla de `rules.md`; se saltan si `skill/` no está
+│   ├── skill-checks/          # Tests de contenido de la skill clonada en `skill/` (`reading-policy`, `multi-operator`, `snapshot`, `version`, `changelog`): fijan la política de lectura, la estructura de lo que se lee en cada sesión y que la versión de la skill coincida en `plugin.json`, `SKILL.md` y la plantilla de `rules.md`; se saltan si `skill/` no está
 │   ├── task-manager/          # Gestión de tareas desde la terminal (`bun run task <comando>`): edita handoff/backlog/history/team-backlog de forma quirúrgica
 │   │   ├── README.md            # Uso: comandos, flags, `--apply` y qué escribe cada uno
 │   │   ├── index.ts             # Arranque: llama al despachador de comandos
@@ -42,7 +43,7 @@ agent-context-kit/
 │
 ├── docs/
 │   ├── README.md            # Mapa de docs/: qué es el proyecto y qué hay en cada archivo (lo primero que lee el agente)
-│   ├── desing.md            # Documento de diseño: historial de decisiones y pendientes
+│   ├── desing.md            # Registro histórico del diseño original (no es la spec vigente)
 │   ├── architecture.md      # Este archivo
 │   ├── philosophy.md        # Principios de diseño: por qué el kit es lo que es
 │   └── agents/               # Dogfooding: este repo usa el skill sobre sí mismo, en modo multi-operador

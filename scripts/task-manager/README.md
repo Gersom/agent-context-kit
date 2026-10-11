@@ -77,7 +77,7 @@ EOF
 
 ## Comandos de lectura
 
-Pensados para un agente que quiere ahorrar tokens: en vez de leer `history.md` entero o todo el backlog, pide lo que necesita. Ninguno escribe, y de `history.md` solo imprimen la cabecera de las entradas (`status`) o la entrada pedida (`show`), nunca el archivo entero. Todos aceptan `--json` y los flags globales (`--agents`, `--operator`). Las secciones vacías no se imprimen.
+Pensados para un agente que quiere ahorrar tokens: en vez de leer `history.md` entero o todo el backlog, pide lo que necesita. Ninguno escribe, y de `history.md` solo imprimen la cabecera de las entradas (`status`) o la entrada pedida (`show`), nunca el archivo entero. Todos aceptan los flags globales (`--agents`, `--operator`) y, salvo `whoami` y `anchors`, `--json`. Las secciones vacías no se imprimen.
 
 ### `status`
 
@@ -350,7 +350,7 @@ scripts/task-manager/
 Desde la raíz de este repo:
 
 ```sh
-bun test            # tests (en scripts/task-manager/test/, scripts/task-tracker/test/ y scripts/_shared/test/)
+bun test            # tests (en scripts/*/test/ y scripts/skill-checks/)
 bun run typecheck   # chequeo de tipos (Bun ejecuta TypeScript sin revisar tipos)
 ```
 
