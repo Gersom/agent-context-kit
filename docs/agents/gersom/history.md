@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-10 — ✅ Tarea 42 — Hacer que docs-check revise AGENTS.md y CLAUDE.md aunque la carpeta indicada no tenga docs/agents
+
+- bun run check <ruta> sobre una carpeta que existe pero no tiene docs/agents ahora revisa también AGENTS.md y CLAUDE.md de esa carpeta, además de dar el error workspace; antes quedaban sin revisar.
+- Si la ruta es una carpeta de agentes vacía, esos archivos se buscan en la raíz del repo. Una ruta que no existe sigue dando solo el error workspace.
+- Commits (kit): 548e326. bun test 995 pass, typecheck ok.
+
 ## 2026-10-10 — ✅ Tarea 3 — Exportar como skill utilizable por Claude
 
 - La skill quedó empaquetada como plugin de Claude Code en su propio repo, para poder instalarla con /plugin en vez de copiarla a mano.

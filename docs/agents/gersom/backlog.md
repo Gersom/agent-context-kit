@@ -39,14 +39,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** Surgida al usar el script en las Tareas 24 y 32. Límites conocidos: block/unblock no soportan tareas agrupadas ni team-backlog.md; add y start sin --json. Surgido al hacer la Tarea 36: `step` ya edita de forma puntual (marcar, desmarcar y reemplazar una subsección), pero no permite cambiar el texto o la nota de un paso, agregar o quitar pasos, ni reabrir uno con motivo (lo pide la Tarea 35), y admite solo una de `--falta`/`--decisiones`/`--proximo` por ejecución.
 - **Agregada:** 2026-10-08.
 
-### Tarea 42 — Hacer que docs-check revise AGENTS.md y CLAUDE.md aunque la carpeta indicada no tenga docs/agents
-
-- **Descripción:** Surgió al cerrar la Tarea 15; falta detallarla.
-- **Decisiones/temas a definir antes de empezar:** Ninguno.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Agregada:** 2026-10-09.
-
 ### Tarea 46 — Hacer template-architecture.md de la skill independiente del repo kit
 
 - **Descripción:** Surgió al cerrar la Tarea 43; falta detallarla.
