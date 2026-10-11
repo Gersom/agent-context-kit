@@ -61,6 +61,8 @@ export interface CheckContext {
   rootFiles: RootFileInfo[];
   /** Ruta relativa de `operators.md`; `null` en el repo plano. */
   operatorsFile: string | null;
+  /** Texto de `operators.md` (LF); vacío en el repo plano o si no existe. */
+  operatorsText: string;
   /** Avisos de lectura del espacio de trabajo (líneas de operators.md sin leer). */
   operatorWarnings: string[];
 }

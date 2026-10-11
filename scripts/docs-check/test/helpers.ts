@@ -29,6 +29,8 @@ export interface ContextOptions {
   /** AGENTS.md y CLAUDE.md de la raíz; `null` = no existen. */
   agentsMd?: string | null;
   claudeMd?: string | null;
+  /** Texto de operators.md en multi; por defecto, el fixture válido. */
+  operators?: string;
   operatorWarnings?: string[];
 }
 
@@ -67,6 +69,7 @@ export function makeCtx(options: ContextOptions = {}): CheckContext {
     rules: makeRules(`${PATHS.flat}/rules.md`, options.rules === undefined ? RULES : options.rules),
     rootFiles: [rootFile("AGENTS.md", options.agentsMd, ROOT_AGENTS), rootFile("CLAUDE.md", options.claudeMd, ROOT_CLAUDE)],
     operatorsFile: mode === "multi" ? PATHS.operators : null,
+    operatorsText: mode === "multi" ? normalizeEol(options.operators ?? OPERATORS).text : "",
     operatorWarnings: options.operatorWarnings ?? [],
   };
 }

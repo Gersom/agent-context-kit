@@ -62,6 +62,7 @@ export function buildContext(workspace: Workspace, read: ReadFile): CheckContext
     rules: makeRules(rel(rulesFile), read(rulesFile)),
     rootFiles: readRootFiles(projectDir, read),
     operatorsFile: workspace.mode === "multi" ? rel(join(workspace.agentsRoot, "operators.md")) : null,
+    operatorsText: workspace.mode === "multi" ? normalizeEol(read(join(workspace.agentsRoot, "operators.md")) ?? "").text : "",
     operatorWarnings: workspace.warnings,
   };
 }

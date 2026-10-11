@@ -6,11 +6,12 @@ import { legacyMarkerLines, MARKER_PREFIX } from "../../../_shared/markers.ts";
 import type { Check, Finding } from "../types.ts";
 
 /** Avisa, una vez por archivo, de los marcadores con un prefijo anterior (apunta a la primera línea). */
-export const checkLegacyMarkers: Check = ({ docs, rules, rootFiles }) => {
+export const checkLegacyMarkers: Check = ({ docs, rules, rootFiles, operatorsFile, operatorsText }) => {
   const files = [
     ...[docs.handoff, docs.backlog, ...(docs.teamBacklog ? [docs.teamBacklog] : [])]
       .filter((doc) => doc.exists)
       .map((doc) => ({ file: doc.file, text: doc.text })),
+    ...(operatorsFile && operatorsText ? [{ file: operatorsFile, text: operatorsText }] : []),
     ...(rules.exists ? [{ file: rules.file, text: rules.head }] : []),
     ...rootFiles.filter((root) => root.exists).map((root) => ({ file: root.file, text: root.text })),
   ];

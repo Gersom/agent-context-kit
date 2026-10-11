@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { checkLegacyMarkers } from "../../src/checks/legacy-marker.ts";
 import { checkRootFiles } from "../../src/checks/files.ts";
 import { checkSkillVersion } from "../../src/checks/skill-version.ts";
-import { BACKLOG, HANDOFF, RULES } from "../fixtures.ts";
+import { BACKLOG, HANDOFF, OPERATORS, RULES, TEAM_BACKLOG } from "../fixtures.ts";
 import { brief, makeCtx, PATHS } from "../helpers.ts";
 
 const old = (text: string): string => text.replaceAll("agent-context-skill:", "agent-context-kit:");
@@ -34,5 +34,11 @@ describe("legacy-marker", () => {
     const ctx = makeCtx({ agentsMd: "<!-- agent-docs-skill:start -->\nLee docs/agents.\n<!-- agent-docs-skill:end -->\n", claudeMd: "Ver AGENTS.md\n" });
     expect(checkRootFiles(ctx)).toEqual([]);
     expect(checkLegacyMarkers(ctx).map(brief)).toEqual([{ severity: "warning", code: "legacy-marker", file: "AGENTS.md", line: 1 }]);
+  });
+
+  test("operators.md y team-backlog.md en multi con el prefijo anterior: aviso en cada uno", () => {
+    const ctx = makeCtx({ teamBacklog: old(TEAM_BACKLOG), operators: old(OPERATORS) });
+    expect(checkLegacyMarkers(ctx).map((f) => f.file)).toEqual([PATHS.teamBacklog, PATHS.operators]);
+    expect(checkLegacyMarkers(makeCtx({ teamBacklog: TEAM_BACKLOG, operators: OPERATORS }))).toEqual([]);
   });
 });
