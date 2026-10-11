@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-10 — ✅ Tarea 46 — Hacer template-architecture.md de la skill independiente del repo kit
+
+- template-architecture.md de la skill dejó de depender del kit: ya no se presenta como documentación de «este repo (agent-context-kit)» ni nombra los scripts del kit (task-tracker), para que la skill se pueda usar y publicar sola.
+- Un test nuevo en skill-checks falla si la skill vuelve a mencionar los scripts del kit.
+- Commits (skill): c8adf94. Commits (kit): 10df134. bun test 996 pass, typecheck ok.
+
 ## 2026-10-10 — ✅ Tarea 42 — Hacer que docs-check revise AGENTS.md y CLAUDE.md aunque la carpeta indicada no tenga docs/agents
 
 - bun run check <ruta> sobre una carpeta que existe pero no tiene docs/agents ahora revisa también AGENTS.md y CLAUDE.md de esa carpeta, además de dar el error workspace; antes quedaban sin revisar.
