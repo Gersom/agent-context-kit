@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 49
+**Próximo número de tarea:** 50
 
 ---
 
@@ -48,13 +48,13 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 48 — Actualizar la documentación de un proyecto al cambiar de versión de la skill (changelog y migración)
+### Tarea 49 — Corregir los huecos pendientes de migration-flow.md
 
-- **Descripción:** Hacer que la skill, al detectar que el proyecto tiene una versión más vieja, aplique los cambios de las partes fijas con confirmación del operador, en vez de solo avisar y mostrar las diferencias.
-- **Decisiones/temas a definir antes de empezar:** Formato y ubicación del changelog por versión; cómo se describe cada cambio para poder aplicarlo (qué reescribir y cómo); qué hacer con las partes fijas que el proyecto adaptó a mano (pisar, fusionar o preguntar); cómo migrar saltos de varias versiones (de 1.6 a 1.9); cómo se prueba con proyectos de versiones anteriores.
-- **Bloqueos:** `[Resuelto el 2026-10-10]` — era `[dependencia]` depende de la Tarea 47 (marcador de versión en la documentación generada y aviso de versión más vieja).
+- **Descripción:** Resolver los huecos que la auditoría de la Tarea 48 encontró en docs/migration-flow.md de la skill y que no eran regresiones de los cambios recientes.
+- **Decisiones/temas a definir antes de empezar:** Si se retiran los originales de docs/ tras migrar (con git rm y confirmación) o se dejan; cómo evitar colisiones en docs/others/ (mantener subruta o desambiguar); qué número fija el umbral de «proporción significativa»; qué carpetas se consideran la documentación vieja (doc/, documentation/, .claude/, raíz); si «Pasar de plano a multi-operador» se mueve a multi-operator.md.
+- **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Surgió al diseñar la Tarea 47: allí la skill solo avisa y ofrece revisar comparando las reglas fijas con la plantilla; acá se agrega la actualización con confirmación sobre el mismo marcador. Afecta al repo de la skill y, si docs-check valida el changelog, al kit.
+- **Detalles:** Hallazgos: (1) no se dice qué pasa con los originales de docs/ tras migrar: quedan duplicados junto a docs/agents/ o docs/others/; (2) docs/others/ es plano y la búsqueda recursiva: dos archivos con el mismo nombre colisionan; (3) el umbral «proporción significativa» no es verificable; (4) la documentación vieja solo se busca en docs/, y cp -r docs docs-legacy copia también documentación que no es de agentes; (5) docs-legacy/ queda en la raíz y nada le dice a los agentes que lo ignoren; (6) el AGENTS.md o CLAUDE.md viejo puede apuntar a rutas viejas y solo se agrega la sección delimitada; (7) hay dos redacciones de «git limpio» (la de docs/ en la migración y la de docs/agents en plano a multi) y ninguna cubre AGENTS.md y CLAUDE.md; (8) las preguntas 1 y 2 de la ronda de confirmación no son independientes; (9) en «Pasar de plano a multi-operador», git mv asume que existen handoff, backlog e history (el set mínimo solo tiene handoff) y el reemplazo del bloque de AGENTS.md no cubre un archivo sin marcadores; (10) el chequeo «ya existe» de SKILL.md usa solo la presencia de docs/agents o docs/project, así que un repo ajeno con un docs/project genérico se clasifica como de la skill. Surgió de la Tarea 48.
 - **Agregada:** 2026-10-10.
 
 <!-- agent-context-kit:section=blocked -->

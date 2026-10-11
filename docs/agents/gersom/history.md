@@ -11,6 +11,14 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-10 — ✅ Tarea 48 — Actualizar la documentación de un proyecto al cambiar de versión de la skill (changelog y migración)
+
+- La skill ahora puede actualizar un proyecto ya generado cuando se vuelve a usar con una versión más reciente, en vez de solo avisar.
+- Se agregó docs/changelog/ (un archivo por versión minor o major, con las patch como secciones) y docs/update-flow.md: crea una rama nueva en el proyecto, muestra un resumen único, confirma cada cambio, pregunta qué hacer si una regla fija fue editada a mano y sube el marcador solo si todo quedó resuelto. version-check.md ofrece «Actualizar», «Solo revisar» o «Ahora no».
+- Se auditó migration-flow.md: se corrigió la ruta obsoleta, su entrada desde SKILL.md y la regex del marcador, y la firma o el marcador ahora ganan sobre la intención de migrar. Los huecos que ya existían quedaron en la Tarea 49.
+- Publicada como 1.10.0 (tag v1.10.0). Probado con claude -p sobre un proyecto 1.10.0 con una skill de prueba 1.11.0 (cambio aplicado, conflicto conservado, commit en la rama nueva).
+- Commits (skill): 72cecf8, ca6a25b y d1fbb31. Commits (kit): 7526df4 y 5e00f0d. bun test 1025 pass, typecheck ok.
+
 ## 2026-10-10 — ✅ Tarea 47 — Revisar el versionado de la skill y registrar su versión en la documentación generada
 
 - La skill ahora deja su versión en la documentación que genera y detecta cuando un proyecto se creó con una versión distinta, para poder avisar al reusarla con una versión más reciente.
