@@ -205,6 +205,15 @@ describe.skipIf(!hasSkill)("enlaces relativos de la documentación de la skill",
     }
     expect(mentions, "la skill no debe depender de archivos del repo kit").toEqual([]);
   });
+
+  test("no menciona los scripts del kit ni se presenta como «este repo (`agent-context-kit`)»", () => {
+    const mentions: string[] = [];
+    for (const file of skillFiles()) {
+      const text = readFileSync(file, "utf8");
+      if (/scripts\/(task-tracker|task-manager|docs-check)|este repo \(`agent-context-kit`\)/.test(text)) mentions.push(rel(file));
+    }
+    expect(mentions, "la skill no debe depender de las herramientas ni del repo kit").toEqual([]);
+  });
 });
 
 describe("docs/architecture.md refleja el modo multi", () => {
