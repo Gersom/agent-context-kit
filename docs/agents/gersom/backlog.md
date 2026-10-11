@@ -48,30 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 51 — Reevaluación de determinismo
-
-- **Descripción:** Ver qué tan fiel y estricto termina el repo en el que se usa la skill en comparación con el template: qué se respeta, qué se desvía y qué parte del resultado depende del criterio del agente.
-- **Decisiones/temas a definir antes de empezar:** Cómo medirlo (repos de prueba generados con la skill, comparación contra el template) y qué nivel de desvío se acepta.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Agregada:** 2026-10-11.
-
-### Tarea 52 — Verificación de optimización
-
-- **Descripción:** Ver si algo en los archivos .md (reglas, plantillas, docs) se puede acortar o quitar para optimizar tokens, sin perder información que el agente necesita.
-- **Decisiones/temas a definir antes de empezar:** Criterio de qué se puede quitar (redundancias, ejemplos, texto repetido entre archivos) y cuánta reducción justifica el cambio.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Agregada:** 2026-10-11.
-
-### Tarea 53 — Actualizar los pendientes desactualizados de docs/desing.md
-
-- **Descripción:** Surgió al cerrar la Tarea 50; falta detallarla.
-- **Decisiones/temas a definir antes de empezar:** Ninguno.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Agregada:** 2026-10-11.
-
 ### Tarea 54 — Confirmar si falta publicar el release del kit (package.json 1.7.0, último tag v1.5.0)
 
 - **Descripción:** Surgió al cerrar la Tarea 50; falta detallarla.
@@ -115,6 +91,22 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Detalles:** Cambios a revisar: (1) los pasos del plan pueden llevar al final de la línea evidencia y commit (· bun test 779 pass · commit abc1234, Tarea 35): ver si el tracker los corta, los desalinea o los muestra bien; (2) un paso reabierto se escribe como (reabierto: motivo); (3) el handoff ahora se edita solo en lo que cambia y las pausadas ya no se leen salvo sin tarea en curso: ver si el tracker asume que el archivo se reescribe entero (reintento de primera lectura en src/io/snapshot.ts); (4) la entrada de history.md ahora es más breve y lista los commits; (5) el reporte de cierre suma Checks pendientes y Próximo paso (no afecta al tracker, solo confirmarlo). Probar contra el handoff real con una tarea en curso, con evidencia en los pasos y con una pausada. Si no hay nada que cambiar, cerrarla con esa conclusión.
 - **Agregada:** 2026-10-08.
+
+### Tarea 52 — Verificación de optimización
+
+- **Descripción:** Ver si algo en los archivos .md (reglas, plantillas, docs) se puede acortar o quitar para optimizar tokens, sin perder información que el agente necesita.
+- **Decisiones/temas a definir antes de empezar:** Criterio de qué se puede quitar (redundancias, ejemplos, texto repetido entre archivos) y cuánta reducción justifica el cambio.
+- **Bloqueos:** `[dependencia]` Depende de la Tarea 51: la optimización de tokens se evalúa después de reevaluar el determinismo.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-11.
+
+### Tarea 51 — Reevaluación de determinismo
+
+- **Descripción:** Ver qué tan fiel y estricto termina el repo en el que se usa la skill en comparación con el template: qué se respeta, qué se desvía y qué parte del resultado depende del criterio del agente.
+- **Decisiones/temas a definir antes de empezar:** Cómo medirlo (repos de prueba generados con la skill, comparación contra el template) y qué nivel de desvío se acepta.
+- **Bloqueos:** `[dependencia]` Depende de las Tareas 53, 54, 55, 56 y 57: el determinismo se reevalúa después de resolver los hallazgos de consistencia.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-11.
 
 <!-- agent-context-kit:section=grouped -->
 ## Tareas agrupadas

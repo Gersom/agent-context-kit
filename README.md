@@ -82,4 +82,4 @@ Si el kit o la skill te sirven y quieres apoyar su desarrollo, puedes hacer una 
 
 ## Estado
 
-Proyecto en diseño. Ver [`docs/architecture.md`](./docs/architecture.md) para la estructura vigente y [`docs/desing.md`](./docs/desing.md) para el registro histórico del diseño original (no es la spec vigente). Las tareas pendientes viven en `docs/agents/`.
+Proyecto en diseño. Ver [`docs/architecture.md`](./docs/architecture.md) para la estructura vigente. Las tareas pendientes viven en `docs/agents/`.

@@ -35,7 +35,6 @@ Varias personas trabajan a la vez, cada una con su agente. Estas reglas se suman
 
 - Estructura de carpetas y por qué está organizado así → [`../architecture.md`](../architecture.md)
 - Razón de ser y principios de diseño → [`../philosophy.md`](../philosophy.md)
-- Historial de decisiones de diseño → [`../desing.md`](../desing.md) (registro histórico, no spec vigente — ver regla 4)
 - Catálogo de plantillas y para qué sirve cada una → `docs/template-architecture.md` del repo de la skill ([Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill), clonado en `skill/`; no está en este repo)
 
 ## Reglas específicas de este proyecto
@@ -55,12 +54,10 @@ Varias personas trabajan a la vez, cada una con su agente. Estas reglas se suman
 ### Si usas el script de tareas
 
 - El script `task-manager` (`bun run task`, [`scripts/task-manager/README.md`](../../scripts/task-manager/README.md)) es la herramienta de tareas de este repo y es opcional: si lo usas, rige la cláusula de «Al cerrar una tarea» (`step` hace la Regla 6; `close`, las Reglas 5 y 7 y el reporte de la Regla 8). Revisa el diff antes de aplicar con `--apply`.
-- En este repo, entre `skill/template/` (el catálogo real) y `docs/desing.md` (registro histórico, no spec vigente) gana `skill/template/` (Regla 4; está en el repo de la skill).
 
 ### Qué NO tocar sin autorización explícita
 
 - La estructura de carpetas de `template/` en el repo de la skill (`skill/template/`): moverla o renombrar archivos rompe las referencias de `questions-flow.md` y `migration-flow.md` y requiere bump major de la skill.
-- `docs/desing.md`: registro histórico de la conversación de diseño original, no el estado actual (para eso, `docs/architecture.md`).
 
 ## Al cerrar una tarea (fijas — leer solo al cerrar)
 

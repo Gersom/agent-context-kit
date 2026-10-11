@@ -2,7 +2,7 @@
 
 El "por qué" del kit y lo que debe respetar cualquier cambio nuevo. El "qué" (la estructura) está en [`architecture.md`](./architecture.md).
 
-> Principios deducidos del diseño y confirmados por el operador (2026-10-05); razón de ser dictada por el operador (2026-10-06). No es un registro histórico (ese es [`desing.md`](./desing.md)): si el diseño cambia, este archivo se actualiza.
+> Principios deducidos del diseño y confirmados por el operador (2026-10-05); razón de ser dictada por el operador (2026-10-06). No es un registro histórico: si el diseño cambia, este archivo se actualiza.
 
 ## Para qué existe el kit
 
