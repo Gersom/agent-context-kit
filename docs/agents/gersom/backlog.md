@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 50
+**Próximo número de tarea:** 58
 
 ---
 
@@ -47,6 +47,62 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador quiera hacer pública la skill, o priorice esta tarea explícitamente.
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
+
+### Tarea 51 — Reevaluación de determinismo
+
+- **Descripción:** Ver qué tan fiel y estricto termina el repo en el que se usa la skill en comparación con el template: qué se respeta, qué se desvía y qué parte del resultado depende del criterio del agente.
+- **Decisiones/temas a definir antes de empezar:** Cómo medirlo (repos de prueba generados con la skill, comparación contra el template) y qué nivel de desvío se acepta.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-11.
+
+### Tarea 52 — Verificación de optimización
+
+- **Descripción:** Ver si algo en los archivos .md (reglas, plantillas, docs) se puede acortar o quitar para optimizar tokens, sin perder información que el agente necesita.
+- **Decisiones/temas a definir antes de empezar:** Criterio de qué se puede quitar (redundancias, ejemplos, texto repetido entre archivos) y cuánta reducción justifica el cambio.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-11.
+
+### Tarea 53 — Actualizar los pendientes desactualizados de docs/desing.md
+
+- **Descripción:** Surgió al cerrar la Tarea 50; falta detallarla.
+- **Decisiones/temas a definir antes de empezar:** Ninguno.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-11.
+
+### Tarea 54 — Confirmar si falta publicar el release del kit (package.json 1.7.0, último tag v1.5.0)
+
+- **Descripción:** Surgió al cerrar la Tarea 50; falta detallarla.
+- **Decisiones/temas a definir antes de empezar:** Ninguno.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-11.
+
+### Tarea 55 — Unificar el orden de las reglas en la plantilla rules.md (Regla 9 entre la 4 y la 5)
+
+- **Descripción:** Surgió al cerrar la Tarea 50; falta detallarla.
+- **Decisiones/temas a definir antes de empezar:** Ninguno.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-11.
+
+### Tarea 56 — Unificar voseo y tuteo en los flujos y plantillas de la skill
+
+- **Descripción:** Surgió al cerrar la Tarea 50; falta detallarla.
+- **Decisiones/temas a definir antes de empezar:** Ninguno.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-11.
+
+### Tarea 57 — Aclarar o unificar los dos prefijos de marcador (agent-docs-skill y agent-context-kit)
+
+- **Descripción:** Surgió al cerrar la Tarea 50; falta detallarla.
+- **Decisiones/temas a definir antes de empezar:** Ninguno.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-11.
 
 <!-- agent-context-kit:section=blocked -->
 ## Tareas bloqueadas / pospuestas

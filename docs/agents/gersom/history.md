@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-11 — ✅ Tarea 50 — Revisión de consistencia
+
+- Commits: kit e518907; skill e1eb38f.
+
 ## 2026-10-10 — ✅ Tarea 49 — Corregir los huecos pendientes de migration-flow.md
 
 - Se corrigieron los huecos de migration-flow.md que la auditoría de la Tarea 48 había encontrado, para que migrar documentación de otro sistema sea verificable y no deje duplicados.
