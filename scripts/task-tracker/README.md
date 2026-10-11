@@ -26,7 +26,7 @@ bun run tasks D:/proyectos/mi-app --compact --no-arrows   # arranca compacto y s
 ```
 
 - **Qué ruta acepta:** la raíz del proyecto (busca adentro `docs/agents/` o `agent-context/agents/`) o directamente la carpeta que contiene `handoff.md`. Las rutas relativas se resuelven desde la carpeta en la que lanzaste el comando, y se pueden pegar con comillas (Windows las agrega al arrastrar una carpeta a la terminal).
-- **Varios proyectos a la vez:** cada instancia es independiente (sin archivos de bloqueo, puertos ni estado compartido), así que podés tener una terminal por proyecto. El título de la ventana muestra el nombre del proyecto.
+- **Varios proyectos a la vez:** cada instancia es independiente (sin archivos de bloqueo, puertos ni estado compartido), así que puedes tener una terminal por proyecto. El título de la ventana muestra el nombre del proyecto.
 - **`--once`:** pinta una vez y sale, sin vigilar ni atajos. Sirve para probar o para scripts.
 - **Operador:** en modo multi-operador (ver abajo), un segundo argumento (o `--operator <carpeta>`) abre de frente el panel de ese operador; sin él se abre la vista de equipo.
 
