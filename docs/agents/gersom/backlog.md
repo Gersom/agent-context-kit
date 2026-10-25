@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 62
+**Próximo número de tarea:** 63
 
 ---
 
@@ -57,14 +57,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** Surgida al cerrar las Tareas 54 y 55: la skill quedó en 2.0.0 sin tag ni push, y package.json del kit sigue en 1.7.0 con más de 40 commits posteriores.
 - **Agregada:** 2026-10-11.
 
-### Tarea 59 — Repetir la medición de determinismo con claude -p real y 2 o más corridas por escenario
-
-- **Descripción:** Surgió al cerrar la Tarea 51; falta detallarla.
-- **Decisiones/temas a definir antes de empezar:** Ninguno.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Agregada:** 2026-10-24.
-
 ### Tarea 60 — Renombrar el name y el título de SKILL.md de agent-context-kit a agent-context-skill
 
 - **Descripción:** Surgió al cerrar la Tarea 51; falta detallarla.
@@ -72,6 +64,15 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Agregada:** 2026-10-24.
+
+### Tarea 62 — Fijar el texto de las plantillas al generar y migrar para que salga idéntico entre corridas
+
+- **Descripción:** La medición de la Tarea 59 mostró que el texto fijo de las plantillas (handoff, backlog, history, roadmap, stack) a veces se copia tal cual y a veces se resume; hay que cerrar ese margen en los flujos de la skill.
+- **Decisiones/temas a definir antes de empezar:** Cómo expresar «copiar literal» sin depender de un comando de un solo sistema (cp/mv no existen en cmd; en PowerShell son alias de Copy-Item/Move-Item): decir «copiar con la herramienta de archivos o el comando nativo del shell, sin reescribir» o dar el equivalente por sistema. Qué partes de cada plantilla se permite adaptar (marcadores, nombre del proyecto) y cuáles no. Si conviene un script de generación que copie el texto fijo sin pasar por el modelo.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Desvíos medidos con claude -p --model sonnet, 2 corridas por escenario (Tarea 59): en migración, el «Formato de cada tarea» de backlog.md sale en 1 línea en una corrida y en 12 en la otra; handoff.md, history.md y roadmap.md también se resumen en una y salen completos en la otra. En generación, además, una corrida crea una entrada de historial desde el commit init y la otra dice «Sin tareas cerradas todavía», y cambian «Zonas frágiles» y el enlace a known-issues.md en rules.md. La actualización fue estable (mismo commit, 8 cambios, solo difieren el formato del árbol de docs/README.md y una línea en blanco). Los saltos de línea CRLF/LF son de Windows, no de la skill. Verificar la mejora repitiendo la medición con 2 corridas por escenario.
+- **Agregada:** 2026-10-25.
 
 <!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas

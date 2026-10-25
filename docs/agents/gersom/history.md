@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-25 — ✅ Tarea 59 — Repetir la medición de determinismo con claude -p real y 2 o más corridas por escenario
+
+- Medición con claude -p --model sonnet, 2 corridas por escenario (generación, migración, actualización 1.11.0 a 2.0.0): el conjunto de archivos y la estructura salen iguales en las 3; el texto fijo de las plantillas a veces se copia y a veces se resume (generación y migración); la actualización fue estable. Detalle y causa probable en la Tarea 62.
+
 ## 2026-10-25 — ✅ Tarea 61 — Reevaluar project/stack.md
 
 - Commits: skill f944b61, 55cc661 y 41dc459; kit b2a0055, 9ef87e2 y d44f04d.
