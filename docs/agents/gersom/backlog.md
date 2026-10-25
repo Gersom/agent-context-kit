@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 63
+**Próximo número de tarea:** 65
 
 ---
 
@@ -65,13 +65,22 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Agregada:** 2026-10-24.
 
-### Tarea 62 — Fijar el texto de las plantillas al generar y migrar para que salga idéntico entre corridas
+### Tarea 63 — Decidir cuándo se genera roadmap.md al migrar
 
-- **Descripción:** La medición de la Tarea 59 mostró que el texto fijo de las plantillas (handoff, backlog, history, roadmap, stack) a veces se copia tal cual y a veces se resume; hay que cerrar ese margen en los flujos de la skill.
-- **Decisiones/temas a definir antes de empezar:** Cómo expresar «copiar literal» sin depender de un comando de un solo sistema (cp/mv no existen en cmd; en PowerShell son alias de Copy-Item/Move-Item): decir «copiar con la herramienta de archivos o el comando nativo del shell, sin reescribir» o dar el equivalente por sistema. Qué partes de cada plantilla se permite adaptar (marcadores, nombre del proyecto) y cuáles no. Si conviene un script de generación que copie el texto fijo sin pasar por el modelo.
+- **Descripción:** En la migración, roadmap.md se creó en una corrida y en la otra no: depende de la etapa del proyecto que el modelo infiere cuando no hay operador interactivo; hay que fijar una regla para que el resultado no varíe.
+- **Decisiones/temas a definir antes de empezar:** Si en una migración roadmap.md se genera siempre (ALCANCE d), solo con ETAPA distinta de idea/setup, o solo si el proyecto migrado ya tenía uno; y qué etapa se asume por defecto cuando no se puede preguntar.
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Desvíos medidos con claude -p --model sonnet, 2 corridas por escenario (Tarea 59): en migración, el «Formato de cada tarea» de backlog.md sale en 1 línea en una corrida y en 12 en la otra; handoff.md, history.md y roadmap.md también se resumen en una y salen completos en la otra. En generación, además, una corrida crea una entrada de historial desde el commit init y la otra dice «Sin tareas cerradas todavía», y cambian «Zonas frágiles» y el enlace a known-issues.md en rules.md. La actualización fue estable (mismo commit, 8 cambios, solo difieren el formato del árbol de docs/README.md y una línea en blanco). Los saltos de línea CRLF/LF son de Windows, no de la skill. Verificar la mejora repitiendo la medición con 2 corridas por escenario.
+- **Detalles:** Surgida de la medición de la Tarea 62 (claude -p --model sonnet, 2 corridas): mig-1 generó docs/agents/roadmap.md y mig-2 no, con el mismo repo de partida. La regla está repartida entre questions-flow.md (roadmap solo si ETAPA distinta de idea/setup) y migration-flow.md paso 4 (seguir como si ALCANCE fuera d). Con operador interactivo la etapa se pregunta, así que el desvío aparece sobre todo sin él. Verificar repitiendo la medición con 2 corridas de migración.
+- **Agregada:** 2026-10-25.
+
+### Tarea 64 — Corrección de tandas de preguntas: mostrar el contexto en el chat
+
+- **Descripción:** Las preguntas de la skill se hacen con AskUserQuestion y el contexto necesario para responder (por ejemplo, el plan completo cuando se pregunta si está bien) queda dentro del enunciado de la pregunta o no se muestra; hay que mostrarlo en el chat antes de preguntar.
+- **Decisiones/temas a definir antes de empezar:** Cómo mostrar el contexto sin duplicarlo: texto en el chat justo antes de la pregunta, o un bloque de contexto por tanda; qué preguntas lo necesitan (plan de la Regla 2, tabla de mapeo de la migración, resumen de la actualización, rondas de questions-flow.md); si la regla vive en asking-questions.md y en rules.md.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Observado por el operador al usar la skill y el agente: se pregunta «¿los pasos están bien?» pero el plan completo no aparece en el chat, solo dentro del enunciado de la pregunta, y el operador no puede revisarlo antes de responder. Revisar docs/asking-questions.md, la Regla 2 de template/agents/rules.md (plan y tanda de preguntas), la «Ronda de confirmación» de migration-flow.md y el resumen previo de update-flow.md.
 - **Agregada:** 2026-10-25.
 
 <!-- agent-context-skill:section=blocked -->

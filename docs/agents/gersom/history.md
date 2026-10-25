@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-25 — ✅ Tarea 62 — Fijar el texto de las plantillas al generar y migrar para que salga idéntico entre corridas
+
+- La skill copia el archivo de la plantilla y edita solo los placeholders y comentarios de guía, así que el texto fijo ya no se resume (flujos de generación y migración, comando de copia neutral al sistema).
+- history.md se reconstruye desde git solo con 2 o más commits; frase fija «Ninguna registrada todavía.»; se comprueba que no queden comentarios de guía.
+- Skill 2.0.1; medición con claude -p (4 corridas por iteración, 2 iteraciones): líneas fijas no literales de 22/32 a 8/11, todas intencionales. Commits: skill 8f81564, 28ca1fd y 9eb90b6; kit: fixture de rules.md.
+
 ## 2026-10-25 — ✅ Tarea 59 — Repetir la medición de determinismo con claude -p real y 2 o más corridas por escenario
 
 - Medición con claude -p --model sonnet, 2 corridas por escenario (generación, migración, actualización 1.11.0 a 2.0.0): el conjunto de archivos y la estructura salen iguales en las 3; el texto fijo de las plantillas a veces se copia y a veces se resume (generación y migración); la actualización fue estable. Detalle y causa probable en la Tarea 62.
