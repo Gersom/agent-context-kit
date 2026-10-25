@@ -74,15 +74,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** Surgida de la medición de la Tarea 62 (claude -p --model sonnet, 2 corridas): mig-1 generó docs/agents/roadmap.md y mig-2 no, con el mismo repo de partida. La regla está repartida entre questions-flow.md (roadmap solo si ETAPA distinta de idea/setup) y migration-flow.md paso 4 (seguir como si ALCANCE fuera d). Con operador interactivo la etapa se pregunta, así que el desvío aparece sobre todo sin él. Verificar repitiendo la medición con 2 corridas de migración.
 - **Agregada:** 2026-10-25.
 
-### Tarea 64 — Corrección de tandas de preguntas: mostrar el contexto en el chat
-
-- **Descripción:** Las preguntas de la skill se hacen con AskUserQuestion y el contexto necesario para responder (por ejemplo, el plan completo cuando se pregunta si está bien) queda dentro del enunciado de la pregunta o no se muestra; hay que mostrarlo en el chat antes de preguntar.
-- **Decisiones/temas a definir antes de empezar:** Cómo mostrar el contexto sin duplicarlo: texto en el chat justo antes de la pregunta, o un bloque de contexto por tanda; qué preguntas lo necesitan (plan de la Regla 2, tabla de mapeo de la migración, resumen de la actualización, rondas de questions-flow.md); si la regla vive en asking-questions.md y en rules.md.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Observado por el operador al usar la skill y el agente: se pregunta «¿los pasos están bien?» pero el plan completo no aparece en el chat, solo dentro del enunciado de la pregunta, y el operador no puede revisarlo antes de responder. Revisar docs/asking-questions.md, la Regla 2 de template/agents/rules.md (plan y tanda de preguntas), la «Ronda de confirmación» de migration-flow.md y el resumen previo de update-flow.md.
-- **Agregada:** 2026-10-25.
-
 <!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 

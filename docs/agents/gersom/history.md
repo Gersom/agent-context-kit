@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-25 — ✅ Tarea 64 — Corrección de tandas de preguntas: mostrar el contexto en el chat
+
+- Las preguntas de la skill van cortas y el contexto que necesitan (plan, tablas, resúmenes, listas, diferencias, evidencia de las recomendaciones) se escribe completo en el chat antes de la tanda: regla 5 de asking-questions.md, Regla 2 de rules.md y cada pregunta de los flujos que depende de contexto.
+- Skill 2.0.2, con el cambio de la Regla 2 en el changelog y una nota sobre cómo aplicarlo a mano en proyectos que ya no usan la skill.
+- Revisión independiente del diff (un bloqueante corregido en SKILL.md) y bun test, typecheck y docs-check en verde. Commits: skill 1cf5796, 80925f0 y el de la nota del changelog; kit ac2153e.
+
 ## 2026-10-25 — ✅ Tarea 62 — Fijar el texto de las plantillas al generar y migrar para que salga idéntico entre corridas
 
 - La skill copia el archivo de la plantilla y edita solo los placeholders y comentarios de guía, así que el texto fijo ya no se resume (flujos de generación y migración, comando de copia neutral al sistema).
