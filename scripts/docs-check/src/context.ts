@@ -13,7 +13,7 @@ import type { DocKind } from "../../task-manager/src/workspace/docs.ts";
 import type { Workspace } from "../../task-manager/src/workspace/workspace.ts";
 import type { CheckContext, DecisionsInfo, DocInfo, RootFileInfo, RulesInfo } from "./types.ts";
 
-/** Archivos de la raíz que llevan el bloque del skill. */
+/** Archivos de la raíz que llevan el bloque de la skill. */
 export const ROOT_FILES = ["AGENTS.md", "CLAUDE.md"];
 
 /** Lee un archivo: su texto, o `null` si no existe (cualquier otro fallo lo lanza el lector). */

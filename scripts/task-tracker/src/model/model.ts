@@ -29,7 +29,7 @@ const CHECKBOX_LINE_RE = /^\s*[-*]\s+\[( |x|X)\]\s+/m;
 
 /**
  * Modelo completo para la pantalla.
- * `backlogText: null` y `historyText: null` son válidos (el set mínimo del skill no los genera).
+ * `backlogText: null` y `historyText: null` son válidos (el set mínimo de la skill no los genera).
  */
 export function buildModel({
   handoffText,
@@ -51,7 +51,7 @@ export function buildModel({
   else handoff = parseHandoff(handoffText);
 
   let backlog: ParsedBacklog | null = null;
-  if (backlogText == null) notes.push("Sin backlog.md (set mínimo del skill): solo se muestran la tarea en progreso y las pausadas.");
+  if (backlogText == null) notes.push("Sin backlog.md (set mínimo de la skill): solo se muestran la tarea en progreso y las pausadas.");
   else if (!backlogText.trim()) warnings.push("backlog.md está vacío (¿se está reescribiendo?).");
   else backlog = parseBacklog(backlogText);
 

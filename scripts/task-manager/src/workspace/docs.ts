@@ -84,7 +84,7 @@ export function readDocs(workspace: Pick<Workspace, "files">): Docs {
 
 /**
  * El archivo, o un error claro si no existe. Para los comandos que lo necesitan para trabajar
- * (el script no crea archivos que faltan: ese es el trabajo del skill).
+ * (el script no crea archivos que faltan: ese es el trabajo de la skill).
  */
 export function requireDoc<P>(doc: Doc<P> | null, what: string): Doc<P> {
   if (!doc) throw new CliError(`${what} no aplica en este repo (es plano, sin modo multi-operador).`);

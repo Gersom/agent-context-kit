@@ -36,7 +36,7 @@ Un bloque por tarea, con este formato:
 
 ### Tarea 4 — Deploy en skills.sh
 
-- **Descripción:** publicar el skill.
+- **Descripción:** publicar la skill.
 - **Bloqueos:** `[dependencia]` depende de la Tarea 3.
 - **Detalles:** ver [el diseño](../desing.md).
 

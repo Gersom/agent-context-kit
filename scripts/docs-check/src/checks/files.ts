@@ -1,10 +1,10 @@
 // Archivos que tienen que existir: los del operador (handoff y backlog son imprescindibles),
-// los avisos de operators.md y los AGENTS.md / CLAUDE.md de la raíz con el bloque del skill.
+// los avisos de operators.md y los AGENTS.md / CLAUDE.md de la raíz con el bloque de la skill.
 
 import { LEGACY_ROOT_PREFIX, MARKER_PREFIX } from "../../../_shared/markers.ts";
 import type { Check, CheckContext, Finding } from "../types.ts";
 
-/** Marca con la que el skill delimita su bloque en AGENTS.md y CLAUDE.md. */
+/** Marca con la que la skill delimita su bloque en AGENTS.md y CLAUDE.md. */
 export const ROOT_MARKER = `${MARKER_PREFIX}:start`;
 
 /** Marca anterior a la 2.0.0: se sigue aceptando (el check `legacy-marker` avisa que hay que actualizarla). */
@@ -26,7 +26,7 @@ export const checkFilesExist: Check = ({ docs }) => {
       code: "file-missing",
       file: doc.file,
       line: null,
-      message: `Falta ${doc.file.split("/").pop()}, que guarda ${what}: créalo desde la plantilla del skill (el script no lo crea).`,
+      message: `Falta ${doc.file.split("/").pop()}, que guarda ${what}: créalo desde la plantilla de la skill (el script no lo crea).`,
     });
   }
   return findings;
@@ -44,7 +44,7 @@ export const checkOperatorsReadable: Check = ({ operatorsFile, operatorWarnings 
   }));
 };
 
-/** AGENTS.md y CLAUDE.md de la raíz: que existan y que dirijan al agente a la documentación (el bloque del skill o una mención de docs/agents; CLAUDE.md puede solo redirigir a AGENTS.md). */
+/** AGENTS.md y CLAUDE.md de la raíz: que existan y que dirijan al agente a la documentación (el bloque de la skill o una mención de docs/agents; CLAUDE.md puede solo redirigir a AGENTS.md). */
 export const checkRootFiles = ({ rootFiles }: Pick<CheckContext, "rootFiles">): Finding[] => {
   const findings: Finding[] = [];
   for (const root of rootFiles) {
@@ -54,7 +54,7 @@ export const checkRootFiles = ({ rootFiles }: Pick<CheckContext, "rootFiles">): 
         code: "root-file",
         file: root.file,
         line: null,
-        message: `Falta ${root.file} en la raíz del proyecto: es lo primero que lee el agente. Créalo desde la plantilla del skill.`,
+        message: `Falta ${root.file} en la raíz del proyecto: es lo primero que lee el agente. Créalo desde la plantilla de la skill.`,
       });
     } else if (!root.text.includes(ROOT_MARKER) && !root.text.includes(LEGACY_ROOT_MARKER) && !root.text.includes("docs/agents") && !root.text.includes("AGENTS.md")) {
       findings.push({
@@ -62,7 +62,7 @@ export const checkRootFiles = ({ rootFiles }: Pick<CheckContext, "rootFiles">): 
         code: "root-file",
         file: root.file,
         line: null,
-        message: `${root.file} no contiene el marcador \`<!-- ${ROOT_MARKER} -->\`: el agente no sabrá que debe leer docs/agents. Agrega el bloque del skill entre \`${ROOT_MARKER}\` y \`${MARKER_PREFIX}:end\`.`,
+        message: `${root.file} no contiene el marcador \`<!-- ${ROOT_MARKER} -->\`: el agente no sabrá que debe leer docs/agents. Agrega el bloque de la skill entre \`${ROOT_MARKER}\` y \`${MARKER_PREFIX}:end\`.`,
       });
     }
   }

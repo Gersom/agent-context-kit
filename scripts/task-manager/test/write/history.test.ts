@@ -54,8 +54,8 @@ describe("insertHistoryEntry", () => {
   });
 
   test("la plantilla (sin entradas): reemplaza la entrada de ejemplo y conserva el comentario que la precede", () => {
-    const template = "# History\n\n---\n\n<!-- Si el skill se agrega de forma retroactiva... -->\n\n## [Placeholder fecha] — ✅ [Placeholder título]\n\n- [Placeholder]\n";
-    expect(insertInto(template, ENTRY)).toBe(`# History\n\n---\n\n<!-- Si el skill se agrega de forma retroactiva... -->\n\n${ENTRY}\n`);
+    const template = "# History\n\n---\n\n<!-- Si la skill se agrega de forma retroactiva... -->\n\n## [Placeholder fecha] — ✅ [Placeholder título]\n\n- [Placeholder]\n";
+    expect(insertInto(template, ENTRY)).toBe(`# History\n\n---\n\n<!-- Si la skill se agrega de forma retroactiva... -->\n\n${ENTRY}\n`);
   });
 
   test("la entrada de ejemplo no es la última cosa del archivo: lo que sigue se respeta", () => {

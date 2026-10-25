@@ -1,4 +1,4 @@
-<!-- agent-context-skill:signature — ignorar al leer/actualizar este archivo, no es contenido. Existe solo para identificar que fue generado por https://github.com/Gersom/agent-context-skill, útil para el flujo de migración (ver docs/migration-flow.md) cuando hay que distinguir este skill de un sistema de documentación parecido pero distinto. Opcional: su ausencia no significa que el archivo no sea de este skill. -->
+<!-- agent-context-skill:signature — ignorar al leer/actualizar este archivo, no es contenido. Existe solo para identificar que fue generado por https://github.com/Gersom/agent-context-skill, útil para el flujo de migración (ver docs/migration-flow.md) cuando hay que distinguir esta skill de un sistema de documentación parecido pero distinto. Opcional: su ausencia no significa que el archivo no sea de esta skill. -->
 
 # Handoff
 

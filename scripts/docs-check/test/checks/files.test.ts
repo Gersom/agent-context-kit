@@ -83,7 +83,7 @@ describe("operators-unreadable", () => {
 });
 
 describe("root-file", () => {
-  test("AGENTS.md y CLAUDE.md con el bloque del skill: sin hallazgos", () => {
+  test("AGENTS.md y CLAUDE.md con el bloque de la skill: sin hallazgos", () => {
     expect(checkRootFiles(makeCtx())).toEqual([]);
   });
 
@@ -109,7 +109,7 @@ describe("root-file", () => {
     expect(findings[0].message).toContain(ROOT_MARKER);
   });
 
-  test("con el marcador del skill no avisa, aunque no mencione docs/agents", () => {
+  test("con el marcador de la skill no avisa, aunque no mencione docs/agents", () => {
     const text = `# X\n\n<!-- ${ROOT_MARKER} -->\nHola\n`;
     expect(checkRootFiles(makeCtx({ agentsMd: text }))).toEqual([]);
   });

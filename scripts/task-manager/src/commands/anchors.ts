@@ -58,7 +58,7 @@ export const anchors: Command = {
     }
     if (problems) {
       io.out("");
-      io.out(`${problems} problema(s): sin anclas el script no edita con seguridad. Agrégalas con el skill (al actualizar el archivo) o a mano.`);
+      io.out(`${problems} problema(s): sin anclas el script no edita con seguridad. Agrégalas con la skill (al actualizar el archivo) o a mano.`);
       return 1;
     }
     io.out("");

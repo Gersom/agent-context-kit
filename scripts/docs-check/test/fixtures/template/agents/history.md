@@ -9,7 +9,7 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
-<!-- Si el skill se agrega de forma retroactiva a un proyecto existente (Ronda 2 de questions-flow.md), esta primera carga se reconstruye con los hitos de `git log` (no un volcado literal), todos como ✅ Hecha. -->
+<!-- Si la skill se agrega de forma retroactiva a un proyecto existente (Ronda 2 de questions-flow.md), esta primera carga se reconstruye con los hitos de `git log` (no un volcado literal), todos como ✅ Hecha. -->
 
 ## [Placeholder fecha] — ✅ [Placeholder título]
 

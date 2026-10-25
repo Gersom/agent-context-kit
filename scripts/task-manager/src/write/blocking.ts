@@ -15,7 +15,7 @@ import { fieldBody, renderField } from "./render.ts";
 /** Tags de bloqueo que mandan la tarea a «bloqueadas / pospuestas» (español e inglés). */
 export const BLOCKING_TAGS = /^(dependencia|postergada|dependency|postponed)$/i;
 
-/** El tag escrito por el usuario (`dependencia`, `[dependencia]`, `` `[Dependencia]` ``) en su forma mínima, o `null` si no es uno de los dos. */
+/** El tag escrito por el operador (`dependencia`, `[dependencia]`, `` `[Dependencia]` ``) en su forma mínima, o `null` si no es uno de los dos. */
 export function parseTagFlag(value: string): string | null {
   const tag = value.trim().replace(/^`?\[?|\]?`?$/g, "").toLowerCase();
   return BLOCKING_TAGS.test(tag) ? tag : null;

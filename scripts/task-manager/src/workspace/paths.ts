@@ -8,7 +8,7 @@ import { CliError } from "../cli/errors.ts";
 
 export const OPERATORS_FILE = "operators.md";
 
-/** Subcarpetas donde el skill genera la documentación, relativas a la raíz del proyecto. */
+/** Subcarpetas donde la skill genera la documentación, relativas a la raíz del proyecto. */
 const AGENTS_SUBDIRS = [join("docs", "agents"), join("agent-context", "agents")];
 
 /**
@@ -74,7 +74,7 @@ export function operatorFolders(agentsRoot: string): string[] {
   }
 }
 
-/** `true` si la carpeta de agentes sigue la estructura del skill (`docs/agents` o `agent-context/agents`). */
+/** `true` si la carpeta de agentes sigue la estructura de la skill (`docs/agents` o `agent-context/agents`). */
 function isStandardAgentsDir(agentsDir: string): boolean {
   return basename(agentsDir) === "agents" && ["docs", "agent-context"].includes(basename(dirname(agentsDir)));
 }

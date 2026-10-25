@@ -243,7 +243,7 @@ function structureWarnings(docs: Docs): string[] {
 /**
  * Estado completo del operador.
  * @throws CliError si falta `handoff.md` (sin él no hay estado que mostrar); backlog, history y
- *   team-backlog ausentes no son un error (el set mínimo del skill solo trae el handoff).
+ *   team-backlog ausentes no son un error (el set mínimo de la skill solo trae el handoff).
  */
 export function buildState(docs: Docs): TaskState {
   requireDoc(docs.handoff, "handoff.md");

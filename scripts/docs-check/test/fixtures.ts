@@ -174,7 +174,7 @@ ${BACKLOG_BLOCKED}${ANCHOR("grouped")}
 
 // -- history.md ---------------------------------------------------------------------------------
 
-const HISTORY_INTRO = until(template("agents", "history.md"), "<!-- Si el skill se agrega");
+const HISTORY_INTRO = until(template("agents", "history.md"), "<!-- Si la skill se agrega");
 
 export const HISTORY_ENTRIES = `## 2026-10-03 — ✅ Tarea 4 — Ignorar bloques de código
 
@@ -221,7 +221,7 @@ export const OPERATORS = `${OPERATORS_INTRO}- gersom: gersom@mail.com, g@work.co
 
 // -- AGENTS.md y CLAUDE.md de la raíz -----------------------------------------------------------
 
-/** El bloque delimitado del skill de una plantilla, sin la guía para el agente que la precede. */
+/** El bloque delimitado de la skill de una plantilla, sin la guía para el agente que la precede. */
 function rootBlock(name: string): string {
   const text = template(name);
   return text.slice(text.indexOf("<!-- agent-context-skill:start -->"));

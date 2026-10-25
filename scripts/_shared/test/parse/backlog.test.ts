@@ -61,7 +61,7 @@ describe("parseBacklog: posiciones en el texto original", () => {
   test("campos: cada uno con su línea y sus continuaciones", () => {
     const { blocked } = parseBacklog(text);
     expect(blocked[0].fields.map((f) => sliceRange(text, f.range!))).toEqual([
-      "- **Descripción:** publicar el skill.\n",
+      "- **Descripción:** publicar la skill.\n",
       "- **Bloqueos:** `[dependencia]` depende de la Tarea 3.\n",
       "- **Detalles:** ver [el diseño](../desing.md).\n",
     ]);
