@@ -14,7 +14,32 @@ Estado "en caliente": en qué se está ahora. **Se actualiza editando solo lo qu
 <!-- agent-context-skill:section=in-progress -->
 ## Tarea en progreso
 
-Sin tarea en curso
+Tarea 61 — Reevaluar project/stack.md
+
+Reevaluar la plantilla project/stack.md de la skill: para qué sirve, si se solapa con architecture.md y decisions.md, y si debe seguir en el set intermedio y completo.
+
+### Plan
+
+- [x] Mapear las referencias a decisions.md y stack.md en la skill y el kit
+- [x] Skill, plantillas: carpeta template/project/decisions/ (README y stack), sin decisions.md ni stack.md sueltos, y enlace de rules.md al índice
+- [x] Skill, flujos: questions-flow (carpeta desde la idea, pregunta Stack, sets), migration-flow, template-architecture, README de plantillas y changelog 2.0
+- [x] Kit: check decisions-index en docs-check con tests, fixtures y documentación
+- [ ] Verificar con bun test, typecheck, docs-check, generación de prueba en frío y revisión con el revisor
+- [ ] Documentar cierre de tarea
+
+**Modo de ejecución acordado:** todos seguidos
+
+### Qué falta
+
+Falta la generación de prueba en frío, la revisión y el cierre
+
+### Decisiones a medio camino
+
+Confirmar el alcance: se entendió la plantilla template/project/stack.md de la skill (el pedido decía «project(stack.md»).
+
+### Próximo paso concreto
+
+Generar docs en un repo idea con un subagente en frío y revisar la carpeta decisions/
 
 <!-- agent-context-skill:section=paused -->
 ## Tareas pausadas
