@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 65
+**Próximo número de tarea:** 66
 
 ---
 
@@ -65,13 +65,13 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Agregada:** 2026-10-24.
 
-### Tarea 63 — Decidir cuándo se genera roadmap.md al migrar
+### Tarea 65 — Mostrar el contexto antes de preguntar sin depender del recuadro
 
-- **Descripción:** En la migración, roadmap.md se creó en una corrida y en la otra no: depende de la etapa del proyecto que el modelo infiere cuando no hay operador interactivo; hay que fijar una regla para que el resultado no varíe.
-- **Decisiones/temas a definir antes de empezar:** Si en una migración roadmap.md se genera siempre (ALCANCE d), solo con ETAPA distinta de idea/setup, o solo si el proyecto migrado ya tenía uno; y qué etapa se asume por defecto cuando no se puede preguntar.
+- **Descripción:** La regla de la Tarea 64 (escribir el contexto en el chat y abrir el recuadro de preguntas en el mismo turno) no funciona en el cliente del operador: el texto previo no se ve mientras responde y vuelve a pedir el plan; hay que cambiar la regla para que el contexto quede visible antes de preguntar.
+- **Decisiones/temas a definir antes de empezar:** Cómo mostrar el contexto: terminar el turno con el contexto y una pregunta en texto simple (excepción a «siempre con AskUserQuestion») para planes, tablas y resúmenes, o resumir el contexto dentro del recuadro; qué preguntas siguen yendo con recuadro (decisiones cortas que se entienden sin contexto).
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Surgida de la medición de la Tarea 62 (claude -p --model sonnet, 2 corridas): mig-1 generó docs/agents/roadmap.md y mig-2 no, con el mismo repo de partida. La regla está repartida entre questions-flow.md (roadmap solo si ETAPA distinta de idea/setup) y migration-flow.md paso 4 (seguir como si ALCANCE fuera d). Con operador interactivo la etapa se pregunta, así que el desvío aparece sobre todo sin él. Verificar repitiendo la medición con 2 corridas de migración.
+- **Detalles:** Observado el 2026-10-25 en las Tareas 59, 62 y 63: el agente escribió el plan en un mensaje y llamó a AskUserQuestion en el mismo turno, y el operador respondió «dime el plan» cada vez. Afecta la regla 5 de docs/asking-questions.md, la frase de SKILL.md sobre preguntar, la Regla 2 de template/agents/rules.md (cambio de texto fijo: entrada en el changelog y bump), las notas de contexto de los flujos añadidas en la Tarea 64 (questions-flow, migration-flow, update-flow, version-check, multi-operator) y la copia de la Regla 2 en docs/agents/rules.md del kit y la fixture de docs-check. Verificar con el operador en su cliente, no con claude -p. Ver la memoria show-context-before-questions.
 - **Agregada:** 2026-10-25.
 
 <!-- agent-context-skill:section=blocked -->

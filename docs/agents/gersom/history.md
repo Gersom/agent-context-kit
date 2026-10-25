@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-25 — ✅ Tarea 63 — Decidir cuándo se genera roadmap.md al migrar
+
+- En una migración, roadmap.md se genera solo si la documentación vieja tenía uno, sin depender de la etapa que el modelo infiera (migration-flow.md, paso 4, y questions-flow.md).
+- Skill 2.0.3, sin cambios que aplicar a proyectos ya generados.
+- Medición con claude -p (2 corridas de migración): ambas sin roadmap.md, antes una sí y otra no. No se probó el caso con un roadmap previo. Commits: skill (docs y chore de T-63); kit test(T-63).
+
 ## 2026-10-25 — ✅ Tarea 64 — Corrección de tandas de preguntas: mostrar el contexto en el chat
 
 - Las preguntas de la skill van cortas y el contexto que necesitan (plan, tablas, resúmenes, listas, diferencias, evidencia de las recomendaciones) se escribe completo en el chat antes de la tanda: regla 5 de asking-questions.md, Regla 2 de rules.md y cada pregunta de los flujos que depende de contexto.
