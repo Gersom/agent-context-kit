@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-25 — ✅ Tarea 65 — Mostrar el contexto antes de preguntar sin depender del recuadro
+
+- Las preguntas de la skill que necesitan que el operador revise contenido (plan, tabla, resumen, lista, diff, estado) van en texto, como mensaje final del turno; las que se entienden solas siguen con el recuadro en tandas. Medido en el cliente del operador: el texto previo al recuadro no se ve si el turno ya usó herramientas.
+- Regla 5 de asking-questions.md, SKILL.md, Regla 2 de rules.md (el plan y sus preguntas en texto, en el mismo mensaje) y cada flujo (questions, migration, update, version-check, multi-operator). Skill 2.0.4; changelog fusionado en la sección 2.0.2 porque 2.0.2 a 2.0.4 no estaban publicadas.
+- Revisión independiente del diff (sin bloqueantes; mejoras corregidas) y bun test, typecheck y docs-check en verde. Falta confirmar la regla en el cliente del operador. Commits: skill 776c539 y 128c1e2; kit edfcec1.
+
 ## 2026-10-25 — ✅ Tarea 63 — Decidir cuándo se genera roadmap.md al migrar
 
 - En una migración, roadmap.md se genera solo si la documentación vieja tenía uno, sin depender de la etapa que el modelo infiera (migration-flow.md, paso 4, y questions-flow.md).
