@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-24 — ✅ Tarea 51 — Reevaluación de determinismo
+
+- Desvíos corregidos: estado en reposo del handoff, plantillas sin contenido y enlaces de archivos compartidos en multi. Commits: skill d72366e; kit 9de7dbb.
+
 ## 2026-10-11 — ✅ Tarea 57 — Aclarar o unificar los dos prefijos de marcador (agent-docs-skill y agent-context-kit)
 
 - Commits: skill 59465d4; kit d2ae1c2, 601d6be y a7765c0.

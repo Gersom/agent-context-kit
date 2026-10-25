@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 59
+**Próximo número de tarea:** 61
 
 ---
 
@@ -57,13 +57,29 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** Surgida al cerrar las Tareas 54 y 55: la skill quedó en 2.0.0 sin tag ni push, y package.json del kit sigue en 1.7.0 con más de 40 commits posteriores.
 - **Agregada:** 2026-10-11.
 
-### Tarea 51 — Reevaluación de determinismo
+### Tarea 52 — Verificación de optimización
 
-- **Descripción:** Ver qué tan fiel y estricto termina el repo en el que se usa la skill en comparación con el template: qué se respeta, qué se desvía y qué parte del resultado depende del criterio del agente.
-- **Decisiones/temas a definir antes de empezar:** Cómo medirlo (repos de prueba generados con la skill, comparación contra el template) y qué nivel de desvío se acepta.
-- **Bloqueos:** `[Resuelto el 2026-10-11]` — era `[dependencia]` Depende de las Tareas 53, 54, 55, 56 y 57: el determinismo se reevalúa después de resolver los hallazgos de consistencia.
+- **Descripción:** Ver si algo en los archivos .md (reglas, plantillas, docs) se puede acortar o quitar para optimizar tokens, sin perder información que el agente necesita.
+- **Decisiones/temas a definir antes de empezar:** Criterio de qué se puede quitar (redundancias, ejemplos, texto repetido entre archivos) y cuánta reducción justifica el cambio.
+- **Bloqueos:** `[Resuelto el 2026-10-24]` — era `[dependencia]` Depende de la Tarea 51: la optimización de tokens se evalúa después de reevaluar el determinismo.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Agregada:** 2026-10-11.
+
+### Tarea 59 — Repetir la medición de determinismo con claude -p real y 2 o más corridas por escenario
+
+- **Descripción:** Surgió al cerrar la Tarea 51; falta detallarla.
+- **Decisiones/temas a definir antes de empezar:** Ninguno.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-24.
+
+### Tarea 60 — Renombrar el name y el título de SKILL.md de agent-context-kit a agent-context-skill
+
+- **Descripción:** Surgió al cerrar la Tarea 51; falta detallarla.
+- **Decisiones/temas a definir antes de empezar:** Ninguno.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-24.
 
 <!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
@@ -76,14 +92,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Detalles:** Cambios a revisar: (1) los pasos del plan pueden llevar al final de la línea evidencia y commit (· bun test 779 pass · commit abc1234, Tarea 35): ver si el tracker los corta, los desalinea o los muestra bien; (2) un paso reabierto se escribe como (reabierto: motivo); (3) el handoff ahora se edita solo en lo que cambia y las pausadas ya no se leen salvo sin tarea en curso: ver si el tracker asume que el archivo se reescribe entero (reintento de primera lectura en src/io/snapshot.ts); (4) la entrada de history.md ahora es más breve y lista los commits; (5) el reporte de cierre suma Checks pendientes y Próximo paso (no afecta al tracker, solo confirmarlo). Probar contra el handoff real con una tarea en curso, con evidencia en los pasos y con una pausada. Si no hay nada que cambiar, cerrarla con esa conclusión.
 - **Agregada:** 2026-10-08.
-
-### Tarea 52 — Verificación de optimización
-
-- **Descripción:** Ver si algo en los archivos .md (reglas, plantillas, docs) se puede acortar o quitar para optimizar tokens, sin perder información que el agente necesita.
-- **Decisiones/temas a definir antes de empezar:** Criterio de qué se puede quitar (redundancias, ejemplos, texto repetido entre archivos) y cuánta reducción justifica el cambio.
-- **Bloqueos:** `[dependencia]` Depende de la Tarea 51: la optimización de tokens se evalúa después de reevaluar el determinismo.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Agregada:** 2026-10-11.
 
 <!-- agent-context-skill:section=grouped -->
 ## Tareas agrupadas
