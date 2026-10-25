@@ -17,7 +17,8 @@ docs/
 │       ├── backlog.md        # las tareas que tomó
 │       └── history.md        # sus tareas cerradas
 ├── architecture.md     # estructura del repo y para qué sirve cada parte
-└── philosophy.md       # por qué el kit es como es
+├── philosophy.md       # por qué el kit es como es
+└── releasing.md        # versionado y releases (cuándo subir patch, minor o major)
 ```
 
 Para ubicarte en el repo o saber dónde va algo nuevo: [`architecture.md`](./architecture.md).
