@@ -2,7 +2,7 @@
 
 Verifica que la documentación de agentes de **otro** proyecto cumpla lo que necesitan la skill `agent-context-skill`, el seguimiento de tareas (`bun run tasks`) y el gestor de tareas (`bun run task`), antes de trabajar ahí. Solo lee: no escribe nada en el proyecto revisado y no corrige (la corrección de repos ya adoptados es otra tarea).
 
-Es una herramienta de este repo, no parte del skill: no se copia a los repos destino.
+Es una herramienta de este repo, no parte de la skill: no se copia a los repos destino.
 
 ## Uso
 
@@ -29,7 +29,7 @@ Cada hallazgo lleva archivo, línea (cuando aplica) y un código. **Error:** el 
 | `workspace` | error | No se pudo ubicar la carpeta de agentes o el operador (mensaje del gestor de tareas). Aun así se revisan `AGENTS.md` y `CLAUDE.md` si la ruta es una carpeta que existe (aunque no tenga `docs/agents`). |
 | `file-missing` | error / aviso | Falta `handoff.md` o `backlog.md` (error); `history.md` o `team-backlog.md` (aviso). |
 | `operators-unreadable` | aviso | Líneas de `operators.md` que no se pudieron leer. |
-| `root-file` | aviso | Falta `AGENTS.md` o `CLAUDE.md`, o no llevan el bloque del skill ni mencionan `docs/agents`. |
+| `root-file` | aviso | Falta `AGENTS.md` o `CLAUDE.md`, o no llevan el bloque de la skill ni mencionan `docs/agents`. |
 | `skill-version` | aviso | `rules.md` de la carpeta de agentes sin el marcador de versión de la skill (`<!-- agent-context-skill:version X.Y.Z … -->`) en sus primeras 3 líneas, o con la versión mal formada. Los proyectos generados antes de la 1.9.0 no lo tienen. Si no hay `rules.md`, no dice nada. |
 | `legacy-marker` | aviso | Marcadores con un prefijo anterior a la skill 2.0.0 (`agent-context-kit:` en anclas, versión y firma; `agent-docs-skill:` en el bloque de `AGENTS.md` y `CLAUDE.md`) en los archivos del operador, `rules.md` o la raíz. Se siguen leyendo; actualízalos a `agent-context-skill:`. |
 | `decisions-index` | aviso | La carpeta `project/decisions/` no tiene `README.md`, un tema no figura en su índice (`- [tema.md](./tema.md) — cuándo leerlo`) o una línea del índice enlaza a un archivo que no existe. |

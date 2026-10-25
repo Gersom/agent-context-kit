@@ -3,7 +3,7 @@
 
 ## Reglas por defecto (fijas — no se editan por proyecto)
 
-Vienen con el skill y aplican a cualquier proyecto; las reglas de proceso adicionales se agregan debajo, no en su reemplazo. Son fijas también en su plantilla (`template/agents/rules.md`, en el repo de la skill). Las Reglas 6 a 9 están al final, en "Al cerrar una tarea".
+Vienen con la skill y aplican a cualquier proyecto; las reglas de proceso adicionales se agregan debajo, no en su reemplazo. Son fijas también en su plantilla (`template/agents/rules.md`, en el repo de la skill). Las Reglas 6 a 9 están al final, en "Al cerrar una tarea".
 
 1. **Cada contenido vive en un único archivo, el de su tema** (una decisión en `decisions/`, un bug en `known-issues.md`). Si otro archivo lo necesita, va una mención breve con link, no una copia.
 
@@ -41,7 +41,7 @@ Varias personas trabajan a la vez, cada una con su agente. Estas reglas se suman
 
 - **Dos repos.** El kit (este repo) tiene las herramientas y su documentación; la skill (`SKILL.md`, flujos y plantillas `.md`, markdown puro, sin código ni build) vive en su propio repo, [Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill), clonado en `skill/` e ignorado por git en el kit (`.gitignore`). Quien clone el kit tiene que clonar también la skill en `skill/` (ver el README raíz); sin ella, los tests de `scripts/skill-checks/` se saltan.
 - **Commits en dos repos (complementa la Regla 5).** Un cambio en la skill se commitea en su repo, con `git -C skill commit` y el mismo formato `tipo(T-N): descripción`; uno en el kit, en el kit. Una tarea que toca ambos tiene commits en los dos. El commit de cierre (`docs(T-N): close task`) va siempre en el kit, porque ahí viven `handoff.md`, `backlog.md` e `history.md`. En `history.md`, la entrada indica el repo de cada commit (ver «Formato» en ese archivo).
-- No hay linter/formatter. `scripts/` (TypeScript con Bun, ej. `scripts/task-tracker/`) son herramientas propias del kit que **no forman parte del skill distribuido** ni se copian a los repos destino.
+- No hay linter/formatter. `scripts/` (TypeScript con Bun, ej. `scripts/task-tracker/`) son herramientas propias del kit que **no forman parte de la skill distribuida** ni se copian a los repos destino.
 - Dependencias de `scripts/`: solo en `devDependencies` del `package.json` raíz (no uno por script); `bun install` en la raíz; `node_modules/` no se commitea y `bun.lock` sí. Tests con `bun test` desde la raíz.
 - Los scripts nuevos se escriben en **TypeScript** (decisión del operador, 2026-10-05), con el `tsconfig.json` raíz (`strict`). Bun no revisa tipos: `bun run typecheck` (`tsc --noEmit`) tiene que pasar junto con `bun test`.
 - **Decisión no negociable —** versionado SemVer, tags de git `vX.Y.Z` y releases manuales en GitHub, no por CI. Cada repo se versiona por separado: el kit con `package.json`; la skill, en su propio repo. Cuándo subir patch, minor o major y dónde vive cada versión: [`../releasing.md`](../releasing.md).

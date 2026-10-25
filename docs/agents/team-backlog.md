@@ -23,9 +23,9 @@ Tareas **sin dueño** del proyecto, visibles para todos los operadores. Las tare
 <!-- agent-context-skill:section=free -->
 ## Tareas libres
 
-### Prompt de normalización para repos que ya adoptaron el skill
+### Prompt de normalización para repos que ya adoptaron la skill
 
-- **Descripción:** escribir el prompt que el operador corre en cada repo que adoptó el skill antes de las anclas (`T-9@gersom`), para que el agente de ese repo agregue las anclas de sección y ajuste `backlog.md`/`handoff.md` (y el formato de `history.md`) a la estructura que lee el task-tracker. Se entrega al operador en el chat y queda guardado junto al script para reusarlo.
+- **Descripción:** escribir el prompt que el operador corre en cada repo que adoptó la skill antes de las anclas (`T-9@gersom`), para que el agente de ese repo agregue las anclas de sección y ajuste `backlog.md`/`handoff.md` (y el formato de `history.md`) a la estructura que lee el task-tracker. Se entrega al operador en el chat y queda guardado junto al script para reusarlo.
 - **Decisiones/temas a definir antes de empezar:** dónde queda guardado (propuesta: README de `scripts/task-tracker/`).
 - **Bloqueos:** `[Resuelto el 2026-10-05]` — era `[postergada]` hasta que el task-tracker llegara a su versión MVP; el operador confirmó el MVP el 2026-10-05, al cerrar la `T-21@gersom`. Ya no hay bloqueo.
 - **Detalles:** antes estaba dentro de la `T-11@gersom`. La `T-15@gersom` (validador) puede servir para verificar el resultado del prompt en cada repo. Era la Tarea 19 de gersom; ese número queda retirado.

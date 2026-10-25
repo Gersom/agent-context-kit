@@ -6,9 +6,9 @@ La razón de ser del kit y sus principios de diseño (markdown plano como fuente
 
 ## Qué hace
 
-Al ejecutarse sobre un repositorio, el skill:
+Al ejecutarse sobre un repositorio, la skill:
 
-1. Detecta si ya existe documentación de contexto (`docs/` o `agent-context/`) generada por este skill.
+1. Detecta si ya existe documentación de contexto (`docs/` o `agent-context/`) generada por esta skill.
    - Si existe, lee `rules.md`, `handoff.md` y lo relevante de `backlog.md`, ejecuta la tarea pedida y al terminar actualiza `handoff.md`/`history.md`.
    - Si no existe, dispara un flujo de preguntas para decidir qué documentación generar, según el alcance de la tarea (puntual, feature, desarrollo prolongado) y la etapa del proyecto.
 2. Genera (o completa) una carpeta de documentación con una estructura predecible: reglas del proyecto, estado "en caliente" del trabajo, backlog, historial, arquitectura, stack, integraciones externas, etc.
@@ -16,9 +16,9 @@ Al ejecutarse sobre un repositorio, el skill:
 
 ## Cómo usar
 
-Invocar el skill explícitamente, pidiéndoselo al agente (se llama igual que su repo, `agent-context-skill`):
+Invocar la skill explícitamente, pidiéndoselo al agente (se llama igual que su repo, `agent-context-skill`):
 
-- **"Usa la skill agent-context-skill"** — dispara la detección automática normal: si el repo ya tiene documentación de este skill, sigue el flujo de proyecto existente; si no, evalúa si hay contenido de otro sistema para migrar, o dispara el scaffolding normal según el alcance de la tarea.
+- **"Usa la skill agent-context-skill"** — dispara la detección automática normal: si el repo ya tiene documentación de esta skill, sigue el flujo de proyecto existente; si no, evalúa si hay contenido de otro sistema para migrar, o dispara el scaffolding normal según el alcance de la tarea.
 - **"Usa la skill agent-context-skill y migra mi proyecto"** — misma detección, pero fuerza el chequeo de migración aunque la heurística de nombres de archivo no encuentre por sí sola suficientes coincidencias como para dispararse (ver "Intención explícita del operador" en `docs/migration-flow.md` del [repo de la skill](https://github.com/Gersom/agent-context-skill)).
 
 ## Clonar la skill
@@ -33,7 +33,7 @@ Sin ese clon todo lo demás funciona, pero los tests de `scripts/skill-checks/` 
 
 ## Seguimiento de tareas en la terminal
 
-Este repo incluye una herramienta para ver, en una terminal aparte, el estado de las tareas de cualquier proyecto que use el skill (tarea en progreso, pausadas, pendientes y últimas completadas), redibujándose sola cuando cambian sus archivos:
+Este repo incluye una herramienta para ver, en una terminal aparte, el estado de las tareas de cualquier proyecto que use la skill (tarea en progreso, pausadas, pendientes y últimas completadas), redibujándose sola cuando cambian sus archivos:
 
 ```sh
 bun install
@@ -55,7 +55,7 @@ Comandos, flags y cómo escribe: [`scripts/task-manager/README.md`](./scripts/ta
 
 ## Verificar un proyecto antes de trabajar en él
 
-Un verificador de solo lectura que revisa si la documentación de agentes de otro repo sirve al skill, al seguimiento y a la gestión de tareas, y lista errores y avisos con archivo y línea:
+Un verificador de solo lectura que revisa si la documentación de agentes de otro repo sirve a la skill, al seguimiento y a la gestión de tareas, y lista errores y avisos con archivo y línea:
 
 ```sh
 bun run check <ruta-del-proyecto>

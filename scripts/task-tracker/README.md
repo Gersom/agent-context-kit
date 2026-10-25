@@ -2,7 +2,7 @@
 
 Muestra en la terminal el estado de las tareas de un proyecto que usa la skill `agent-context-skill` y se redibuja solo cada vez que cambian sus archivos. Está pensado para tenerlo abierto en una terminal mientras en otra un agente de IA trabaja sobre el proyecto.
 
-Es una herramienta de este repo, no parte del skill: no se copia a los repos destino. Se lanza desde acá y apunta a la carpeta del proyecto que quieras seguir.
+Es una herramienta de este repo, no parte de la skill: no se copia a los repos destino. Se lanza desde acá y apunta a la carpeta del proyecto que quieras seguir.
 
 ## Requisitos
 
@@ -105,7 +105,7 @@ El pie de la pantalla lista las teclas que valen en la vista actual como `[tecla
 - **`backlog.md`, compacto:** libres (y sus grupos) y bloqueadas como `T-N: título`. Cada bloqueada muestra su tag (`[dependencia]`, `[postergada]`…) y las tareas que menciona su motivo; si alguna ya está cerrada en `history.md`, lo marca en amarillo como recordatorio de la Regla 8 (moverla a libres).
 - **Avisos:** al final, fuera de los recuadros, lo que no se pudo leer o interpretar (ver abajo).
 
-`backlog.md` e `history.md` son opcionales: el set mínimo del skill solo genera `handoff.md`, y en ese caso sus recuadros no aparecen. Los recuadros PAUSADAS y BLOQUEADAS tampoco aparecen cuando no hay tareas de ese tipo (los demás se muestran siempre, con "Sin tarea en curso" o "Ninguna" si están vacíos).
+`backlog.md` e `history.md` son opcionales: el set mínimo de la skill solo genera `handoff.md`, y en ese caso sus recuadros no aparecen. Los recuadros PAUSADAS y BLOQUEADAS tampoco aparecen cuando no hay tareas de ese tipo (los demás se muestran siempre, con "Sin tarea en curso" o "Ninguna" si están vacíos).
 
 El tachado usa el código de tachado de la terminal: Windows Terminal, VS Code y la mayoría de las terminales actuales lo muestran; si una no lo soporta, el texto sale normal. Con `NO_COLOR` no hay colores ni tachado.
 
@@ -124,11 +124,11 @@ El script no depende del idioma de la documentación (los headers se traducen po
 
 | Aviso | Qué significa |
 |---|---|
-| `… no tiene anclas de sección: se ubicaron las secciones por orden (plan B).` | El archivo es anterior a las anclas. Funciona, pero conviene agregarlas (el skill lo hace solo al actualizar el archivo). |
+| `… no tiene anclas de sección: se ubicaron las secciones por orden (plan B).` | El archivo es anterior a las anclas. Funciona, pero conviene agregarlas (la skill lo hace solo al actualizar el archivo). |
 | `… no se pudo leer (…): mostrando la versión de las HH:MM:SS.` | El archivo falló justo al leerlo (normalmente, un agente reescribiéndolo). Se corrige solo con el próximo cambio. |
 | `Tarea N está en "bloqueadas" sin bloqueo vigente: ¿moverla a libres? (Regla 8)` | Su campo `Bloqueos` solo tiene historial resuelto. |
 | `… tiene placeholders sin completar.` | Quedó texto `[Placeholder…]` de la plantilla. |
-| `Sin backlog.md (set mínimo del skill)…` | El proyecto usa el set mínimo; no es un error. |
+| `Sin backlog.md (set mínimo de la skill)…` | El proyecto usa el set mínimo; no es un error. |
 
 ## Desarrollo
 

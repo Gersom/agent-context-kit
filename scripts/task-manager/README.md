@@ -2,7 +2,7 @@
 
 Gestiona las tareas de un proyecto que usa la skill `agent-context-skill` editando de forma **quirúrgica** sus archivos (`handoff.md`, `backlog.md`, `history.md` y, en modo multi-operador, `team-backlog.md`), en lugar de que un agente o una persona los edite a mano. Los comandos de negocio se van sumando por etapas; hoy están la infraestructura, dos comandos de diagnóstico, los de lectura (`status`, `next`, `show`) y los de escritura que llevan una tarea por todo su ciclo de vida (`add`, `start`, `step`, `pause`, `resume`, `block`, `unblock` y `close`, que la cierra con las Reglas 6 a 9 de `rules.md`).
 
-Es **opcional** y es una herramienta de este repo, no parte del skill: no se copia a los repos destino (principio 4 de [`docs/philosophy.md`](../../docs/philosophy.md)). Sin ella, los archivos se editan a mano igual.
+Es **opcional** y es una herramienta de este repo, no parte de la skill: no se copia a los repos destino (principio 4 de [`docs/philosophy.md`](../../docs/philosophy.md)). Sin ella, los archivos se editan a mano igual.
 
 ## Requisitos
 
@@ -311,7 +311,7 @@ Sigue `docs/multi-operator.md` de la skill y nunca escribe al resolver:
 
 Lee `handoff.md`, `backlog.md` e `history.md` de la carpeta del operador y `team-backlog.md` de la raíz de agentes (solo en modo multi-operador). Los parsea con los parsers de [`scripts/_shared/`](../_shared/) (los mismos del task-tracker), que devuelven la posición exacta de cada sección, tarea, campo y paso del plan.
 
-- **Archivo ausente** (el set mínimo del skill solo genera `handoff.md`; `team-backlog.md` puede no existir): no es un error al leer; queda marcado como inexistente y cada comando decide si lo necesita. Este script no crea archivos que faltan.
+- **Archivo ausente** (el set mínimo de la skill solo genera `handoff.md`; `team-backlog.md` puede no existir): no es un error al leer; queda marcado como inexistente y cada comando decide si lo necesita. Este script no crea archivos que faltan.
 - **Archivo que no se puede leer** (permisos, trabado, es una carpeta): sí es un error, con su ruta.
 
 ## Edición quirúrgica

@@ -6,7 +6,7 @@ El "por qué" del kit y lo que debe respetar cualquier cambio nuevo. El "qué" (
 
 ## Para qué existe el kit
 
-`agent-context-kit` empezó como un skill; hoy es un **kit de herramientas** (los scripts de [`scripts/`](../scripts/)) que acompañan a la skill, que vive en su propio repo, [Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill). Mantiene documentación que sirve de **contexto para cualquier agente de IA y para las personas del proyecto**:
+`agent-context-kit` empezó como una skill; hoy es un **kit de herramientas** (los scripts de [`scripts/`](../scripts/)) que acompañan a la skill, que vive en su propio repo, [Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill). Mantiene documentación que sirve de **contexto para cualquier agente de IA y para las personas del proyecto**:
 
 - el **estado** del trabajo y el **historial de cambios**;
 - los **datos importantes y las decisiones ya tomadas**, para no volver a discutirlas ni inventar lo ya definido.
@@ -37,7 +37,7 @@ Todo cambio de estado es un diff de git, revisable y revertible. Funciona con cu
 
 ### 4. Las herramientas son opcionales
 
-Los scripts de `scripts/` (el task-tracker y los que vengan) son un atajo, nunca un requisito: son del repo, no del skill distribuido, y no se copian a los repos destino. Sin ellos, el agente edita los markdown a mano. Las reglas pueden preferir una herramienta, siempre con ese respaldo manual.
+Los scripts de `scripts/` (el task-tracker y los que vengan) son un atajo, nunca un requisito: son del repo, no de la skill distribuida, y no se copian a los repos destino. Sin ellos, el agente edita los markdown a mano. Las reglas pueden preferir una herramienta, siempre con ese respaldo manual.
 
 ### 5. Tolerancia a la edición manual
 
@@ -46,6 +46,15 @@ Como los archivos se editan a mano, las herramientas tienen que convivir con eso
 - Los parsers aceptan ediciones razonables (espacios, orden de campos, texto libre) y usan anclas de máquina (`<!-- agent-context-skill:section=... -->`) en vez de depender del idioma de los headers.
 - Lo que no puedan leer se avisa con archivo y línea; no se ignora en silencio.
 - Una herramienta que modifica un archivo hace edición quirúrgica: no reformatea lo que no toca y el diff muestra solo el cambio pedido.
+
+## Términos
+
+Un término por concepto, en toda la documentación y en los mensajes de los scripts:
+
+- **La skill** (femenino): `agent-context-skill`, el repo de `skill/`.
+- **Operador:** la persona que trabaja con el agente (definido en [`README.md`](./README.md)). «Usuario» solo nombra a quien usa el producto de un proyecto.
+- **Plantilla:** cada archivo de `template/` que la skill copia a un proyecto. «Template» solo nombra la carpeta `template/` o el archivo `template-architecture.md`.
+- **Ronda** (bloque de preguntas de un flujo) y **tanda** (hasta 4 preguntas en una llamada); **recuadro** es la interfaz de `AskUserQuestion`, nunca «widget». Ver `asking-questions.md` de la skill.
 
 ## Cambios nuevos
 

@@ -12,14 +12,14 @@ agent-context-kit/
 ├── package.json            # Versión del kit (SemVer) + scripts (tasks, task, check, test, typecheck) y devDependencies de scripts/
 ├── tsconfig.json           # TypeScript (strict) para scripts/; `bun run typecheck` = tsc --noEmit
 │
-├── scripts/                # Herramientas propias del repo (TypeScript con Bun); no forman parte del skill
+├── scripts/                # Herramientas propias del repo (TypeScript con Bun); no forman parte de la skill
 │   ├── _shared/               # Código compartido entre scripts (el `_` marca que no es un script: las carpetas sin `_` sí lo son)
 │   │   ├── markers.ts           # Prefijo `agent-context-skill:` de los marcadores de la skill y los prefijos anteriores que se siguen leyendo
 │   │   ├── types.ts             # Tipos del dominio: tarea, campo, sección, entrada de historial, handoff/backlog interpretados
 │   │   ├── parse/               # Markdown → datos: secciones por ancla, bloques, handoff, backlog, history, operators, team-backlog
 │   │   ├── tasks/               # Tag de bloqueo vigente (block-info) y tareas mencionadas en un texto (task-refs)
 │   │   └── test/                # Tests en espejo de parse/ y tasks/ + fixtures/ (docs de ejemplo) + helpers.ts
-│   ├── docs-check/            # Verificador de otro repo (`bun run check <ruta>`): comprueba que su documentación de agentes sirva al skill, al tracker y al task-manager
+│   ├── docs-check/            # Verificador de otro repo (`bun run check <ruta>`): comprueba que su documentación de agentes sirva a la skill, al tracker y al task-manager
 │   │   ├── README.md            # Uso, códigos de hallazgo y estructura
 │   │   ├── index.ts             # Arranque: llama a run()
 │   │   ├── src/                 # args, run, context, lines, report, types y checks/ (files, anchors, placeholders, tasks, handoff, history, skill-version, legacy-marker, decisions)
@@ -47,7 +47,7 @@ agent-context-kit/
 │   ├── architecture.md      # Este archivo
 │   ├── philosophy.md        # Principios de diseño: por qué el kit es lo que es
 │   ├── releasing.md         # Versionado y releases: cuándo subir patch, minor o major
-│   └── agents/               # Dogfooding: este repo usa el skill sobre sí mismo, en modo multi-operador
+│   └── agents/               # Dogfooding: este repo usa la skill sobre sí mismo, en modo multi-operador
 │       ├── rules.md            # Reglas de este repo, de todos los operadores
 │       ├── operators.md        # Operadores y sus correos de git
 │       ├── team-backlog.md     # Tareas sin dueño, sin numeración
@@ -66,9 +66,9 @@ agent-context-kit/
 
 - **`docs/philosophy.md`** — la razón de ser del kit y sus principios de diseño.
 - **`docs/releasing.md`** — cómo se versionan el kit y la skill y cuándo sube cada número; se lee al publicar.
-- **`docs/agents/`** — dogfooding: este repo usa el skill sobre sí mismo en modo multi-operador (`rules.md`, `operators.md` y `team-backlog.md` son compartidos; cada operador tiene su carpeta con `handoff.md`, `backlog.md` e `history.md`, con la estructura que el skill genera en un repo destino).
+- **`docs/agents/`** — dogfooding: este repo usa la skill sobre sí mismo en modo multi-operador (`rules.md`, `operators.md` y `team-backlog.md` son compartidos; cada operador tiene su carpeta con `handoff.md`, `backlog.md` e `history.md`, con la estructura que la skill genera en un repo destino).
 - **`skill/`** — la skill, que vive en su propio repo ([Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill)) con su propia versión y tags; acá solo se clona (ignorada por git) para que los tests de `scripts/skill-checks/` la lean. `SKILL.md` es el punto de entrada (resuelve el caso "ya existe documentación"), `docs/` tiene los flujos (`questions-flow.md`, `migration-flow.md`, y `multi-operator.md` para el modo de varias personas, que solo se abre si se activa) y qué es cada plantilla (`template-architecture.md`), y `template/` es el catálogo de plantillas. Cómo clonarla: [README raíz](../README.md#clonar-la-skill).
 - **`scripts/_shared/`** — código compartido entre los scripts: parseo de `handoff.md`, `backlog.md`, `history.md`, `operators.md` y `team-backlog.md` (`parse/`), tag de bloqueo y referencias entre tareas (`tasks/`), el prefijo de los marcadores (`markers.ts`: el vigente y los anteriores a la skill 2.0.0, que se leen pero no se escriben), tipos del dominio y fixtures. Lo usan el task-tracker y el task-manager.
-- **`scripts/docs-check/`** — herramienta de este repo (no del skill, no se copia a los repos destino) que se corre contra otro proyecto (`bun run check <ruta>`) y reporta, con archivo y línea, si su documentación de agentes cumple lo que necesitan el skill, el task-tracker y el task-manager (anclas, tareas, números, bloqueos, placeholders) y avisa (`skill-version`) si `rules.md` no lleva el marcador de versión de la skill; solo lee, y sale con código distinto de 0 si hay errores. Reutiliza `resolveWorkspace` del task-manager y el parser de `_shared/`. Uso y códigos: [`scripts/docs-check/README.md`](../scripts/docs-check/README.md).
-- **`scripts/task-tracker/`** — herramienta de este repo (no del skill, no se copia a los repos destino) que muestra en la terminal el estado de las tareas de un proyecto y se redibuja sola; se lanza con `bun run tasks [ruta]`. Uso, formatos y estructura interna: [`scripts/task-tracker/README.md`](../scripts/task-tracker/README.md).
-- **`scripts/task-manager/`** — herramienta de este repo (no del skill, no se copia a los repos destino y opcional: sin ella los archivos se editan a mano) que gestiona las tareas por comandos (`status`, `next`, `show`, `add`, `start`, `step`, `pause`, `resume`, `block`, `unblock`, `close`) editando de forma quirúrgica `handoff.md`, `backlog.md`, `history.md` y `team-backlog.md`; las escrituras exigen `--apply`. Se lanza con `bun run task <comando>`. Comandos, flags y estructura interna: [`scripts/task-manager/README.md`](../scripts/task-manager/README.md).
+- **`scripts/docs-check/`** — herramienta de este repo (no de la skill, no se copia a los repos destino) que se corre contra otro proyecto (`bun run check <ruta>`) y reporta, con archivo y línea, si su documentación de agentes cumple lo que necesitan la skill, el task-tracker y el task-manager (anclas, tareas, números, bloqueos, placeholders) y avisa (`skill-version`) si `rules.md` no lleva el marcador de versión de la skill; solo lee, y sale con código distinto de 0 si hay errores. Reutiliza `resolveWorkspace` del task-manager y el parser de `_shared/`. Uso y códigos: [`scripts/docs-check/README.md`](../scripts/docs-check/README.md).
+- **`scripts/task-tracker/`** — herramienta de este repo (no de la skill, no se copia a los repos destino) que muestra en la terminal el estado de las tareas de un proyecto y se redibuja sola; se lanza con `bun run tasks [ruta]`. Uso, formatos y estructura interna: [`scripts/task-tracker/README.md`](../scripts/task-tracker/README.md).
+- **`scripts/task-manager/`** — herramienta de este repo (no de la skill, no se copia a los repos destino y opcional: sin ella los archivos se editan a mano) que gestiona las tareas por comandos (`status`, `next`, `show`, `add`, `start`, `step`, `pause`, `resume`, `block`, `unblock`, `close`) editando de forma quirúrgica `handoff.md`, `backlog.md`, `history.md` y `team-backlog.md`; las escrituras exigen `--apply`. Se lanza con `bun run task <comando>`. Comandos, flags y estructura interna: [`scripts/task-manager/README.md`](../scripts/task-manager/README.md).
