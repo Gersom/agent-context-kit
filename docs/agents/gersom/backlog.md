@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 61
+**Próximo número de tarea:** 62
 
 ---
 
@@ -57,14 +57,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** Surgida al cerrar las Tareas 54 y 55: la skill quedó en 2.0.0 sin tag ni push, y package.json del kit sigue en 1.7.0 con más de 40 commits posteriores.
 - **Agregada:** 2026-10-11.
 
-### Tarea 52 — Verificación de optimización
-
-- **Descripción:** Ver si algo en los archivos .md (reglas, plantillas, docs) se puede acortar o quitar para optimizar tokens, sin perder información que el agente necesita.
-- **Decisiones/temas a definir antes de empezar:** Criterio de qué se puede quitar (redundancias, ejemplos, texto repetido entre archivos) y cuánta reducción justifica el cambio.
-- **Bloqueos:** `[Resuelto el 2026-10-24]` — era `[dependencia]` Depende de la Tarea 51: la optimización de tokens se evalúa después de reevaluar el determinismo.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Agregada:** 2026-10-11.
-
 ### Tarea 59 — Repetir la medición de determinismo con claude -p real y 2 o más corridas por escenario
 
 - **Descripción:** Surgió al cerrar la Tarea 51; falta detallarla.
@@ -77,6 +69,14 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 - **Descripción:** Surgió al cerrar la Tarea 51; falta detallarla.
 - **Decisiones/temas a definir antes de empezar:** Ninguno.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-24.
+
+### Tarea 61 — Reevaluar project/stack.md
+
+- **Descripción:** Reevaluar la plantilla project/stack.md de la skill: para qué sirve, si se solapa con architecture.md y decisions.md, y si debe seguir en el set intermedio y completo.
+- **Decisiones/temas a definir antes de empezar:** Confirmar el alcance: se entendió la plantilla template/project/stack.md de la skill (el pedido decía «project(stack.md»).
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Agregada:** 2026-10-24.
