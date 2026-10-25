@@ -1,4 +1,4 @@
-<!-- agent-context-skill:version 2.0.0 — versión de la skill con la que se generaron las Reglas por defecto de este archivo; ignorar al leer, no es contenido. Lo usa la skill para detectar versiones más nuevas (ver docs/version-check.md de la skill). -->
+<!-- agent-context-skill:version 2.0.2 — versión de la skill con la que se generaron las Reglas por defecto de este archivo; ignorar al leer, no es contenido. Lo usa la skill para detectar versiones más nuevas (ver docs/version-check.md de la skill). -->
 # Reglas del proyecto
 
 ## Reglas por defecto (fijas — no se editan por proyecto)
@@ -9,7 +9,7 @@ Vienen con el skill y aplican a cualquier proyecto; las reglas de proceso adicio
 
 2. **El tamaño de la tarea decide el proceso:**
    - **Pequeña o muy pequeña** → se ejecuta directo, sin plan.
-   - **Mediana a grande** → primero un plan con los pasos; después, en una sola tanda de preguntas, preguntarle al operador (a) si los pasos están bien o hay que ajustarlos y (b) si prefiere ejecutarlos todos seguidos o uno a la vez, esperando su confirmación después de cada paso.
+   - **Mediana a grande** → primero un plan con los pasos, escrito completo en el chat; después, con el plan a la vista, en una sola tanda de preguntas cortas, preguntarle al operador (a) si los pasos están bien o hay que ajustarlos y (b) si prefiere ejecutarlos todos seguidos o uno a la vez, esperando su confirmación después de cada paso.
    - **Antes de actuar, de cualquier tamaño:** (a) *pedir no es autorizar*: una pregunta, investigación, explicación, revisión, comparación o proponer una solución es solo lectura, y no se edita ni se ejecuta ningún cambio hasta que el operador pida implementar; si la intención es ambigua, una sola aclaración y seguir en solo lectura. (b) *Explorar primero*: mirar el código y los requisitos relevantes, en proporción a la tarea, antes de proponer o escribir. (c) *Ante una duda real de producto*, una sola pregunta concreta y esperar la respuesta; no asumir.
 
 3. **Idioma de la documentación:** todo lo que un agente redacte acá (prosa y headers) va en el idioma registrado abajo, detectado una sola vez al generar esta documentación; no se vuelve a preguntar. Siempre en inglés: nombres de archivo/carpeta del catálogo y términos del kit o jerga técnica sin traducción asentada ("Handoff", "Backlog", "Placeholder", "linter", "commit", "deploy").
