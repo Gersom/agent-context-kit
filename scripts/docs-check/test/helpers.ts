@@ -12,7 +12,7 @@ import { parseTeamBacklog } from "../../_shared/parse/team-backlog.ts";
 import type { Io } from "../../task-manager/src/cli/types.ts";
 import type { DocKind } from "../../task-manager/src/workspace/docs.ts";
 import { makeRules } from "../src/context.ts";
-import type { CheckContext, DocInfo, Finding, RootFileInfo } from "../src/types.ts";
+import type { CheckContext, DecisionsInfo, DocInfo, Finding, RootFileInfo } from "../src/types.ts";
 import { BACKLOG, HANDOFF, HISTORY, OPERATORS, ROOT_AGENTS, ROOT_CLAUDE, RULES, TEAM_BACKLOG } from "./fixtures.ts";
 
 export interface ContextOptions {
@@ -31,6 +31,8 @@ export interface ContextOptions {
   claudeMd?: string | null;
   /** Texto de operators.md en multi; por defecto, el fixture válido. */
   operators?: string;
+  /** `project/decisions/`: por defecto no existe la carpeta. */
+  decisions?: Partial<DecisionsInfo>;
   operatorWarnings?: string[];
 }
 
@@ -70,6 +72,7 @@ export function makeCtx(options: ContextOptions = {}): CheckContext {
     rootFiles: [rootFile("AGENTS.md", options.agentsMd, ROOT_AGENTS), rootFile("CLAUDE.md", options.claudeMd, ROOT_CLAUDE)],
     operatorsFile: mode === "multi" ? PATHS.operators : null,
     operatorsText: mode === "multi" ? normalizeEol(options.operators ?? OPERATORS).text : "",
+    decisions: { dir: "docs/project/decisions", exists: false, readme: null, files: [], legacy: [], ...options.decisions },
     operatorWarnings: options.operatorWarnings ?? [],
   };
 }

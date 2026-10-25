@@ -5,7 +5,7 @@
 
 Vienen con el skill y aplican a cualquier proyecto; las reglas de proceso adicionales se agregan debajo, no en su reemplazo. Son fijas también en su plantilla (`template/agents/rules.md`, en el repo de la skill). Las Reglas 6 a 9 están al final, en "Al cerrar una tarea".
 
-1. **Cada contenido vive en un único archivo, el de su tema** (una decisión en `decisions.md`, un bug en `known-issues.md`). Si otro archivo lo necesita, va una mención breve con link, no una copia.
+1. **Cada contenido vive en un único archivo, el de su tema** (una decisión en `decisions/`, un bug en `known-issues.md`). Si otro archivo lo necesita, va una mención breve con link, no una copia.
 
 2. **El tamaño de la tarea decide el proceso:**
    - **Pequeña o muy pequeña** → se ejecuta directo, sin plan.

@@ -510,3 +510,29 @@ describe("solo lee: no modifica el proyecto revisado", () => {
     expect(Object.keys(snapshot(p.root)).sort()).toEqual(before);
   });
 });
+
+describe("decisions-index (proyecto real)", () => {
+  const withDecisions = (extra: Tree): Tree => ({ ...flatTree(), ...extra });
+  const index = "# Decisiones\n\n## Índice\n\n- [stack.md](./stack.md) — antes de tocar una librería\n";
+
+  test("carpeta con índice completo: sin avisos de decisiones", async () => {
+    const p = project(withDecisions({ "docs/project/decisions/README.md": index, "docs/project/decisions/stack.md": "# Stack\n" }));
+    const report = await checkJson([p.root]);
+    expect(report.findings.filter((f) => f.code.startsWith("decisions"))).toEqual([]);
+  });
+
+  test("un tema fuera del índice y un stack.md suelto del formato anterior: dos avisos", async () => {
+    const p = project(
+      withDecisions({
+        "docs/project/decisions/README.md": index,
+        "docs/project/decisions/stack.md": "# Stack\n",
+        "docs/project/decisions/auth.md": "# Auth\n",
+        "docs/project/stack.md": "# Stack viejo\n",
+      }),
+    );
+    const report = await checkJson([p.root]);
+    const found = report.findings.filter((f) => f.code.startsWith("decisions")).map((f) => `${f.code} ${f.file}`);
+    expect(found.sort()).toEqual(["decisions-index docs/project/decisions/README.md", "decisions-legacy docs/project/stack.md"]);
+    expect(report.code).toBe(0);
+  });
+});

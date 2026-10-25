@@ -22,7 +22,7 @@ agent-context-kit/
 │   ├── docs-check/            # Verificador de otro repo (`bun run check <ruta>`): comprueba que su documentación de agentes sirva al skill, al tracker y al task-manager
 │   │   ├── README.md            # Uso, códigos de hallazgo y estructura
 │   │   ├── index.ts             # Arranque: llama a run()
-│   │   ├── src/                 # args, run, context, lines, report, types y checks/ (files, anchors, placeholders, tasks, handoff, history, skill-version, legacy-marker)
+│   │   ├── src/                 # args, run, context, lines, report, types y checks/ (files, anchors, placeholders, tasks, handoff, history, skill-version, legacy-marker, decisions)
 │   │   └── test/                # Tests en espejo de src/ + e2e/ con proyectos en un directorio temporal
 │   ├── skill-checks/          # Tests de contenido de la skill clonada en `skill/` (`reading-policy`, `multi-operator`, `snapshot`, `version`, `changelog`): fijan la política de lectura, la estructura de lo que se lee en cada sesión y que la versión de la skill coincida en `plugin.json`, `SKILL.md` y la plantilla de `rules.md`; se saltan si `skill/` no está
 │   ├── task-manager/          # Gestión de tareas desde la terminal (`bun run task <comando>`): edita handoff/backlog/history/team-backlog de forma quirúrgica

@@ -5,7 +5,7 @@
 
 Vienen con el skill y aplican a cualquier proyecto; las reglas de proceso adicionales se agregan debajo, no en su reemplazo. Las Reglas 6 a 9 están al final, en "Al cerrar una tarea".
 
-1. **Cada contenido vive en un único archivo, el de su tema** (una decisión en `decisions.md`, un bug en `known-issues.md`). Si otro archivo lo necesita, va una mención breve con link, no una copia.
+1. **Cada contenido vive en un único archivo, el de su tema** (una decisión en `decisions/`, un bug en `known-issues.md`). Si otro archivo lo necesita, va una mención breve con link, no una copia.
 
 2. **El tamaño de la tarea decide el proceso:**
    - **Pequeña o muy pequeña** → se ejecuta directo, sin plan.
@@ -23,13 +23,12 @@ Vienen con el skill y aplican a cualquier proyecto; las reglas de proceso adicio
 ## Enlaces (evitar duplicar contexto)
 
 - Estructura del código y dónde va cada cosa nueva → [`../project/architecture.md`](../project/architecture.md)
-- Decisiones de stack y qué no usar → [`../project/stack.md`](../project/stack.md)
-- El "por qué" de decisiones técnicas ya tomadas → [`../project/decisions.md`](../project/decisions.md)
+- Decisiones técnicas, stack y qué no usar (un archivo por tema) → [`../project/decisions/README.md`](../project/decisions/README.md)
 - Bugs conocidos / zonas frágiles → [`./known-issues.md`](./known-issues.md)
 
 ## Reglas específicas de este proyecto
 
-<!-- Reglas concretas de estilo/naming/formato que el proyecto ya sigue. Si hay un linter/formatter configurado, nombrarlo y enlazar su config en vez de repetir sus reglas. Solo se agregan por instrucción explícita del operador, nunca por inferencia propia; si ya están en architecture.md, stack.md o decisions.md, enlazarlas. -->
+<!-- Reglas concretas de estilo/naming/formato que el proyecto ya sigue. Si hay un linter/formatter configurado, nombrarlo y enlazar su config en vez de repetir sus reglas. Solo se agregan por instrucción explícita del operador, nunca por inferencia propia; si ya están en architecture.md o decisions/, enlazarlas. -->
 
 - [Placeholder]
 
@@ -41,7 +40,7 @@ Vienen con el skill y aplican a cualquier proyecto; las reglas de proceso adicio
 
 ### Decisiones no negociables
 
-<!-- Cosas ya decididas que un agente no debe re-litigar ni revertir por su cuenta (ej. "no se usa Redux"). Si hay un ADR, enlazar la entrada de decisions.md. -->
+<!-- Cosas ya decididas que un agente no debe re-litigar ni revertir por su cuenta (ej. "no se usa Redux"). Si hay un ADR, enlazar la entrada de `decisions/`. -->
 
 - [Placeholder]
 

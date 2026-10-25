@@ -54,11 +54,25 @@ export interface RulesInfo {
   head: string;
 }
 
+/** La carpeta `project/decisions/` (un archivo por tema, con su `README.md` como índice) y los archivos sueltos del formato anterior. */
+export interface DecisionsInfo {
+  /** Ruta relativa a la raíz del proyecto, con `/` (también si no existe: dónde debería estar). */
+  dir: string;
+  exists: boolean;
+  /** Texto del `README.md` (LF); `null` si no existe. */
+  readme: string | null;
+  /** Los `.md` de la carpeta salvo `README.md`, ordenados. */
+  files: string[];
+  /** `decisions.md` y `stack.md` sueltos en `project/` (rutas relativas): formato anterior a la skill 2.0.0. */
+  legacy: string[];
+}
+
 export interface CheckContext {
   mode: "flat" | "multi";
   docs: DocSet;
   rules: RulesInfo;
   rootFiles: RootFileInfo[];
+  decisions: DecisionsInfo;
   /** Ruta relativa de `operators.md`; `null` en el repo plano. */
   operatorsFile: string | null;
   /** Texto de `operators.md` (LF); vacío en el repo plano o si no existe. */
