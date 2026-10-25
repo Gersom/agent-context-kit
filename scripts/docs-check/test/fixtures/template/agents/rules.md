@@ -40,7 +40,7 @@ Vienen con el skill y aplican a cualquier proyecto; las reglas de proceso adicio
 
 ### Decisiones no negociables
 
-<!-- Cosas ya decididas que un agente no debe re-litigar ni revertir por su cuenta (ej. "no se usa Redux"). Si hay un ADR, enlazar la entrada de `decisions/`. -->
+<!-- Cosas ya decididas que un agente no debe re-litigar ni revertir por su cuenta (ej. "no se editan las migraciones ya aplicadas"). Lo de stack va en `decisions/stack.md`; si hay un ADR, enlazar la entrada de `decisions/`. -->
 
 - [Placeholder]
 
