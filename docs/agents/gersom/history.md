@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-25 — ✅ Tarea 61 — Reevaluar project/stack.md
+
+- Commits: skill f944b61, 55cc661 y 41dc459; kit b2a0055, 9ef87e2 y d44f04d.
+
 ## 2026-10-24 — ✅ Tarea 52 — Verificación de optimización
 
 - Sin cambios en las reglas fijas de las plantillas: los recortes posibles no llegan al 5 % del archivo. bun test (1034), typecheck y docs-check sin errores. Commits: skill d179455; kit 7b997fb.
