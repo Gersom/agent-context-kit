@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-25 — ✅ Tarea 66 — Unificar los términos de la documentación: «la skill», operador, ronda y tanda
+
+- Un término por concepto: «la skill» en femenino (93 cambios en 36 archivos), «operador» en vez de «usuario» para quien trabaja con el agente, «plantilla» en prosa y template/ solo como carpeta, «recuadro» en vez de widget, y ronda frente a tanda definidas.
+- Sección «Términos» en docs/philosophy.md del kit y línea en asking-questions.md de la skill. Cambio 2 en la sección 2.0.2 del changelog para la introducción de las reglas por defecto de rules.md.
+- Revisión independiente del diff (sin bloqueantes; dos fallos de género corregidos), bun test, typecheck y docs-check en verde. Commits: skill 2f1b688; kit 842aedd y fc76f9c.
+
 ## 2026-10-25 — ✅ Tarea 60 — Renombrar el name y el título de SKILL.md de agent-context-kit a agent-context-skill
 
 - La skill pasa a llamarse agent-context-skill (igual que su repo) en SKILL.md, plugin.json, marketplace.json, el README de la skill (instalación y frases de invocación, con aviso de reinstalación) y los ejemplos de los flujos.

@@ -57,15 +57,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** Surgida al cerrar las Tareas 54 y 55: la skill quedó en 2.0.0 sin tag ni push, y package.json del kit sigue en 1.7.0 con más de 40 commits posteriores.
 - **Agregada:** 2026-10-11.
 
-### Tarea 66 — Unificar los términos de la documentación: «la skill», operador, ronda y tanda
-
-- **Descripción:** La documentación mezcla «el skill» y «la skill», y otros términos con más de una forma; hay que fijar uno por concepto y aplicarlo en el kit y en la skill.
-- **Decisiones/temas a definir antes de empezar:** Qué término queda para cada concepto: «la skill» (femenino, como el resto de la documentación nueva); operador frente a usuario o persona; «ronda» (rondas de preguntas de questions-flow.md) frente a «tanda» (hasta 4 preguntas por llamada); «recuadro» frente a «widget» y «herramienta de preguntas»; «plantilla» frente a «template». Si los términos se fijan en un glosario del kit (docs/) o en las reglas.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Surgida al revisar la Tarea 60: «el skill» aparece en README.md del kit (líneas 9, 11, 19, 21, 36), docs/architecture.md (15, 50, 69, 72 a 74), docs/philosophy.md (40), scripts/task-tracker/README.md (5, 108, 131), scripts/task-manager/README.md (314) y en la skill (por ejemplo «Rige el skill», «los flujos de este skill» en questions-flow.md, migration-flow.md y template-architecture.md), junto a «la skill» en el resto. Revisar con grep «el skill», «este skill», «del skill», «al skill», «de este skill». Los términos de la skill que lee el agente están en español y mezclan «widget» y «recuadro» (asking-questions.md). Un cambio de texto fijo en plantillas (template/) exige entrada en el changelog y versión; la documentación de los flujos y del kit no.
-- **Agregada:** 2026-10-25.
-
 ### Tarea 67 — Renombrar a agent-context-skill los marcadores y nombres heredados agent-context-kit en proyectos ya generados
 
 - **Descripción:** Cuando la skill encuentre en un proyecto el nombre heredado agent-context-kit (marcadores de máquina: anclas, versión, firma y bloques start/end) debe ofrecer renombrarlo a agent-context-skill en lugar de solo aceptarlo.
