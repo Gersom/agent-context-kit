@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-25 — ✅ Tarea 60 — Renombrar el name y el título de SKILL.md de agent-context-kit a agent-context-skill
+
+- La skill pasa a llamarse agent-context-skill (igual que su repo) en SKILL.md, plugin.json, marketplace.json, el README de la skill (instalación y frases de invocación, con aviso de reinstalación) y los ejemplos de los flujos.
+- La documentación del kit que habla de la skill también dice agent-context-skill; el kit y sus scripts siguen siendo agent-context-kit, y el prefijo heredado agent-context-kit: de los marcadores no se tocó.
+- Revisión independiente del diff (sin bloqueantes; un residual corregido), bun test, typecheck, docs-check y claude plugin validate en verde. Commits: skill b66a38e; kit 3712ef1.
+
 ## 2026-10-25 — ✅ Tarea 65 — Mostrar el contexto antes de preguntar sin depender del recuadro
 
 - Las preguntas de la skill que necesitan que el operador revise contenido (plan, tabla, resumen, lista, diff, estado) van en texto, como mensaje final del turno; las que se entienden solas siguen con el recuadro en tandas. Medido en el cliente del operador: el texto previo al recuadro no se ve si el turno ya usó herramientas.
