@@ -1,6 +1,6 @@
 # task-tracker
 
-Muestra en la terminal el estado de las tareas de un proyecto que usa el skill `agent-context-kit` y se redibuja solo cada vez que cambian sus archivos. Está pensado para tenerlo abierto en una terminal mientras en otra un agente de IA trabaja sobre el proyecto.
+Muestra en la terminal el estado de las tareas de un proyecto que usa la skill `agent-context-skill` y se redibuja solo cada vez que cambian sus archivos. Está pensado para tenerlo abierto en una terminal mientras en otra un agente de IA trabaja sobre el proyecto.
 
 Es una herramienta de este repo, no parte del skill: no se copia a los repos destino. Se lanza desde acá y apunta a la carpeta del proyecto que quieras seguir.
 
