@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 80
+**Próximo número de tarea:** 81
 
 ---
 
@@ -66,13 +66,13 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** Publicar es irreversible (una versión no se reutiliza): confirmar con el operador antes del npm publish. Depende de la prueba de instalación real.
 - **Agregada:** 2026-10-26.
 
-### Tarea 79 — Renombrar «kit» a «suite» (agent-context-suite, comando acsuite) en todo el repo
+### Tarea 80 — Skill 2.0.7: quitar «kit» de sus textos y promocionar agent-context-suite
 
-- **Descripción:** Cambiar el término «kit» por «suite» en todas las menciones del presente del repo y de la skill (repo aparte, con git -C skill), y el comando ackit por acsuite: carpeta scripts/ackit/ a scripts/acsuite/, textos de ayuda, README raíz y de scripts, architecture.md, philosophy.md, releasing.md, rules.md, package.json (description), tests y fixtures. Fuera del cambio: los tags de git y history.md (registro histórico). Hecho: no quedan menciones de «kit» ni de ackit en el presente (salvo las históricas), bun test y typecheck pasan, y docs-check da 0 errores.
-- **Decisiones/temas a definir antes de empezar:** Decidido: término «suite»; paquete agent-context-suite (npm, sin scope); comando acsuite. Falta: cómo se llama el repo en GitHub (lo renombra el operador) y la forma de decir «el kit» en español («la suite»).
+- **Descripción:** En el repo de la skill (git -C skill): (1) 'términos del kit' (template/agents/rules.md:15) y 'términos propios de este kit' (docs/questions-flow.md:39) pasan a hablar de la skill/catálogo, sin nombrar la suite; (2) template/agents/backlog.md:22 deja de nombrar agent-context-kit y dice de forma genérica quién usa las anclas; (3) la skill promociona agent-context-suite como herramienta recomendada y opcional, en un solo lugar (README de la skill: qué es, cómo se instala y se usa con npx/acsuite). Subir el patch a 2.0.7 (plugin.json, SKILL.md, marcador de la plantilla, changelog), con tag, y sincronizar en el kit los fixtures espejo de docs-check y el marcador de rules.md. Hecho: la skill no menciona la suite salvo en esa promoción, el prefijo legado agent-context-kit: y la migración del nombre viejo de la skill quedan intactos, y bun test del kit pasa (incluidos skill-checks).
+- **Decisiones/temas a definir antes de empezar:** Decidido: la skill promociona la suite (opcional y en un solo lugar) y no la nombra en las plantillas que se generan en cada proyecto. Definir al hacerla: texto exacto de la promoción y si el flujo de preguntas ofrece la suite al operador o solo el README la menciona.
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Va antes de publicar en npm (T-77): el nombre del paquete no se puede cambiar después de publicado. La T-75 ya fija name y bin en package.json. Renombrar el repo Gersom/agent-context-kit en GitHub afecta la URL de package.json, los README y la skill; GitHub redirige el nombre viejo. Revisar el marcador y la versión de la skill si se cambia su plantilla.
+- **Detalles:** Depende de la T-79 (renombrado en el kit) y va antes de publicar en npm (T-77), para que la promoción apunte al paquete real. No renombrar el prefijo legado agent-context-kit: de los marcadores ni la línea del README sobre reinstalar la skill. Commits de la skill con git -C skill; el cierre va en el kit.
 - **Agregada:** 2026-10-26.
 
 <!-- agent-context-skill:section=blocked -->
