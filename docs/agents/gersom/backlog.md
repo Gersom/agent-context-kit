@@ -57,15 +57,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** Surgida al cerrar las Tareas 54 y 55: la skill quedó en 2.0.0 sin tag ni push, y package.json del kit sigue en 1.7.0 con más de 40 commits posteriores.
 - **Agregada:** 2026-10-11.
 
-### Tarea 67 — Renombrar a agent-context-skill los marcadores y nombres heredados agent-context-kit en proyectos ya generados
-
-- **Descripción:** Cuando la skill encuentre en un proyecto el nombre heredado agent-context-kit (marcadores de máquina: anclas, versión, firma y bloques start/end) debe ofrecer renombrarlo a agent-context-skill en lugar de solo aceptarlo.
-- **Decisiones/temas a definir antes de empezar:** Cuándo se hace: siempre que se aplique la skill sobre un proyecto con el prefijo heredado, o solo dentro de «Actualizar»; si pregunta antes (texto, con la lista de archivos afectados) o lo hace sola por ser un cambio mecánico; qué hacer con el prefijo agent-docs-skill: del bloque de AGENTS.md y CLAUDE.md; si docs-check y los scripts dejan de aceptar el prefijo heredado después de renombrar o lo siguen aceptando.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Hoy el prefijo heredado agent-context-kit: se acepta pero no se corrige solo. version-check.md y migration-flow.md lo reconocen (regex agent-context-(?:skill|kit):version), scripts/_shared/markers.ts lo acepta (LEGACY_MARKER_PREFIX) y docs-check avisa con legacy-marker; el único camino para renombrarlo es el cambio 2 de docs/changelog/2.0.md (tipo manual), que solo corre dentro de update-flow.md y si el proyecto tiene marcador de versión (sin marcador se trata como 1.9 y se aplica desde ahí). Falta el caso de un proyecto con el nombre viejo en anclas o bloques pero sin pasar por version-check, o con rules.md ya en 2.0 y marcadores a medias. Incluir también el nombre de la skill en frases de AGENTS.md o CLAUDE.md de proyectos que digan «usa la skill agent-context-kit». Medir con claude -p sobre un proyecto generado con la 1.11.0 (como en la Tarea 59) que el renombrado sea completo y estable entre corridas.
-- **Agregada:** 2026-10-25.
-
 <!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 

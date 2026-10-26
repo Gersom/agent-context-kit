@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-25 — ✅ Tarea 67 — Renombrar a agent-context-skill los marcadores y nombres heredados agent-context-kit en proyectos ya generados
+
+- Cuando la skill se aplica sobre un proyecto con documentación y encuentra el prefijo heredado (agent-context-kit: en anclas, versión y firma; agent-docs-skill: en los bloques start/end), ofrece renombrarlo a agent-context-skill: con la lista de archivos y líneas, en texto y con confirmación. Corre también con la versión «Igual» y tras «Actualizar», sin tocar history.md. Los scripts siguen leyendo el prefijo heredado.
+- version-check.md (sección «Marcadores heredados»), update-flow.md, SKILL.md y template-architecture.md; skill 2.0.5 con «Sin cambios que aplicar» en el changelog.
+- Medición con claude -p en dos caminos (versión igual y Actualizar), 2 corridas cada uno: 0 prefijos heredados y resultados idénticos. Revisión independiente (2 bloqueantes corregidos), bun test, typecheck y docs-check en verde. Commits: skill 95a22d9 y e79aa87; kit 03e6084.
+
 ## 2026-10-25 — ✅ Tarea 66 — Unificar los términos de la documentación: «la skill», operador, ronda y tanda
 
 - Un término por concepto: «la skill» en femenino (93 cambios en 36 archivos), «operador» en vez de «usuario» para quien trabaja con el agente, «plantilla» en prosa y template/ solo como carpeta, «recuadro» en vez de widget, y ronda frente a tanda definidas.
