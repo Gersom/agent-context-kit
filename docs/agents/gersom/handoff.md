@@ -19,12 +19,4 @@ Sin tarea en curso
 <!-- agent-context-skill:section=paused -->
 ## Tareas pausadas
 
-### Tarea 72 — CLI único ackit con subcomandos
-
-- **Descripción:** Un punto de entrada ackit que despache a tasks (task-tracker, aún con su nombre actual), task (task-manager) y check (docs-check). Actualizar los scripts de package.json, los README de cada script y el README raíz. Hecho: ackit tasks|task|check <args> funciona con Bun y con Node.
-- **Detalles:** Un solo paquete y un solo bin (ackit); los scripts comparten _shared y el formato de los archivos del proyecto, por eso no se separan. Va antes que la tarea de renombrar tasks a board. Depende de la tarea de quitar APIs de Bun.
-- **Qué falta:** Todo: no se tocó código; solo está el plan propuesto en el chat.
-- **Decisiones a medio camino:** Ninguna.
-- **Próximo paso concreto:** Confirmar el plan con el operador y empezar por el paso 1.
-- **Por qué se pausó:** El operador pidió hacer antes la T-73 (renombrar tasks a board).
-- **Qué espera para retomarse:** Que termine la T-73; retomarla con el plan de 7 pasos propuesto (refactor del tracker a main(argv), despachador scripts/ackit, package.json, tests, docs, verificación con Bun y Node, cierre), pendiente de confirmar pasos y modo de ejecución.
+Ninguna.

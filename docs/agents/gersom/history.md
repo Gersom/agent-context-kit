@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-26 — ✅ Tarea 72 — CLI único ackit con subcomandos
+
+- CLI único ackit con los subcomandos board (task-tracker), task (task-manager) y check (docs-check): despachador en scripts/ackit/dispatch.ts, con ayuda y código 2 ante uso incorrecto; el task-tracker pasó a main(argv) en src/main.ts.
+- Scripts de package.json (ackit, board, task, check) apuntan al despachador; sin campo bin (T-75). Documentado en README raíz, architecture.md y los tres README de scripts.
+- bun test 1049 pass, typecheck limpio; los tres subcomandos probados con Bun y con Node 24. Commits 0b66bff y 0bd4066 (kit).
+
 ## 2026-10-26 — ✅ Tarea 73 — Renombrar el comando tasks a board
 
 - Renombrado el comando del task-tracker de bun run tasks a bun run board: script de package.json y menciones en README raíz, architecture.md, README y comentarios del task-tracker y textos de ayuda/reporte de docs-check.
