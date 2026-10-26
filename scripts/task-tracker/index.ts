@@ -8,7 +8,7 @@
 // flechas del flujo. En modo multi-operador, ↑/↓ eligen operador en la vista de equipo, Enter
 // abre su panel y `b` o Esc vuelven al equipo.
 //
-// Uso (desde la raíz de agent-context-kit):
+// Uso (desde la raíz de agent-context-suite):
 //   bun run board                 → pregunta la ruta a vigilar
 //   bun run board <ruta>          → raíz del proyecto (busca docs/agents/ o agent-context/agents/)
 //                                   o la carpeta que contiene handoff.md

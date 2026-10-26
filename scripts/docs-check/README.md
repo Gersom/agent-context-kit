@@ -6,7 +6,7 @@ Es una herramienta de este repo, no parte de la skill: no se copia a los repos d
 
 ## Uso
 
-`bun run check` es el subcomando `check` del CLI único del kit: equivale a `bun run acsuite check`.
+`bun run check` es el subcomando `check` del CLI único de la suite: equivale a `bun run acsuite check`.
 
 Desde la raíz de este repo (con `bun install` hecho):
 

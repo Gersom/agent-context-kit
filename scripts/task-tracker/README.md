@@ -15,7 +15,7 @@ Es una herramienta de este repo, no parte de la skill: no se copia a los repos d
 
 ## Uso
 
-`bun run board` es el subcomando `board` del CLI único del kit: equivale a `bun run acsuite board`.
+`bun run board` es el subcomando `board` del CLI único de la suite: equivale a `bun run acsuite board`.
 
 Desde la raíz de este repo:
 

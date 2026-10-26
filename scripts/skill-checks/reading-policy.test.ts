@@ -86,7 +86,7 @@ describe.skipIf(!hasSkill)("política de lectura: AGENTS.md", () => {
 });
 
 describe("política de lectura: rules.md", () => {
-  // Las Reglas 6 a 9 van en la sección final de cierre, tanto en la plantilla de la skill como en el rules.md del kit.
+  // Las Reglas 6 a 9 van en la sección final de cierre, tanto en la plantilla de la skill como en el rules.md de la suite.
   const checkRules = (text: string) => {
     const closing = text.indexOf("## Al cerrar una tarea");
     expect(closing).toBeGreaterThan(0);

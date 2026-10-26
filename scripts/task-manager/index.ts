@@ -2,7 +2,7 @@
 // team-backlog.md del operador, en lugar de que un agente (o una persona) los edite a mano.
 // Es opcional: sin este script los archivos se editan a mano igual (docs/philosophy.md, principio 4).
 //
-// Uso (desde la raíz de agent-context-kit):
+// Uso (desde la raíz de agent-context-suite):
 //   bun run task                       → lista los comandos
 //   bun run task <comando> --help      → ayuda de un comando
 //   bun run task whoami                → operador, carpeta y archivos resueltos

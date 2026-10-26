@@ -15,7 +15,7 @@ if (!hasSkill) {
 
 const normalize = (text: string) => text.replace(/\r\n/g, "\n");
 
-/** Lee un archivo del kit (relativo a la raíz del repo). */
+/** Lee un archivo de la suite (relativo a la raíz del repo). */
 export function readRoot(rel: string): string {
   return normalize(readFileSync(join(ROOT, rel), "utf8"));
 }

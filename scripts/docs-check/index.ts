@@ -2,7 +2,7 @@
 // docs/agents cumple lo que necesitan la skill, el seguimiento de tareas (`bun run board`) y el
 // gestor de tareas (`bun run task`). Solo lee el proyecto revisado: nunca escribe en él.
 //
-// Uso (desde la raíz de agent-context-kit):
+// Uso (desde la raíz de agent-context-suite):
 //   bun run check <ruta>               → raíz del proyecto, carpeta de agentes o de un operador
 //   bun run check <ruta> --operator <carpeta>
 //                                      → en modo multi-operador, revisa a ese operador (por defecto,

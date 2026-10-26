@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "agent-context-kit",
+      "name": "agent-context-suite",
       "devDependencies": {
         "@types/bun": "^1.4.2",
         "picocolors": "^1.1.1",

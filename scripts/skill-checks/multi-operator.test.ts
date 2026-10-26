@@ -147,13 +147,13 @@ function isInside(base: string, target: string): boolean {
   return rel === "" || (rel !== ".." && !rel.startsWith(`..${sep}`) && !isAbsolute(rel));
 }
 
-describe("enlaces relativos de la documentación del kit", () => {
-  const kitFiles = () => [...walkMd(join(ROOT, "docs")), ...["README.md", "AGENTS.md", "CLAUDE.md"].map((f) => join(ROOT, f))];
+describe("enlaces relativos de la documentación de la suite", () => {
+  const suiteFiles = () => [...walkMd(join(ROOT, "docs")), ...["README.md", "AGENTS.md", "CLAUDE.md"].map((f) => join(ROOT, f))];
   const rel = (abs: string) => relative(ROOT, abs).split(sep).join("/");
 
   test("todos apuntan a archivos o carpetas que existen", () => {
     const broken: string[] = [];
-    for (const file of kitFiles()) {
+    for (const file of suiteFiles()) {
       for (const link of relativeLinksOf(file)) {
         if (!existsSync(resolve(dirname(file), link))) broken.push(`${rel(file)} → ${link}`);
       }
@@ -168,12 +168,12 @@ describe("enlaces relativos de la documentación del kit", () => {
       return r === "docs/desing.md" || /^docs\/agents\/[^/]+\/(history|backlog)\.md$/.test(r);
     };
     const offenders: string[] = [];
-    for (const file of kitFiles().filter((f) => !historical(f))) {
+    for (const file of suiteFiles().filter((f) => !historical(f))) {
       for (const link of anyRelativeLinksOf(file)) {
         if (isInside(join(ROOT, "skill"), resolve(dirname(file), link))) offenders.push(`${rel(file)} → ${link}`);
       }
     }
-    expect(offenders, "enlaces del kit que apuntan dentro de skill/ (quítalos o conviértelos en texto)").toEqual([]);
+    expect(offenders, "enlaces de la suite que apuntan dentro de skill/ (quítalos o conviértelos en texto)").toEqual([]);
   });
 });
 
@@ -201,22 +201,22 @@ describe.skipIf(!hasSkill)("enlaces relativos de la documentación de la skill",
     expect(escaping, "la skill debe ser autocontenida: sus enlaces no pueden salir de su carpeta").toEqual([]);
   });
 
-  test("no menciona (ni en texto plano) el README raíz ni docs/desing.md del kit", () => {
+  test("no menciona (ni en texto plano) el README raíz ni docs/desing.md de la suite", () => {
     const mentions: string[] = [];
     for (const file of skillFiles()) {
       const text = readFileSync(file, "utf8");
       if (/desing.md|`README.md` raíz|README.md raíz/.test(text)) mentions.push(rel(file));
     }
-    expect(mentions, "la skill no debe depender de archivos del repo kit").toEqual([]);
+    expect(mentions, "la skill no debe depender de archivos del repo de la suite").toEqual([]);
   });
 
-  test("no menciona los scripts del kit ni se presenta como «este repo (`agent-context-kit`)»", () => {
+  test("no menciona los scripts de la suite ni se presenta como «este repo (`agent-context-kit`)»", () => {
     const mentions: string[] = [];
     for (const file of skillFiles()) {
       const text = readFileSync(file, "utf8");
       if (/scripts\/(task-tracker|task-manager|docs-check)|este repo \(`agent-context-kit`\)/.test(text)) mentions.push(rel(file));
     }
-    expect(mentions, "la skill no debe depender de las herramientas ni del repo kit").toEqual([]);
+    expect(mentions, "la skill no debe depender de las herramientas ni del repo de la suite").toEqual([]);
   });
 });
 

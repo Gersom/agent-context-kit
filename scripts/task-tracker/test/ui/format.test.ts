@@ -19,7 +19,7 @@ describe("helpers de formato", () => {
 
 describe("nombres para la pantalla", () => {
   test("displayProjectName: mayúsculas y guiones como espacios (los guiones bajos quedan)", () => {
-    expect(displayProjectName("agent-context-kit")).toBe("AGENT CONTEXT KIT");
+    expect(displayProjectName("agent-context-suite")).toBe("AGENT CONTEXT SUITE");
     expect(displayProjectName("mi_proyecto-web")).toBe("MI_PROYECTO WEB");
   });
 
