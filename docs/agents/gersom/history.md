@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-26 — ✅ Tarea 75 — Preparar package.json para npm
+
+- package.json listo para npm: name agent-context-suite, bin acsuite (dist/cli.js), files [dist], engines node >=20, prepublishOnly (bun run build) y sin private. Eliminada de rules.md la restricción «solo en devDependencies».
+- npm pack --dry-run lista solo LICENSE, README.md, dist/cli.js y package.json (71 KB). bun test 1049 pass, typecheck limpio. Commit 1f6248c (kit). Nombre decidido: suite (agent-context-suite / acsuite); el renombrado del repo es la T-79.
+
 ## 2026-10-26 — ✅ Tarea 74 — Build a JS publicable
 
 - Build a JS publicable: bun run build (scripts/ackit/build.ts, Bun.build) genera dist/cli.js (248 KB) para Node con shebang y picocolors/string-width dentro del bundle; dist/ ya estaba en .gitignore.

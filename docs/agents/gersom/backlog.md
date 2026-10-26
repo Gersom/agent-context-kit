@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 79
+**Próximo número de tarea:** 80
 
 ---
 
@@ -48,15 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 75 — Preparar package.json para npm
-
-- **Descripción:** Quitar private, definir name (comprobar disponibilidad de agent-context-kit en npm; si no, @gersom/agent-context-kit), bin (ackit), files (dist), engines (node >=20) y prepublishOnly con el build. Eliminar de rules.md la regla «Dependencias de scripts/: solo en devDependencies» (decidido por el operador). Hecho: npm pack --dry-run lista solo lo esperado.
-- **Decisiones/temas a definir antes de empezar:** Decidido: eliminar la regla de devDependencies. Falta: el name final del paquete según disponibilidad.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** rules.md es de todos los operadores; hoy solo figura gersom. Depende de la tarea de build a JS.
-- **Agregada:** 2026-10-26.
-
 ### Tarea 76 — Probar la instalación real del paquete
 
 - **Descripción:** Instalar el tarball de npm pack en una carpeta limpia y ejecutar ackit board, task y check con npx y con bunx, en Windows y al menos en otro SO si es posible. Hecho: los tres subcomandos corren desde la instalación, sin clonar el repo.
@@ -73,6 +64,15 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Detalles:** Publicar es irreversible (una versión no se reutiliza): confirmar con el operador antes del npm publish. Depende de la prueba de instalación real.
+- **Agregada:** 2026-10-26.
+
+### Tarea 79 — Renombrar «kit» a «suite» (agent-context-suite, comando acsuite) en todo el repo
+
+- **Descripción:** Cambiar el término «kit» por «suite» en todas las menciones del presente del repo y de la skill (repo aparte, con git -C skill), y el comando ackit por acsuite: carpeta scripts/ackit/ a scripts/acsuite/, textos de ayuda, README raíz y de scripts, architecture.md, philosophy.md, releasing.md, rules.md, package.json (description), tests y fixtures. Fuera del cambio: los tags de git y history.md (registro histórico). Hecho: no quedan menciones de «kit» ni de ackit en el presente (salvo las históricas), bun test y typecheck pasan, y docs-check da 0 errores.
+- **Decisiones/temas a definir antes de empezar:** Decidido: término «suite»; paquete agent-context-suite (npm, sin scope); comando acsuite. Falta: cómo se llama el repo en GitHub (lo renombra el operador) y la forma de decir «el kit» en español («la suite»).
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Va antes de publicar en npm (T-77): el nombre del paquete no se puede cambiar después de publicado. La T-75 ya fija name y bin en package.json. Renombrar el repo Gersom/agent-context-kit en GitHub afecta la URL de package.json, los README y la skill; GitHub redirige el nombre viejo. Revisar el marcador y la versión de la skill si se cambia su plantilla.
 - **Agregada:** 2026-10-26.
 
 <!-- agent-context-skill:section=blocked -->
