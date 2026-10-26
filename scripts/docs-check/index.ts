@@ -1,5 +1,5 @@
 // Verificador de documentación de agentes: se corre contra OTRO proyecto y comprueba que su
-// docs/agents cumple lo que necesitan la skill, el seguimiento de tareas (`bun run tasks`) y el
+// docs/agents cumple lo que necesitan la skill, el seguimiento de tareas (`bun run board`) y el
 // gestor de tareas (`bun run task`). Solo lee el proyecto revisado: nunca escribe en él.
 //
 // Uso (desde la raíz de agent-context-kit):

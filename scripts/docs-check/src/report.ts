@@ -68,7 +68,7 @@ export function renderText(report: Report): string[] {
       );
     }
   } else {
-    lines.push("Corrige los errores: sin eso el seguimiento (`bun run tasks`) y `bun run task` no pueden trabajar bien con este proyecto.");
+    lines.push("Corrige los errores: sin eso el seguimiento (`bun run board`) y `bun run task` no pueden trabajar bien con este proyecto.");
   }
   return lines;
 }

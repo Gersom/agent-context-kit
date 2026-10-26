@@ -9,13 +9,13 @@
 // abre su panel y `b` o Esc vuelven al equipo.
 //
 // Uso (desde la raíz de agent-context-kit):
-//   bun run tasks                 → pregunta la ruta a vigilar
-//   bun run tasks <ruta>          → raíz del proyecto (busca docs/agents/ o agent-context/agents/)
+//   bun run board                 → pregunta la ruta a vigilar
+//   bun run board <ruta>          → raíz del proyecto (busca docs/agents/ o agent-context/agents/)
 //                                   o la carpeta que contiene handoff.md
-//   bun run tasks <ruta> --once   → pinta una sola vez y sale (útil para probar o en CI)
-//   bun run tasks <ruta> --compact --no-arrows
+//   bun run board <ruta> --once   → pinta una sola vez y sale (útil para probar o en CI)
+//   bun run board <ruta> --compact --no-arrows
 //                                 → arranca con los recuadros compactos y sin flechas
-//   bun run tasks <ruta> <operador>
+//   bun run board <ruta> <operador>
 //                                 → en modo multi-operador, abre de frente el panel de ese
 //                                   operador (también `--operator <carpeta>`); sin él, la vista
 //                                   de equipo con el operador de `git config user.email` elegido

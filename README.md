@@ -37,7 +37,7 @@ Este repo incluye una herramienta para ver, en una terminal aparte, el estado de
 
 ```sh
 bun install
-bun run tasks <ruta-del-proyecto>
+bun run board <ruta-del-proyecto>
 ```
 
 Uso, atajos y cómo lee los archivos: [`scripts/task-tracker/README.md`](./scripts/task-tracker/README.md).

@@ -1,6 +1,6 @@
 # docs-check
 
-Verifica que la documentación de agentes de **otro** proyecto cumpla lo que necesitan la skill `agent-context-skill`, el seguimiento de tareas (`bun run tasks`) y el gestor de tareas (`bun run task`), antes de trabajar ahí. Solo lee: no escribe nada en el proyecto revisado y no corrige (la corrección de repos ya adoptados es otra tarea).
+Verifica que la documentación de agentes de **otro** proyecto cumpla lo que necesitan la skill `agent-context-skill`, el seguimiento de tareas (`bun run board`) y el gestor de tareas (`bun run task`), antes de trabajar ahí. Solo lee: no escribe nada en el proyecto revisado y no corrige (la corrección de repos ya adoptados es otra tarea).
 
 Es una herramienta de este repo, no parte de la skill: no se copia a los repos destino.
 

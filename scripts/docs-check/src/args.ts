@@ -16,7 +16,7 @@ export interface CheckArgs {
 /** Ayuda: uso, flags y códigos de salida. */
 export const HELP: string[] = [
   "Verifica que la documentación de agentes de OTRO proyecto cumpla lo que necesitan la skill, el",
-  "seguimiento de tareas (`bun run tasks`) y el gestor de tareas (`bun run task`). Solo lee: no escribe nada.",
+  "seguimiento de tareas (`bun run board`) y el gestor de tareas (`bun run task`). Solo lee: no escribe nada.",
   "",
   "Uso: bun run check <ruta> [--operator <carpeta>] [--json] [--strict]",
   "",

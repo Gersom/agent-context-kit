@@ -12,7 +12,7 @@ const AGENTS_SUBDIRS = [join("docs", "agents"), join("agent-context", "agents")]
 /**
  * Carpeta desde la que el operador lanzó el comando, para resolver rutas relativas.
  *
- * `bun run tasks` (Bun 1.4.2) cambia el cwd a la raíz del package y NO define `INIT_CWD`
+ * `bun run board` (Bun 1.4.2) cambia el cwd a la raíz del package y NO define `INIT_CWD`
  * (a diferencia de npm); sí deja la carpeta de invocación en `npm_config_local_prefix`.
  * Se prueban en ese orden y, si ninguna existe (ej. `bun scripts/task-tracker/index.ts`
  * directo), el cwd real ya es la carpeta de invocación.

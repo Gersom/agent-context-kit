@@ -18,11 +18,11 @@ Es una herramienta de este repo, no parte de la skill: no se copia a los repos d
 Desde la raíz de este repo:
 
 ```sh
-bun run tasks                         # pregunta la ruta a vigilar
-bun run tasks D:/proyectos/mi-app     # raíz del proyecto
-bun run tasks D:/proyectos/mi-app --once   # pinta una sola vez y sale
-bun run tasks D:/proyectos/mi-app ana      # modo multi-operador: abre de frente el panel de «ana»
-bun run tasks D:/proyectos/mi-app --compact --no-arrows   # arranca compacto y sin flechas
+bun run board                         # pregunta la ruta a vigilar
+bun run board D:/proyectos/mi-app     # raíz del proyecto
+bun run board D:/proyectos/mi-app --once   # pinta una sola vez y sale
+bun run board D:/proyectos/mi-app ana      # modo multi-operador: abre de frente el panel de «ana»
+bun run board D:/proyectos/mi-app --compact --no-arrows   # arranca compacto y sin flechas
 ```
 
 - **Qué ruta acepta:** la raíz del proyecto (busca adentro `docs/agents/` o `agent-context/agents/`) o directamente la carpeta que contiene `handoff.md`. Las rutas relativas se resuelven desde la carpeta en la que lanzaste el comando, y se pueden pegar con comillas (Windows las agrega al arrastrar una carpeta a la terminal).
