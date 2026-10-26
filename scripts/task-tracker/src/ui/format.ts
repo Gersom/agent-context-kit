@@ -2,6 +2,8 @@
 // al ancho visible, nombres cortos de tarea y del proyecto. La hora vive en src/shared/time.ts
 // (también la usa io/).
 
+import stringWidth from "string-width";
+
 const BAR_WIDTH = 12;
 
 /** Quita el formato markdown inline que en la terminal solo ensucia (negritas y backticks). */
@@ -33,10 +35,10 @@ export function truncate(text: string, max: number): string {
 
 /**
  * Columnas que ocupa un texto en la terminal: ignora los códigos ANSI de color y cuenta los
- * caracteres anchos (ej. CJK) como 2, con `Bun.stringWidth`.
+ * caracteres anchos (ej. CJK) como 2, con `string-width`.
  */
 export function visibleLength(text: string): number {
-  return Bun.stringWidth(text);
+  return stringWidth(text);
 }
 
 /** Nombre del proyecto para el encabezado: en mayúsculas y con los guiones como espacios. */

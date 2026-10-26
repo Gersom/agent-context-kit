@@ -3,6 +3,7 @@
 // perezosos: solo se resuelven si el comando los pide) y devuelve el código de salida. Los errores
 // esperables (`CliError`) salen como un mensaje en español, sin stack.
 
+import { text } from "node:stream/consumers";
 import { COMMANDS } from "../commands/index.ts";
 import { commitChanges, planChanges } from "../edit/changes.ts";
 import { type Docs, readDocs } from "../workspace/docs.ts";
@@ -44,7 +45,7 @@ async function defaultReadStdin(): Promise<string> {
   if (process.stdin.isTTY) {
     throw new UsageError("El valor `-` lee la entrada estándar, pero no hay nada redirigido: usa `... | bun run task ...` o un heredoc.");
   }
-  return Bun.stdin.text();
+  return text(process.stdin);
 }
 
 /**
