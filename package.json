@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Gersom/agent-context-kit.git"
+    "url": "git+https://github.com/Gersom/agent-context-suite.git"
   },
   "scripts": {
     "acsuite": "bun scripts/acsuite/index.ts",
