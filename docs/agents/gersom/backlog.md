@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 68
+**Próximo número de tarea:** 70
 
 ---
 
@@ -47,6 +47,15 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador quiera hacer pública la skill, o priorice esta tarea explícitamente.
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
+
+### Tarea 69 — Redactar la respuesta a la propuesta de publicación de Agensi
+
+- **Descripción:** Escribir el correo de respuesta a Joeri Brons (Agensi.io) con el nombre correcto de la skill, preguntas cortas y la verificación previa de la plataforma.
+- **Decisiones/temas a definir antes de empezar:** Si se lista gratis o con precio; qué licencia se declara (depende de la tarea de la licencia); qué se pregunta: hospedaje frente a enlace al repo y cómo se actualizan las versiones, instalación como plugin de Claude Code, términos de creador por escrito y, si se cobra, pagos y comisiones.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Antes de responder, el operador verifica por su cuenta que agensi.io existe y que el dominio del correo coincide, sin usar enlaces del correo. El borrador del operador nombraba mal la skill («context-agent-kit»): es agent-context-skill (repo Gersom/agent-context-skill), no el kit. Reducir las ocho preguntas a las que cambian la decisión. Sale en inglés, como el correo recibido. Depende de la licencia (Tarea 68) para no prometer derechos sin definir.
+- **Agregada:** 2026-10-25.
 
 <!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas

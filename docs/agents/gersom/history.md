@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-26 — ✅ Tarea 68 — Agregar una licencia al kit y a la skill
+
+- Licencia MIT («Copyright (c) 2026 Gersom Alaja») en la raíz del kit y de la skill (LICENSE idénticos), declarada con el campo license en package.json y plugin.json y con una sección Licencia en cada README; LICENSE añadido a los tres árboles de archivos.
+- Skill 2.0.6 (tag local v2.0.6) y kit 1.8.1 (tag local v1.8.1), sin subir a GitHub todavía.
+- Revisión independiente (sin bloqueantes; dos mejoras aplicadas), bun test, typecheck, docs-check y claude plugin validate en verde. Commits: skill 44085ab y 804e7e2; kit 520490e y b4b33c4.
+
 ## 2026-10-25 — ✅ Tarea 58 — Publicar la skill 2.0.0 y un release del kit
 
 - Skill publicada como v2.0.5 (plugin.json, SKILL.md y marcador en 2.0.5; un solo tag porque 2.0.0 a 2.0.4 nunca se etiquetaron) y kit como v1.8.0 (package.json de 1.7.0 a 1.8.0).
