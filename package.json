@@ -1,6 +1,6 @@
 {
   "name": "agent-context-kit",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "Kit de herramientas (task-tracker, task-manager, docs-check) para los proyectos que usan la skill agent-context-skill, que genera documentación de contexto de proyecto para agentes de IA.",
   "private": true,
   "type": "module",
