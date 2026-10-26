@@ -48,15 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 71 — Quitar las APIs de Bun del runtime de los scripts
-
-- **Descripción:** Reemplazar Bun.stringWidth (scripts/task-tracker/src/ui/format.ts) por string-width y Bun.stdin.text() (scripts/task-manager/src/cli/dispatch.ts) por lectura de process.stdin. Hecho: los tres scripts corren igual con Node y con Bun, y bun test y bun run typecheck pasan.
-- **Decisiones/temas a definir antes de empezar:** Ninguno.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Primer paso para publicar el kit en npm en JS (corre con npx y con bunx). Los bun:test y import.meta.dir de los tests no cuentan: no van al paquete.
-- **Agregada:** 2026-10-26.
-
 ### Tarea 72 — CLI único ackit con subcomandos
 
 - **Descripción:** Un punto de entrada ackit que despache a tasks (task-tracker, aún con su nombre actual), task (task-manager) y check (docs-check). Actualizar los scripts de package.json, los README de cada script y el README raíz. Hecho: ackit tasks|task|check <args> funciona con Bun y con Node.

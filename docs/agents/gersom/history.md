@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-26 — ✅ Tarea 71 — Quitar las APIs de Bun del runtime de los scripts
+
+- Quitadas las dos APIs de Bun del runtime: Bun.stringWidth por string-width (task-tracker/ui/format.ts) y Bun.stdin.text() por text(process.stdin) de node:stream/consumers (task-manager/cli/dispatch.ts).
+- string-width 8.3.0 en devDependencies. bun test 1043 pass y typecheck limpio; stdin y string-width probados con Node 24. Commit 5d1541f (kit).
+
 ## 2026-10-26 — ✅ Tarea 70 — Precisar la regla de tags de versión (anotados, en el commit de versión, con --follow-tags)
 
 - Regla de tags precisada: tag anotado vX.Y.Z por cada cambio de versión, creado en el commit que la sube y subido con git push --follow-tags, desde la v1.8.1.
