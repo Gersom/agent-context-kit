@@ -14,6 +14,7 @@
     "board": "bun scripts/ackit/index.ts board",
     "task": "bun scripts/ackit/index.ts task",
     "check": "bun scripts/ackit/index.ts check",
+    "build": "bun scripts/ackit/build.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },

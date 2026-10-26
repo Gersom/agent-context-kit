@@ -10,12 +10,13 @@ agent-context-kit/
 ├── CLAUDE.md               # Puntero para agentes: remite a AGENTS.md
 ├── AGENTS.md               # Orden de lectura de la documentación de contexto (docs/README.md, rules, operators, handoff)
 ├── LICENSE                 # Licencia MIT (la skill tiene la misma, en su propio repo)
-├── package.json            # Versión del kit (SemVer), licencia + scripts (ackit, board, task, check, test, typecheck) y devDependencies de scripts/
+├── package.json            # Versión del kit (SemVer), licencia + scripts (ackit, board, task, check, build, test, typecheck) y devDependencies de scripts/
 ├── tsconfig.json           # TypeScript (strict) para scripts/; `bun run typecheck` = tsc --noEmit
 │
 ├── scripts/                # Herramientas propias del repo (TypeScript con Bun); no forman parte de la skill
 │   ├── ackit/                 # CLI único (`bun run ackit <board|task|check>`): despacha cada subcomando a su herramienta
 │   │   ├── index.ts             # Arranque: pasa los argumentos al despachador y fija el código de salida
+│   │   ├── build.ts             # Compila el CLI a `dist/cli.js` para Node, con las dependencias dentro (`bun run build`; `dist/` se ignora en git)
 │   │   ├── dispatch.ts          # Despachador: registro de subcomandos, ayuda, error de uso (2) ante uno desconocido
 │   │   └── test/                # Tests del despachador
 │   ├── _shared/               # Código compartido entre scripts (el `_` marca que no es un script: las carpetas sin `_` sí lo son)
