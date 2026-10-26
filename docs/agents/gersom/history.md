@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-26 — ✅ Tarea 69 — Redactar la respuesta a la propuesta de publicación de Agensi
+
+- Respuesta a Agensi redactada en inglés para exploración sin compromiso: aclara que la skill a listar es agent-context-skill (MIT) y no el kit, y pregunta por el proceso de alta, qué hay que aportar, formato y envío (paquete o GitHub), revisión y escaneo de seguridad, publicación de versiones nuevas y si se puede retirar el listado.
+- Antes se comprobó en fuentes públicas que Agensi existe y qué dicen sus términos (70/30 sin cargos extra, licencia no exclusiva, copia hospedada por ellos). El correo no se ha enviado; lo envía el operador tras verificar agensi.io.
+
 ## 2026-10-26 — ✅ Tarea 68 — Agregar una licencia al kit y a la skill
 
 - Licencia MIT («Copyright (c) 2026 Gersom Alaja») en la raíz del kit y de la skill (LICENSE idénticos), declarada con el campo license en package.json y plugin.json y con una sección Licencia en cada README; LICENSE añadido a los tres árboles de archivos.
