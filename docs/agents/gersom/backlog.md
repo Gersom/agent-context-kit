@@ -48,24 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 72 — CLI único ackit con subcomandos
-
-- **Descripción:** Un punto de entrada ackit que despache a tasks (task-tracker, aún con su nombre actual), task (task-manager) y check (docs-check). Actualizar los scripts de package.json, los README de cada script y el README raíz. Hecho: ackit tasks|task|check <args> funciona con Bun y con Node.
-- **Decisiones/temas a definir antes de empezar:** Ninguno.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Un solo paquete y un solo bin (ackit); los scripts comparten _shared y el formato de los archivos del proyecto, por eso no se separan. Va antes que la tarea de renombrar tasks a board. Depende de la tarea de quitar APIs de Bun.
-- **Agregada:** 2026-10-26.
-
-### Tarea 73 — Renombrar el comando tasks a board
-
-- **Descripción:** Renombrar el subcomando del task-tracker de tasks a board (ackit board), porque ackit tasks y ackit task difieren en una letra. Actualizar README raíz, README del script, docs/ y referencias en rules.md. Hecho: ackit board funciona, y no quedan referencias a ackit tasks ni a bun run tasks.
-- **Decisiones/temas a definir antes de empezar:** Ninguno.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Va después de la tarea del CLI ackit.
-- **Agregada:** 2026-10-26.
-
 ### Tarea 74 — Build a JS publicable
 
 - **Descripción:** Generar dist/ (bun build --target=node o tsc) con shebang de Node, y dist/ en .gitignore. Las dependencias (picocolors, string-width) van dentro del bundle. Verificar que ningún script lea archivos fuera de dist/ en runtime. Hecho: node dist/cli.js check <proyecto> funciona desde otra carpeta, sin el repo.

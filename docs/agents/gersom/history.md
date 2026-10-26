@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-26 — ✅ Tarea 73 — Renombrar el comando tasks a board
+
+- Renombrado el comando del task-tracker de bun run tasks a bun run board: script de package.json y menciones en README raíz, architecture.md, README y comentarios del task-tracker y textos de ayuda/reporte de docs-check.
+- history.md no se tocó (registro histórico). bun test 1043 pass, typecheck limpio, bun run board arranca. Commit 54a71c4 (kit).
+
 ## 2026-10-26 — ✅ Tarea 71 — Quitar las APIs de Bun del runtime de los scripts
 
 - Quitadas las dos APIs de Bun del runtime: Bun.stringWidth por string-width (task-tracker/ui/format.ts) y Bun.stdin.text() por text(process.stdin) de node:stream/consumers (task-manager/cli/dispatch.ts).
