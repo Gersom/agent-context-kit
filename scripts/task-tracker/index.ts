@@ -23,23 +23,6 @@
 // Cada instancia es independiente (sin lockfiles, puertos ni estado compartido): se puede
 // correr una por proyecto en paralelo.
 
-import { startApp } from "./src/app.ts";
-import { parseArgs } from "./src/cli/args.ts";
-import { askForPath, printResolveError } from "./src/cli/ask-path.ts";
-import { resolveAgentsDir } from "./src/io/paths.ts";
-import type { ResolveOk } from "./src/shared/types.ts";
+import { main } from "./src/main.ts";
 
-const { once, pathArg, operator, compact, arrows } = parseArgs(process.argv.slice(2));
-
-const target = pathArg != null ? resolveFromArg(pathArg, operator) : askForPath(operator);
-const { agentsDir, projectName, projectDir, multi } = target;
-
-startApp({ agentsDir, projectName, projectDir, multi, compact, arrows, once });
-
-/** Ruta pasada por argumento: si no es válida, se informa y se sale con código 1. */
-function resolveFromArg(input: string, operatorArg: string | undefined): ResolveOk {
-  const result = resolveAgentsDir(input, undefined, { operator: operatorArg });
-  if (result.ok) return result;
-  printResolveError(result);
-  process.exit(1);
-}
+main(process.argv.slice(2));
