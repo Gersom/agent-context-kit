@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-26 — ✅ Tarea 70 — Precisar la regla de tags de versión (anotados, en el commit de versión, con --follow-tags)
+
+- Regla de tags precisada: tag anotado vX.Y.Z por cada cambio de versión, creado en el commit que la sube y subido con git push --follow-tags, desde la v1.8.1.
+- Se editó la «Decisión no negociable» de rules.md y se agregó la viñeta «Tags» en docs/releasing.md. Commit c686f36 (kit).
+
 ## 2026-10-26 — ✅ Tarea 69 — Redactar la respuesta a la propuesta de publicación de Agensi
 
 - Respuesta a Agensi redactada en inglés para exploración sin compromiso: aclara que la skill a listar es agent-context-skill (MIT) y no el kit, y pregunta por el proceso de alta, qué hay que aportar, formato y envío (paquete o GitHub), revisión y escaneo de seguridad, publicación de versiones nuevas y si se puede retirar el listado.

@@ -48,15 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 70 — Precisar la regla de tags de versión (anotados, en el commit de versión, con --follow-tags)
-
-- **Descripción:** Ajustar la «Decisión no negociable» de rules.md y docs/releasing.md: cada cambio de versión lleva un tag anotado vX.Y.Z en el commit que la sube, y se sube con git push --follow-tags (no --tags). Aplica a todo el kit desde la v1.8.1 (que ya tiene su tag).
-- **Decisiones/temas a definir antes de empezar:** Ninguno. Decidido: tags anotados; se suben con --follow-tags junto al push del commit; desde v1.8.1 en adelante.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** rules.md es de todos los operadores; hoy solo figura gersom. No tocar push.followTags de la config de git de nadie.
-- **Agregada:** 2026-10-26.
-
 ### Tarea 71 — Quitar las APIs de Bun del runtime de los scripts
 
 - **Descripción:** Reemplazar Bun.stringWidth (scripts/task-tracker/src/ui/format.ts) por string-width y Bun.stdin.text() (scripts/task-manager/src/cli/dispatch.ts) por lectura de process.stdin. Hecho: los tres scripts corren igual con Node y con Bun, y bun test y bun run typecheck pasan.
