@@ -48,15 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 74 — Build a JS publicable
-
-- **Descripción:** Generar dist/ (bun build --target=node o tsc) con shebang de Node, y dist/ en .gitignore. Las dependencias (picocolors, string-width) van dentro del bundle. Verificar que ningún script lea archivos fuera de dist/ en runtime. Hecho: node dist/cli.js check <proyecto> funciona desde otra carpeta, sin el repo.
-- **Decisiones/temas a definir antes de empezar:** Ninguno.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Depende de las tareas del CLI ackit y de quitar APIs de Bun.
-- **Agregada:** 2026-10-26.
-
 ### Tarea 75 — Preparar package.json para npm
 
 - **Descripción:** Quitar private, definir name (comprobar disponibilidad de agent-context-kit en npm; si no, @gersom/agent-context-kit), bin (ackit), files (dist), engines (node >=20) y prepublishOnly con el build. Eliminar de rules.md la regla «Dependencias de scripts/: solo en devDependencies» (decidido por el operador). Hecho: npm pack --dry-run lista solo lo esperado.

@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-26 — ✅ Tarea 74 — Build a JS publicable
+
+- Build a JS publicable: bun run build (scripts/ackit/build.ts, Bun.build) genera dist/cli.js (248 KB) para Node con shebang y picocolors/string-width dentro del bundle; dist/ ya estaba en .gitignore.
+- Sin lecturas fuera de dist/ en runtime ni referencias a Bun en el bundle. Probado con Node desde otra carpeta y sin node_modules (check, task, board). bun test 1049 pass, typecheck limpio. Commit f4bf9da (kit).
+
 ## 2026-10-26 — ✅ Tarea 72 — CLI único ackit con subcomandos
 
 - CLI único ackit con los subcomandos board (task-tracker), task (task-manager) y check (docs-check): despachador en scripts/ackit/dispatch.ts, con ayuda y código 2 ante uso incorrecto; el task-tracker pasó a main(argv) en src/main.ts.
