@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-25 — ✅ Tarea 58 — Publicar la skill 2.0.0 y un release del kit
+
+- Skill publicada como v2.0.5 (plugin.json, SKILL.md y marcador en 2.0.5; un solo tag porque 2.0.0 a 2.0.4 nunca se etiquetaron) y kit como v1.8.0 (package.json de 1.7.0 a 1.8.0).
+- Ramas main y los dos tags subidos a GitHub con autorización del operador; los releases de GitHub los publica el operador con los textos redactados en el chat.
+- bun test, typecheck, docs-check y claude plugin validate en verde antes de subir. Commits: kit d8ad045 (versión 1.8.0); skill sin commits nuevos (tag sobre e79aa87).
+
 ## 2026-10-25 — ✅ Tarea 67 — Renombrar a agent-context-skill los marcadores y nombres heredados agent-context-kit en proyectos ya generados
 
 - Cuando la skill se aplica sobre un proyecto con documentación y encuentra el prefijo heredado (agent-context-kit: en anclas, versión y firma; agent-docs-skill: en los bloques start/end), ofrece renombrarlo a agent-context-skill: con la lista de archivos y líneas, en texto y con confirmación. Corre también con la versión «Igual» y tras «Actualizar», sin tocar history.md. Los scripts siguen leyendo el prefijo heredado.
