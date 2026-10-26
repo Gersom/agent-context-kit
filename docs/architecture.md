@@ -1,16 +1,16 @@
 # Arquitectura del proyecto
 
-Este documento describe la estructura general del repo `agent-context-kit` y para qué sirve cada parte.
+Este documento describe la estructura general del repo `agent-context-suite` y para qué sirve cada parte.
 
 ## Estructura
 
 ```
-agent-context-kit/
+agent-context-suite/
 ├── README.md              # Presentación del proyecto
 ├── CLAUDE.md               # Puntero para agentes: remite a AGENTS.md
 ├── AGENTS.md               # Orden de lectura de la documentación de contexto (docs/README.md, rules, operators, handoff)
 ├── LICENSE                 # Licencia MIT (la skill tiene la misma, en su propio repo)
-├── package.json            # Versión del kit (SemVer), licencia + scripts (acsuite, board, task, check, build, test, typecheck) y devDependencies de scripts/
+├── package.json            # Versión de la suite (SemVer), licencia + scripts (acsuite, board, task, check, build, test, typecheck) y devDependencies de scripts/
 ├── tsconfig.json           # TypeScript (strict) para scripts/; `bun run typecheck` = tsc --noEmit
 │
 ├── scripts/                # Herramientas propias del repo (TypeScript con Bun); no forman parte de la skill
@@ -51,7 +51,7 @@ agent-context-kit/
 ├── docs/
 │   ├── README.md            # Mapa de docs/: qué es el proyecto y qué hay en cada archivo (lo primero que lee el agente)
 │   ├── architecture.md      # Este archivo
-│   ├── philosophy.md        # Principios de diseño: por qué el kit es lo que es
+│   ├── philosophy.md        # Principios de diseño: por qué la suite es lo que es
 │   ├── releasing.md         # Versionado y releases: cuándo subir patch, minor o major
 │   └── agents/               # Dogfooding: este repo usa la skill sobre sí mismo, en modo multi-operador
 │       ├── rules.md            # Reglas de este repo, de todos los operadores
@@ -70,11 +70,11 @@ agent-context-kit/
 
 ## Qué es cada parte
 
-- **`docs/philosophy.md`** — la razón de ser del kit y sus principios de diseño.
-- **`docs/releasing.md`** — cómo se versionan el kit y la skill y cuándo sube cada número; se lee al publicar.
+- **`docs/philosophy.md`** — la razón de ser de la suite y sus principios de diseño.
+- **`docs/releasing.md`** — cómo se versionan la suite y la skill y cuándo sube cada número; se lee al publicar.
 - **`docs/agents/`** — dogfooding: este repo usa la skill sobre sí mismo en modo multi-operador (`rules.md`, `operators.md` y `team-backlog.md` son compartidos; cada operador tiene su carpeta con `handoff.md`, `backlog.md` e `history.md`, con la estructura que la skill genera en un repo destino).
 - **`skill/`** — la skill, que vive en su propio repo ([Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill)) con su propia versión y tags; acá solo se clona (ignorada por git) para que los tests de `scripts/skill-checks/` la lean. `SKILL.md` es el punto de entrada (resuelve el caso "ya existe documentación"), `docs/` tiene los flujos (`questions-flow.md`, `migration-flow.md`, y `multi-operator.md` para el modo de varias personas, que solo se abre si se activa) y qué es cada plantilla (`template-architecture.md`), y `template/` es el catálogo de plantillas. Cómo clonarla: [README raíz](../README.md#clonar-la-skill).
-- **`scripts/acsuite/`** — el CLI único del kit: `acsuite <subcomando>` (`board`, `task`, `check`) despacha al task-tracker, al task-manager o a docs-check pasándoles el resto de los argumentos; sin subcomando o con uno desconocido sale con código 2. Los scripts de `package.json` (`board`, `task`, `check`) apuntan a él.
+- **`scripts/acsuite/`** — el CLI único de la suite: `acsuite <subcomando>` (`board`, `task`, `check`) despacha al task-tracker, al task-manager o a docs-check pasándoles el resto de los argumentos; sin subcomando o con uno desconocido sale con código 2. Los scripts de `package.json` (`board`, `task`, `check`) apuntan a él.
 - **`scripts/_shared/`** — código compartido entre los scripts: parseo de `handoff.md`, `backlog.md`, `history.md`, `operators.md` y `team-backlog.md` (`parse/`), tag de bloqueo y referencias entre tareas (`tasks/`), el prefijo de los marcadores (`markers.ts`: el vigente y los anteriores a la skill 2.0.0, que se leen pero no se escriben), tipos del dominio y fixtures. Lo usan el task-tracker y el task-manager.
 - **`scripts/docs-check/`** — herramienta de este repo (no de la skill, no se copia a los repos destino) que se corre contra otro proyecto (`bun run check <ruta>`) y reporta, con archivo y línea, si su documentación de agentes cumple lo que necesitan la skill, el task-tracker y el task-manager (anclas, tareas, números, bloqueos, placeholders) y avisa (`skill-version`) si `rules.md` no lleva el marcador de versión de la skill; solo lee, y sale con código distinto de 0 si hay errores. Reutiliza `resolveWorkspace` del task-manager y el parser de `_shared/`. Uso y códigos: [`scripts/docs-check/README.md`](../scripts/docs-check/README.md).
 - **`scripts/task-tracker/`** — herramienta de este repo (no de la skill, no se copia a los repos destino) que muestra en la terminal el estado de las tareas de un proyecto y se redibuja sola; se lanza con `bun run board [ruta]`. Uso, formatos y estructura interna: [`scripts/task-tracker/README.md`](../scripts/task-tracker/README.md).

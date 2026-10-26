@@ -1,6 +1,6 @@
-# agent-context-kit
+# agent-context-suite
 
-Kit de herramientas de la skill [agent-context-skill](https://github.com/Gersom/agent-context-skill), que genera, en un repo, la documentación de contexto para agentes de IA (reglas, estado del trabajo, backlog, historial, arquitectura), para que un agente sepa en qué punto está el proyecto sin depender de la memoria de una conversación. La skill vive en su propio repo (se clona en `skill/`, ignorada por git); este repo se documenta con ella.
+Suite de herramientas de la skill [agent-context-skill](https://github.com/Gersom/agent-context-skill), que genera, en un repo, la documentación de contexto para agentes de IA (reglas, estado del trabajo, backlog, historial, arquitectura), para que un agente sepa en qué punto está el proyecto sin depender de la memoria de una conversación. La skill vive en su propio repo (se clona en `skill/`, ignorada por git); este repo se documenta con ella.
 
 **Operador:** cada persona que trabaja en el proyecto con su agente, le pide tareas, aprueba decisiones y es a quien se le pregunta cuando algo no está definido.
 
@@ -17,7 +17,7 @@ docs/
 │       ├── backlog.md        # las tareas que tomó
 │       └── history.md        # sus tareas cerradas
 ├── architecture.md     # estructura del repo y para qué sirve cada parte
-├── philosophy.md       # por qué el kit es como es
+├── philosophy.md       # por qué la suite es como es
 └── releasing.md        # versionado y releases (cuándo subir patch, minor o major)
 ```
 

@@ -1,12 +1,12 @@
 # Filosofía del proyecto
 
-El "por qué" del kit y lo que debe respetar cualquier cambio nuevo. El "qué" (la estructura) está en [`architecture.md`](./architecture.md).
+El "por qué" de la suite y lo que debe respetar cualquier cambio nuevo. El "qué" (la estructura) está en [`architecture.md`](./architecture.md).
 
 > Principios deducidos del diseño y confirmados por el operador (2026-10-05); razón de ser dictada por el operador (2026-10-06). No es un registro histórico: si el diseño cambia, este archivo se actualiza.
 
-## Para qué existe el kit
+## Para qué existe la suite
 
-`agent-context-kit` empezó como una skill; hoy es un **kit de herramientas** (los scripts de [`scripts/`](../scripts/)) que acompañan a la skill, que vive en su propio repo, [Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill). Mantiene documentación que sirve de **contexto para cualquier agente de IA y para las personas del proyecto**:
+`agent-context-suite` empezó como una skill; hoy es una **suite de herramientas** (los scripts de [`scripts/`](../scripts/)) que acompañan a la skill, que vive en su propio repo, [Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill). Mantiene documentación que sirve de **contexto para cualquier agente de IA y para las personas del proyecto**:
 
 - el **estado** del trabajo y el **historial de cambios**;
 - los **datos importantes y las decisiones ya tomadas**, para no volver a discutirlas ni inventar lo ya definido.
@@ -19,13 +19,13 @@ Con eso:
 
 **Qué se gana y qué no:** se reduce el retrabajo y el tiempo de las personas (volver a preguntar, repetir lo ya decidido, rehacer lo ya hecho). No se promete ahorrar tokens: leer la documentación también cuesta, y ese costo se mantiene bajo solo si la documentación se mantiene corta.
 
-Todo lo que sigue se deriva de esto: lo que no ayude a que el contexto sobreviva intacto de un agente o una persona a otra, no pertenece al kit.
+Todo lo que sigue se deriva de esto: lo que no ayude a que el contexto sobreviva intacto de un agente o una persona a otra, no pertenece a la suite.
 
 ## Principios
 
 ### 1. Markdown plano como fuente de verdad del estado
 
-El estado vive en archivos markdown (`handoff.md`, `backlog.md`, `history.md`, etc.), sin base de datos, servidor ni build step. El agente y el operador los leen y editan directamente: esa es la interfaz. Si el estado dejara de ser texto plano, el kit perdería lo que lo diferencia.
+El estado vive en archivos markdown (`handoff.md`, `backlog.md`, `history.md`, etc.), sin base de datos, servidor ni build step. El agente y el operador los leen y editan directamente: esa es la interfaz. Si el estado dejara de ser texto plano, la suite perdería lo que la diferencia.
 
 ### 2. El código gana ante un conflicto
 

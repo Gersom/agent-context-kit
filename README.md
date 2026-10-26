@@ -1,8 +1,8 @@
-# agent-context-kit
+# agent-context-suite
 
-Kit de herramientas para trabajar con la skill [agent-context-skill](https://github.com/Gersom/agent-context-skill), que genera documentación de contexto de proyecto para que **cualquier agente de IA** (Claude Code, Cursor, Copilot, etc.) entienda en qué momento está un proyecto, qué falta, qué se hizo y por qué — sin depender de la memoria de una sola conversación. La skill vive en su propio repo (el repo se llama `agent-context-skill`, pero la skill se invoca por el nombre de su `SKILL.md`, `agent-context-kit`); este repo tiene las herramientas (seguimiento, gestión y verificación de tareas) y la documentación del proyecto.
+Suite de herramientas para trabajar con la skill [agent-context-skill](https://github.com/Gersom/agent-context-skill), que genera documentación de contexto de proyecto para que **cualquier agente de IA** (Claude Code, Cursor, Copilot, etc.) entienda en qué momento está un proyecto, qué falta, qué se hizo y por qué — sin depender de la memoria de una sola conversación. La skill vive en su propio repo (`agent-context-skill`); este repo tiene las herramientas (seguimiento, gestión y verificación de tareas) y la documentación del proyecto.
 
-La razón de ser del kit y sus principios de diseño (markdown plano como fuente de verdad, herramientas opcionales, el código gana ante un conflicto) están en [`docs/philosophy.md`](./docs/philosophy.md).
+La razón de ser de la suite y sus principios de diseño (markdown plano como fuente de verdad, herramientas opcionales, el código gana ante un conflicto) están en [`docs/philosophy.md`](./docs/philosophy.md).
 
 ## Qué hace
 
@@ -23,13 +23,13 @@ Invocar la skill explícitamente, pidiéndoselo al agente (se llama igual que su
 
 ## Clonar la skill
 
-La skill no está en este repo: vive en [Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill) y se clona dentro del kit, en `skill/` (ya está en `.gitignore`):
+La skill no está en este repo: vive en [Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill) y se clona dentro de la suite, en `skill/` (ya está en `.gitignore`):
 
 ```sh
 git clone https://github.com/Gersom/agent-context-skill skill
 ```
 
-Sin ese clon todo lo demás funciona, pero los tests de `scripts/skill-checks/` se saltan, y con ellos la comparación del snapshot de plantillas que usa `docs-check` (`scripts/docs-check/test/fixtures/template/`), así que ese snapshot no se valida. Los cambios en la skill se commitean allí (`git -C skill ...`), no en el kit. Si la clonas en otra carpeta, indícala con la variable de entorno `SKILL_DIR`.
+Sin ese clon todo lo demás funciona, pero los tests de `scripts/skill-checks/` se saltan, y con ellos la comparación del snapshot de plantillas que usa `docs-check` (`scripts/docs-check/test/fixtures/template/`), así que ese snapshot no se valida. Los cambios en la skill se commitean allí (`git -C skill ...`), no en la suite. Si la clonas en otra carpeta, indícala con la variable de entorno `SKILL_DIR`.
 
 ## Un solo comando: acsuite
 
@@ -75,11 +75,11 @@ Uso y códigos de hallazgo: [`scripts/docs-check/README.md`](./scripts/docs-chec
 ## Estructura del repositorio
 
 ```
-agent-context-kit/
+agent-context-suite/
 ├── skill/           # Clon de Gersom/agent-context-skill (otro repo, ignorado por git): SKILL.md, flujos (docs/) y plantillas (template/)
-├── scripts/         # Herramientas del kit, no parte de la skill: acsuite (CLI único), task-tracker, task-manager, docs-check y código compartido (_shared/)
+├── scripts/         # Herramientas de la suite, no parte de la skill: acsuite (CLI único), task-tracker, task-manager, docs-check y código compartido (_shared/)
 ├── docs/            # Documentación del propio repo: filosofía, arquitectura, diseño y su estado (agents/)
-├── package.json     # Versión del kit (SemVer), licencia y comandos de los scripts
+├── package.json     # Versión de la suite (SemVer), licencia y comandos de los scripts
 ├── LICENSE          # Licencia MIT
 └── tsconfig.json    # TypeScript (strict) para scripts/
 ```
@@ -92,7 +92,7 @@ El árbol completo y para qué sirve cada parte están en [`docs/architecture.md
 
 ## Apoyar el proyecto
 
-Si el kit o la skill te sirven y quieres apoyar su desarrollo, puedes hacer una donación por PayPal: [paypal.me/gersomalaja](https://paypal.me/gersomalaja).
+Si la suite o la skill te sirven y quieres apoyar su desarrollo, puedes hacer una donación por PayPal: [paypal.me/gersomalaja](https://paypal.me/gersomalaja).
 
 ## Estado
 
