@@ -18,11 +18,11 @@
     "url": "git+https://github.com/Gersom/agent-context-kit.git"
   },
   "scripts": {
-    "ackit": "bun scripts/ackit/index.ts",
-    "board": "bun scripts/ackit/index.ts board",
-    "task": "bun scripts/ackit/index.ts task",
-    "check": "bun scripts/ackit/index.ts check",
-    "build": "bun scripts/ackit/build.ts",
+    "acsuite": "bun scripts/acsuite/index.ts",
+    "board": "bun scripts/acsuite/index.ts board",
+    "task": "bun scripts/acsuite/index.ts task",
+    "check": "bun scripts/acsuite/index.ts check",
+    "build": "bun scripts/acsuite/build.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "bun run build"

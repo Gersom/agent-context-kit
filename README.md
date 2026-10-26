@@ -31,13 +31,13 @@ git clone https://github.com/Gersom/agent-context-skill skill
 
 Sin ese clon todo lo demás funciona, pero los tests de `scripts/skill-checks/` se saltan, y con ellos la comparación del snapshot de plantillas que usa `docs-check` (`scripts/docs-check/test/fixtures/template/`), así que ese snapshot no se valida. Los cambios en la skill se commitean allí (`git -C skill ...`), no en el kit. Si la clonas en otra carpeta, indícala con la variable de entorno `SKILL_DIR`.
 
-## Un solo comando: ackit
+## Un solo comando: acsuite
 
-Las tres herramientas de abajo se invocan desde un único CLI, `ackit <subcomando>` (`board`, `task` y `check`). Desde la raíz de este repo, `bun run ackit <subcomando> ...` y los atajos `bun run board`, `bun run task` y `bun run check` son lo mismo:
+Las tres herramientas de abajo se invocan desde un único CLI, `acsuite <subcomando>` (`board`, `task` y `check`). Desde la raíz de este repo, `bun run acsuite <subcomando> ...` y los atajos `bun run board`, `bun run task` y `bun run check` son lo mismo:
 
 ```sh
-bun run ackit            # lista los subcomandos
-bun run ackit board <ruta-del-proyecto>
+bun run acsuite            # lista los subcomandos
+bun run acsuite board <ruta-del-proyecto>
 ```
 
 ## Seguimiento de tareas en la terminal
@@ -77,7 +77,7 @@ Uso y códigos de hallazgo: [`scripts/docs-check/README.md`](./scripts/docs-chec
 ```
 agent-context-kit/
 ├── skill/           # Clon de Gersom/agent-context-skill (otro repo, ignorado por git): SKILL.md, flujos (docs/) y plantillas (template/)
-├── scripts/         # Herramientas del kit, no parte de la skill: ackit (CLI único), task-tracker, task-manager, docs-check y código compartido (_shared/)
+├── scripts/         # Herramientas del kit, no parte de la skill: acsuite (CLI único), task-tracker, task-manager, docs-check y código compartido (_shared/)
 ├── docs/            # Documentación del propio repo: filosofía, arquitectura, diseño y su estado (agents/)
 ├── package.json     # Versión del kit (SemVer), licencia y comandos de los scripts
 ├── LICENSE          # Licencia MIT

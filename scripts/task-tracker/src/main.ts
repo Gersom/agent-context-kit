@@ -1,5 +1,5 @@
 // Arranque del seguimiento de tareas: interpreta los argumentos, resuelve el proyecto a vigilar
-// y lanza la aplicación. Lo llaman `index.ts` y el despachador `ackit`.
+// y lanza la aplicación. Lo llaman `index.ts` y el despachador `acsuite`.
 
 import { startApp } from "./app.ts";
 import { parseArgs } from "./cli/args.ts";

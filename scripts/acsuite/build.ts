@@ -1,4 +1,4 @@
-// Compila el CLI `ackit` a un único archivo JS para Node en `dist/cli.js`, con las dependencias
+// Compila el CLI `acsuite` a un único archivo JS para Node en `dist/cli.js`, con las dependencias
 // (picocolors, string-width) dentro del bundle. Es lo que se publica en npm (`bun run build`).
 
 import { fileURLToPath } from "node:url";

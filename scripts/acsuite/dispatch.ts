@@ -1,4 +1,4 @@
-// Despachador de `ackit <subcomando> [argumentos]`: el primer argumento elige la herramienta del
+// Despachador de `acsuite <subcomando> [argumentos]`: el primer argumento elige la herramienta del
 // kit y el resto se le pasa tal cual. Un subcomando desconocido o la falta de uno es un error de
 // uso (código 2); `--help` o `-h` lista los subcomandos.
 
@@ -9,7 +9,7 @@ import { main as board } from "../task-tracker/src/main.ts";
 /** Una herramienta del kit: recibe los argumentos que siguen al subcomando y devuelve el código de salida. */
 export type Runner = (argv: string[]) => number | Promise<number>;
 
-/** Los subcomandos de `ackit`, con la línea que los describe en la ayuda. */
+/** Los subcomandos de `acsuite`, con la línea que los describe en la ayuda. */
 export const SUBCOMMANDS: Record<string, { summary: string; run: Runner }> = {
   board: {
     summary: "Seguimiento de tareas en la terminal (task-tracker)",
@@ -26,12 +26,12 @@ export function helpText(): string {
   const width = Math.max(...Object.keys(SUBCOMMANDS).map((name) => name.length));
   const lines = Object.entries(SUBCOMMANDS).map(([name, { summary }]) => `  ${name.padEnd(width)}  ${summary}`);
   return [
-    "Uso: ackit <subcomando> [argumentos]",
+    "Uso: acsuite <subcomando> [argumentos]",
     "",
     "Subcomandos:",
     ...lines,
     "",
-    "Para la ayuda de cada uno: ackit <subcomando> --help",
+    "Para la ayuda de cada uno: acsuite <subcomando> --help",
   ].join("\n");
 }
 

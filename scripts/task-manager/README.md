@@ -11,7 +11,7 @@ Es **opcional** y es una herramienta de este repo, no parte de la skill: no se c
 
 ## Uso
 
-`bun run task` es el subcomando `task` del CLI único del kit: equivale a `bun run ackit task`.
+`bun run task` es el subcomando `task` del CLI único del kit: equivale a `bun run acsuite task`.
 
 Desde la raíz de este repo:
 
