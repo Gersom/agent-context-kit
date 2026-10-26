@@ -50,7 +50,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 ### Tarea 76 — Probar la instalación real del paquete
 
-- **Descripción:** Instalar el tarball de npm pack en una carpeta limpia y ejecutar ackit board, task y check con npx y con bunx, en Windows y al menos en otro SO si es posible. Hecho: los tres subcomandos corren desde la instalación, sin clonar el repo.
+- **Descripción:** Instalar el tarball de npm pack en una carpeta limpia y ejecutar acsuite board, task y check con npx y con bunx, en Windows y al menos en otro SO si es posible. Hecho: los tres subcomandos corren desde la instalación, sin clonar el repo.
 - **Decisiones/temas a definir antes de empezar:** Ninguno.
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.

@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-26 — ✅ Tarea 79 — Renombrar «kit» a «suite» (agent-context-suite, comando acsuite) en todo el repo
+
+- Renombrado «kit» a «suite» en todo el repo: carpeta scripts/ackit a scripts/acsuite y comando acsuite; prosa, comentarios, tests (format.test.ts, multi-operator.test.ts), description de package.json y bun.lock; repo renombrado en GitHub a Gersom/agent-context-suite con remoto y repository.url actualizados.
+- Intactos: prefijo legado agent-context-kit: de los marcadores, history.md, fixtures espejo de la skill y tags. README corregido: la skill se llama agent-context-skill. Revisado por un revisor independiente (corregida una concordancia). bun test 1049 pass, typecheck y check limpios; dist/cli.js probado con Node. Commits e33829a, 1685cb7, bf64152 y cd8d17f (kit).
+
 ## 2026-10-26 — ✅ Tarea 75 — Preparar package.json para npm
 
 - package.json listo para npm: name agent-context-suite, bin acsuite (dist/cli.js), files [dist], engines node >=20, prepublishOnly (bun run build) y sin private. Eliminada de rules.md la restricción «solo en devDependencies».

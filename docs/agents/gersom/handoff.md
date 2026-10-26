@@ -14,23 +14,7 @@ Estado "en caliente": en qué se está ahora. **Se actualiza editando solo lo qu
 <!-- agent-context-skill:section=in-progress -->
 ## Tarea en progreso
 
-Tarea 79 — Renombrar «kit» a «suite» (agent-context-suite, comando acsuite) en todo el repo
-
-Cambiar el término «kit» por «suite» en todas las menciones del presente del repo y de la skill (repo aparte, con git -C skill), y el comando ackit por acsuite: carpeta scripts/ackit/ a scripts/acsuite/, textos de ayuda, README raíz y de scripts, architecture.md, philosophy.md, releasing.md, rules.md, package.json (description), tests y fixtures. Fuera del cambio: los tags de git y history.md (registro histórico). Hecho: no quedan menciones de «kit» ni de ackit en el presente (salvo las históricas), bun test y typecheck pasan, y docs-check da 0 errores.
-
-- **Detalles:** Va antes de publicar en npm (T-77): el nombre del paquete no se puede cambiar después de publicado. La T-75 ya fija name y bin en package.json. Renombrar el repo Gersom/agent-context-kit en GitHub afecta la URL de package.json, los README y la skill; GitHub redirige el nombre viejo. Revisar el marcador y la versión de la skill si se cambia su plantilla.
-
-### Qué falta
-
-Toda la tarea.
-
-### Decisiones a medio camino
-
-Decidido: término «suite»; paquete agent-context-suite (npm, sin scope); comando acsuite. Falta: cómo se llama el repo en GitHub (lo renombra el operador) y la forma de decir «el kit» en español («la suite»).
-
-### Próximo paso concreto
-
-Empezar la tarea.
+Sin tarea en curso
 
 <!-- agent-context-skill:section=paused -->
 ## Tareas pausadas
