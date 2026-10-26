@@ -44,7 +44,7 @@ Varias personas trabajan a la vez, cada una con su agente. Estas reglas se suman
 - No hay linter/formatter. `scripts/` (TypeScript con Bun, ej. `scripts/task-tracker/`) son herramientas propias del kit que **no forman parte de la skill distribuida** ni se copian a los repos destino.
 - Dependencias de `scripts/`: solo en `devDependencies` del `package.json` raíz (no uno por script); `bun install` en la raíz; `node_modules/` no se commitea y `bun.lock` sí. Tests con `bun test` desde la raíz.
 - Los scripts nuevos se escriben en **TypeScript** (decisión del operador, 2026-10-05), con el `tsconfig.json` raíz (`strict`). Bun no revisa tipos: `bun run typecheck` (`tsc --noEmit`) tiene que pasar junto con `bun test`.
-- **Decisión no negociable —** versionado SemVer, tags de git `vX.Y.Z` y releases manuales en GitHub, no por CI. Cada repo se versiona por separado: el kit con `package.json`; la skill, en su propio repo. Cuándo subir patch, minor o major y dónde vive cada versión: [`../releasing.md`](../releasing.md).
+- **Decisión no negociable —** versionado SemVer, un tag de git anotado `vX.Y.Z` por cada cambio de versión (se sube con `git push --follow-tags`) y releases manuales en GitHub, no por CI. Cada repo se versiona por separado: el kit con `package.json`; la skill, en su propio repo. Cuándo subir patch, minor o major y dónde vive cada versión: [`../releasing.md`](../releasing.md).
 
 ### Si usas el script de tareas
 

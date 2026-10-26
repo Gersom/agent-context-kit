@@ -5,6 +5,7 @@ Cómo se versionan el kit y la skill. Se lee al publicar una versión; la decisi
 Versionado SemVer, con tags de git `vX.Y.Z` y releases manuales en GitHub, no por CI (los releases son poco frecuentes y son repos de documentación y herramientas chicas). Cada repo se versiona por separado:
 
 - **El kit:** `package.json` (`version`) + tags en este repo. Versiona los scripts y la documentación del kit. Las versiones y tags `v1.x` que ya existen son anteriores a la separación y cubren también la skill, que entonces vivía acá.
+- **Tags (desde la `v1.8.1`):** cada vez que cambia la versión (`1.9.0` → `1.9.1`) se crea un tag **anotado** `vX.Y.Z` (`git tag -a vX.Y.Z -m "…"`) en el commit que la sube, y se sube junto con el push de ese commit usando `git push --follow-tags` (no `--tags`, que subiría también tags locales de prueba; `--follow-tags` ignora los tags ligeros, por eso son anotados). Un tag local sin subir no cuenta. Aplica al kit y a la skill, cada uno en su repo.
 - **La skill:** su propia versión y sus propios tags, en el repo [Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill); no se versiona desde el kit. La versión vive en `.claude-plugin/plugin.json`, en `SKILL.md` y en el marcador de la plantilla `template/agents/rules.md`; `scripts/skill-checks/version.test.ts` verifica que coincidan. Bump:
   - **patch** — fixes/ajustes de redacción en plantillas existentes.
   - **minor** — contenido nuevo que no rompe nada (nueva plantilla, nueva rama del árbol de preguntas).
