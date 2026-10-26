@@ -1,10 +1,18 @@
 {
-  "name": "agent-context-kit",
+  "name": "agent-context-suite",
   "version": "1.8.1",
   "description": "Kit de herramientas (task-tracker, task-manager, docs-check) para los proyectos que usan la skill agent-context-skill, que genera documentación de contexto de proyecto para agentes de IA.",
   "license": "MIT",
-  "private": true,
   "type": "module",
+  "bin": {
+    "acsuite": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Gersom/agent-context-kit.git"
@@ -16,7 +24,8 @@
     "check": "bun scripts/ackit/index.ts check",
     "build": "bun scripts/ackit/build.ts",
     "test": "bun test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "bun run build"
   },
   "devDependencies": {
     "@types/bun": "^1.4.2",
