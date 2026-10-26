@@ -9,7 +9,8 @@ agent-context-kit/
 ├── README.md              # Presentación del proyecto
 ├── CLAUDE.md               # Puntero para agentes: remite a AGENTS.md
 ├── AGENTS.md               # Orden de lectura de la documentación de contexto (docs/README.md, rules, operators, handoff)
-├── package.json            # Versión del kit (SemVer) + scripts (tasks, task, check, test, typecheck) y devDependencies de scripts/
+├── LICENSE                 # Licencia MIT (la skill tiene la misma, en su propio repo)
+├── package.json            # Versión del kit (SemVer), licencia + scripts (tasks, task, check, test, typecheck) y devDependencies de scripts/
 ├── tsconfig.json           # TypeScript (strict) para scripts/; `bun run typecheck` = tsc --noEmit
 │
 ├── scripts/                # Herramientas propias del repo (TypeScript con Bun); no forman parte de la skill

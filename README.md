@@ -70,11 +70,16 @@ agent-context-kit/
 ├── skill/           # Clon de Gersom/agent-context-skill (otro repo, ignorado por git): SKILL.md, flujos (docs/) y plantillas (template/)
 ├── scripts/         # Herramientas del kit, no parte de la skill: task-tracker, task-manager, docs-check y código compartido (_shared/)
 ├── docs/            # Documentación del propio repo: filosofía, arquitectura, diseño y su estado (agents/)
-├── package.json     # Versión del kit (SemVer) y comandos de los scripts
+├── package.json     # Versión del kit (SemVer), licencia y comandos de los scripts
+├── LICENSE          # Licencia MIT
 └── tsconfig.json    # TypeScript (strict) para scripts/
 ```
 
 El árbol completo y para qué sirve cada parte están en [`docs/architecture.md`](./docs/architecture.md); qué es cada plantilla del catálogo, en `docs/template-architecture.md` del [repo de la skill](https://github.com/Gersom/agent-context-skill).
+
+## Licencia
+
+[MIT](./LICENSE). La skill, que vive en su propio repo, tiene la misma licencia.
 
 ## Apoyar el proyecto
 
