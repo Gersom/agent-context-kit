@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 85
+**Próximo número de tarea:** 87
 
 ---
 
@@ -47,6 +47,15 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador quiera hacer pública la skill, o priorice esta tarea explícitamente.
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
+
+### Tarea 86 — Que el agente sepa usar la suite cuando está instalada
+
+- **Descripción:** Hoy, en un proyecto nuevo con la skill y la suite instalada de forma global, el agente no sabe que existe acsuite ni cómo usarlo: AGENTS.md, CLAUDE.md y rules.md no la nombran (solo hay una regla genérica sobre «una herramienta de tareas»). Diseñar cómo se entera: (C) una línea fija en la plantilla de AGENTS.md del tipo «si el comando acsuite existe, úsalo para gestionar tareas (acsuite task --help)», y/o (B) un comando de la suite (acsuite init) que escribe ese párrafo en el proyecto, y/o (A) que la skill detecte acsuite al generar y lo agregue a rules.md. Hecho: decisión tomada y aplicada; un agente en un proyecto nuevo con la suite instalada la usa para las tareas sin que el operador se lo diga.
+- **Decisiones/temas a definir antes de empezar:** Debatir con el operador: ¿qué opción (A, B, C o combinación)? ¿La línea va siempre en la plantilla de AGENTS.md o solo cuando el operador aceptó la suite? Recomendado: C (una línea fija que remite a acsuite task --help, sin duplicar instrucciones) y B después como mejora.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Cambiar las plantillas obliga a una skill nueva (2.0.8) con su entrada de changelog y a sincronizar fixtures y el marcador de rules.md en la suite. Relacionada con la T-80 (recomendación opcional de la suite, que solo informa al operador una vez y no deja nada escrito para el agente).
+- **Agregada:** 2026-10-26.
 
 <!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
