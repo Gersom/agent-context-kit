@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-26 — ✅ Tarea 84 — Quitar la ruta del proyecto de los comandos (la ruta es donde se ejecuta el comando)
+
+- board y check usan por defecto el proyecto de la carpeta de invocación (se sube hasta la raíz de git, como task); la ruta sigue siendo opcional. board deja de usar prompt() (que no existe en Node: fallaba con «prompt is not defined») y gana --help; gitToplevel pasó a scripts/_shared/git.ts y ask-path.ts a resolve-error.ts.
+- Ayuda, mensajes, tests (1067 pass), README raíz y README de las herramientas actualizados, sin bun run en el README raíz. Versión 1.10.0 (320b302) con tag v1.10.0, publicada en npm por el operador y con release en GitHub; verificada por nombre con npx (raíz, subcarpeta, fuera de proyecto), bunx (con y sin --bun) e instalación global (npm y bun). Commits eabf23f, 0042f1e y 320b302 (kit).
+
 ## 2026-10-26 — ✅ Tarea 80 — Skill 2.0.7: quitar «kit» de sus textos y promocionar agent-context-suite
 
 - Skill 2.0.7: las tres líneas con «kit» reescritas sin nombrar la suite (Regla 3 de template/agents/rules.md, questions-flow.md y la nota de anclas de template/agents/backlog.md), sección «Herramientas complementarias (opcional)» en el README de la skill y archivo nuevo docs/suite-recommendation.md, enlazado al final de questions-flow.md y como paso 8 de migration-flow.md (no desde SKILL.md ni en las sesiones donde la documentación ya existía).
