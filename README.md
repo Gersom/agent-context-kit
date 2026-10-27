@@ -1,8 +1,6 @@
 # agent-context-suite
 
-Suite de herramientas para trabajar con la skill [agent-context-skill](https://github.com/Gersom/agent-context-skill), que genera documentación de contexto de proyecto para que **cualquier agente de IA** (Claude Code, Cursor, Copilot, etc.) entienda en qué momento está un proyecto, qué falta, qué se hizo y por qué — sin depender de la memoria de una sola conversación. La skill vive en su propio repo (`agent-context-skill`); este repo tiene las herramientas (seguimiento, gestión y verificación de tareas) y la documentación del proyecto.
-
-La razón de ser de la suite y sus principios de diseño (markdown plano como fuente de verdad, herramientas opcionales, el código gana ante un conflicto) están en [`docs/philosophy.md`](./docs/philosophy.md).
+Suite de herramientas para trabajar con la skill [agent-context-skill](https://github.com/Gersom/agent-context-skill), que genera documentación de contexto de proyecto para que **cualquier agente de IA** (Claude Code, Cursor, Copilot, etc.) entienda en qué momento está un proyecto, qué falta, qué se hizo y por qué — sin depender de la memoria de una sola conversación. La skill vive en su propio repo (`agent-context-skill`); este repo tiene las herramientas (seguimiento, gestión y verificación de tareas).
 
 ## Herramientas
 
@@ -11,13 +9,6 @@ La suite trae tres herramientas, que se usan con el comando `acsuite`:
 - **`acsuite board`**: tablero de tareas en vivo en la terminal (en progreso, pausadas, pendientes y últimas completadas), que se redibuja cuando cambian los archivos.
 - **`acsuite task`**: consulta y edita las tareas sin tocar a mano `handoff.md`, `backlog.md` ni `history.md`.
 - **`acsuite check`**: verifica que la documentación de agentes del proyecto esté en orden, con errores y avisos por archivo y línea.
-
-## Cómo usar
-
-Invocar la skill explícitamente, pidiéndoselo al agente (se llama igual que su repo, `agent-context-skill`):
-
-- **"Usa la skill agent-context-skill"** — dispara la detección automática normal: si el repo ya tiene documentación de esta skill, sigue el flujo de proyecto existente; si no, evalúa si hay contenido de otro sistema para migrar, o dispara el scaffolding normal según el alcance de la tarea.
-- **"Usa la skill agent-context-skill y migra mi proyecto"** — misma detección, pero fuerza el chequeo de migración aunque la heurística de nombres de archivo no encuentre por sí sola suficientes coincidencias como para dispararse (ver "Intención explícita del operador" en `docs/migration-flow.md` del [repo de la skill](https://github.com/Gersom/agent-context-skill)).
 
 ## Instalar la suite
 
@@ -125,10 +116,6 @@ El árbol completo y para qué sirve cada parte están en [`docs/architecture.md
 ## Apoyar el proyecto
 
 Si la suite o la skill te sirven y quieres apoyar su desarrollo, puedes hacer una donación por PayPal: [paypal.me/gersomalaja](https://paypal.me/gersomalaja).
-
-## Estado
-
-Proyecto en diseño. Ver [`docs/architecture.md`](./docs/architecture.md) para la estructura vigente. Las tareas pendientes viven en `docs/agents/`.
 
 ## Colaborar
 

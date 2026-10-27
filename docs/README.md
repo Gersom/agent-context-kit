@@ -4,6 +4,8 @@ Suite de herramientas de la skill [agent-context-skill](https://github.com/Gerso
 
 **Operador:** cada persona que trabaja en el proyecto con su agente, le pide tareas, aprueba decisiones y es a quien se le pregunta cuando algo no está definido.
 
+La razón de ser de la suite y sus principios de diseño (markdown plano como fuente de verdad, herramientas opcionales, el código gana ante un conflicto) están en [`philosophy.md`](./philosophy.md).
+
 ## Mapa de `docs/`
 
 ```
