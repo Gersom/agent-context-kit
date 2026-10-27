@@ -9,6 +9,7 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { upsertSuiteBlock } from "../../_shared/rules-block.ts";
 
 const TEMPLATE = join(import.meta.dir, "fixtures", "template");
 
@@ -232,8 +233,11 @@ export const ROOT_CLAUDE = rootBlock("CLAUDE.md");
 
 // -- rules.md de la carpeta de agentes -------------------------------------------------------------
 
-/** rules.md de la plantilla: lleva el marcador de versión de la skill en la línea 1. */
-export const RULES = template("agents", "rules.md");
+/** rules.md de la plantilla, tal como la genera la skill (sin la sección de la suite): lleva el marcador de versión en la línea 1. */
+export const TEMPLATE_RULES = template("agents", "rules.md");
+
+/** rules.md de un proyecto que ya corrió `acsuite init`: la plantilla más el bloque de la suite (no es parte del espejo de la skill). */
+export const RULES = upsertSuiteBlock(TEMPLATE_RULES).text;
 
 // -- Variantes ----------------------------------------------------------------------------------
 

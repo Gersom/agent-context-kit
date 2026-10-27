@@ -3,9 +3,10 @@
 
 import { afterAll, describe, expect, test } from "bun:test";
 import { basename, dirname, join, resolve } from "node:path";
+import { SUITE_BLOCK } from "../../../_shared/rules-block.ts";
 import { run } from "../../src/run.ts";
 import type { Finding } from "../../src/types.ts";
-import { ANCHOR, BACKLOG, HANDOFF, HISTORY, lineOf } from "../fixtures.ts";
+import { ANCHOR, BACKLOG, HANDOFF, HISTORY, lineOf, TEMPLATE_RULES } from "../fixtures.ts";
 import { captureIo, flatTree, multiTree, snapshot, type TempProject, type Tree, writeProject } from "../helpers.ts";
 
 const created: TempProject[] = [];
@@ -74,6 +75,7 @@ const BROKEN_CODES = [
   "placeholder",
   "root-file",
   "skill-version",
+  "suite-rules",
   "task-duplicate",
   "task-heading",
 ];
@@ -210,7 +212,7 @@ describe("marcador de versión de la skill en rules.md", () => {
 
   test("repo plano sin marcador: aviso skill-version, código 0 y 1 con --strict", async () => {
     const tree = flatTree();
-    tree[RULES_FILE] = "# Reglas del proyecto\n";
+    tree[RULES_FILE] = `# Reglas del proyecto\n\n${SUITE_BLOCK}\n`;
     const q = project(tree);
     const report = await checkJson([q.root]);
     expect(report).toMatchObject({ code: 0, ok: true, errors: 0, warnings: 1 });
@@ -220,14 +222,14 @@ describe("marcador de versión de la skill en rules.md", () => {
 
   test("marcador mal formado: aviso con su línea", async () => {
     const tree = flatTree();
-    tree[RULES_FILE] = "# Reglas del proyecto\n<!-- agent-context-skill:version 1.9 -->\n";
+    tree[RULES_FILE] = `# Reglas del proyecto\n<!-- agent-context-skill:version 1.9 -->\n\n${SUITE_BLOCK}\n`;
     const report = await checkJson([project(tree).root]);
     expect(report.findings).toMatchObject([{ severity: "warning", code: "skill-version", file: RULES_FILE, line: 2 }]);
   });
 
   test("multi-operador: se revisa el rules.md compartido de la carpeta de agentes", async () => {
     const tree = multiTree();
-    tree[RULES_FILE] = "# Reglas del proyecto\n";
+    tree[RULES_FILE] = `# Reglas del proyecto\n\n${SUITE_BLOCK}\n`;
     const report = await checkJson([project(tree).root], { email: "ana@mail.com" });
     expect(report.findings).toMatchObject([{ severity: "warning", code: "skill-version", file: RULES_FILE }]);
   });
@@ -235,6 +237,31 @@ describe("marcador de versión de la skill en rules.md", () => {
   test("con CRLF el marcador se reconoce", async () => {
     const report = await checkJson([project(toCrlf(flatTree())).root]);
     expect(report.findings).toEqual([]);
+  });
+});
+
+describe("sección de la suite en rules.md", () => {
+  const RULES_FILE = "docs/agents/rules.md";
+  const withoutBlock = (tree: Tree): Tree => ({ ...tree, [RULES_FILE]: TEMPLATE_RULES });
+
+  test("repo plano sin la sección: aviso suite-rules, código 0 y 1 con --strict", async () => {
+    const q = project(withoutBlock(flatTree()));
+    const report = await checkJson([q.root]);
+    expect(report).toMatchObject({ code: 0, ok: true, errors: 0, warnings: 1 });
+    expect(report.findings).toMatchObject([{ severity: "warning", code: "suite-rules", file: RULES_FILE, line: null }]);
+    expect(report.findings[0].message).toContain("acsuite init");
+    expect((await check([q.root, "--strict"])).code).toBe(1);
+  });
+
+  test("multi-operador: se revisa el rules.md compartido", async () => {
+    const report = await checkJson([project(withoutBlock(multiTree())).root], { email: "ana@mail.com" });
+    expect(report.findings).toMatchObject([{ severity: "warning", code: "suite-rules", file: RULES_FILE }]);
+  });
+
+  test("sin rules.md no se reporta (lo dice el check de archivos)", async () => {
+    const tree = flatTree();
+    delete tree[RULES_FILE];
+    expect((await checkJson([project(tree).root])).findings.map((f) => f.code)).not.toContain("suite-rules");
   });
 });
 

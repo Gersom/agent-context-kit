@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { SUITE_BLOCK } from "../../../_shared/rules-block.ts";
 import { runChecks } from "../../src/checks/index.ts";
 import { checkSkillVersion, VERSION_MARKER_RE } from "../../src/checks/skill-version.ts";
 import { makeRules } from "../../src/context.ts";
@@ -65,13 +66,13 @@ describe("skill-version", () => {
   });
 
   test("runChecks incluye el aviso y no cambia el resto", () => {
-    const findings = runChecks(makeCtx({ rules: "# Reglas\n" }));
+    const findings = runChecks(makeCtx({ rules: `# Reglas\n\n${SUITE_BLOCK}\n` }));
     expect(findings.map((f) => f.code)).toEqual(["skill-version"]);
   });
 
-  test("makeRules conserva solo la cabecera", () => {
+  test("makeRules guarda la cabecera y el texto completo (en LF)", () => {
     const rules = makeRules("docs/agents/rules.md", "a\r\nb\r\nc\r\nd\r\ne\r\n");
-    expect(rules).toEqual({ file: "docs/agents/rules.md", exists: true, head: "a\nb\nc" });
-    expect(makeRules("docs/agents/rules.md", null)).toEqual({ file: "docs/agents/rules.md", exists: false, head: "" });
+    expect(rules).toEqual({ file: "docs/agents/rules.md", exists: true, head: "a\nb\nc", text: "a\nb\nc\nd\ne\n" });
+    expect(makeRules("docs/agents/rules.md", null)).toEqual({ file: "docs/agents/rules.md", exists: false, head: "", text: "" });
   });
 });

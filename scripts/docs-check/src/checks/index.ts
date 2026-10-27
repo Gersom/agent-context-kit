@@ -10,6 +10,7 @@ import { checkHistoryEntries } from "./history.ts";
 import { checkLegacyMarkers } from "./legacy-marker.ts";
 import { checkPlaceholders } from "./placeholders.ts";
 import { checkSkillVersion } from "./skill-version.ts";
+import { checkSuiteRules } from "./suite-rules.ts";
 import { checkBlockTags, checkDuplicateNumbers, checkNextNumber, checkTaskFields, checkTaskHeadings } from "./tasks.ts";
 
 export const CHECKS: Check[] = [
@@ -17,6 +18,7 @@ export const CHECKS: Check[] = [
   checkOperatorsReadable,
   checkRootFiles,
   checkSkillVersion,
+  checkSuiteRules,
   checkLegacyMarkers,
   checkDecisionsIndex,
   checkAnchors,

@@ -45,13 +45,15 @@ export interface RootFileInfo {
   text: string;
 }
 
-/** `rules.md` de la carpeta de agentes compartida: solo se lee su cabecera (donde va el marcador de versión). */
+/** `rules.md` de la carpeta de agentes compartida: su cabecera (donde va el marcador de versión) y el texto completo. */
 export interface RulesInfo {
   /** Ruta relativa a la raíz del proyecto, con `/` (también si no existe: dónde debería estar). */
   file: string;
   exists: boolean;
   /** Las primeras líneas del archivo (LF); vacío si no existe. */
   head: string;
+  /** El texto completo (LF); vacío si no existe. */
+  text: string;
 }
 
 /** La carpeta `project/decisions/` (un archivo por tema, con su `README.md` como índice) y los archivos sueltos del formato anterior. */

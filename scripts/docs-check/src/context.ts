@@ -54,10 +54,10 @@ export function readRootFiles(projectDir: string, read: ReadFile): RootFileInfo[
 /** Cuántas líneas de `rules.md` se conservan: el marcador de versión va en las primeras. */
 export const RULES_HEAD_LINES = 3;
 
-/** `rules.md` de la carpeta de agentes: su cabecera, o vacía si no existe. */
+/** `rules.md` de la carpeta de agentes: su cabecera y su texto, o vacíos si no existe. */
 export function makeRules(file: string, raw: string | null): RulesInfo {
   const text = normalizeEol(raw ?? "").text;
-  return { file, exists: raw !== null, head: text.split("\n").slice(0, RULES_HEAD_LINES).join("\n") };
+  return { file, exists: raw !== null, head: text.split("\n").slice(0, RULES_HEAD_LINES).join("\n"), text };
 }
 
 /** `project/decisions/` junto a la carpeta de agentes (`docs/project/decisions` o `agent-context/project/decisions`). */
