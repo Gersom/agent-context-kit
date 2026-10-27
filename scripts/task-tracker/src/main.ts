@@ -27,6 +27,9 @@ export const HELP: string[] = [
   "  --compact             Arranca con un solo recuadro por tarea.",
   "  --no-arrows           Arranca sin las flechas del flujo.",
   "  -h, --help            Muestra esta ayuda.",
+  "",
+  "La lista de proyectos se guarda en projects.json dentro de ~/.acsuite (o de la carpeta de la variable",
+  "ACSUITE_HOME): los repos abiertos de frente (sin --once) y los agregados con la tecla a.",
 ];
 
 export function main(argv: string[]): void {

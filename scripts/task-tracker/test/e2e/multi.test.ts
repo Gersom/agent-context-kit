@@ -37,10 +37,13 @@ const TEAM_BACKLOG = `<!-- agent-context-skill:section=free -->
 `;
 
 let repo: string;
+// Carpeta de config del usuario (`ACSUITE_HOME`) de todas las corridas: temporal, nunca la real.
+let home: string;
 let hasGit = true;
 
 beforeAll(() => {
   repo = mkdtempSync(join(tmpdir(), "task-tracker-multi-"));
+  home = mkdtempSync(join(tmpdir(), "task-tracker-multi-home-"));
   const agents = join(repo, "docs", "agents");
   for (const folder of ["gersom", "ana"]) {
     mkdirSync(join(agents, folder), { recursive: true });
@@ -55,11 +58,14 @@ beforeAll(() => {
   if (hasGit) spawnSync("git", ["-C", repo, "config", "user.email", "Ana@Mail.com"]);
 });
 
-afterAll(() => rmSync(repo, { recursive: true, force: true }));
+afterAll(() => {
+  rmSync(repo, { recursive: true, force: true });
+  rmSync(home, { recursive: true, force: true });
+});
 
 /** Corre index.ts con los argumentos dados, sin datos de entrada y sin colores. */
 async function run(args: string[]): Promise<{ stdout: string; stderr: string; code: number }> {
-  const env: Record<string, string | undefined> = { ...process.env, NO_COLOR: "1" };
+  const env: Record<string, string | undefined> = { ...process.env, NO_COLOR: "1", ACSUITE_HOME: home };
   delete env.INIT_CWD;
   delete env.npm_config_local_prefix;
   const proc = Bun.spawn([process.execPath, INDEX, ...args], { env, stdin: "ignore", stdout: "pipe", stderr: "pipe" });

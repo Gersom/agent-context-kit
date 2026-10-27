@@ -4,6 +4,7 @@
 // navegación con ↑/↓, Enter y `b`/Esc (ver cli/nav.ts). Sin un repo al que abrir de frente, se
 // muestra la lista de proyectos (ver cli/projects-nav.ts): Enter abre uno y `b`/Esc vuelven a ella.
 
+import { gitToplevel } from "../../_shared/git.ts";
 import { editLine } from "./cli/line-edit.ts";
 import { parseKeys } from "./cli/keys.ts";
 import { initialNav, type NavRow, navReduce, type NavState, reconcileNav } from "./cli/nav.ts";
@@ -12,6 +13,7 @@ import { resolveAgentsDir } from "./io/paths.ts";
 import { createProjectList, defaultProjects, type ProjectsProvider, readProjectRows } from "./io/projects.ts";
 import { createSnapshotReader, RETRY_MS } from "./io/snapshot.ts";
 import { createTeamReader, ROOT_WATCHED_FILES } from "./io/team.ts";
+import { saveProject } from "./io/user-config.ts";
 import { watchDir } from "./io/watch.ts";
 import { buildModel } from "./model/model.ts";
 import { buildTeamModel } from "./model/team.ts";
@@ -57,8 +59,8 @@ export function startApp({
   let projectRows: ProjectRow[] = [];
   let projectsNav: ProjectsNavState = initialProjectsNav([]);
   let projectsNotices: string[] = [];
-  // Lista de proyectos: la del proveedor más los repos agregados con `a` en esta sesión.
-  const projectList = createProjectList(listProjects);
+  // Lista de proyectos: la del proveedor más los repos agregados con `a` (que además se guardan en disco).
+  const projectList = createProjectList(listProjects, { save: saveProject });
   // Texto de la ruta que se escribe para agregar un repo; `null` si no se está agregando.
   let adding: string | null = null;
   // Atajos solo con una terminal interactiva de verdad (no con salida o entrada redirigida).
@@ -83,7 +85,9 @@ export function startApp({
   function loadProjects(): void {
     projectRows = readProjectRows(projectList.list());
     projectsNav = reconcileProjects(projectsNav, projectRows.map((row) => row.path));
-    projectsNotices = [];
+    // Si la lista guardada no se pudo leer, se avisa (y se ignora): ver `ProjectsProvider.warning`.
+    const warning = listProjects.warning?.() ?? null;
+    projectsNotices = warning ? [warning] : [];
   }
 
   /** Enter con una ruta escrita: la agrega y la elige; si no sirve, avisa y deja la entrada abierta. */
@@ -96,7 +100,8 @@ export function startApp({
     adding = null;
     loadProjects();
     projectsNav = { selected: result.path, opened: null };
-    projectsNotices = result.added ? [] : ["Ese repo ya estaba en la lista."];
+    if (!result.added) projectsNotices.push("Ese repo ya estaba en la lista.");
+    if (result.warning) projectsNotices.push(`No se pudo guardar la lista: ${result.warning}`);
   }
 
   /** Enter en la lista: abre ese repo en el tablero; si ya no se puede abrir, lo avisa y se queda. */
@@ -215,6 +220,12 @@ export function startApp({
   }
 
   open(initialTarget);
+  if (initialTarget && !once) {
+    // Un repo abierto de frente se agrega solo a la lista guardada (con `--once` no se escribe nada).
+    // El aviso de un fallo viaja por el canal de avisos de la vista del repo.
+    const error = saveProject(gitToplevel(initialTarget.projectDir));
+    if (error) watcherErrors.push(`No se pudo guardar la lista: ${error}`);
+  }
   draw({ kind: "start" });
   if (once) return;
   syncWatchers();

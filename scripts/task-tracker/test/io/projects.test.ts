@@ -1,4 +1,4 @@
-import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -108,8 +108,14 @@ describe("readProjectRows", () => {
 });
 
 describe("defaultProjects", () => {
-  const KEYS = ["INIT_CWD", "npm_config_local_prefix"];
+  const KEYS = ["INIT_CWD", "npm_config_local_prefix", "ACSUITE_HOME"];
   const saved = Object.fromEntries(KEYS.map((key) => [key, process.env[key]]));
+  let home: string;
+  beforeEach(() => {
+    // Nunca la carpeta de config real: cada test con la suya, vacía.
+    home = mkdtempSync(join(root, "home-"));
+    process.env.ACSUITE_HOME = home;
+  });
   afterEach(() => {
     for (const key of KEYS) {
       if (saved[key] === undefined) delete process.env[key];
@@ -117,16 +123,30 @@ describe("defaultProjects", () => {
     }
   });
 
-  test("el repo de la carpeta de invocación, si tiene docs de la skill", () => {
+  test("sin archivo guardado, la lista queda vacía y sin aviso, aunque la carpeta de invocación tenga docs", () => {
     delete process.env.npm_config_local_prefix;
     process.env.INIT_CWD = flat;
-    expect(defaultProjects()).toEqual([flat]);
+    expect(defaultProjects()).toEqual([]);
+    expect(defaultProjects.warning?.()).toBeNull();
   });
 
-  test("sin docs de la skill ahí, la lista queda vacía", () => {
-    delete process.env.npm_config_local_prefix;
-    process.env.INIT_CWD = noDocs;
+  test("los repos del archivo guardado, en su orden (también el que ya no existe: sale como fila con aviso)", () => {
+    const gone = join(root, "ya-no-existe");
+    writeFileSync(join(home, "projects.json"), JSON.stringify({ version: 1, projects: [multi, gone, flat] }));
+    expect(defaultProjects()).toEqual([multi, gone, flat]);
+    expect(defaultProjects.warning?.()).toBeNull();
+    expect(readProjectRows(defaultProjects(), { email: null }).map((row) => [row.path, row.warning === null])).toEqual([
+      [multi, true],
+      [gone, false],
+      [flat, true],
+    ]);
+  });
+
+  test("archivo corrupto: lista vacía y el aviso de lectura", () => {
+    const file = join(home, "projects.json");
+    writeFileSync(file, "no es json");
     expect(defaultProjects()).toEqual([]);
+    expect(defaultProjects.warning?.()).toContain(file);
   });
 });
 
@@ -155,6 +175,32 @@ describe("createProjectList", () => {
       projects.add(multi);
       expect(projects.list()).toEqual([flat, multi]);
     }
+  });
+
+  test("con `save`: se llama al agregar una ruta nueva, con la raíz del repo, y no hay aviso si guarda bien", () => {
+    if (!hasGit) return;
+    const saved: string[] = [];
+    const projects = createProjectList(() => [], { save: (path) => (saved.push(path), null) });
+    expect(projects.add(join(multi, "docs", "agents", "ana"))).toEqual({ ok: true, path: multi, added: true });
+    expect(saved).toEqual([multi]);
+    // Una ruta que ya figuraba no se vuelve a guardar.
+    expect(projects.add(multi)).toEqual({ ok: true, path: multi, added: false });
+    expect(createProjectList(() => [flat], { save: (path) => (saved.push(path), null) }).add(flat)).toMatchObject({ added: false });
+    expect(saved).toEqual([multi]);
+  });
+
+  test("con `save` que falla: el repo queda en la lista de la sesión y el resultado lleva el aviso", () => {
+    if (!hasGit) return;
+    const projects = createProjectList(() => [], { save: () => "disco lleno" });
+    expect(projects.add(multi)).toEqual({ ok: true, path: multi, added: true, warning: "disco lleno" });
+    expect(projects.list()).toEqual([multi]);
+  });
+
+  test("con `save`, una ruta inválida no se guarda", () => {
+    const saved: string[] = [];
+    const projects = createProjectList(() => [], { save: (path) => (saved.push(path), null) });
+    expect(projects.add(noDocs)).toMatchObject({ ok: false });
+    expect(saved).toEqual([]);
   });
 
   test("errores: vacía, inexistente y sin documentación de la skill; la lista no cambia", () => {

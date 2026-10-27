@@ -1,0 +1,116 @@
+// Configuración del usuario: la lista de proyectos de `acsuite board` guardada en disco, en
+// `projects.json` dentro de la carpeta de config (`ACSUITE_HOME`, o `~/.acsuite`). Formato:
+// `{ "version": 1, "projects": ["<ruta absoluta de la raíz del repo>", ...] }`, en orden de alta y
+// sin duplicados. Nada de acá lanza: los errores de disco vuelven como mensaje o como aviso.
+
+import { copyFileSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { join, resolve } from "node:path";
+import { invocationDir } from "./paths.ts";
+
+const PROJECTS_FILE = "projects.json";
+const FORMAT_VERSION = 1;
+
+/** Carpeta de config del usuario: `ACSUITE_HOME` si está definida, si no `~/.acsuite`. */
+export function configDir(): string {
+  // Un `ACSUITE_HOME` relativo se toma desde donde se lanzó el comando, no desde el cwd del proceso.
+  const custom = process.env.ACSUITE_HOME;
+  return custom ? resolve(invocationDir(), custom) : join(homedir(), ".acsuite");
+}
+
+/** Dos rutas son la misma: sin distinguir mayúsculas en Windows. */
+export function samePath(a: string, b: string): boolean {
+  return process.platform === "win32" ? a.toLowerCase() === b.toLowerCase() : a === b;
+}
+
+/** Lo leído de `projects.json`: ausente, bueno, con contenido que no sirve, o que no se pudo leer. */
+type Saved =
+  | { state: "missing" | "ok"; paths: string[]; warning: null }
+  | { state: "corrupt" | "unreadable"; paths: []; warning: string };
+
+function readSaved(file: string): Saved {
+  let text: string;
+  try {
+    // Editores y PowerShell en Windows pueden guardar el JSON con BOM.
+    text = readFileSync(file, "utf8").replace(/^﻿/, "");
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return { state: "missing", paths: [], warning: null };
+    return { state: "unreadable", paths: [], warning: `No se pudo leer ${file}: ${errorMessage(error)}. Se ignora.` };
+  }
+
+  let data: unknown;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    return { state: "corrupt", paths: [], warning: `${file} no es un JSON válido. Se ignora.` };
+  }
+  const projects = (data as { version?: unknown; projects?: unknown } | null)?.projects;
+  const valid =
+    (data as { version?: unknown } | null)?.version === FORMAT_VERSION &&
+    Array.isArray(projects) &&
+    projects.every((entry) => typeof entry === "string" && entry !== "");
+  if (!valid) {
+    return {
+      state: "corrupt",
+      paths: [],
+      warning: `${file} no tiene la forma esperada ({ "version": ${FORMAT_VERSION}, "projects": [rutas] }). Se ignora.`,
+    };
+  }
+
+  const paths: string[] = [];
+  for (const entry of projects as string[]) if (!paths.some((p) => samePath(p, entry))) paths.push(entry);
+  return { state: "ok", paths, warning: null };
+}
+
+/**
+ * Los repos guardados, en orden de alta. Sin archivo, lista vacía y sin aviso; con el archivo
+ * corrupto o ilegible, lista vacía y un aviso que dice cuál archivo se ignora.
+ */
+export function loadSavedProjects(): { paths: string[]; warning: string | null } {
+  try {
+    const { paths, warning } = readSaved(join(configDir(), PROJECTS_FILE));
+    return { paths, warning };
+  } catch (error) {
+    return { paths: [], warning: `No se pudo ubicar la carpeta de config: ${errorMessage(error)}. Se ignora la lista guardada.` };
+  }
+}
+
+/**
+ * Agrega la raíz de un repo a la lista guardada (al final; si ya figura, no toca el archivo).
+ * Crea la carpeta de config si falta y escribe de forma atómica (archivo temporal + renombrar).
+ * Si el archivo existente estaba corrupto, antes lo copia a `projects.json.bak`.
+ * Devuelve el mensaje del error, o `null` si quedó guardado.
+ */
+export function saveProject(path: string): string | null {
+  let dir: string;
+  try {
+    dir = configDir();
+  } catch (error) {
+    return `No se pudo ubicar la carpeta de config: ${errorMessage(error)}`;
+  }
+  const file = join(dir, PROJECTS_FILE);
+  const temp = `${file}.${process.pid}.tmp`;
+  try {
+    const saved = readSaved(file);
+    // Ilegible por un error de disco (permisos, es una carpeta...): no se pisa lo que no se pudo leer.
+    if (saved.state === "unreadable") return `${file} no se pudo leer, así que no se sobrescribe.`;
+    if (saved.paths.some((p) => samePath(p, path))) return null;
+
+    mkdirSync(dir, { recursive: true });
+    if (saved.state === "corrupt") copyFileSync(file, `${file}.bak`);
+    writeFileSync(temp, `${JSON.stringify({ version: FORMAT_VERSION, projects: [...saved.paths, path] }, null, 2)}\n`);
+    renameSync(temp, file);
+    return null;
+  } catch (error) {
+    try {
+      rmSync(temp, { force: true });
+    } catch {
+      // Sin más que hacer: el mensaje del error original es el que importa.
+    }
+    return `${file}: ${errorMessage(error)}`;
+  }
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}

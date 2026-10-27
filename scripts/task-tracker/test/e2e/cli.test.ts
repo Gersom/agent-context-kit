@@ -2,17 +2,24 @@
 
 import { afterAll, describe, expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { FIXTURES, requireFixture } from "../../../_shared/test/helpers.ts";
 
 const INDEX = join(import.meta.dir, "..", "..", "index.ts");
 
-/** Corre index.ts con los argumentos dados (desde `cwd`, si se indica), sin datos de entrada y sin colores. */
-async function run(args: string[], cwd?: string): Promise<{ stdout: string; stderr: string; code: number }> {
+// Carpeta de config por defecto de todas las corridas: temporal y vacía, nunca la real (~/.acsuite).
+const sharedHome = mkdtempSync(join(tmpdir(), "board-home-"));
+afterAll(() => rmSync(sharedHome, { recursive: true, force: true }));
+
+/**
+ * Corre index.ts con los argumentos dados (desde `cwd`, si se indica), sin datos de entrada y sin colores.
+ * `home`: carpeta de config del usuario (`ACSUITE_HOME`).
+ */
+async function run(args: string[], cwd?: string, home = sharedHome): Promise<{ stdout: string; stderr: string; code: number }> {
   // Sin variables de `bun run` heredadas: las rutas relativas no deben depender de quién lanzó los tests.
-  const env: Record<string, string | undefined> = { ...process.env, NO_COLOR: "1" };
+  const env: Record<string, string | undefined> = { ...process.env, NO_COLOR: "1", ACSUITE_HOME: home };
   delete env.INIT_CWD;
   delete env.npm_config_local_prefix;
 
@@ -142,6 +149,65 @@ describe("index.ts sin ruta: el proyecto de la carpeta donde se lanza", () => {
     expect(code).toBe(1);
     expect(stderr).toContain("No existe la carpeta");
     expect(stdout).toBe("");
+  });
+
+  test("--once en un repo con docs no escribe nada en la carpeta de config", async () => {
+    const root = tempProject({ git: true });
+    const home = join(mkdtempSync(join(tmpdir(), "board-home-")), "acsuite");
+    created.push(join(home, ".."));
+    for (const args of [["--once"], [root, "--once"]]) {
+      const { code } = await run(args, root, home);
+      expect(code).toBe(0);
+    }
+    expect(existsSync(join(home, "projects.json"))).toBe(false);
+    expect(existsSync(home)).toBe(false);
+  });
+
+  test("sin --once, abrir el board en una subcarpeta de un repo registra la raíz del repo en projects.json", async () => {
+    const root = tempProject({ git: true });
+    const home = mkdtempSync(join(tmpdir(), "board-home-"));
+    created.push(home);
+    const env: Record<string, string | undefined> = { ...process.env, NO_COLOR: "1", ACSUITE_HOME: home };
+    delete env.INIT_CWD;
+    delete env.npm_config_local_prefix;
+    const proc = Bun.spawn([process.execPath, INDEX], { env, cwd: join(root, "src", "app"), stdin: "ignore", stdout: "ignore", stderr: "ignore" });
+    try {
+      const file = join(home, "projects.json");
+      for (let i = 0; i < 100 && !existsSync(file); i++) await Bun.sleep(100);
+      expect(existsSync(file)).toBe(true);
+      const saved = JSON.parse(readFileSync(file, "utf8")) as { version: number; projects: string[] };
+      expect(saved.version).toBe(1);
+      expect(saved.projects).toHaveLength(1);
+      expect(basename(saved.projects[0])).toBe(basename(root));
+    } finally {
+      proc.kill();
+      await proc.exited;
+    }
+  });
+
+  test("fuera de un proyecto: la lista de proyectos muestra los repos de projects.json de ACSUITE_HOME", async () => {
+    const saved = tempProject({ git: true });
+    const outside = tempProject({ git: false, docs: false });
+    const home = mkdtempSync(join(tmpdir(), "board-home-"));
+    created.push(home);
+    writeFileSync(join(home, "projects.json"), JSON.stringify({ version: 1, projects: [saved] }));
+    const { stdout, stderr, code } = await run(["--once"], outside, home);
+    expect(stderr).toBe("");
+    expect(code).toBe(0);
+    expect(stdout).toContain("╭─ PROYECTOS (1)");
+    expect(stdout).toContain(basename(saved));
+    expect(stdout).not.toContain("No hay proyectos para mostrar.");
+  });
+
+  test("projects.json corrupto: la lista sale vacía con el aviso, no es un error", async () => {
+    const outside = tempProject({ git: false, docs: false });
+    const home = mkdtempSync(join(tmpdir(), "board-home-"));
+    created.push(home);
+    writeFileSync(join(home, "projects.json"), "{ roto");
+    const { stdout, code } = await run(["--once"], outside, home);
+    expect(code).toBe(0);
+    expect(stdout).toContain("╭─ PROYECTOS (0)");
+    expect(stdout).toContain("projects.json no es un JSON válido");
   });
 
   test("con ruta, la carpeta de lanzamiento no importa", async () => {

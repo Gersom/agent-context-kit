@@ -1,7 +1,7 @@
-// Lista de proyectos: de dónde sale (un proveedor de rutas inyectable) y la lectura de cada repo
-// para la vista de proyectos. Cada fila es lo que ve el operador de ese repo —el del correo de su
-// `git config user.email`—, no el de quien lanzó el comando. La lectura es puntual (al abrir la
-// vista y con `r`): no hay watchers por repo.
+// Lista de proyectos: de dónde sale (un proveedor de rutas inyectable; por defecto, el archivo
+// guardado del usuario) y la lectura de cada repo para la vista de proyectos. Cada fila es lo que
+// ve el operador de ese repo —el del correo de su `git config user.email`—, no el de quien lanzó
+// el comando. La lectura es puntual (al abrir la vista y con `r`): no hay watchers por repo.
 
 import { basename, join, resolve } from "node:path";
 import { gitToplevel } from "../../../_shared/git.ts";
@@ -9,20 +9,23 @@ import { buildModel } from "../model/model.ts";
 import type { ProjectRow } from "../shared/types.ts";
 import { cleanPathInput, invocationDir, resolveAgentsDir } from "./paths.ts";
 import { createSnapshotReader } from "./snapshot.ts";
-
-/** Rutas de los repos a listar. La Tarea 97 la reemplaza por la lista guardada del usuario. */
-export type ProjectsProvider = () => string[];
+import { loadSavedProjects, samePath } from "./user-config.ts";
 
 /**
- * Proveedor por defecto: solo el repo actual (la raíz git de la carpeta de invocación, o la
- * carpeta misma si no está en uno), y únicamente si tiene la documentación de la skill.
+ * Rutas de los repos a listar. `warning`: aviso sobre la última lectura de donde salen (ej. un
+ * archivo guardado que no sirve), o `null`; se pide justo después de listar.
  */
-export const defaultProjects: ProjectsProvider = () => {
-  const root = gitToplevel(invocationDir());
-  return resolveAgentsDir(root).ok ? [root] : [];
-};
+export type ProjectsProvider = (() => string[]) & { warning?: () => string | null };
 
-export type AddResult = { ok: true; path: string; added: boolean } | { ok: false; error: string };
+/**
+ * Proveedor por defecto: los repos guardados en `projects.json` (ver user-config.ts), en orden de
+ * alta. Uno cuya carpeta ya no existe se queda: sale como fila con aviso (ver `readProjectRows`).
+ */
+export const defaultProjects: ProjectsProvider = Object.assign(() => loadSavedProjects().paths, {
+  warning: () => loadSavedProjects().warning,
+});
+
+export type AddResult = { ok: true; path: string; added: boolean; warning?: string } | { ok: false; error: string };
 
 /** La lista que ve la vista de proyectos: la del proveedor más los repos agregados en esta sesión. */
 export interface ProjectList {
@@ -30,17 +33,20 @@ export interface ProjectList {
   /**
    * Agrega la carpeta `input` (la raíz de un repo o cualquier subcarpeta suya): se sube a la raíz
    * del repo y ahí se exige la documentación de la skill. Una ruta que ya figura no se duplica
-   * (`added: false`). Vive solo en memoria; guardarla en disco es la Tarea 97.
+   * (`added: false`). Si se pidió guardarla (`save`) y no se pudo, el resultado lleva `warning`:
+   * el repo queda en la lista de esta sesión igual.
    */
   add(input: string): AddResult;
 }
 
-export function createProjectList(base: ProjectsProvider): ProjectList {
+export function createProjectList(
+  base: ProjectsProvider,
+  { save }: { save?: (path: string) => string | null } = {},
+): ProjectList {
   const extra: string[] = [];
-  const same = (a: string, b: string) => (process.platform === "win32" ? a.toLowerCase() === b.toLowerCase() : a === b);
   const list = () => {
     const paths = [...base()];
-    for (const path of extra) if (!paths.some((p) => same(p, path))) paths.push(path);
+    for (const path of extra) if (!paths.some((p) => samePath(p, path))) paths.push(path);
     return paths;
   };
   return {
@@ -51,10 +57,11 @@ export function createProjectList(base: ProjectsProvider): ProjectList {
       const root = gitToplevel(resolve(invocationDir(), cleaned));
       const resolved = resolveAgentsDir(root);
       if (!resolved.ok) return { ok: false, error: resolved.error.replace(/:$/, "") };
-      const known = list().find((p) => same(p, root));
+      const known = list().find((p) => samePath(p, root));
       if (known) return { ok: true, path: known, added: false };
       extra.push(root);
-      return { ok: true, path: root, added: true };
+      const warning = save?.(root);
+      return warning ? { ok: true, path: root, added: true, warning } : { ok: true, path: root, added: true };
     },
   };
 }
