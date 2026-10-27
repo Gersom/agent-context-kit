@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-26 — ✅ Tarea 81 — Aclarar el flujo de instalación de la suite en el README
+
+- README reescrito: instalación recomendada global (npm install -g / bun add -g), alternativa sin instalar con npx/bunx, diferencia entre paquete (agent-context-suite) y comando (acsuite) y tabla de uso de los comandos; sin menciones de bun run.
+- La ayuda y los mensajes del CLI (docs-check y task-manager) y sus tests pasan de bun run a acsuite. Versión 1.9.1 (736d3f0) con el tag v1.9.1, publicada en npm por el operador y con release en GitHub; verificada por nombre con npx, bunx e instalación global (npm y bun). Se dejaron con bun run los README por herramienta, architecture.md y los comentarios de cabecera (documentación de desarrollo). Commits 511de9b, 5018b99, f6b57a2 y 736d3f0 (kit).
+
 ## 2026-10-26 — ✅ Tarea 77 — Publicar la primera versión en npm y documentar la instalación
 
 - Primera versión de la suite publicada: agent-context-suite 1.9.0 en npm (publicado por el operador con 2FA), commit de versión 63a28d3 con el tag anotado v1.9.0 subido con git push --follow-tags, y release v1.9.0 en GitHub.
