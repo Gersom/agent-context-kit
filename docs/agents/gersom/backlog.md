@@ -48,11 +48,11 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 95 — Board: tecla para ir a la vista de listado de projects (repositorios)
+### Tarea 96 — Board: opción de agregar repo en el listado de projects
 
-- **Descripción:** En el comando `acsuite board`, agregar una tecla que lleve a la vista de listado de projects (repositorios).
-- **Decisiones/temas a definir antes de empezar:** Qué tecla usar y desde qué vistas está disponible.
-- **Bloqueos:** `[Resuelto el 2026-10-27]` — era `[dependencia]` Depende de la Tarea 98.
+- **Descripción:** En `acsuite board`, en la vista de listado de projects, agregar la opción de agregar un repo.
+- **Decisiones/temas a definir antes de empezar:** Cómo se ingresa el repo (ruta escrita, selector) y qué se valida (que exista, que tenga docs/agents).
+- **Bloqueos:** `[Resuelto el 2026-10-27]` — era `[dependencia]` Depende de la Tarea 95.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Agregada:** 2026-10-27.
 
@@ -75,14 +75,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Bloqueos:** [postergada] Hay que debatirla al llegar a esta tarea, tras publicar la primera versión.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Agregada:** 2026-10-26.
-
-### Tarea 96 — Board: opción de agregar repo en el listado de projects
-
-- **Descripción:** En `acsuite board`, en la vista de listado de projects, agregar la opción de agregar un repo.
-- **Decisiones/temas a definir antes de empezar:** Cómo se ingresa el repo (ruta escrita, selector) y qué se valida (que exista, que tenga docs/agents).
-- **Bloqueos:** `[dependencia]` Depende de la Tarea 95.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Agregada:** 2026-10-27.
 
 ### Tarea 97 — Board: guardar los repos en los que se ejecuta
 

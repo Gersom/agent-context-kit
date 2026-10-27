@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 95 — Board: tecla para ir a la vista de listado de projects (repositorios)
+
+- Tecla p en acsuite board: desde cualquier vista de un repo (panel plano, equipo, panel de operador) lleva a la lista de proyectos; en la lista no hace nada.
+- El pie de las vistas de un repo muestra [p] proyectos y la ayuda del comando lo menciona.
+- Commit en la suite: 6bc87bf.
+
 ## 2026-10-27 — ✅ Tarea 98 — Board: crear la vista de listado de proyectos
 
 - Vista de listado de proyectos en acsuite board: una fila por repo con nombre, ruta, tu operador, tarea en curso y cantidad de libres y bloqueadas.
