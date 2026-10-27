@@ -4,11 +4,12 @@
 // navegación con ↑/↓, Enter y `b`/Esc (ver cli/nav.ts). Sin un repo al que abrir de frente, se
 // muestra la lista de proyectos (ver cli/projects-nav.ts): Enter abre uno y `b`/Esc vuelven a ella.
 
+import { editLine } from "./cli/line-edit.ts";
 import { parseKeys } from "./cli/keys.ts";
 import { initialNav, type NavRow, navReduce, type NavState, reconcileNav } from "./cli/nav.ts";
 import { initialProjectsNav, type ProjectsNavState, projectsReduce, reconcileProjects } from "./cli/projects-nav.ts";
 import { resolveAgentsDir } from "./io/paths.ts";
-import { defaultProjects, type ProjectsProvider, readProjectRows } from "./io/projects.ts";
+import { createProjectList, defaultProjects, type ProjectsProvider, readProjectRows } from "./io/projects.ts";
 import { createSnapshotReader, RETRY_MS } from "./io/snapshot.ts";
 import { createTeamReader, ROOT_WATCHED_FILES } from "./io/team.ts";
 import { watchDir } from "./io/watch.ts";
@@ -56,6 +57,10 @@ export function startApp({
   let projectRows: ProjectRow[] = [];
   let projectsNav: ProjectsNavState = initialProjectsNav([]);
   let projectsNotices: string[] = [];
+  // Lista de proyectos: la del proveedor más los repos agregados con `a` en esta sesión.
+  const projectList = createProjectList(listProjects);
+  // Texto de la ruta que se escribe para agregar un repo; `null` si no se está agregando.
+  let adding: string | null = null;
   // Atajos solo con una terminal interactiva de verdad (no con salida o entrada redirigida).
   const interactive = !once && Boolean(process.stdin.isTTY) && Boolean(process.stdout.isTTY);
   const controls: Controls = once ? "none" : interactive ? "keys" : "ctrl-c";
@@ -76,9 +81,22 @@ export function startApp({
 
   /** Vuelve a leer la lista de proyectos y todos sus repos (solo al abrir la vista y con `r`). */
   function loadProjects(): void {
-    projectRows = readProjectRows(listProjects());
+    projectRows = readProjectRows(projectList.list());
     projectsNav = reconcileProjects(projectsNav, projectRows.map((row) => row.path));
     projectsNotices = [];
+  }
+
+  /** Enter con una ruta escrita: la agrega y la elige; si no sirve, avisa y deja la entrada abierta. */
+  function submitAdding(): void {
+    const result = projectList.add(adding ?? "");
+    if (!result.ok) {
+      projectsNotices = [result.error];
+      return;
+    }
+    adding = null;
+    loadProjects();
+    projectsNav = { selected: result.path, opened: null };
+    projectsNotices = result.added ? [] : ["Ese repo ya estaba en la lista."];
   }
 
   /** Enter en la lista: abre ese repo en el tablero; si ya no se puede abrir, lo avisa y se queda. */
@@ -108,7 +126,7 @@ export function startApp({
     if (!target) {
       // La lista no se relee al redibujar (cambio de tamaño): solo con `r` o al abrir la vista.
       projectsNav = reconcileProjects(projectsNav, projectRows.map((row) => row.path));
-      screen = renderProjects(projectRows, { ...common, selected: projectsNav.selected, multiView: "projects" }, projectsNotices);
+      screen = renderProjects(projectRows, { ...common, selected: projectsNav.selected, multiView: "projects", input: adding }, projectsNotices);
       return write(screen);
     }
 
@@ -216,11 +234,30 @@ export function startApp({
     process.stdin.setRawMode(true);
     process.stdin.setEncoding("utf8");
     process.stdin.on("data", (chunk: string) => {
+      if (adding != null) {
+        // Escribiendo una ruta: todo es texto, salvo Ctrl+C (sale), Enter (agrega) y Esc (cancela).
+        if (chunk.includes("")) return quit();
+        const edit = editLine(adding, chunk);
+        adding = edit.text;
+        if (edit.done === "cancel") {
+          adding = null;
+          projectsNotices = [];
+        } else if (edit.done === "submit") submitAdding();
+        return draw({ kind: "redraw" });
+      }
       for (const key of parseKeys(chunk)) {
         if (key === "quit") return quit();
         if (key === "redraw") {
           if (!target) loadProjects();
           draw({ kind: "redraw" });
+        } else if (!target && key === "add") {
+          adding = "";
+          projectsNotices = [];
+          // Lo que siga en este mismo bloque ya es la ruta, no teclas de navegación.
+          const rest = chunk.slice(chunk.search(/[aA]/) + 1);
+          if (rest) adding = editLine("", rest).text;
+          draw({ kind: "redraw" });
+          return;
         } else if (!target) {
           const next = projectsReduce(projectsNav, key, projectRows.map((row) => row.path));
           if (next.opened) openProject(next.opened);

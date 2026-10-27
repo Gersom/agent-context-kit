@@ -303,11 +303,19 @@ const PROJECT_GAP = "  ";
 export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, warnings: string[] = []): string {
   const canvas = createCanvas(meta, "proyectos");
   const { pc, box, secondary, width } = canvas;
+  // La ruta que se escribe se muestra por el final (donde está el cursor), no por el principio.
+  const inputLine = (text: string): string => {
+    const label = "Ruta del repo: ";
+    const room = Math.max(1, width - BOX_PADDING - 2 - label.length - 1);
+    const chars = Array.from(text);
+    return `${label}${chars.length > room ? `…${chars.slice(-(room - 1)).join("")}` : text}█`;
+  };
 
   box(`PROYECTOS (${rows.length})`, "docs/agents", pc.green, (row) => {
     if (!rows.length) {
       row(0, { paint: secondary, text: "No hay proyectos para mostrar." });
-      row(0, { paint: secondary, text: "Abre uno con: acsuite board <ruta>" });
+      row(0, { paint: secondary, text: `Abre uno con: acsuite board <ruta>${meta.controls === "keys" ? ", o agrégalo con [a]" : ""}` });
+      if (meta.input != null) row(0, { text: inputLine(meta.input) });
       return;
     }
     const currentText = (r: ProjectRow) => (r.work?.current ? shortTaskName(r.work.current.number, r.work.current.title) : r.work ? "Sin tarea en curso" : "—");
@@ -351,6 +359,7 @@ export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, war
         { paint: work?.counts.blocked ? pc.red : secondary, text: fit(String(work?.counts.blocked ?? "—"), blockedW, true) },
       );
     }
+    if (meta.input != null) row(0, { text: inputLine(meta.input) });
   });
 
   return finishCanvas(canvas, meta, { warnings });
@@ -417,7 +426,7 @@ function footerLines(meta: CanvasMeta, width: number): string[] {
   const parts: string[] = [];
   if (meta.multiView === "projects") {
     // La lista de proyectos no se compacta ni tiene flechas de flujo, y `r` la vuelve a leer.
-    parts.push("[↑/↓] elegir", "[Enter] abrir", "[r] releer", "[Ctrl+C o q] salir");
+    parts.push(...(meta.input != null ? ["[Enter] agregar", "[Esc] cancelar", "[Ctrl+C] salir"] : ["[↑/↓] elegir", "[Enter] abrir", "[a] agregar repo", "[r] releer", "[Ctrl+C o q] salir"]));
   } else {
     if (meta.multiView === "team") parts.push("[↑/↓] elegir", "[Enter] abrir");
     if (meta.multiView === "operator") parts.push("[Esc o b] volver al equipo");

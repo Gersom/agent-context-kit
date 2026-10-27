@@ -68,9 +68,31 @@ describe("renderProjects", () => {
 
   test("pie: sin controles nada; con teclas, las de la lista; con Ctrl+C, solo salir", () => {
     expect(renderProjects(rows, { ...meta, controls: "none" })).not.toContain("[");
-    expect(renderProjects(rows, { ...meta, controls: "keys", multiView: "projects" })).toContain("[↑/↓] elegir - [Enter] abrir - [r] releer - [Ctrl+C o q] salir");
+    expect(renderProjects(rows, { ...meta, controls: "keys", multiView: "projects" })).toContain("[↑/↓] elegir - [Enter] abrir - [a] agregar repo - [r] releer - [Ctrl+C o q] salir");
     expect(renderProjects(rows, { ...meta, controls: "keys", multiView: "projects" })).not.toContain("compactar");
     expect(renderProjects(rows, { ...meta, controls: "ctrl-c" })).toContain("[Ctrl+C] salir");
+  });
+
+  test("agregando un repo: la línea de la ruta con el cursor y el pie de la entrada", () => {
+    const out = renderProjects(rows, { ...meta, controls: "keys", multiView: "projects", input: "/repos/nuevo" });
+    expect(out).toContain("Ruta del repo: /repos/nuevo█");
+    expect(out).toContain("[Enter] agregar - [Esc] cancelar - [Ctrl+C] salir");
+    expect(out).not.toContain("[a] agregar repo");
+    expect(renderProjects(rows, meta)).not.toContain("Ruta del repo");
+    expect(renderProjects([], { ...meta, input: "x" })).toContain("Ruta del repo: x█");
+  });
+
+  test("una ruta más larga que el ancho se muestra por el final, con el cursor", () => {
+    const long = `/repos/${"carpeta/".repeat(20)}final`;
+    const out = renderProjects(rows, { ...meta, input: long });
+    expect(out).toContain("Ruta del repo: …");
+    expect(out).toContain("final█");
+    expect(out).not.toContain("/repos/carpeta");
+  });
+
+  test("sin teclas no se sugiere [a] en el estado vacío", () => {
+    expect(renderProjects([], { ...meta, controls: "keys" })).toContain("[a]");
+    expect(renderProjects([], { ...meta, controls: "ctrl-c" })).not.toContain("[a]");
   });
 
   test("avisos de la vista", () => {

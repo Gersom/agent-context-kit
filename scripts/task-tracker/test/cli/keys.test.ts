@@ -12,6 +12,10 @@ describe("parseKeys", () => {
     expect(parseKeys("pP")).toEqual(["projects", "projects"]);
   });
 
+  test("a pide agregar un repo (mayúscula o minúscula)", () => {
+    expect(parseKeys("aA")).toEqual(["add", "add"]);
+  });
+
   test("c compacta o expande y f oculta o muestra las flechas del flujo (mayúscula o minúscula)", () => {
     expect(parseKeys("cC")).toEqual(["compact", "compact"]);
     expect(parseKeys("fF")).toEqual(["flow", "flow"]);

@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { defaultProjects, readProjectRows } from "../../src/io/projects.ts";
+import { createProjectList, defaultProjects, readProjectRows } from "../../src/io/projects.ts";
 import { requireFixture } from "../../../_shared/test/helpers.ts";
 
 const OPERATORS = `# Operadores
@@ -127,5 +127,43 @@ describe("defaultProjects", () => {
     delete process.env.npm_config_local_prefix;
     process.env.INIT_CWD = noDocs;
     expect(defaultProjects()).toEqual([]);
+  });
+});
+
+describe("createProjectList", () => {
+  test("agrega la raíz del repo, también si se da una subcarpeta o se escribe entre comillas", () => {
+    if (!hasGit) return;
+    for (const input of [multi, join(multi, "docs", "agents", "ana"), `"${multi}"`]) {
+      const projects = createProjectList(() => []);
+      expect(projects.add(input)).toEqual({ ok: true, path: multi, added: true });
+      expect(projects.list()).toEqual([multi]);
+    }
+  });
+
+  test("una ruta que ya figura (del proveedor o agregada antes) no se duplica", () => {
+    if (!hasGit) return;
+    const projects = createProjectList(() => [multi]);
+    expect(projects.add(multi)).toEqual({ ok: true, path: multi, added: false });
+    expect(projects.list()).toEqual([multi]);
+    expect(createProjectList(() => []).add(multi)).toMatchObject({ added: true });
+  });
+
+  test("el repo agregado se suma al final de los del proveedor", () => {
+    const projects = createProjectList(() => [flat]);
+    expect(projects.add(flat)).toMatchObject({ ok: true, added: false });
+    if (hasGit) {
+      projects.add(multi);
+      expect(projects.list()).toEqual([flat, multi]);
+    }
+  });
+
+  test("errores: vacía, inexistente y sin documentación de la skill; la lista no cambia", () => {
+    const projects = createProjectList(() => []);
+    expect(projects.add("   ")).toEqual({ ok: false, error: "Escribe la ruta de la carpeta del repo." });
+    const missing = projects.add(join(root, "no-existe"));
+    expect(missing).toMatchObject({ ok: false });
+    expect(missing.ok ? "" : missing.error).toContain("No existe la carpeta");
+    expect(projects.add(noDocs)).toMatchObject({ ok: false });
+    expect(projects.list()).toEqual([]);
   });
 });
