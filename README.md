@@ -96,19 +96,6 @@ acsuite check
 
 Revisa el proyecto de la carpeta actual; para otro, pásale la ruta (`acsuite check D:/otro-proyecto`). Uso y códigos de hallazgo: [`scripts/docs-check/README.md`](./scripts/docs-check/README.md).
 
-## Estructura del repositorio
-
-```
-agent-context-suite/
-├── scripts/         # Herramientas de la suite, no parte de la skill: acsuite (CLI único), task-tracker, task-manager, docs-check y código compartido (_shared/)
-├── docs/            # Documentación del propio repo: filosofía, arquitectura, diseño y su estado (agents/)
-├── package.json     # Versión de la suite (SemVer), licencia y comandos de los scripts
-├── LICENSE          # Licencia MIT
-└── tsconfig.json    # TypeScript (strict) para scripts/
-```
-
-El árbol completo y para qué sirve cada parte están en [`docs/architecture.md`](./docs/architecture.md); qué es cada plantilla del catálogo, en `docs/template-architecture.md` del [repo de la skill](https://github.com/Gersom/agent-context-skill).
-
 ## Licencia
 
 [MIT](./LICENSE). La skill, que vive en su propio repo, tiene la misma licencia.
