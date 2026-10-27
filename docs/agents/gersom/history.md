@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 86 — Que el agente sepa usar la suite cuando está instalada
+
+- Nuevo subcomando acsuite init: agrega a rules.md del proyecto un bloque delimitado (agent-context-suite:start/end) que enseña al agente a usar acsuite task, check y board, insertado al inicio del archivo (tras el título, antes del primer ##, sin depender del idioma de los encabezados). Sin --apply muestra el diff; es idempotente; avisa en multi-operador. Nuevo aviso suite-rules en acsuite check cuando falta el bloque.
+- Lógica compartida en scripts/_shared/rules-block.ts; este repo ya tiene el bloque. bun test 1130 pass, typecheck limpio; probado con Node 20, 22 y 24 (incluido un rules.md en inglés). Versión 1.11.0 (6937c80) con tag v1.11.0 y release en GitHub, publicada en npm por el operador y verificada por nombre con npx, bunx e instalación global (npm y bun). Commits 9a669f4, fc216ab, e1fb649, 9d22ef7, 0bc3a25 y 6937c80 (kit).
+
 ## 2026-10-26 — ✅ Tarea 85 — Reestructurar el README
 
 - README raíz reestructurado: «Instalar la suite» con Requisitos (Node 20 o Bun y haber iniciado la skill en el proyecto), instalación recomendada global con bun add -g / npm install -g agent-context-suite@latest (actualizar con el mismo comando) y alternativa npx/bunx con @latest, un comando por bloque; una sola sección «Herramientas» (board, task, check) debajo de la instalación, con descripción breve y comando copiable cada una.
