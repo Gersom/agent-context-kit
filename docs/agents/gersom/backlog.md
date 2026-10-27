@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 98
+**Próximo número de tarea:** 99
 
 ---
 
@@ -71,6 +71,15 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Detalles:** Relacionada con la tarea de agregar repo en el listado de projects: ambas comparten la lista guardada.
+- **Agregada:** 2026-10-27.
+
+### Tarea 98 — Board: crear la vista de listado de proyectos
+
+- **Descripción:** En `acsuite board`, crear la vista que lista los proyectos (repositorios).
+- **Decisiones/temas a definir antes de empezar:** Qué muestra cada fila (nombre, ruta, operador, tarea en curso) y cómo se elige uno para abrirlo.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Es la base de las tareas 95 (tecla para ir a esta vista), 96 (agregar repo) y 97 (guardar los repos); conviene hacerla antes que ellas.
 - **Agregada:** 2026-10-27.
 
 <!-- agent-context-skill:section=blocked -->
