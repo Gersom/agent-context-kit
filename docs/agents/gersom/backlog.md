@@ -48,15 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 99 — Board: eliminar proyectos inexistentes de la lista
-
-- **Descripción:** En acsuite board, permitir quitar de la lista de proyectos (y del archivo guardado) los repos cuya carpeta ya no existe, que hoy quedan como fila con aviso.
-- **Decisiones/temas a definir antes de empezar:** Cómo se quita (tecla en la fila elegida, con confirmación) y si también se pueden quitar repos que sí existen; si se ofrece quitar todos los inexistentes de una vez.
-- **Bloqueos:** `[Resuelto el 2026-10-27]` — era `[dependencia]` Depende de la Tarea 97.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** La Tarea 97 guarda la lista en ~/.acsuite/projects.json y deja los repos inexistentes con aviso sin borrarlos; esta tarea agrega la forma de quitarlos.
-- **Agregada:** 2026-10-27.
-
 <!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 

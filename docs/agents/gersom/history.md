@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 99 — Board: eliminar proyectos inexistentes de la lista
+
+- Tecla x en la lista de proyectos de acsuite board: pide confirmación (Enter acepta; Esc o n cancelan) y quita el proyecto elegido de la lista y de projects.json, sin borrar nada del disco; vale para cualquier fila.
+- La selección pasa a la fila vecina sin releer los repos; si falla el guardado, avisa y la lista no cambia.
+- Commit en la suite: 94c7462.
+
 ## 2026-10-27 — ✅ Tarea 97 — Board: guardar los repos en los que se ejecuta
 
 - La lista de proyectos de acsuite board se guarda en projects.json dentro de ACSUITE_HOME (por defecto ~/.acsuite), con formato { version: 1, projects: [rutas] }, escritura atómica, sin duplicados y con rutas normalizadas (barras y barra final).
