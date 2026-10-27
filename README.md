@@ -4,15 +4,13 @@ Suite de herramientas para trabajar con la skill [agent-context-skill](https://g
 
 La razón de ser de la suite y sus principios de diseño (markdown plano como fuente de verdad, herramientas opcionales, el código gana ante un conflicto) están en [`docs/philosophy.md`](./docs/philosophy.md).
 
-## Qué hace
+## Herramientas
 
-Al ejecutarse sobre un repositorio, la skill:
+La suite trae tres herramientas, que se usan con el comando `acsuite`:
 
-1. Detecta si ya existe documentación de contexto (`docs/` o `agent-context/`) generada por esta skill.
-   - Si existe, lee `rules.md`, `handoff.md` y lo relevante de `backlog.md`, ejecuta la tarea pedida y al terminar actualiza `handoff.md`/`history.md`.
-   - Si no existe, dispara un flujo de preguntas para decidir qué documentación generar, según el alcance de la tarea (puntual, feature, desarrollo prolongado) y la etapa del proyecto.
-2. Genera (o completa) una carpeta de documentación con una estructura predecible: reglas del proyecto, estado "en caliente" del trabajo, backlog, historial, arquitectura, stack, integraciones externas, etc.
-3. Asegura un puntero explícito en `CLAUDE.md` / `AGENTS.md` en la raíz del repo para que cualquier agente sepa dónde está la documentación, sin adivinar ni duplicar contenido.
+- **`acsuite board`**: tablero de tareas en vivo en la terminal (en progreso, pausadas, pendientes y últimas completadas), que se redibuja cuando cambian los archivos.
+- **`acsuite task`**: consulta y edita las tareas sin tocar a mano `handoff.md`, `backlog.md` ni `history.md`.
+- **`acsuite check`**: verifica que la documentación de agentes del proyecto esté en orden, con errores y avisos por archivo y línea.
 
 ## Cómo usar
 
@@ -23,18 +21,26 @@ Invocar la skill explícitamente, pidiéndoselo al agente (se llama igual que su
 
 ## Instalar la suite
 
-No hace falta clonar este repo. Requiere Node 20 o superior, o Bun.
+### Requisitos
+
+- Node 20 o superior, o Bun.
+- Haber iniciado la skill [agent-context-skill](https://github.com/Gersom/agent-context-skill) en el proyecto en el que ejecutas la suite.
 
 ### Recomendado: instalarla de forma global
 
 Se instala una vez y desde entonces existe el comando `acsuite` en cualquier carpeta:
 
 ```sh
-npm install -g agent-context-suite
-bun add -g agent-context-suite     # o con Bun
+bun add -g agent-context-suite@latest
 ```
 
-Para actualizarla, repite el comando con `@latest` (`npm install -g agent-context-suite@latest`).
+O con npm:
+
+```sh
+npm install -g agent-context-suite@latest
+```
+
+Para actualizarla, ejecuta el mismo comando.
 
 ### Alternativa: usarla sin instalar nada
 
@@ -42,7 +48,10 @@ Con `npx` o `bunx` se descarga, se ejecuta y termina, sin dejar instalado el com
 
 ```sh
 npx agent-context-suite@latest board
-bunx agent-context-suite@latest board   # igual, con Bun
+```
+
+```sh
+bunx agent-context-suite@latest board
 ```
 
 `@latest` trae siempre la versión más reciente. Sin ruta, usa el proyecto de la carpeta donde lo ejecutas; si quieres otro, pásale su ruta al final (`npx agent-context-suite@latest board D:/otro-proyecto`).
