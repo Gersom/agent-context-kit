@@ -119,8 +119,6 @@ export interface RenderMeta {
   teamBacklog?: TeamBacklogModel;
   /** Qué vista es, si no es el panel de un repo plano (cambia las teclas que indica el pie). */
   multiView?: "team" | "operator" | "projects";
-  /** `true`: el repo se abrió desde la lista de proyectos, así que `b`/Esc pueden volver a ella (el pie no lo anuncia: ofrece `[p]`). */
-  backToProjects?: boolean;
   /** Lista de proyectos: texto de la ruta que se escribe para agregar un repo; `null` si no se agrega. */
   input?: string | null;
   /** Lista de proyectos: nombre y ruta del proyecto cuya salida de la lista se pide confirmar; `null` si no se confirma nada. */

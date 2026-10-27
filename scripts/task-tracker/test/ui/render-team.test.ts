@@ -80,7 +80,7 @@ describe("renderTeam", () => {
 
   test("el pie de equipo no anuncia compactar/expandir ni volver a proyectos, tampoco con compact activo", () => {
     for (const compact of [false, true]) {
-      const out = renderTeam(team, { ...meta, controls: "keys", multiView: "team", compact, backToProjects: true });
+      const out = renderTeam(team, { ...meta, controls: "keys", multiView: "team", compact });
       expect(out).not.toContain("[c]");
       expect(out).not.toContain("compactar");
       expect(out).not.toContain("expandir");

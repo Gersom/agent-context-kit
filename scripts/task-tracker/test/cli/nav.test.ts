@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { initialNav, type NavRow, type NavState, navReduce, reconcileNav, selectable } from "../../src/cli/nav.ts";
+import { compactApplies, initialNav, type NavRow, type NavState, navReduce, reconcileNav, selectable } from "../../src/cli/nav.ts";
 
 const ROWS: NavRow[] = [
   { folder: "ana", folderless: false },
@@ -73,6 +73,18 @@ describe("navReduce en el panel de un operador", () => {
       expect(navReduce(panel, key, ROWS)).toBe(panel);
       expect(navReduce(team("ana"), key, ROWS)).toEqual(team("ana"));
     }
+  });
+});
+
+describe("compactApplies", () => {
+  test("en la vista de equipo la tecla `c` no hace nada", () => {
+    expect(compactApplies(team("ana"))).toBe(false);
+    expect(compactApplies(team(null))).toBe(false);
+  });
+
+  test("en el panel de un operador y fuera del modo multi-operador (sin navegación) sí aplica", () => {
+    expect(compactApplies({ view: { kind: "operator", folder: "ana" }, selected: "ana" })).toBe(true);
+    expect(compactApplies(null)).toBe(true);
   });
 });
 

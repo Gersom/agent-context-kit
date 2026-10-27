@@ -32,8 +32,27 @@ export function samePath(a: string, b: string): boolean {
  */
 type Saved =
   | { state: "missing"; paths: []; warning: null }
-  | { state: "ok"; paths: string[]; warning: string | null }
+  | { state: "ok"; paths: string[]; warning: string | null; ignored: number }
   | { state: "corrupt" | "unreadable"; paths: []; warning: string };
+
+/** Un error al escribir la lista guardada: la causa (sin punto final) y el archivo que se iba a escribir. */
+export interface ConfigError {
+  cause: string;
+  file: string;
+}
+
+/**
+ * Aviso de un guardado o un quitado que falló: `No se pudo <acción> «<nombre>»: <causa>. Archivo: <ruta>`.
+ * La ruta va siempre al final: si la pantalla recorta, se pierde la ruta y no la causa.
+ */
+export function failureMessage(action: "guardar" | "quitar", name: string, { cause, file }: ConfigError): string {
+  return `No se pudo ${action} «${name}»: ${cause}. Archivo: ${file}`;
+}
+
+/** Si reescribir el archivo perdería algo que hay que respaldar: está corrupto o trae entradas inválidas. */
+function needsBackup(saved: Saved): boolean {
+  return saved.state === "corrupt" || (saved.state === "ok" && saved.ignored > 0);
+}
 
 function readSaved(file: string): Saved {
   let text: string;
@@ -75,7 +94,7 @@ function readSaved(file: string): Saved {
   const warning = ignored
     ? `${file}: ${ignored === 1 ? "se ignoró 1 entrada que no es" : `se ignoraron ${ignored} entradas que no son`} una ruta.`
     : null;
-  return { state: "ok", paths, warning };
+  return { state: "ok", paths, warning, ignored };
 }
 
 /** Marca de tiempo local para el nombre del respaldo: `AAAAMMDD-HHMMSS`. */
@@ -110,27 +129,27 @@ export function loadSavedProjects(): { paths: string[]; warning: string | null }
 /**
  * Agrega la raíz de un repo a la lista guardada (al final; si ya figura, no toca el archivo).
  * Crea la carpeta de config si falta y escribe de forma atómica (archivo temporal + renombrar).
- * Si el archivo existente estaba corrupto, antes lo copia a `projects.json.<AAAAMMDD-HHMMSS>.bak`
- * (el aviso de `loadSavedProjects` ya lo anuncia). Las entradas inválidas de un archivo bueno no
- * se conservan al reescribirlo. Devuelve el mensaje del error, o `null` si quedó guardado.
+ * Si el archivo existente estaba corrupto o trae entradas inválidas (que al reescribirlo no se
+ * conservan), antes lo copia a `projects.json.<AAAAMMDD-HHMMSS>.bak`; sin escribir no hay respaldo.
+ * Devuelve el error (causa y archivo; ver `failureMessage`), o `null` si quedó guardado.
  */
-export function saveProject(path: string): string | null {
+export function saveProject(path: string): ConfigError | null {
   let dir: string;
   try {
     dir = configDir();
   } catch (error) {
-    return `No se pudo ubicar la carpeta de config: ${errorMessage(error)}`;
+    return { cause: `No se pudo ubicar la carpeta de config: ${errorMessage(error)}`, file: PROJECTS_FILE };
   }
   const file = join(dir, PROJECTS_FILE);
   const temp = `${file}.${process.pid}.tmp`;
   try {
     const saved = readSaved(file);
     // Ilegible por un error de disco (permisos, es una carpeta...): no se pisa lo que no se pudo leer.
-    if (saved.state === "unreadable") return `${file} no se pudo leer, así que no se sobrescribe.`;
+    if (saved.state === "unreadable") return { cause: "no se pudo leer, así que no se sobrescribe", file };
     if (saved.paths.some((p) => samePath(p, path))) return null;
 
     mkdirSync(dir, { recursive: true });
-    if (saved.state === "corrupt") copyFileSync(file, backupPath(file));
+    if (needsBackup(saved)) copyFileSync(file, backupPath(file));
     writeFileSync(temp, `${JSON.stringify({ version: FORMAT_VERSION, projects: [...saved.paths, resolve(path)] }, null, 2)}\n`);
     renameSync(temp, file);
     return null;
@@ -140,7 +159,7 @@ export function saveProject(path: string): string | null {
     } catch {
       // Sin más que hacer: el mensaje del error original es el que importa.
     }
-    return `${file}: ${errorMessage(error)}`;
+    return { cause: errorMessage(error), file };
   }
 }
 
@@ -149,23 +168,26 @@ export function saveProject(path: string): string | null {
  * disco más que esa entrada. Si la ruta no figura, no toca el archivo; eso incluye uno corrupto,
  * que se lee como lista vacía y no se reescribe (no hay nada que quitar, y reescribirlo perdería
  * lo que contiene). Escribe de forma atómica (archivo temporal + renombrar) y no pisa un archivo
- * que no se pudo leer. Devuelve el mensaje del error, o `null` si quedó quitada (o no figuraba).
+ * que no se pudo leer. Si el archivo trae entradas inválidas (que al reescribirlo no se conservan),
+ * antes lo copia a `projects.json.<AAAAMMDD-HHMMSS>.bak`; sin escribir no hay respaldo. Devuelve el
+ * error (causa y archivo; ver `failureMessage`), o `null` si quedó quitada (o no figuraba).
  */
-export function removeProject(path: string): string | null {
+export function removeProject(path: string): ConfigError | null {
   let dir: string;
   try {
     dir = configDir();
   } catch (error) {
-    return `No se pudo ubicar la carpeta de config: ${errorMessage(error)}`;
+    return { cause: `No se pudo ubicar la carpeta de config: ${errorMessage(error)}`, file: PROJECTS_FILE };
   }
   const file = join(dir, PROJECTS_FILE);
   const temp = `${file}.${process.pid}.tmp`;
   try {
     const saved = readSaved(file);
     // Ilegible por un error de disco (permisos, es una carpeta...): no se pisa lo que no se pudo leer.
-    if (saved.state === "unreadable") return `${file} no se pudo leer, así que no se sobrescribe.`;
+    if (saved.state === "unreadable") return { cause: "no se pudo leer, así que no se sobrescribe", file };
     if (!saved.paths.some((p) => samePath(p, path))) return null;
 
+    if (needsBackup(saved)) copyFileSync(file, backupPath(file));
     writeFileSync(temp, `${JSON.stringify({ version: FORMAT_VERSION, projects: saved.paths.filter((p) => !samePath(p, path)) }, null, 2)}\n`);
     renameSync(temp, file);
     return null;
@@ -175,7 +197,7 @@ export function removeProject(path: string): string | null {
     } catch {
       // Sin más que hacer: el mensaje del error original es el que importa.
     }
-    return `${file}: ${errorMessage(error)}`;
+    return { cause: errorMessage(error), file };
   }
 }
 

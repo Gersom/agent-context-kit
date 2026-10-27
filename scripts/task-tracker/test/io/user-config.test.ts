@@ -2,7 +2,7 @@ import { afterAll, afterEach, beforeEach, describe, expect, test } from "bun:tes
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { isAbsolute, join, resolve } from "node:path";
-import { configDir, loadSavedProjects, removeProject, samePath, saveProject } from "../../src/io/user-config.ts";
+import { configDir, failureMessage, loadSavedProjects, removeProject, samePath, saveProject } from "../../src/io/user-config.ts";
 
 // Rutas de prueba en su forma normal (en Windows llevan unidad y `\`).
 const A = resolve("/a/repo");
@@ -177,27 +177,54 @@ describe("saveProject", () => {
     expect(backups()).toEqual([]);
   });
 
-  test("archivo con entradas inválidas: no es corrupto, no se respalda y se reescribe con las buenas", () => {
-    writeFileSync(file, JSON.stringify({ version: 1, projects: [B, 3] }));
+  test("archivo con entradas inválidas: se respalda tal cual con sello y se reescribe con las buenas", () => {
+    const text = JSON.stringify({ version: 1, projects: [B, 3] });
+    writeFileSync(file, text);
     expect(saveProject(A)).toBeNull();
-    expect(backups()).toEqual([]);
+    expect(backups()).toHaveLength(1);
+    expect(backups()[0]).toMatch(/^projects\.json\.\d{8}-\d{6}\.bak$/);
+    expect(readFileSync(join(home, backups()[0]), "utf8")).toBe(text);
     expect(JSON.parse(readFileSync(file, "utf8"))).toEqual({ version: 1, projects: [B, A] });
   });
 
-  test("error de escritura (ACSUITE_HOME es un archivo): devuelve el mensaje y no lanza", () => {
+  test("entradas inválidas y la ruta ya figura: no se escribe, así que no hay respaldo", () => {
+    const text = JSON.stringify({ version: 1, projects: [A, 3] });
+    writeFileSync(file, text);
+    expect(saveProject(A)).toBeNull();
+    expect(backups()).toEqual([]);
+    expect(readFileSync(file, "utf8")).toBe(text);
+  });
+
+  test("dos reescrituras de archivos con entradas inválidas no pisan el respaldo anterior", () => {
+    writeFileSync(file, JSON.stringify({ version: 1, projects: [3] }));
+    expect(saveProject(A)).toBeNull();
+    writeFileSync(file, JSON.stringify({ version: 1, projects: [A, ""] }));
+    expect(saveProject(B)).toBeNull();
+    expect(backups()).toHaveLength(2);
+  });
+
+  test("error de escritura (ACSUITE_HOME es un archivo): devuelve causa y archivo, y no lanza", () => {
     const blocker = join(root, "es-un-archivo");
     writeFileSync(blocker, "");
     process.env.ACSUITE_HOME = blocker;
     const error = saveProject(A);
-    expect(typeof error).toBe("string");
-    expect(error).toContain("projects.json");
+    expect(typeof error?.cause).toBe("string");
+    expect(error?.cause).not.toBe("");
+    expect(error?.file).toBe(join(blocker, "projects.json"));
   });
 
-  test("el archivo es una carpeta (no se puede leer): devuelve el mensaje, sin pisarlo", () => {
+  test("el archivo es una carpeta (no se puede leer): devuelve causa y archivo, sin pisarlo", () => {
     mkdirSync(file);
     const error = saveProject(A);
-    expect(error).toContain(file);
+    expect(error).toEqual({ cause: "no se pudo leer, así que no se sobrescribe", file });
     expect(readdirSync(home)).toEqual(["projects.json"]);
+  });
+});
+
+describe("failureMessage", () => {
+  test("«No se pudo <acción> «<nombre>»: <causa>. Archivo: <ruta>», con la ruta al final", () => {
+    expect(failureMessage("guardar", "mi-app", { cause: "disco lleno", file })).toBe(`No se pudo guardar «mi-app»: disco lleno. Archivo: ${file}`);
+    expect(failureMessage("quitar", "mi-app", { cause: "disco lleno", file })).toBe(`No se pudo quitar «mi-app»: disco lleno. Archivo: ${file}`);
   });
 });
 
@@ -243,16 +270,34 @@ describe("removeProject", () => {
     expect(backups()).toEqual([]);
   });
 
-  test("archivo con entradas inválidas: quita la ruta y las buenas conservan su orden", () => {
-    writeFileSync(file, JSON.stringify({ version: 1, projects: [B, 3, A, C] }));
+  test("archivo con entradas inválidas: se respalda tal cual, quita la ruta y las buenas conservan su orden", () => {
+    const text = JSON.stringify({ version: 1, projects: [B, 3, A, C] });
+    writeFileSync(file, text);
     expect(removeProject(A)).toBeNull();
     expect(JSON.parse(readFileSync(file, "utf8"))).toEqual({ version: 1, projects: [B, C] });
+    expect(backups()).toHaveLength(1);
+    expect(backups()[0]).toMatch(/^projects\.json\.\d{8}-\d{6}\.bak$/);
+    expect(readFileSync(join(home, backups()[0]), "utf8")).toBe(text);
   });
 
-  test("el archivo es una carpeta (no se puede leer): devuelve el mensaje, sin pisarlo", () => {
+  test("entradas inválidas y la ruta no figura: no se escribe, así que no hay respaldo", () => {
+    const text = JSON.stringify({ version: 1, projects: [B, 3] });
+    writeFileSync(file, text);
+    expect(removeProject(C)).toBeNull();
+    expect(backups()).toEqual([]);
+    expect(readFileSync(file, "utf8")).toBe(text);
+  });
+
+  test("archivo bueno: quitar no crea respaldo", () => {
+    writeFileSync(file, JSON.stringify({ version: 1, projects: [A, B] }));
+    expect(removeProject(A)).toBeNull();
+    expect(backups()).toEqual([]);
+  });
+
+  test("el archivo es una carpeta (no se puede leer): devuelve causa y archivo, sin pisarlo", () => {
     mkdirSync(file);
     const error = removeProject(A);
-    expect(error).toContain(file);
+    expect(error).toEqual({ cause: "no se pudo leer, así que no se sobrescribe", file });
     expect(readdirSync(home)).toEqual(["projects.json"]);
   });
 
@@ -261,7 +306,7 @@ describe("removeProject", () => {
     writeFileSync(blocker, "");
     process.env.ACSUITE_HOME = blocker;
     const error = removeProject(A);
-    if (error !== null) expect(error).toContain("projects.json");
+    if (error !== null) expect(error.file).toBe(join(blocker, "projects.json"));
     expect(readFileSync(blocker, "utf8")).toBe("");
   });
 

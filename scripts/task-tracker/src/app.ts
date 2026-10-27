@@ -4,16 +4,17 @@
 // navegación con ↑/↓, Enter y `b`/Esc (ver cli/nav.ts). Sin un repo al que abrir de frente, se
 // muestra la lista de proyectos (ver cli/projects-nav.ts): Enter abre uno y `b`/Esc vuelven a ella.
 
+import { basename } from "node:path";
 import { gitToplevel } from "../../_shared/git.ts";
 import { editLine } from "./cli/line-edit.ts";
 import { parseConfirm, parseKeys } from "./cli/keys.ts";
-import { initialNav, type NavRow, navReduce, type NavState, reconcileNav } from "./cli/nav.ts";
+import { compactApplies, initialNav, type NavRow, navReduce, type NavState, reconcileNav } from "./cli/nav.ts";
 import { initialProjectsNav, neighborAfterRemove, type ProjectsNavState, projectsReduce, reconcileProjects } from "./cli/projects-nav.ts";
 import { resolveAgentsDir } from "./io/paths.ts";
 import { createProjectList, defaultProjects, type ProjectsProvider, readProjectRows } from "./io/projects.ts";
 import { createSnapshotReader, RETRY_MS } from "./io/snapshot.ts";
 import { createTeamReader, ROOT_WATCHED_FILES } from "./io/team.ts";
-import { removeProject, samePath, saveProject } from "./io/user-config.ts";
+import { failureMessage, removeProject, samePath, saveProject } from "./io/user-config.ts";
 import { watchDir } from "./io/watch.ts";
 import { buildModel } from "./model/model.ts";
 import { buildTeamModel } from "./model/team.ts";
@@ -104,7 +105,7 @@ export function startApp({
     loadProjects();
     projectsNav = { selected: result.path, opened: null };
     if (!result.added) projectsNotices.push("Ese repo ya estaba en la lista.");
-    if (result.warning) projectsNotices.push(`No se pudo guardar la lista: ${result.warning}`);
+    if (result.warning) projectsNotices.push(result.warning);
   }
 
   /**
@@ -118,7 +119,7 @@ export function startApp({
     if (!path) return;
     const error = projectList.remove(path);
     if (error) {
-      projectsNotices = [`No se pudo quitar de la lista: ${error}`];
+      projectsNotices = [error];
       return;
     }
     // Sin releer los repos (eso es de `r`): se saca la fila y la selección pasa al vecino.
@@ -161,7 +162,7 @@ export function startApp({
     }
 
     const { agentsDir, projectName, projectDir, multi } = target;
-    const meta: RenderMeta = { ...common, projectName, projectDir, backToProjects: fromList };
+    const meta: RenderMeta = { ...common, projectName, projectDir };
 
     if (teamReader && multi) {
       const read = teamReader.read({ allowRetry });
@@ -248,8 +249,9 @@ export function startApp({
   if (initialTarget && !once) {
     // Un repo abierto de frente se agrega solo a la lista guardada (con `--once` no se escribe nada).
     // El aviso de un fallo viaja por el canal de avisos de la vista del repo.
-    const error = saveProject(gitToplevel(initialTarget.projectDir));
-    if (error) watcherErrors.push(`No se pudo guardar la lista: ${error}`);
+    const root = gitToplevel(initialTarget.projectDir);
+    const failure = saveProject(root);
+    if (failure) watcherErrors.push(failureMessage("guardar", basename(root), failure));
   }
   draw({ kind: "start" });
   if (once) return;
@@ -330,6 +332,8 @@ export function startApp({
           open(null);
           draw({ kind: "redraw" });
         } else if (key === "compact" || key === "flow") {
+          // En la vista de equipo `c` no hace nada (ni cambia `ui.compact`).
+          if (key === "compact" && !compactApplies(nav)) continue;
           if (key === "compact") ui.compact = !ui.compact;
           else ui.arrows = !ui.arrows;
           draw({ kind: "redraw" });

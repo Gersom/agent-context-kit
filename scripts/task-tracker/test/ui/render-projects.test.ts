@@ -176,16 +176,15 @@ describe("pie de un repo abierto desde la lista", () => {
   });
   const repo = { projectName: "demo-app", projectDir: "/repos/demo-app", updatedAt: meta.updatedAt, trigger: meta.trigger, color: false, width: 120, controls: "keys" as const };
 
-  test("el panel plano ofrece solo [p] proyectos, también abierto desde la lista (`b`/Esc siguen funcionando, pero no se anuncian)", () => {
-    expect(render(model, { ...repo, backToProjects: true })).toContain("[p] proyectos - [c] compactar");
-    expect(render(model, { ...repo, backToProjects: true })).not.toContain("volver a proyectos");
-    expect(render(model, { ...repo, backToProjects: true })).not.toContain("[Esc o b]");
+  test("el panel plano ofrece solo [p] proyectos (`b`/Esc, con el repo abierto desde la lista, siguen funcionando, pero no se anuncian)", () => {
+    expect(render(model, repo)).toContain("[p] proyectos - [c] compactar");
     expect(render(model, repo)).not.toContain("volver a proyectos");
+    expect(render(model, repo)).not.toContain("[Esc o b]");
   });
 
-  test("la vista de equipo abierta desde la lista: solo [p] proyectos, sin volver a proyectos ni [c]", () => {
+  test("la vista de equipo: solo [p] proyectos, sin volver a proyectos ni [c]", () => {
     const team = { rows: [], teamBacklog: { present: false as const, free: [], blocked: [], warnings: [] }, warnings: [] };
-    const out = renderTeam(team, { ...repo, backToProjects: true, multiView: "team", selected: null, preferred: null });
+    const out = renderTeam(team, { ...repo, multiView: "team", selected: null, preferred: null });
     expect(out).toContain("[↑/↓] elegir - [Enter] abrir - [p] proyectos - [r] redibujar - [Ctrl+C o q] salir");
     expect(out).not.toContain("volver a proyectos");
     expect(out).not.toContain("[Esc o b]");
@@ -196,11 +195,10 @@ describe("pie de un repo abierto desde la lista", () => {
   test("todas las vistas de un repo ofrecen [p] proyectos; la lista no", () => {
     expect(render(model, repo)).toContain("[p] proyectos");
     expect(render(model, { ...repo, multiView: "operator" })).toContain("[p] proyectos");
-    expect(render(model, { ...repo, backToProjects: true })).toContain("[p] proyectos");
   });
 
   test("en el panel de un operador `b` vuelve al equipo, no a la lista", () => {
-    const out = render(model, { ...repo, backToProjects: true, multiView: "operator" });
+    const out = render(model, { ...repo, multiView: "operator" });
     expect(out).toContain("[Esc o b] volver al equipo");
     expect(out).not.toContain("volver a proyectos");
   });

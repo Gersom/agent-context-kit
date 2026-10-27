@@ -2,8 +2,8 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } fr
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
-import { join } from "node:path";
-import { createProjectList, defaultProjects, readProjectRows } from "../../src/io/projects.ts";
+import { join, resolve } from "node:path";
+import { createProjectList, defaultProjects, isDubiousOwnership, readProjectRows } from "../../src/io/projects.ts";
 import { removeProject } from "../../src/io/user-config.ts";
 import { requireFixture } from "../../../_shared/test/helpers.ts";
 
@@ -24,6 +24,8 @@ let multi: string;
 let flat: string;
 let noDocs: string;
 let hasGit = true;
+// Archivo de config que citan los avisos de guardado y de quitar (no se escribe nada ahí).
+const configFile = join(resolve("/cfg"), "projects.json");
 
 /** Copia los archivos de un fixture a `dir`. */
 function copyFixture(name: string, dir: string, files = ["handoff.md", "backlog.md", "history.md"]): void {
@@ -190,10 +192,10 @@ describe("createProjectList", () => {
     expect(saved).toEqual([multi]);
   });
 
-  test("con `save` que falla: el repo queda en la lista de la sesión y el resultado lleva el aviso", () => {
+  test("con `save` que falla: el repo queda en la lista de la sesión y el resultado lleva el aviso con el nombre, la causa y el archivo al final", () => {
     if (!hasGit) return;
-    const projects = createProjectList(() => [], { save: () => "disco lleno" });
-    expect(projects.add(multi)).toEqual({ ok: true, path: multi, added: true, warning: "disco lleno" });
+    const projects = createProjectList(() => [], { save: () => ({ cause: "disco lleno", file: configFile }) });
+    expect(projects.add(multi)).toEqual({ ok: true, path: multi, added: true, warning: `No se pudo guardar «multi-app»: disco lleno. Archivo: ${configFile}` });
     expect(projects.list()).toEqual([multi]);
   });
 
@@ -226,9 +228,9 @@ describe("createProjectList", () => {
     expect(projects.list()).toEqual([multi]);
   });
 
-  test("con `remove` que falla: devuelve el mensaje y la lista queda como estaba", () => {
-    const projects = createProjectList(() => [flat, multi], { remove: () => "disco lleno" });
-    expect(projects.remove(flat)).toBe("disco lleno");
+  test("con `remove` que falla: devuelve el aviso con el nombre, la causa y el archivo al final, y la lista queda como estaba", () => {
+    const projects = createProjectList(() => [flat, multi], { remove: () => ({ cause: "disco lleno", file: configFile }) });
+    expect(projects.remove(flat)).toBe(`No se pudo quitar «flat-app»: disco lleno. Archivo: ${configFile}`);
     expect(projects.list()).toEqual([flat, multi]);
   });
 
@@ -297,25 +299,37 @@ describe("createProjectList", () => {
     expect(projects.list()).toEqual([]);
   });
 
-  test("git falla por otra causa que «no es un repo» y no hay docs: el error suma la nota de confianza", () => {
+  test("sin la nota de dueño ajeno cuando git falla por otra causa, no es un repo o la carpeta no existe", () => {
     if (!hasGit) return;
-    // Un `.git` que no es un repo válido: git responde «invalid gitfile format», no «not a git repository».
+    const note = "es de otro usuario";
+    // Un `.git` que no es un repo válido: git responde «invalid gitfile format», no «dubious ownership».
     const broken = join(root, "git-roto");
     mkdirSync(broken, { recursive: true });
     writeFileSync(join(broken, ".git"), "esto no es un gitfile");
-    const result = createProjectList(() => []).add(broken);
-    expect(result.ok).toBe(false);
-    const error = result.ok ? "" : result.error;
-    expect(error).toContain("No se encontró handoff.md en ninguna de estas carpetas");
-    expect(error).toEndWith(". Si es un repo de otro usuario, git puede no confiar en la carpeta.");
-  });
-
-  test("sin la nota cuando git dice que no es un repo o cuando la carpeta no existe", () => {
-    const note = "git puede no confiar";
     const projects = createProjectList(() => []);
+    const failed = projects.add(broken);
+    expect(failed.ok).toBe(false);
+    expect(failed.ok ? "" : failed.error).toContain("No se encontró handoff.md en ninguna de estas carpetas");
+    expect(failed.ok ? "" : failed.error).not.toContain(note);
     const plain = projects.add(noDocs);
     expect(plain.ok ? "" : plain.error).not.toContain(note);
     const missing = projects.add(join(root, "no-existe"));
     expect(missing.ok ? "" : missing.error).not.toContain(note);
+  });
+});
+
+describe("isDubiousOwnership", () => {
+  test("reconoce el rechazo de git por el dueño de la carpeta, sin importar mayúsculas ni espacios", () => {
+    const real = "fatal: detected dubious ownership in repository at 'X'";
+    expect(isDubiousOwnership(real)).toBe(true);
+    expect(isDubiousOwnership(real.toUpperCase())).toBe(true);
+    expect(isDubiousOwnership("fatal: Dubious   Ownership in repository")).toBe(true);
+    expect(isDubiousOwnership(`${real}${String.fromCharCode(10)}To add an exception for this directory, call:`)).toBe(true);
+  });
+
+  test("cualquier otro fallo de git no cuenta", () => {
+    for (const text of ["", "fatal: not a git repository (or any of the parent directories): .git", "fatal: invalid gitfile format: .git", "fatal: unsafe repository"]) {
+      expect(isDubiousOwnership(text)).toBe(false);
+    }
   });
 });

@@ -444,7 +444,7 @@ function footerLines(meta: CanvasMeta, width: number): string[] {
     if (meta.multiView === "operator") parts.push("[Esc o b] volver al equipo");
     // Desde la raíz de un repo abierto desde la lista, `b`/Esc también vuelven a ella, pero el pie solo ofrece `[p]`.
     parts.push("[p] proyectos");
-    // La vista de equipo no ofrece compactar (el atajo existe y compacta SIN DUEÑO, pero no se anuncia) ni tiene flechas de flujo.
+    // La vista de equipo no ofrece compactar (la tecla `c` no hace nada ahí) ni tiene flechas de flujo.
     if (meta.multiView !== "team") {
       parts.push(meta.compact ? "[c] expandir" : "[c] compactar");
       parts.push(meta.arrows === false ? "[f] mostrar flechas" : "[f] ocultar flechas");
