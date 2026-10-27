@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 83
+**Próximo número de tarea:** 84
 
 ---
 
@@ -48,13 +48,13 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 81 — Aclarar el flujo de instalación de la suite en el README
+### Tarea 83 — Reevaluar la dependencia de la skill respecto de la suite
 
-- **Descripción:** Reescribir la sección «Instalar la suite» del README: separar las dos formas de uso, que hoy se mezclan. (A) Sin instalar: npx o bunx agent-context-suite@latest <subcomando> <ruta>, que no deja instalado el comando. (B) Instalada: npm install -g agent-context-suite, que da el comando acsuite <subcomando> <ruta>. Dejar claro la diferencia entre el nombre del paquete (agent-context-suite) y el del comando (acsuite), usar el mismo subcomando en todos los ejemplos y quitar el «lo mismo con Bun». Hecho: la sección se entiende sin conocer npx, y los ejemplos de A y B son equivalentes.
-- **Decisiones/temas a definir antes de empezar:** Ninguno.
+- **Descripción:** Reevaluar si la suite depende de la skill: hoy hay que clonar la skill en skill/ para que corran los tests de scripts/skill-checks/ y se valide el snapshot de plantillas de docs-check, y la suite lee su contenido. Si depende de verdad, plantear que la skill vaya dentro de la suite para no pedir un clon aparte, o buscar alternativas (submódulo de git, descarga en los tests, fixtures versionados). Hecho: decisión tomada y documentada (qué se mantiene, qué cambia y por qué), con las tareas derivadas si hay cambios.
+- **Decisiones/temas a definir antes de empezar:** Debatir con el operador: ¿la suite depende de la skill solo para sus tests o también en runtime? ¿Conviene un solo repo, un submódulo o mantener dos repos? Impacto en el versionado, los tags y la regla «Dos repos» de rules.md.
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Surgió al cerrar la T-77: el operador no entendió si npx y acsuite eran pasos consecutivos. El README del paquete en la página de npm viene empaquetado en 1.9.0, así que la corrección llega a npm solo con la próxima versión; en GitHub se ve enseguida. Va justo después de la T-77.
+- **Detalles:** Surgió al preparar la instalación de la suite: quien clone el repo para desarrollar tiene que clonar también la skill, y sin ella los tests de skill-checks se saltan. Relacionada con la T-80 (skill 2.0.7, pausada).
 - **Agregada:** 2026-10-26.
 
 <!-- agent-context-skill:section=blocked -->
