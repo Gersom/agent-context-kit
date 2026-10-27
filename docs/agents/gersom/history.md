@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 93 — Skill 2.3.1: borrar la rama de trabajo tras un merge exitoso
+
+- Tras un merge exitoso, los flujos de la skill que trabajan en rama (generar, migrar y actualizar) borran la rama agent-context-* con git branch -d (nunca -D ni remotas) para que no se acumulen; no la borran si el operador la dejó, si hubo conflictos o si descartó el commit, y el mensaje de resultado dice si se borró o se dejó y por qué. Una ejecución que no escribió nada también borra su rama vacía.
+- Skill 2.3.1 (patch, ajuste de redacción; changelog «Sin cambios que aplicar»), tag v2.3.1. En la suite: marcador de rules.md y fixture espejo sincronizados. Revisión independiente sin bloqueantes (mejoras aplicadas); bun test 1130 pass, typecheck y check limpios. Commits 9a6e957, 1912202 y 75f12c7 (skill) y 87d0b42 (kit).
+
 ## 2026-10-27 — ✅ Tarea 92 — Skill 2.3.0: los flujos que escriben trabajan en una rama nueva y ofrecen el merge
 
 - Los flujos de la skill que escriben en el repo (generar, migrar y actualizar) ahora trabajan en una rama nueva (agent-context-generate, -migrate o -update-X) creada desde la rama de partida, no siguen sin ella (ni sin git, ni con HEAD desacoplado, ni con cambios previos en sus rutas) y, al terminar, hacen el commit con confirmación y preguntan si el agente hace el merge de vuelta (nunca push). Antes, un agente siguió sin rama porque el árbol estaba modificado y el flujo de actualizar terminaba sin ofrecer el merge.
