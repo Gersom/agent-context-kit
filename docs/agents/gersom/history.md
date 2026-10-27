@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 88 — Skill 2.1.0: los commits se escriben siempre en inglés
+
+- La Regla 5 de la plantilla rules.md de la skill ahora fija que los commits se escriben siempre en inglés (título y cuerpo), sea cual sea el idioma de la documentación, y su ejemplo pasa a inglés; antes no decía nada y el ejemplo en español hacía que los agentes commitearan en español.
+- Skill 2.1.0 (minor, porque añade una obligación nueva): plugin.json, SKILL.md, marcador de la plantilla y docs/changelog/2.1.md con dos cambios «reemplazar»; tag v2.1.0. En la suite: marcador de rules.md y fixture espejo sincronizados. Revisión independiente sin bloqueantes; bun test 1130 pass, typecheck y check limpios. Commits 8c91851 y 94d116d (skill) y 9e5eed1 y 6e34ee5 (kit).
+
 ## 2026-10-27 — ✅ Tarea 87 — Skill 2.0.8: la recomendación de la suite ofrece acsuite init
 
 - La recomendación de la suite en la skill (docs/suite-recommendation.md) ahora, si el operador acepta, le ofrece dos caminos: que el agente instale la suite de forma global (bun add -g / npm install -g agent-context-suite@latest) y ejecute acsuite init --apply, o que lo haga el operador; le explica que desde entonces el agente usará acsuite task y que puede ver el tablero con acsuite board dentro del repo; no instala ni ejecuta nada hasta que el operador elige.
