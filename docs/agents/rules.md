@@ -1,4 +1,4 @@
-<!-- agent-context-skill:version 2.0.7 — versión de la skill con la que se generaron las Reglas por defecto de este archivo; ignorar al leer, no es contenido. Lo usa la skill para detectar versiones más nuevas (ver docs/version-check.md de la skill). -->
+<!-- agent-context-skill:version 2.0.8 — versión de la skill con la que se generaron las Reglas por defecto de este archivo; ignorar al leer, no es contenido. Lo usa la skill para detectar versiones más nuevas (ver docs/version-check.md de la skill). -->
 # Reglas del proyecto
 
 <!-- agent-context-suite:start -->
