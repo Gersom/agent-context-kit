@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 102
+**Próximo número de tarea:** 103
 
 ---
 
@@ -48,13 +48,13 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 101 — Board: menores pendientes de la lista de proyectos
+### Tarea 102 — Board: menores descartados y pegados en la lista de proyectos
 
-- **Descripción:** Atender los detalles menores que se descartaron al cerrar la Tarea 100, más la decisión sobre la tecla c en la vista de equipo.
-- **Decisiones/temas a definir antes de empezar:** Cuáles vale la pena hacer; si c debe seguir compactando SIN DUEÑO en la vista de equipo sin anunciarse o desactivarse ahí.
+- **Descripción:** Registro de los menores que se descartaron al cerrar la Tarea 101 y de los casos raros de pegado en el manejo de teclas de la lista de proyectos.
+- **Decisiones/temas a definir antes de empezar:** Si alguno justifica hacerse; los tres primeros se descartaron a propósito.
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** (1) dos board arrancando a la vez pueden perder un alta o baja de projects.json y no hay fsync antes del rename; (2) con el archivo corrupto, quitar con x solo oculta el proyecto en la sesión; (3) el aviso de guardado se trunca al ancho de la terminal y un error del watcher lo pisa; (4) app.ts no tiene tests del flujo interactivo (extraer el manejo de teclas a una función pura); (5) las entradas inválidas de un archivo bueno se descartan al reescribir sin respaldo ni aviso previo; (6) el campo backToProjects de RenderMeta ya no lo lee ningún render; (7) la nota de git en el error al agregar puede salir en casos que no son de confianza (repo bare, .git interno); (8) la tecla c en equipo compacta SIN DUEÑO pero ya no se anuncia en el pie.
+- **Detalles:** Descartados: (1) dos board escribiendo a la vez pueden pisar un alta o baja de projects.json (sin bloqueo de archivo ni fsync); (2) con el archivo corrupto, quitar con x solo oculta el proyecto en la sesión; (3) el aviso de guardado se trunca al ancho de la terminal y, en las vistas de un repo, un error del watcher lo pisa. Pegados (ya existían antes del refactor): (4) una flecha arriba y la tecla a en el mismo bloque dejan una a de más en la ruta, porque se busca la a con chunk.search; (5) Enter o Esc justo después de a en el mismo bloque no actúan; (6) Ctrl+C después de a o x en el mismo bloque no sale; (7) el flujo de app.ts que ejecuta las acciones no tiene tests.
 - **Agregada:** 2026-10-27.
 
 <!-- agent-context-skill:section=blocked -->

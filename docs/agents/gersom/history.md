@@ -11,6 +11,13 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 101 — Board: menores pendientes de la lista de proyectos
+
+- Pulido de la lista de proyectos de acsuite board: c ya no actúa en la vista de equipo y se eliminó el campo backToProjects; el error de git con dubious ownership explica que la carpeta es de otro usuario.
+- Reescribir un projects.json con entradas inválidas lo respalda con sello de tiempo, y los avisos de guardado y de quitar muestran proyecto, causa y ruta completa al final.
+- El manejo de teclas de la lista pasó a un reductor puro (src/cli/projects-keys.ts) con tests, sin cambios de comportamiento.
+- Commits en la suite: efa677e, 937fa03.
+
 ## 2026-10-27 — ✅ Tarea 100 — Board: pulir menores de la lista de proyectos
 
 - Pulido de la lista de proyectos de acsuite board: las entradas inválidas de projects.json se filtran con aviso con conteo, y el respaldo de un archivo corrupto lleva sello de tiempo sin pisar anteriores.
