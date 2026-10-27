@@ -1,7 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import { hasSuiteBlock, RulesBlockError, SUITE_BLOCK, SUITE_BLOCK_END, SUITE_BLOCK_START, upsertSuiteBlock } from "../rules-block.ts";
 
-const WITH_SPECIFIC = `# Reglas
+const MARKER = "<!-- agent-context-skill:version 2.0.7 — marcador de versión -->";
+
+const SPANISH = `${MARKER}
+# Reglas
 
 ## Reglas por defecto
 
@@ -11,24 +14,20 @@ const WITH_SPECIFIC = `# Reglas
 
 - Algo propio.
 
-### Si usas el script
-
-- Detalle.
-
 ## Al cerrar una tarea (fijas — leer solo al cerrar)
 
 6. Cierre.
 `;
 
-const WITHOUT_SPECIFIC = `# Reglas
+const ENGLISH = `# Rules
 
-## Reglas por defecto
+## Default rules
 
-1. Una regla.
+1. A rule.
 
-## Al cerrar una tarea (fijas — leer solo al cerrar)
+## When closing a task
 
-6. Cierre.
+6. Closing.
 `;
 
 describe("SUITE_BLOCK", () => {
@@ -39,42 +38,74 @@ describe("SUITE_BLOCK", () => {
     expect(lines[1]).toBe("### Herramientas de la suite");
     expect(lines.filter((line) => line.startsWith("## "))).toEqual([]);
   });
+
+  test("no depende de «Al cerrar una tarea»", () => {
+    expect(SUITE_BLOCK).not.toContain("Al cerrar");
+    expect(SUITE_BLOCK).not.toContain("Con una herramienta de tareas");
+  });
 });
 
 describe("upsertSuiteBlock: insertar", () => {
-  test("al final de «Reglas específicas», antes de «Al cerrar una tarea»", () => {
-    const { text, action } = upsertSuiteBlock(WITH_SPECIFIC);
+  test("después del título y antes del primer `##`; la línea 1 y el título no se tocan", () => {
+    const { text, action } = upsertSuiteBlock(SPANISH);
     expect(action).toBe("inserted");
-    expect(text).toBe(WITH_SPECIFIC.replace("## Al cerrar", `${SUITE_BLOCK}\n\n## Al cerrar`));
-    expect(text.indexOf(SUITE_BLOCK)).toBeGreaterThan(text.indexOf("- Detalle."));
-    expect(text.indexOf(SUITE_BLOCK)).toBeLessThan(text.indexOf("## Al cerrar"));
-  });
-
-  test("sin la sección específica, la crea antes de «Al cerrar una tarea»", () => {
-    const { text, action } = upsertSuiteBlock(WITHOUT_SPECIFIC);
-    expect(action).toBe("inserted");
-    expect(text).toBe(WITHOUT_SPECIFIC.replace("## Al cerrar", `## Reglas específicas de este proyecto\n\n${SUITE_BLOCK}\n\n## Al cerrar`));
-  });
-
-  test("deja una línea en blanco antes y después aunque la sección termine sin ella", () => {
-    const { text } = upsertSuiteBlock("## Reglas específicas de este proyecto\n- a\n## Al cerrar una tarea\nx\n");
-    expect(text).toBe(`## Reglas específicas de este proyecto\n- a\n\n${SUITE_BLOCK}\n\n## Al cerrar una tarea\nx\n`);
+    expect(text).toBe(SPANISH.replace("## Reglas por defecto", `${SUITE_BLOCK}\n\n## Reglas por defecto`));
+    expect(text.split("\n").slice(0, 2)).toEqual([MARKER, "# Reglas"]);
+    expect(text.indexOf(SUITE_BLOCK)).toBeGreaterThan(text.indexOf("# Reglas"));
+    expect(text.indexOf(SUITE_BLOCK)).toBeLessThan(text.indexOf("## Reglas por defecto"));
   });
 
   test("no toca nada más del archivo", () => {
-    const { text } = upsertSuiteBlock(WITH_SPECIFIC);
-    expect(text.replace(`${SUITE_BLOCK}\n\n`, "")).toBe(WITH_SPECIFIC);
+    const { text } = upsertSuiteBlock(SPANISH);
+    expect(text.replace(`${SUITE_BLOCK}\n\n`, "")).toBe(SPANISH);
   });
 
-  test("«Al cerrar una tarea» en la primera línea: no antepone una línea en blanco", () => {
-    const { text } = upsertSuiteBlock("## Al cerrar una tarea\nx\n");
-    expect(text.startsWith("## Reglas específicas de este proyecto\n\n<!--")).toBe(true);
+  test("funciona con encabezados en otro idioma", () => {
+    const { text, action } = upsertSuiteBlock(ENGLISH);
+    expect(action).toBe("inserted");
+    expect(text).toBe(`# Rules\n\n${SUITE_BLOCK}\n\n## Default rules\n\n1. A rule.\n\n## When closing a task\n\n6. Closing.\n`);
+  });
+
+  test("deja una línea en blanco antes y después aunque el título esté pegado al primer `##`", () => {
+    const { text } = upsertSuiteBlock("# R\n## Uno\nx\n");
+    expect(text).toBe(`# R\n\n${SUITE_BLOCK}\n\n## Uno\nx\n`);
+  });
+
+  test("no duplica la línea en blanco que ya había antes del primer `##`", () => {
+    const { text } = upsertSuiteBlock("# R\n\n## Uno\nx\n");
+    expect(text).toBe(`# R\n\n${SUITE_BLOCK}\n\n## Uno\nx\n`);
+    expect(text).not.toContain("\n\n\n");
+  });
+
+  test("el primer `##` en la primera línea: no antepone una línea en blanco", () => {
+    const { text } = upsertSuiteBlock("## Uno\nx\n");
+    expect(text).toBe(`${SUITE_BLOCK}\n\n## Uno\nx\n`);
+  });
+
+  test("lo que haya entre el título y el primer `##` queda antes del bloque", () => {
+    const { text } = upsertSuiteBlock("# R\n\nIntro.\n\n## Uno\nx\n");
+    expect(text).toBe(`# R\n\nIntro.\n\n${SUITE_BLOCK}\n\n## Uno\nx\n`);
+  });
+
+  test("sin ningún `##`, va al final con una línea en blanco antes", () => {
+    expect(upsertSuiteBlock("# R\n\nTexto.\n").text).toBe(`# R\n\nTexto.\n\n${SUITE_BLOCK}\n`);
+    expect(upsertSuiteBlock("# R\n\nTexto.").text).toBe(`# R\n\nTexto.\n\n${SUITE_BLOCK}`);
+    expect(upsertSuiteBlock("# R\n\nTexto.\n\n").text).toBe(`# R\n\nTexto.\n\n${SUITE_BLOCK}\n`);
+  });
+
+  test("un archivo vacío recibe solo el bloque", () => {
+    expect(upsertSuiteBlock("").text).toBe(`${SUITE_BLOCK}\n`);
+  });
+
+  test("un `###` no cuenta como el primer `##`", () => {
+    const { text } = upsertSuiteBlock("# R\n\n### Sub\nx\n");
+    expect(text).toBe(`# R\n\n### Sub\nx\n\n${SUITE_BLOCK}\n`);
   });
 });
 
 describe("upsertSuiteBlock: idempotencia y actualización", () => {
   test("una segunda pasada no cambia nada", () => {
-    for (const source of [WITH_SPECIFIC, WITHOUT_SPECIFIC]) {
+    for (const source of [SPANISH, ENGLISH, "# R\n\nTexto.\n"]) {
       const first = upsertSuiteBlock(source);
       const second = upsertSuiteBlock(first.text);
       expect(second.action).toBe("unchanged");
@@ -83,14 +114,30 @@ describe("upsertSuiteBlock: idempotencia y actualización", () => {
   });
 
   test("reemplaza un bloque desactualizado sin tocar lo de alrededor", () => {
-    const stale = WITH_SPECIFIC.replace("## Al cerrar", `${SUITE_BLOCK_START}\n### Herramientas de la suite\n\nTexto viejo.\n${SUITE_BLOCK_END}\n\n## Al cerrar`);
+    const stale = SPANISH.replace("## Reglas por defecto", `${SUITE_BLOCK_START}\n### Herramientas de la suite\n\nTexto viejo.\n${SUITE_BLOCK_END}\n\n## Reglas por defecto`);
     const { text, action } = upsertSuiteBlock(stale);
     expect(action).toBe("updated");
-    expect(text).toBe(WITH_SPECIFIC.replace("## Al cerrar", `${SUITE_BLOCK}\n\n## Al cerrar`));
+    expect(text).toBe(upsertSuiteBlock(SPANISH).text);
     expect(upsertSuiteBlock(text).action).toBe("unchanged");
   });
 
-  test("un bloque desactualizado se reemplaza donde esté, aunque falte «Al cerrar una tarea»", () => {
+  test("reemplaza el bloque donde esté (también al final o antes de «Al cerrar»), sin moverlo", () => {
+    for (const source of [
+      SPANISH.replace("## Al cerrar", `${SUITE_BLOCK_START}\nviejo\n${SUITE_BLOCK_END}\n\n## Al cerrar`),
+      `${SPANISH}\n${SUITE_BLOCK_START}\nviejo\n${SUITE_BLOCK_END}\n`,
+    ]) {
+      const { text, action } = upsertSuiteBlock(source);
+      expect(action).toBe("updated");
+      expect(text).toBe(source.replace(`${SUITE_BLOCK_START}\nviejo\n${SUITE_BLOCK_END}`, SUITE_BLOCK));
+    }
+  });
+
+  test("un bloque en una posición cualquiera, ya al día, queda unchanged", () => {
+    const text = SPANISH.replace("## Al cerrar", `${SUITE_BLOCK}\n\n## Al cerrar`);
+    expect(upsertSuiteBlock(text)).toEqual({ text, action: "unchanged" });
+  });
+
+  test("un bloque desactualizado se reemplaza donde esté, sin `##` en el archivo", () => {
     const { text, action } = upsertSuiteBlock(`# R\n\n${SUITE_BLOCK_START}\nviejo\n${SUITE_BLOCK_END}\n\nfin\n`);
     expect(action).toBe("updated");
     expect(text).toBe(`# R\n\n${SUITE_BLOCK}\n\nfin\n`);
@@ -109,50 +156,46 @@ describe("upsertSuiteBlock: errores (no escribe ni adivina)", () => {
   };
 
   test("solo la marca de inicio", () => {
-    expect(fails(`${SUITE_BLOCK_START}\n${WITH_SPECIFIC}`)).toContain("Falta la marca de cierre");
+    expect(fails(`${SUITE_BLOCK_START}\n${SPANISH}`)).toContain("Falta la marca de cierre");
   });
 
   test("solo la marca de cierre", () => {
-    expect(fails(`${WITH_SPECIFIC}${SUITE_BLOCK_END}\n`)).toContain("Falta la marca de inicio");
+    expect(fails(`${SPANISH}${SUITE_BLOCK_END}\n`)).toContain("Falta la marca de inicio");
   });
 
   test("marcas invertidas", () => {
-    expect(fails(`${SUITE_BLOCK_END}\n${WITH_SPECIFIC}${SUITE_BLOCK_START}\n`)).toContain("está antes que la de inicio");
+    expect(fails(`${SUITE_BLOCK_END}\n${SPANISH}${SUITE_BLOCK_START}\n`)).toContain("está antes que la de inicio");
   });
 
   test("marcas duplicadas", () => {
-    const message = fails(`${SUITE_BLOCK}\n\n${SUITE_BLOCK}\n\n${WITH_SPECIFIC}`);
+    const message = fails(`${SUITE_BLOCK}\n\n${SUITE_BLOCK}\n\n${SPANISH}`);
     expect(message).toContain("2 marca(s) de inicio y 2 de cierre");
-  });
-
-  test("sin la sección «Al cerrar una tarea»", () => {
-    expect(fails("# Reglas\n\n## Reglas específicas de este proyecto\n\n- a\n")).toContain("No encuentro la sección «Al cerrar una tarea»");
   });
 });
 
 describe("upsertSuiteBlock: lo que está en bloques de código o comentarios no cuenta", () => {
-  test("un «## Al cerrar una tarea» dentro de ``` se ignora", () => {
-    const text = "```md\n## Al cerrar una tarea\n```\n\n## Al cerrar una tarea (fijas)\nx\n";
+  test("un `##` dentro de ``` se ignora: el bloque va antes del primer `##` real", () => {
+    const text = "# R\n\n```md\n## Falso\n```\n\n## Real\nx\n";
     const { text: out } = upsertSuiteBlock(text);
-    expect(out).toBe(`\`\`\`md\n## Al cerrar una tarea\n\`\`\`\n\n## Reglas específicas de este proyecto\n\n${SUITE_BLOCK}\n\n## Al cerrar una tarea (fijas)\nx\n`);
+    expect(out).toBe(`# R\n\n\`\`\`md\n## Falso\n\`\`\`\n\n${SUITE_BLOCK}\n\n## Real\nx\n`);
   });
 
-  test("un «## Al cerrar una tarea» dentro de un comentario se ignora (y sin el real, es error)", () => {
-    expect(() => upsertSuiteBlock("<!--\n## Al cerrar una tarea\n-->\n")).toThrow(RulesBlockError);
-    const real = upsertSuiteBlock("<!--\n## Al cerrar una tarea\n-->\n\n## Al cerrar una tarea\nx\n");
-    expect(real.text.indexOf(SUITE_BLOCK)).toBeGreaterThan(real.text.indexOf("-->"));
-    expect(real.text.indexOf(SUITE_BLOCK)).toBeLessThan(real.text.lastIndexOf("## Al cerrar una tarea"));
-  });
-
-  test("un «## Reglas específicas…» dentro de ``` o de un comentario no cuenta como la sección", () => {
-    for (const fake of ["```\n## Reglas específicas de este proyecto\n```", "<!--\n## Reglas específicas de este proyecto\n-->"]) {
-      const { text } = upsertSuiteBlock(`${fake}\n\n## Al cerrar una tarea\nx\n`);
-      expect(text).toContain(`\n## Reglas específicas de este proyecto\n\n${SUITE_BLOCK}\n\n## Al cerrar`);
+  test("un `##` dentro de un comentario se ignora (en una o varias líneas)", () => {
+    for (const comment of ["<!--\n## Falso\n-->", "<!-- ## Falso -->"]) {
+      const { text } = upsertSuiteBlock(`# R\n\n${comment}\n\n## Real\nx\n`);
+      expect(text).toBe(`# R\n\n${comment}\n\n${SUITE_BLOCK}\n\n## Real\nx\n`);
     }
   });
 
+  test("si todos los `##` están en código o comentarios, el bloque va al final", () => {
+    const code = "# R\n\n```md\n## Falso\n```\n";
+    expect(upsertSuiteBlock(code).text).toBe(`${code}\n${SUITE_BLOCK}\n`);
+    const comment = "# R\n\n<!--\n## Falso\n-->\n";
+    expect(upsertSuiteBlock(comment).text).toBe(`${comment}\n${SUITE_BLOCK}\n`);
+  });
+
   test("marcas dentro de un bloque de código no cuentan", () => {
-    const fenced = `\`\`\`\n${SUITE_BLOCK}\n\`\`\`\n\n## Al cerrar una tarea\nx\n`;
+    const fenced = `# R\n\n\`\`\`\n${SUITE_BLOCK}\n\`\`\`\n\n## Uno\nx\n`;
     expect(hasSuiteBlock(fenced)).toBe(false);
     expect(upsertSuiteBlock(fenced).action).toBe("inserted");
   });
@@ -160,12 +203,12 @@ describe("upsertSuiteBlock: lo que está en bloques de código o comentarios no 
 
 describe("hasSuiteBlock", () => {
   test("detecta el bloque, también desactualizado", () => {
-    expect(hasSuiteBlock(upsertSuiteBlock(WITH_SPECIFIC).text)).toBe(true);
+    expect(hasSuiteBlock(upsertSuiteBlock(SPANISH).text)).toBe(true);
     expect(hasSuiteBlock(`${SUITE_BLOCK_START}\nviejo\n${SUITE_BLOCK_END}\n`)).toBe(true);
   });
 
   test("sin marcas, con una sola o invertidas: no", () => {
-    expect(hasSuiteBlock(WITH_SPECIFIC)).toBe(false);
+    expect(hasSuiteBlock(SPANISH)).toBe(false);
     expect(hasSuiteBlock(`${SUITE_BLOCK_START}\nx\n`)).toBe(false);
     expect(hasSuiteBlock(`${SUITE_BLOCK_END}\nx\n${SUITE_BLOCK_START}\n`)).toBe(false);
     expect(hasSuiteBlock("")).toBe(false);

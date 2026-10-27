@@ -51,17 +51,42 @@ describe("acsuite init", () => {
     expect(snapshot(p.root)).toEqual(before);
   });
 
-  test("--apply inserta el bloque antes de «Al cerrar una tarea» y deja el resto igual", async () => {
+  test("--apply inserta el bloque tras el título, antes del primer `##`, y deja el resto igual", async () => {
     const p = project();
     const { code, out } = await exec(["--apply"], p.root);
     expect(code).toBe(0);
     expect(out).toContain("se agregó la sección de la suite");
     const text = rulesOf(p);
     expect(text).toBe(INSERTED);
-    expect(text.indexOf(SUITE_BLOCK)).toBeLessThan(text.indexOf("## Al cerrar una tarea"));
+    expect(text.indexOf(SUITE_BLOCK)).toBeGreaterThan(text.indexOf("\n# "));
+    expect(text.indexOf(SUITE_BLOCK)).toBeLessThan(text.indexOf("\n## "));
     expect(text.replace(`${SUITE_BLOCK}\n\n`, "")).toBe(TEMPLATE_RULES);
-    // La línea 1 (marcador de versión) queda idéntica.
-    expect(text.split("\n")[0]).toBe(TEMPLATE_RULES.split("\n")[0]);
+    // La línea 1 (marcador de versión) y el título quedan idénticos.
+    expect(text.split("\n").slice(0, 2)).toEqual(TEMPLATE_RULES.split("\n").slice(0, 2));
+  });
+
+  test("un rules.md en otro idioma recibe el bloque igual, antes del primer `##`", async () => {
+    const english = "# Rules\n\n## Default rules\n\n1. A rule.\n\n## When closing a task\n\n6. Closing.\n";
+    const p = project({ rules: english });
+    const { code } = await exec(["--apply"], p.root);
+    expect(code).toBe(0);
+    expect(rulesOf(p)).toBe(`# Rules\n\n${SUITE_BLOCK}\n\n${english.slice("# Rules\n\n".length)}`);
+  });
+
+  test("un rules.md sin ningún `##` recibe el bloque al final", async () => {
+    const p = project({ rules: "# Reglas\n\nTexto.\n" });
+    const { code } = await exec(["--apply"], p.root);
+    expect(code).toBe(0);
+    expect(rulesOf(p)).toBe(`# Reglas\n\nTexto.\n\n${SUITE_BLOCK}\n`);
+  });
+
+  test("un bloque en otra posición se actualiza ahí mismo", async () => {
+    const stale = TEMPLATE_RULES.replace("## Al cerrar", `<!-- agent-context-suite:start -->\nviejo\n<!-- agent-context-suite:end -->\n\n## Al cerrar`);
+    const p = project({ rules: stale });
+    const { code, out } = await exec(["--apply"], p.root);
+    expect(code).toBe(0);
+    expect(out).toContain("se actualizó la sección de la suite");
+    expect(rulesOf(p)).toBe(TEMPLATE_RULES.replace("## Al cerrar", `${SUITE_BLOCK}\n\n## Al cerrar`));
   });
 
   test("una segunda ejecución no cambia nada", async () => {
@@ -94,13 +119,17 @@ describe("acsuite init", () => {
   });
 
   test("conserva los finales de línea mezclados fuera del bloque", async () => {
-    const mixed = `${toEol(TEMPLATE_RULES.slice(0, 200), "\r\n")}${TEMPLATE_RULES.slice(200)}`;
-    const p = project({ rules: mixed });
+    // Antes del primer `##` en CRLF y desde ahí en LF: el bloque se inserta justo en la frontera.
+    const cut = TEMPLATE_RULES.indexOf("## ");
+    const head = toEol(TEMPLATE_RULES.slice(0, cut), "\r\n");
+    const tail = TEMPLATE_RULES.slice(cut);
+    const p = project({ rules: `${head}${tail}` });
     await exec(["--apply"], p.root);
     const text = rulesOf(p);
-    expect(text.startsWith(toEol(TEMPLATE_RULES.slice(0, 200), "\r\n"))).toBe(true);
-    expect(text).toContain(SUITE_BLOCK);
-    expect(text.endsWith(TEMPLATE_RULES.slice(-200))).toBe(true);
+    expect(text.startsWith(head)).toBe(true);
+    expect(text.replace(/\r\n/g, "\n")).toContain(SUITE_BLOCK);
+    expect(text.endsWith(tail)).toBe(true);
+    expect((await exec(["--apply"], p.root)).out).toBe("Ya está al día: no hay cambios.");
   });
 
   test("modo plano: sin aviso de multi-operador", async () => {
@@ -165,15 +194,6 @@ describe("acsuite init: errores", () => {
     expect(code).toBe(1);
     expect(err).toContain("Falta la marca de cierre");
     expect(err).toContain("No se escribió nada.");
-    expect(snapshot(p.root)).toEqual(before);
-  });
-
-  test("sin «Al cerrar una tarea»: error 1 sin escribir", async () => {
-    const p = project({ rules: "# Reglas\n\n## Otra cosa\n" });
-    const before = snapshot(p.root);
-    const { code, err } = await exec(["--apply"], p.root);
-    expect(code).toBe(1);
-    expect(err).toContain("No encuentro la sección «Al cerrar una tarea»");
     expect(snapshot(p.root)).toEqual(before);
   });
 

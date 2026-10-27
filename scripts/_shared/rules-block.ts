@@ -1,7 +1,8 @@
 // El bloque de la suite en rules.md: la sección delimitada que enseña al agente a usar las
 // herramientas (`acsuite init` la escribe y `acsuite check` avisa si falta). Código puro, sin E/S:
 // recibe el texto de rules.md en LF y devuelve el texto nuevo. Las reglas fijas de rules.md no se tocan;
-// el bloque va al final de «Reglas específicas de este proyecto», justo antes de «Al cerrar una tarea».
+// el bloque va al inicio del archivo, después del título y antes del primer encabezado `## ` (sin depender
+// de ningún texto del idioma del proyecto).
 
 import { commentStateAfter } from "./parse/markdown.ts";
 import { FENCE_RE, H2_RE } from "./parse/sections.ts";
@@ -13,18 +14,12 @@ export const SUITE_BLOCK_END = "<!-- agent-context-suite:end -->";
 export const SUITE_BLOCK = `${SUITE_BLOCK_START}
 ### Herramientas de la suite
 
-Este proyecto usa [agent-context-suite](https://github.com/Gersom/agent-context-suite). Aplica la cláusula «Con una herramienta de tareas» de «Al cerrar una tarea»: no edites a mano \`handoff.md\`, \`backlog.md\` ni \`history.md\`; usa \`acsuite task\` (el detalle: \`acsuite task --help\`). Para verificar la documentación, \`acsuite check\`; para ver el tablero, \`acsuite board\`.
+Este proyecto usa [agent-context-suite](https://github.com/Gersom/agent-context-suite). No edites a mano \`handoff.md\`, \`backlog.md\` ni \`history.md\`: usa \`acsuite task\` (el detalle: \`acsuite task --help\`). Para verificar la documentación, \`acsuite check\`; para ver el tablero, \`acsuite board\`.
 ${SUITE_BLOCK_END}`;
-
-/** Encabezado de la sección donde va el bloque (se crea si falta). */
-export const SPECIFIC_HEADING = "Reglas específicas de este proyecto";
-
-/** Encabezado de la sección fija ante la cual se inserta el bloque (se busca por su comienzo). */
-export const CLOSING_HEADING = "Al cerrar una tarea";
 
 export type RulesBlockAction = "inserted" | "updated" | "unchanged";
 
-/** El bloque no se puede escribir sin adivinar (marcas incompletas, repetidas o invertidas; falta «Al cerrar una tarea»). El mensaje es para el operador. */
+/** El bloque no se puede escribir sin adivinar (marcas incompletas, repetidas o invertidas). El mensaje es para el operador. */
 export class RulesBlockError extends Error {
   constructor(message: string) {
     super(message);
@@ -37,14 +32,14 @@ interface Scan {
   /** Líneas (0-based) de las marcas de inicio y de cierre. */
   starts: number[];
   ends: number[];
-  /** Encabezados `## ` con su línea (0-based). */
-  headings: { line: number; title: string }[];
+  /** Línea (0-based) del primer encabezado `## `, o `null` si no hay ninguno. */
+  firstH2: number | null;
 }
 
 /** Recorre el texto ignorando bloques de código y comentarios HTML (lo que contienen no cuenta). */
 function scan(text: string): Scan {
   const lines = text.split("\n");
-  const result: Scan = { lines, starts: [], ends: [], headings: [] };
+  const result: Scan = { lines, starts: [], ends: [], firstH2: null };
   let inComment = false;
   let inFence = false;
   lines.forEach((line, i) => {
@@ -59,10 +54,7 @@ function scan(text: string): Scan {
     const trimmed = line.trim();
     if (trimmed === SUITE_BLOCK_START) result.starts.push(i);
     else if (trimmed === SUITE_BLOCK_END) result.ends.push(i);
-    else {
-      const h2 = line.match(H2_RE);
-      if (h2) result.headings.push({ line: i, title: h2[1] });
-    }
+    else if (result.firstH2 === null && H2_RE.test(line)) result.firstH2 = i;
   });
   return result;
 }
@@ -85,15 +77,15 @@ function marksProblem({ starts, ends }: Scan): string | null {
 }
 
 /**
- * Deja el bloque de la suite en `text`: lo reemplaza si ya está y difiere, o lo inserta al final de
- * «Reglas específicas de este proyecto» (antes de «Al cerrar una tarea»; si esa sección no existe,
- * la crea). No escribe nada: devuelve el texto nuevo y qué hizo.
+ * Deja el bloque de la suite en `text`: lo reemplaza in situ si ya está y difiere, o lo inserta después
+ * del título y antes del primer `## ` (si no hay ninguno, al final). No escribe nada: devuelve el texto
+ * nuevo y qué hizo.
  * @param text contenido de rules.md con saltos de línea LF
- * @throws RulesBlockError marcas incompletas, repetidas o invertidas, o sin «Al cerrar una tarea» donde insertar
+ * @throws RulesBlockError marcas incompletas, repetidas o invertidas
  */
 export function upsertSuiteBlock(text: string): { text: string; action: RulesBlockAction } {
   const found = scan(text);
-  const { lines, starts, ends, headings } = found;
+  const { lines, starts, ends, firstH2 } = found;
 
   if (starts.length || ends.length) {
     const problem = marksProblem(found);
@@ -106,15 +98,15 @@ export function upsertSuiteBlock(text: string): { text: string; action: RulesBlo
     return { text: next.join("\n"), action: "updated" };
   }
 
-  const closing = headings.find((h) => h.title.startsWith(CLOSING_HEADING));
-  if (!closing) {
-    throw new RulesBlockError(
-      `No encuentro la sección «${CLOSING_HEADING}» en rules.md, así que no sé dónde insertar el bloque. Restaura la sección o agrega el bloque a mano.`,
-    );
+  const block = SUITE_BLOCK.split("\n");
+  if (firstH2 !== null) {
+    const head = lines.slice(0, firstH2);
+    const next = [...head, ...(head.length && head[head.length - 1].trim() !== "" ? [""] : []), ...block, "", ...lines.slice(firstH2)];
+    return { text: next.join("\n"), action: "inserted" };
   }
-  const hasSpecific = headings.some((h) => h.line < closing.line && h.title.startsWith(SPECIFIC_HEADING));
-  const head = lines.slice(0, closing.line);
-  const insert = hasSpecific ? SUITE_BLOCK.split("\n") : [`## ${SPECIFIC_HEADING}`, "", ...SUITE_BLOCK.split("\n")];
-  const next = [...head, ...(head.length && head[head.length - 1].trim() !== "" ? [""] : []), ...insert, "", ...lines.slice(closing.line)];
+  // Sin ningún `## `: al final, conservando el salto de línea final si lo había.
+  const endsWithNewline = lines[lines.length - 1] === "";
+  const body = endsWithNewline ? lines.slice(0, -1) : lines;
+  const next = [...body, ...(body.length && body[body.length - 1].trim() !== "" ? [""] : []), ...block, ...(endsWithNewline ? [""] : [])];
   return { text: next.join("\n"), action: "inserted" };
 }

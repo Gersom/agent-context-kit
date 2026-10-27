@@ -31,8 +31,8 @@ const FLAGS = {
 /** Ayuda: uso, flags y códigos de salida. */
 export const HELP: string[] = [
   "Agrega a rules.md del proyecto la sección que enseña al agente a usar la suite (`acsuite task`,",
-  "`acsuite check` y `acsuite board`). La pone al final de «Reglas específicas de este proyecto», entre sus",
-  "marcas; si ya está, solo la actualiza cuando cambió. No toca las reglas fijas ni ningún otro archivo.",
+  "`acsuite check` y `acsuite board`). La pone al inicio de rules.md, después del título y entre sus marcas;",
+  "si ya está, solo la actualiza cuando cambió, donde esté. No toca las reglas fijas ni ningún otro archivo.",
   "",
   "Uso: acsuite init [--agents <ruta>] [--apply] [--dry-run]",
   "",
