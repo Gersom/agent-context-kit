@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-26 — ✅ Tarea 76 — Probar la instalación real del paquete
+
+- Instalación real del paquete probada en Windows 11 con el tarball de npm pack (agent-context-suite 1.8.1): npm install local + npx, instalación global con shim .cmd, npx y bunx (con y sin --bun) sobre Node 20.20.2, 22.23.4 y 24.14.0; check, task status, board --once, task add por stdin y códigos de salida correctos. Node 16 falla por sintaxis, lo que confirma engines >=20.
+- No probado: Linux ni macOS (sin WSL) ni la instalación por nombre desde el registro (se verifica tras publicar, T-77). Rarezas de rutas locales de npx (ruta absoluta con /) y bunx (ruta relativa) con tarballs, no del paquete.
+
 ## 2026-10-26 — ✅ Tarea 79 — Renombrar «kit» a «suite» (agent-context-suite, comando acsuite) en todo el repo
 
 - Renombrado «kit» a «suite» en todo el repo: carpeta scripts/ackit a scripts/acsuite y comando acsuite; prosa, comentarios, tests (format.test.ts, multi-operator.test.ts), description de package.json y bun.lock; repo renombrado en GitHub a Gersom/agent-context-suite con remoto y repository.url actualizados.
