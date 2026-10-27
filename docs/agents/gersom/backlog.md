@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 81
+**Próximo número de tarea:** 83
 
 ---
 
@@ -48,13 +48,13 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 77 — Publicar la primera versión en npm y documentar la instalación
+### Tarea 81 — Aclarar el flujo de instalación de la suite en el README
 
-- **Descripción:** npm publish (con 2FA), sección de instalación y actualización en el README (npx agent-context-kit@latest, npm install -g ...@latest), subir la versión del kit, con su tag según la regla de tags. Hecho: el paquete se instala desde npm y el README lo explica.
+- **Descripción:** Reescribir la sección «Instalar la suite» del README: separar las dos formas de uso, que hoy se mezclan. (A) Sin instalar: npx o bunx agent-context-suite@latest <subcomando> <ruta>, que no deja instalado el comando. (B) Instalada: npm install -g agent-context-suite, que da el comando acsuite <subcomando> <ruta>. Dejar claro la diferencia entre el nombre del paquete (agent-context-suite) y el del comando (acsuite), usar el mismo subcomando en todos los ejemplos y quitar el «lo mismo con Bun». Hecho: la sección se entiende sin conocer npx, y los ejemplos de A y B son equivalentes.
 - **Decisiones/temas a definir antes de empezar:** Ninguno.
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Publicar es irreversible (una versión no se reutiliza): confirmar con el operador antes del npm publish. Depende de la prueba de instalación real.
+- **Detalles:** Surgió al cerrar la T-77: el operador no entendió si npx y acsuite eran pasos consecutivos. El README del paquete en la página de npm viene empaquetado en 1.9.0, así que la corrección llega a npm solo con la próxima versión; en GitHub se ve enseguida. Va justo después de la T-77.
 - **Agregada:** 2026-10-26.
 
 <!-- agent-context-skill:section=blocked -->

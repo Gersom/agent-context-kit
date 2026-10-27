@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-26 — ✅ Tarea 77 — Publicar la primera versión en npm y documentar la instalación
+
+- Primera versión de la suite publicada: agent-context-suite 1.9.0 en npm (publicado por el operador con 2FA), commit de versión 63a28d3 con el tag anotado v1.9.0 subido con git push --follow-tags, y release v1.9.0 en GitHub.
+- README con instalación, actualización y compatibilidad (probada en Windows 11 con Node 20, 22 y 24 y Bun; problemas en Linux/macOS por Issue). Verificado por nombre desde el registro con npx, bunx (con y sin --bun) e instalación global. Queda cosmética la versión placeholder 0.0.0-stage del registro y sin probar Linux/macOS. Commits 24558d5 y 63a28d3 (kit).
+
 ## 2026-10-26 — ✅ Tarea 76 — Probar la instalación real del paquete
 
 - Instalación real del paquete probada en Windows 11 con el tarball de npm pack (agent-context-suite 1.8.1): npm install local + npx, instalación global con shim .cmd, npx y bunx (con y sin --bun) sobre Node 20.20.2, 22.23.4 y 24.14.0; check, task status, board --once, task add por stdin y códigos de salida correctos. Node 16 falla por sintaxis, lo que confirma engines >=20.
