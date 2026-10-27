@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 94 — Suite 1.11.1: versión con el fixture de la skill 2.3.1
+
+- La suite sube a la versión 1.11.1 (patch): desde la 1.11.0 solo cambió el fixture espejo de la skill (hasta la 2.3.1) y la documentación; el código es el mismo.
+- package.json 1.11.1, tag v1.11.1 subido con push --follow-tags y release en GitHub; la publicación en npm queda para el operador. bun test 1130 pass, typecheck, check y build limpios; npm pack muestra 1.11.1. Commit f39d148 (kit).
+
 ## 2026-10-27 — ✅ Tarea 93 — Skill 2.3.1: borrar la rama de trabajo tras un merge exitoso
 
 - Tras un merge exitoso, los flujos de la skill que trabajan en rama (generar, migrar y actualizar) borran la rama agent-context-* con git branch -d (nunca -D ni remotas) para que no se acumulen; no la borran si el operador la dejó, si hubo conflictos o si descartó el commit, y el mensaje de resultado dice si se borró o se dejó y por qué. Una ejecución que no escribió nada también borra su rama vacía.
