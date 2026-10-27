@@ -105,8 +105,14 @@ describe("pie de un repo abierto desde la lista", () => {
   const repo = { projectName: "demo-app", projectDir: "/repos/demo-app", updatedAt: meta.updatedAt, trigger: meta.trigger, color: false, width: 120, controls: "keys" as const };
 
   test("el panel plano indica cómo volver a la lista; sin ella, no", () => {
-    expect(render(model, { ...repo, backToProjects: true })).toContain("[Esc o b] volver a proyectos - [c] compactar");
+    expect(render(model, { ...repo, backToProjects: true })).toContain("[Esc o b] volver a proyectos - [p] proyectos - [c] compactar");
     expect(render(model, repo)).not.toContain("volver a proyectos");
+  });
+
+  test("todas las vistas de un repo ofrecen [p] proyectos; la lista no", () => {
+    expect(render(model, repo)).toContain("[p] proyectos");
+    expect(render(model, { ...repo, multiView: "operator" })).toContain("[p] proyectos");
+    expect(render(model, { ...repo, backToProjects: true })).toContain("[p] proyectos");
   });
 
   test("en el panel de un operador `b` vuelve al equipo, no a la lista", () => {

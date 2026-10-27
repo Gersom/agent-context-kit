@@ -204,7 +204,7 @@ describe("render", () => {
   });
 
   test("el pie se parte en más líneas si no entra, y «salir» nunca se recorta", () => {
-    const full = "[Esc o b] volver al equipo - [c] compactar - [f] ocultar flechas - [r] redibujar - [Ctrl+C o q] salir";
+    const full = "[Esc o b] volver al equipo - [p] proyectos - [c] compactar - [f] ocultar flechas - [r] redibujar - [Ctrl+C o q] salir";
     expect(screen("minimal", { controls: "keys", multiView: "operator", width: 120 })).toContain(full);
     const narrow = screen("minimal", { controls: "keys", multiView: "operator", width: 60 }).split("\n");
     const at = narrow.findIndex((l) => l.startsWith("[Esc o b]"));

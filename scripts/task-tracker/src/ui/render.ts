@@ -423,6 +423,7 @@ function footerLines(meta: CanvasMeta, width: number): string[] {
     if (meta.multiView === "operator") parts.push("[Esc o b] volver al equipo");
     // Desde la raíz de un repo abierto desde la lista (panel plano o vista de equipo), `b`/Esc vuelven a ella.
     else if (meta.backToProjects) parts.push("[Esc o b] volver a proyectos");
+    parts.push("[p] proyectos");
     parts.push(meta.compact ? "[c] expandir" : "[c] compactar");
     // La vista de equipo no tiene flechas de flujo.
     if (meta.multiView !== "team") parts.push(meta.arrows === false ? "[f] mostrar flechas" : "[f] ocultar flechas");

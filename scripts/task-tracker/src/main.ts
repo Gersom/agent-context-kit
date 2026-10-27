@@ -20,6 +20,7 @@ export const HELP: string[] = [
   "  [ruta]                Raíz del proyecto, carpeta de agentes (docs/agents) o carpeta de un operador.",
   "                        Por defecto, el proyecto de la carpeta actual; si no tiene documentación,",
   "                        la lista de proyectos (↑/↓ eligen, Enter abre, Esc o b vuelven a la lista).",
+  "                        Con un proyecto abierto, la tecla p lleva a la lista de proyectos.",
   "  [operador]            Con ruta, abre de frente el panel de ese operador (modo multi-operador).",
   "  --operator <carpeta>  Lo mismo, con o sin ruta.",
   "  --once                Pinta una sola vez y sale.",

@@ -228,6 +228,11 @@ export function startApp({
             projectsNav = next;
             draw({ kind: "redraw" });
           }
+        } else if (key === "projects") {
+          // Desde cualquier vista de un repo, a la lista de proyectos (se vuelve a leer al abrirla).
+          fromList = false;
+          open(null);
+          draw({ kind: "redraw" });
         } else if (key === "back" && fromList && (!target.multi || nav?.view.kind === "team")) {
           // Desde la raíz del repo (el panel plano o la vista de equipo), de vuelta a la lista.
           fromList = false;
