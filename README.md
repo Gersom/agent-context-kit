@@ -23,35 +23,45 @@ Invocar la skill explícitamente, pidiéndoselo al agente (se llama igual que su
 
 ## Instalar la suite
 
-No hace falta clonar este repo. Requiere Node 20 o superior (o Bun). Hay dos formas de usarla; elige una:
+No hace falta clonar este repo. Requiere Node 20 o superior, o Bun.
 
-### A. Sin instalar nada (`npx` o `bunx`)
+### Recomendado: instalarla de forma global
 
-Un solo comando: descarga la suite, la ejecuta y termina. **No deja instalado el comando `acsuite`**, así que cada vez se escribe completo:
+Se instala una vez y desde entonces existe el comando `acsuite` en cualquier carpeta:
 
 ```sh
-npx agent-context-suite@latest check <ruta-del-proyecto>
-bunx agent-context-suite@latest check <ruta-del-proyecto>   # igual, con Bun
+npm install -g agent-context-suite
+bun add -g agent-context-suite     # o con Bun
+```
+
+Para actualizarla, repite el comando con `@latest` (`npm install -g agent-context-suite@latest`).
+
+### Alternativa: usarla sin instalar nada
+
+Con `npx` o `bunx` se descarga, se ejecuta y termina, sin dejar instalado el comando `acsuite`, así que cada vez se escribe completo:
+
+```sh
+npx agent-context-suite@latest board <ruta-del-proyecto>
+bunx agent-context-suite@latest board <ruta-del-proyecto>   # igual, con Bun
 ```
 
 `@latest` trae siempre la versión más reciente.
 
-### B. Instalada (comando `acsuite`)
-
-Se instala una vez y desde entonces existe el comando `acsuite`:
-
-```sh
-npm install -g agent-context-suite
-acsuite check <ruta-del-proyecto>
-```
-
-Para actualizarla: `npm install -g agent-context-suite@latest`.
-
-### Nombres
-
-El **paquete** (lo que escribes con `npx`, `bunx` o `npm install`) es `agent-context-suite`; el **comando** (lo que escribes una vez instalada) es `acsuite`. Los subcomandos son `board`, `task` y `check`, y funcionan igual en A y en B.
+**Nombres.** El *paquete* (lo que escribes con `npm install`, `npx` o `bunx`) es `agent-context-suite`; el *comando* (una vez instalada) es `acsuite`.
 
 **Compatibilidad.** Probada en Windows 11 con Node 20, 22 y 24, y con Bun. En Linux y macOS debería funcionar igual (es Node estándar), pero no está comprobado: si encuentras algún problema, abre un [Issue](https://github.com/Gersom/agent-context-suite/issues).
+
+## Uso de los comandos
+
+Los tres subcomandos trabajan sobre un proyecto que use la skill. Con la suite instalada (si no, antepón `npx agent-context-suite@latest` al subcomando):
+
+| Comando | Qué hace | Ejemplo |
+|---|---|---|
+| `acsuite board <ruta>` | Tablero de tareas en vivo en la terminal (en progreso, pausadas, pendientes y últimas completadas) | `acsuite board D:/mi-app` |
+| `acsuite task <comando>` | Consulta y edita las tareas sin tocar a mano `handoff.md`, `backlog.md` ni `history.md`; las escrituras exigen `--apply` | `acsuite task status` |
+| `acsuite check <ruta>` | Verifica que la documentación de agentes del proyecto esté en orden, con errores y avisos por archivo y línea | `acsuite check D:/mi-app` |
+
+`acsuite` sin argumentos lista los subcomandos, y `acsuite <subcomando> --help` muestra la ayuda de cada uno. Detalle de cada herramienta: [`board`](./scripts/task-tracker/README.md), [`task`](./scripts/task-manager/README.md) y [`check`](./scripts/docs-check/README.md).
 
 ## Clonar la skill
 
