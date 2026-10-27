@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-26 — ✅ Tarea 80 — Skill 2.0.7: quitar «kit» de sus textos y promocionar agent-context-suite
+
+- Skill 2.0.7: las tres líneas con «kit» reescritas sin nombrar la suite (Regla 3 de template/agents/rules.md, questions-flow.md y la nota de anclas de template/agents/backlog.md), sección «Herramientas complementarias (opcional)» en el README de la skill y archivo nuevo docs/suite-recommendation.md, enlazado al final de questions-flow.md y como paso 8 de migration-flow.md (no desde SKILL.md ni en las sesiones donde la documentación ya existía).
+- Versión 2.0.7 en plugin.json, SKILL.md y el marcador de la plantilla, con su entrada en el changelog (un cambio reemplazar y uno manual). En la suite: fixtures espejo de docs-check y rules.md sincronizados con la plantilla. bun test 1049 pass, typecheck y check limpios. Commits 87ff819 y 56fedea (skill, tag v2.0.7 y release en GitHub) y aad4577 (kit).
+
 ## 2026-10-26 — ✅ Tarea 81 — Aclarar el flujo de instalación de la suite en el README
 
 - README reescrito: instalación recomendada global (npm install -g / bun add -g), alternativa sin instalar con npx/bunx, diferencia entre paquete (agent-context-suite) y comando (acsuite) y tabla de uso de los comandos; sin menciones de bun run.
