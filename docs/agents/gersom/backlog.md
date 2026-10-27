@@ -48,13 +48,12 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 98 — Board: crear la vista de listado de proyectos
+### Tarea 95 — Board: tecla para ir a la vista de listado de projects (repositorios)
 
-- **Descripción:** En `acsuite board`, crear la vista que lista los proyectos (repositorios).
-- **Decisiones/temas a definir antes de empezar:** Qué muestra cada fila (nombre, ruta, operador, tarea en curso) y cómo se elige uno para abrirlo.
-- **Bloqueos:** Ninguno.
+- **Descripción:** En el comando `acsuite board`, agregar una tecla que lleve a la vista de listado de projects (repositorios).
+- **Decisiones/temas a definir antes de empezar:** Qué tecla usar y desde qué vistas está disponible.
+- **Bloqueos:** `[Resuelto el 2026-10-27]` — era `[dependencia]` Depende de la Tarea 98.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Es la base de las tareas 95 (tecla para ir a esta vista), 96 (agregar repo) y 97 (guardar los repos); conviene hacerla antes que ellas.
 - **Agregada:** 2026-10-27.
 
 <!-- agent-context-skill:section=blocked -->
@@ -76,14 +75,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Bloqueos:** [postergada] Hay que debatirla al llegar a esta tarea, tras publicar la primera versión.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Agregada:** 2026-10-26.
-
-### Tarea 95 — Board: tecla para ir a la vista de listado de projects (repositorios)
-
-- **Descripción:** En el comando `acsuite board`, agregar una tecla que lleve a la vista de listado de projects (repositorios).
-- **Decisiones/temas a definir antes de empezar:** Qué tecla usar y desde qué vistas está disponible.
-- **Bloqueos:** `[dependencia]` Depende de la Tarea 98.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Agregada:** 2026-10-27.
 
 ### Tarea 96 — Board: opción de agregar repo en el listado de projects
 

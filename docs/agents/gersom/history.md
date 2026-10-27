@@ -11,6 +11,13 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 98 — Board: crear la vista de listado de proyectos
+
+- Vista de listado de proyectos en acsuite board: una fila por repo con nombre, ruta, tu operador, tarea en curso y cantidad de libres y bloqueadas.
+- Enter abre el repo y b/Esc vuelve a la lista; se lee solo al abrir la vista y con r. Fuera de un repo con docs, el board abre la lista (vacía) en vez de fallar.
+- La lista de rutas es inyectable y hoy trae solo el repo actual (persistencia: Tarea 97; tecla de acceso: Tarea 95).
+- Commit en la suite: 98f3951.
+
 ## 2026-10-27 — ✅ Tarea 94 — Suite 1.11.1: versión con el fixture de la skill 2.3.1
 
 - La suite sube a la versión 1.11.1 (patch): desde la 1.11.0 solo cambió el fixture espejo de la skill (hasta la 2.3.1) y la documentación; el código es el mismo.
