@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-26 — ✅ Tarea 85 — Reestructurar el README
+
+- README raíz reestructurado: «Instalar la suite» con Requisitos (Node 20 o Bun y haber iniciado la skill en el proyecto), instalación recomendada global con bun add -g / npm install -g agent-context-suite@latest (actualizar con el mismo comando) y alternativa npx/bunx con @latest, un comando por bloque; una sola sección «Herramientas» (board, task, check) debajo de la instalación, con descripción breve y comando copiable cada una.
+- Se quitaron «Cómo usar» (es de la skill), la frase de filosofía (pasó a docs/README.md), «Estado», «Estructura del repositorio» y las secciones repetidas, y ya no hay menciones de docs/ en el README raíz. @latest se mantiene en npx/bunx: bunx reutiliza una versión vieja en caché sin él. bun test 1072 pass, check limpio. Commits 8496930, fd5c5c2, c32fb78 y f8f079f (kit).
+
 ## 2026-10-26 — ✅ Tarea 83 — Reevaluar la dependencia de la skill respecto de la suite
 
 - Decisión: se mantienen dos repos (la suite no depende de la skill en runtime; solo la usan en desarrollo los tests de scripts/skill-checks). La guía para colaborar pasa a CONTRIBUTING.md (PRs e Issues, requisitos, pruebas, clon de la skill, commits sin T-N) y el README del usuario ya no habla de clonar la skill: termina con una sección «Colaborar» con enlace absoluto.
