@@ -74,8 +74,19 @@ describe("renderTeam", () => {
 
   test("avisos y pie con las teclas del selector", () => {
     expect(out).toContain("! [mia] handoff.md no existe (¿se está reescribiendo?).");
-    expect(renderTeam(team, { ...meta, controls: "keys", multiView: "team" })).toContain("[↑/↓] elegir - [Enter] abrir - [p] proyectos - [c] compactar - [r] redibujar - [Ctrl+C o q] salir");
+    expect(renderTeam(team, { ...meta, controls: "keys", multiView: "team" })).toContain("[↑/↓] elegir - [Enter] abrir - [p] proyectos - [r] redibujar - [Ctrl+C o q] salir");
     expect(renderTeam(team, { ...meta, controls: "none" })).not.toContain("↑/↓");
+  });
+
+  test("el pie de equipo no anuncia compactar/expandir ni volver a proyectos, tampoco con compact activo", () => {
+    for (const compact of [false, true]) {
+      const out = renderTeam(team, { ...meta, controls: "keys", multiView: "team", compact, backToProjects: true });
+      expect(out).not.toContain("[c]");
+      expect(out).not.toContain("compactar");
+      expect(out).not.toContain("expandir");
+      expect(out).not.toContain("volver a proyectos");
+      expect(out).toContain("[p] proyectos");
+    }
   });
 
   test("sin team-backlog.md no hay recuadro; sin operadores lo dice", () => {

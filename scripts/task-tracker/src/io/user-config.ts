@@ -3,13 +3,15 @@
 // `{ "version": 1, "projects": ["<ruta absoluta de la raíz del repo>", ...] }`, en orden de alta y
 // sin duplicados. Nada de acá lanza: los errores de disco vuelven como mensaje o como aviso.
 
-import { copyFileSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 import { invocationDir } from "./paths.ts";
 
 const PROJECTS_FILE = "projects.json";
 const FORMAT_VERSION = 1;
+/** Se agrega al aviso de un archivo corrupto: qué pasa con él al guardar un repo (ver `saveProject`). */
+const BACKUP_NOTE = "; al guardar un repo se respaldará en projects.json.<AAAAMMDD-HHMMSS>.bak";
 
 /** Carpeta de config del usuario: `ACSUITE_HOME` si está definida, si no `~/.acsuite`. */
 export function configDir(): string {
@@ -24,9 +26,13 @@ export function samePath(a: string, b: string): boolean {
   return process.platform === "win32" ? x.toLowerCase() === y.toLowerCase() : x === y;
 }
 
-/** Lo leído de `projects.json`: ausente, bueno, con contenido que no sirve, o que no se pudo leer. */
+/**
+ * Lo leído de `projects.json`: ausente, bueno, con contenido que no sirve, o que no se pudo leer.
+ * Un archivo bueno puede traer un aviso: las entradas que no eran una ruta se ignoraron.
+ */
 type Saved =
-  | { state: "missing" | "ok"; paths: string[]; warning: null }
+  | { state: "missing"; paths: []; warning: null }
+  | { state: "ok"; paths: string[]; warning: string | null }
   | { state: "corrupt" | "unreadable"; paths: []; warning: string };
 
 function readSaved(file: string): Saved {
@@ -43,33 +49,54 @@ function readSaved(file: string): Saved {
   try {
     data = JSON.parse(text);
   } catch {
-    return { state: "corrupt", paths: [], warning: `${file} no es un JSON válido. Se ignora.` };
+    return { state: "corrupt", paths: [], warning: `${file} no es un JSON válido. Se ignora${BACKUP_NOTE}.` };
   }
   const projects = (data as { version?: unknown; projects?: unknown } | null)?.projects;
-  const valid =
-    (data as { version?: unknown } | null)?.version === FORMAT_VERSION &&
-    Array.isArray(projects) &&
-    projects.every((entry) => typeof entry === "string" && entry !== "");
-  if (!valid) {
+  // Solo esto invalida el archivo entero; una entrada mala se filtra (ver abajo).
+  if ((data as { version?: unknown } | null)?.version !== FORMAT_VERSION || !Array.isArray(projects)) {
     return {
       state: "corrupt",
       paths: [],
-      warning: `${file} no tiene la forma esperada ({ "version": ${FORMAT_VERSION}, "projects": [rutas] }). Se ignora.`,
+      warning: `${file} no tiene la forma esperada ({ "version": ${FORMAT_VERSION}, "projects": [rutas] }). Se ignora${BACKUP_NOTE}.`,
     };
   }
 
   const paths: string[] = [];
-  for (const entry of projects as string[]) {
-    // Una ruta escrita a mano (`D:/a/b/`) se lee en su forma normal (`D:`).
+  let ignored = 0;
+  for (const entry of projects) {
+    if (typeof entry !== "string" || entry === "") {
+      ignored++;
+      continue;
+    }
+    // Una ruta escrita a mano (`D:/a/b/`) se lee en su forma normal.
     const normal = resolve(entry);
     if (!paths.some((p) => samePath(p, normal))) paths.push(normal);
   }
-  return { state: "ok", paths, warning: null };
+  const warning = ignored
+    ? `${file}: ${ignored === 1 ? "se ignoró 1 entrada que no es" : `se ignoraron ${ignored} entradas que no son`} una ruta.`
+    : null;
+  return { state: "ok", paths, warning };
+}
+
+/** Marca de tiempo local para el nombre del respaldo: `AAAAMMDD-HHMMSS`. */
+function stamp(date: Date): string {
+  const two = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}${two(date.getMonth() + 1)}${two(date.getDate())}-${two(date.getHours())}${two(date.getMinutes())}${two(date.getSeconds())}`;
+}
+
+/** Nombre libre para el respaldo de `file`: con sello de tiempo y, si ya existe, un número, para no pisar uno anterior. */
+function backupPath(file: string): string {
+  const base = `${file}.${stamp(new Date())}`;
+  let candidate = `${base}.bak`;
+  for (let n = 2; existsSync(candidate); n++) candidate = `${base}-${n}.bak`;
+  return candidate;
 }
 
 /**
  * Los repos guardados, en orden de alta. Sin archivo, lista vacía y sin aviso; con el archivo
- * corrupto o ilegible, lista vacía y un aviso que dice cuál archivo se ignora.
+ * corrupto (JSON ilegible, otra `version` o `projects` que no es una lista) o ilegible, lista vacía
+ * y un aviso que dice cuál archivo se ignora. Las entradas de `projects` que no son una ruta se
+ * filtran y el aviso dice cuántas fueron; las buenas se conservan.
  */
 export function loadSavedProjects(): { paths: string[]; warning: string | null } {
   try {
@@ -83,8 +110,9 @@ export function loadSavedProjects(): { paths: string[]; warning: string | null }
 /**
  * Agrega la raíz de un repo a la lista guardada (al final; si ya figura, no toca el archivo).
  * Crea la carpeta de config si falta y escribe de forma atómica (archivo temporal + renombrar).
- * Si el archivo existente estaba corrupto, antes lo copia a `projects.json.bak`.
- * Devuelve el mensaje del error, o `null` si quedó guardado.
+ * Si el archivo existente estaba corrupto, antes lo copia a `projects.json.<AAAAMMDD-HHMMSS>.bak`
+ * (el aviso de `loadSavedProjects` ya lo anuncia). Las entradas inválidas de un archivo bueno no
+ * se conservan al reescribirlo. Devuelve el mensaje del error, o `null` si quedó guardado.
  */
 export function saveProject(path: string): string | null {
   let dir: string;
@@ -102,7 +130,7 @@ export function saveProject(path: string): string | null {
     if (saved.paths.some((p) => samePath(p, path))) return null;
 
     mkdirSync(dir, { recursive: true });
-    if (saved.state === "corrupt") copyFileSync(file, `${file}.bak`);
+    if (saved.state === "corrupt") copyFileSync(file, backupPath(file));
     writeFileSync(temp, `${JSON.stringify({ version: FORMAT_VERSION, projects: [...saved.paths, resolve(path)] }, null, 2)}\n`);
     renameSync(temp, file);
     return null;

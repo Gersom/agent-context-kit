@@ -308,7 +308,15 @@ export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, war
     const label = "Ruta del repo: ";
     const room = Math.max(1, width - BOX_PADDING - 2 - label.length - 1);
     const chars = Array.from(text);
-    return `${label}${chars.length > room ? `…${chars.slice(-(room - 1)).join("")}` : text}█`;
+    return `${label}${chars.length > room ? `…${chars.slice(Math.max(0, chars.length - (room - 1))).join("")}` : text}█`;
+  };
+  // La confirmación de quitar lleva el nombre y la ruta; si no cabe, la ruta se corta por el principio.
+  const confirmLine = ({ name, path }: { name: string; path: string }): string => {
+    const head = `¿Quitar ${name} (`;
+    const tail = ") de la lista? [Enter] sí · [Esc] no";
+    const room = Math.max(1, width - BOX_PADDING - 2 - visibleLength(head + tail));
+    const chars = Array.from(path);
+    return `${head}${chars.length > room ? `…${chars.slice(Math.max(0, chars.length - (room - 1))).join("")}` : path}${tail}`;
   };
 
   box(`PROYECTOS (${rows.length})`, "docs/agents", pc.green, (row) => {
@@ -360,10 +368,10 @@ export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, war
       );
     }
     if (meta.input != null) row(0, { text: inputLine(meta.input) });
-    if (meta.confirmRemove != null) row(0, { paint: pc.yellow, text: `¿Quitar ${meta.confirmRemove} de la lista? [Enter] sí · [Esc] no` });
+    if (meta.confirmRemove != null) row(0, { paint: pc.yellow, text: confirmLine(meta.confirmRemove) });
   });
 
-  return finishCanvas(canvas, meta, { warnings });
+  return finishCanvas(canvas, { ...meta, hasRows: rows.length > 0 }, { warnings });
 }
 
 /**
@@ -430,16 +438,17 @@ function footerLines(meta: CanvasMeta, width: number): string[] {
     // Agregando o confirmando una salida de la lista, solo valen las teclas de ese paso.
     if (meta.input != null) parts.push("[Enter] agregar", "[Esc] cancelar", "[Ctrl+C] salir");
     else if (meta.confirmRemove != null) parts.push("[Enter] quitar", "[Esc] cancelar", "[Ctrl+C] salir");
-    else parts.push("[↑/↓] elegir", "[Enter] abrir", "[a] agregar repo", "[x] quitar", "[r] releer", "[Ctrl+C o q] salir");
+    else parts.push("[↑/↓] elegir", "[Enter] abrir", "[a] agregar repo", ...(meta.hasRows ? ["[x] quitar"] : []), "[r] releer", "[Ctrl+C o q] salir");
   } else {
     if (meta.multiView === "team") parts.push("[↑/↓] elegir", "[Enter] abrir");
     if (meta.multiView === "operator") parts.push("[Esc o b] volver al equipo");
-    // Desde la raíz de un repo abierto desde la lista (panel plano o vista de equipo), `b`/Esc vuelven a ella.
-    else if (meta.backToProjects) parts.push("[Esc o b] volver a proyectos");
+    // Desde la raíz de un repo abierto desde la lista, `b`/Esc también vuelven a ella, pero el pie solo ofrece `[p]`.
     parts.push("[p] proyectos");
-    parts.push(meta.compact ? "[c] expandir" : "[c] compactar");
-    // La vista de equipo no tiene flechas de flujo.
-    if (meta.multiView !== "team") parts.push(meta.arrows === false ? "[f] mostrar flechas" : "[f] ocultar flechas");
+    // La vista de equipo no ofrece compactar (el atajo existe y compacta SIN DUEÑO, pero no se anuncia) ni tiene flechas de flujo.
+    if (meta.multiView !== "team") {
+      parts.push(meta.compact ? "[c] expandir" : "[c] compactar");
+      parts.push(meta.arrows === false ? "[f] mostrar flechas" : "[f] ocultar flechas");
+    }
     parts.push("[r] redibujar", "[Ctrl+C o q] salir");
   }
 

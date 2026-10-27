@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import type { ProjectRow, ProjectsRenderMeta } from "../../src/shared/types.ts";
-import { render, renderProjects } from "../../src/ui/render.ts";
+import { render, renderProjects, renderTeam } from "../../src/ui/render.ts";
 import { buildModel } from "../../src/model/model.ts";
 import { fixture } from "../../../_shared/test/helpers.ts";
 
@@ -82,10 +82,10 @@ describe("renderProjects", () => {
     expect(renderProjects([], { ...meta, input: "x" })).toContain("Ruta del repo: x█");
   });
 
-  test("confirmando quitar: la línea con el nombre dentro del recuadro y el pie de la confirmación", () => {
+  test("confirmando quitar: la línea con el nombre y la ruta dentro del recuadro y el pie de la confirmación", () => {
     const keys = { ...meta, controls: "keys" as const, multiView: "projects" as const };
-    const out = renderProjects(rows, { ...keys, confirmRemove: "demo-app" });
-    expect(out.split("\n").find((l) => l.includes("¿Quitar"))).toMatch(/^│ ¿Quitar demo-app de la lista\? \[Enter\] sí · \[Esc\] no +│$/);
+    const out = renderProjects(rows, { ...keys, confirmRemove: { name: "demo-app", path: "/repos/demo-app" } });
+    expect(out.split("\n").find((l) => l.includes("¿Quitar"))).toMatch(/^│ ¿Quitar demo-app \(\/repos\/demo-app\) de la lista\? \[Enter\] sí · \[Esc\] no +│$/);
     expect(out).toContain("[Enter] quitar - [Esc] cancelar - [Ctrl+C] salir");
     expect(out).not.toContain("[x] quitar");
     expect(out).not.toContain("[a] agregar repo");
@@ -102,12 +102,34 @@ describe("renderProjects", () => {
     expect(renderProjects(rows, { ...meta, controls: "none" })).not.toContain("[x]");
   });
 
+  test("[x] quitar solo aparece en el pie cuando hay filas", () => {
+    const keys = { ...meta, controls: "keys" as const, multiView: "projects" as const };
+    const empty = renderProjects([], keys);
+    expect(empty).not.toContain("[x]");
+    expect(empty).toContain("[↑/↓] elegir - [Enter] abrir - [a] agregar repo - [r] releer - [Ctrl+C o q] salir");
+    expect(renderProjects(rows.slice(0, 1), keys)).toContain("[a] agregar repo - [x] quitar - [r] releer");
+  });
+
   test("la línea de confirmación cabe en el ancho, también con ancho chico y un nombre largo", () => {
+    const confirmRemove = { name: "un-nombre-de-proyecto-muy-largo-que-no-entra", path: "/repos/un-nombre-de-proyecto-muy-largo-que-no-entra" };
     for (const width of [100, 60, 40]) {
-      for (const line of renderProjects(rows, { ...meta, width, confirmRemove: "un-nombre-de-proyecto-muy-largo-que-no-entra" }).split("\n")) {
+      for (const line of renderProjects(rows, { ...meta, width, confirmRemove }).split("\n")) {
         expect([...line].length).toBeLessThanOrEqual(width);
       }
     }
+  });
+
+  test("una ruta que no cabe en la confirmación se corta por el principio y deja entero el resto de la línea", () => {
+    const path = `/repos/${"carpeta/".repeat(20)}final`;
+    for (const width of [100, 80]) {
+      const line = renderProjects(rows, { ...meta, width, confirmRemove: { name: "demo-app", path } }).split("\n").find((l) => l.includes("¿Quitar"))!;
+      expect(line).toMatch(/^│ ¿Quitar demo-app \(….*final\) de la lista\? \[Enter\] sí · \[Esc\] no +│$/);
+      expect([...line].length).toBeLessThanOrEqual(width);
+      expect(line).not.toContain("/repos/carpeta");
+    }
+    // Si cabe, va entera y sin «…».
+    const short = renderProjects(rows, { ...meta, confirmRemove: { name: "demo-app", path: "/repos/demo-app" } });
+    expect(short).not.toContain("(…");
   });
 
   test("una ruta más larga que el ancho se muestra por el final, con el cursor", () => {
@@ -154,9 +176,21 @@ describe("pie de un repo abierto desde la lista", () => {
   });
   const repo = { projectName: "demo-app", projectDir: "/repos/demo-app", updatedAt: meta.updatedAt, trigger: meta.trigger, color: false, width: 120, controls: "keys" as const };
 
-  test("el panel plano indica cómo volver a la lista; sin ella, no", () => {
-    expect(render(model, { ...repo, backToProjects: true })).toContain("[Esc o b] volver a proyectos - [p] proyectos - [c] compactar");
+  test("el panel plano ofrece solo [p] proyectos, también abierto desde la lista (`b`/Esc siguen funcionando, pero no se anuncian)", () => {
+    expect(render(model, { ...repo, backToProjects: true })).toContain("[p] proyectos - [c] compactar");
+    expect(render(model, { ...repo, backToProjects: true })).not.toContain("volver a proyectos");
+    expect(render(model, { ...repo, backToProjects: true })).not.toContain("[Esc o b]");
     expect(render(model, repo)).not.toContain("volver a proyectos");
+  });
+
+  test("la vista de equipo abierta desde la lista: solo [p] proyectos, sin volver a proyectos ni [c]", () => {
+    const team = { rows: [], teamBacklog: { present: false as const, free: [], blocked: [], warnings: [] }, warnings: [] };
+    const out = renderTeam(team, { ...repo, backToProjects: true, multiView: "team", selected: null, preferred: null });
+    expect(out).toContain("[↑/↓] elegir - [Enter] abrir - [p] proyectos - [r] redibujar - [Ctrl+C o q] salir");
+    expect(out).not.toContain("volver a proyectos");
+    expect(out).not.toContain("[Esc o b]");
+    expect(out).not.toContain("[c]");
+    expect(out).not.toContain("[f]");
   });
 
   test("todas las vistas de un repo ofrecen [p] proyectos; la lista no", () => {

@@ -1,7 +1,7 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import { createProjectList, defaultProjects, readProjectRows } from "../../src/io/projects.ts";
 import { removeProject } from "../../src/io/user-config.ts";
@@ -273,5 +273,49 @@ describe("createProjectList", () => {
     expect(missing.ok ? "" : missing.error).toContain("No existe la carpeta");
     expect(projects.add(noDocs)).toMatchObject({ ok: false });
     expect(projects.list()).toEqual([]);
+  });
+
+  test("un ~ inicial (con / o con barra invertida) se expande al home antes de resolver", () => {
+    const back = String.fromCharCode(92);
+    const name = "acsuite-test-no-existe";
+    const target = join(homedir(), name);
+    for (const input of [`~/${name}`, `~${back}${name}`]) {
+      expect(createProjectList(() => []).add(input)).toEqual({ ok: false, error: `No existe la carpeta: ${target}` });
+    }
+    // La prueba no crea nada en el home: la carpeta tiene que seguir sin existir.
+    expect(existsSync(target)).toBe(false);
+  });
+
+  test("una ruta que es un archivo: «es un archivo, no una carpeta» y no se guarda", () => {
+    const file = join(root, "un-archivo.txt");
+    writeFileSync(file, "hola");
+    const saved: string[] = [];
+    const projects = createProjectList(() => [], { save: (path) => (saved.push(path), null) });
+    expect(projects.add(file)).toEqual({ ok: false, error: `${file} es un archivo, no una carpeta.` });
+    expect(projects.add(`"${file}"`)).toEqual({ ok: false, error: `${file} es un archivo, no una carpeta.` });
+    expect(saved).toEqual([]);
+    expect(projects.list()).toEqual([]);
+  });
+
+  test("git falla por otra causa que «no es un repo» y no hay docs: el error suma la nota de confianza", () => {
+    if (!hasGit) return;
+    // Un `.git` que no es un repo válido: git responde «invalid gitfile format», no «not a git repository».
+    const broken = join(root, "git-roto");
+    mkdirSync(broken, { recursive: true });
+    writeFileSync(join(broken, ".git"), "esto no es un gitfile");
+    const result = createProjectList(() => []).add(broken);
+    expect(result.ok).toBe(false);
+    const error = result.ok ? "" : result.error;
+    expect(error).toContain("No se encontró handoff.md en ninguna de estas carpetas");
+    expect(error).toEndWith(". Si es un repo de otro usuario, git puede no confiar en la carpeta.");
+  });
+
+  test("sin la nota cuando git dice que no es un repo o cuando la carpeta no existe", () => {
+    const note = "git puede no confiar";
+    const projects = createProjectList(() => []);
+    const plain = projects.add(noDocs);
+    expect(plain.ok ? "" : plain.error).not.toContain(note);
+    const missing = projects.add(join(root, "no-existe"));
+    expect(missing.ok ? "" : missing.error).not.toContain(note);
   });
 });

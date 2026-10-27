@@ -2,6 +2,7 @@
 // operador, y el nombre del proyecto para el encabezado.
 
 import { existsSync, statSync } from "node:fs";
+import { homedir } from "node:os";
 import { basename, dirname, isAbsolute, join, resolve } from "node:path";
 import type { MultiInfo, ResolveResult } from "../shared/types.ts";
 import { isMultiDir, OPERATORS_FILE, operatorFolders, resolveOperator } from "./operator.ts";
@@ -29,6 +30,16 @@ export function cleanPathInput(raw: string): string {
   let value = raw.trim();
   while (value.length >= 2 && /^(["']).*\1$/.test(value)) value = value.slice(1, -1).trim();
   return value;
+}
+
+/**
+ * Expande un `~` inicial (`~`, `~/x` o `~\x`) al home del usuario, como lo hace un shell. Cualquier
+ * otra ruta (incluido `~usuario` o un `~` en medio) queda tal cual.
+ */
+export function expandHome(input: string): string {
+  if (input === "~") return homedir();
+  if (input.startsWith("~/") || input.startsWith("~\\")) return join(homedir(), input.slice(2));
+  return input;
 }
 
 function isDir(path: string): boolean {

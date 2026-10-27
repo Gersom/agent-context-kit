@@ -1,8 +1,8 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
-import { cleanPathInput, invocationDir, projectDirFor, projectNameFor, resolveAgentsDir } from "../../src/io/paths.ts";
+import { cleanPathInput, expandHome, invocationDir, projectDirFor, projectNameFor, resolveAgentsDir } from "../../src/io/paths.ts";
 import type { ResolveError, ResolveOk, ResolveResult } from "../../src/shared/types.ts";
 
 /** Afirma que la ruta se resolvió bien y lo deja tipado como tal. */
@@ -118,6 +118,15 @@ describe("resolveAgentsDir en modo multi-operador", () => {
 describe("helpers de rutas", () => {
   test("cleanPathInput quita comillas y espacios", () => {
     expect(cleanPathInput(`  '"D:\\a b"'  `)).toBe("D:\\a b");
+  });
+
+  test("expandHome: un ~ inicial (solo o con barra)es el home (también con barra invertida); lo demás queda igual", () => {
+    const back = String.fromCharCode(92);
+    expect(expandHome("~")).toBe(homedir());
+    expect(expandHome("~/")).toBe(homedir());
+    expect(expandHome("~/work/app")).toBe(join(homedir(), "work", "app"));
+    expect(expandHome(`~${back}work${back}app`)).toBe(join(homedir(), "work", "app"));
+    for (const same of ["~usuario/x", "/a/~/b", "a~", "~x", "", "/abs/ruta"]) expect(expandHome(same)).toBe(same);
   });
 
   test("projectNameFor usa la carpeta que contiene docs/agents", () => {

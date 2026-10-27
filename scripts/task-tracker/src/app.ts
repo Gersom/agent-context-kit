@@ -155,8 +155,8 @@ export function startApp({
     if (!target) {
       // La lista no se relee al redibujar (cambio de tamaño): solo con `r` o al abrir la vista.
       projectsNav = reconcileProjects(projectsNav, projectRows.map((row) => row.path));
-      const confirmName = confirmRemove ? (projectRows.find((row) => row.path === confirmRemove)?.name ?? confirmRemove) : null;
-      screen = renderProjects(projectRows, { ...common, selected: projectsNav.selected, multiView: "projects", input: adding, confirmRemove: confirmName }, projectsNotices);
+      const confirm = confirmRemove ? { name: projectRows.find((row) => row.path === confirmRemove)?.name ?? confirmRemove, path: confirmRemove } : null;
+      screen = renderProjects(projectRows, { ...common, selected: projectsNav.selected, multiView: "projects", input: adding, confirmRemove: confirm }, projectsNotices);
       return write(screen);
     }
 

@@ -3,11 +3,13 @@
 // ve el operador de ese repo —el del correo de su `git config user.email`—, no el de quien lanzó
 // el comando. La lectura es puntual (al abrir la vista y con `r`): no hay watchers por repo.
 
+import { spawnSync } from "node:child_process";
+import { statSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { gitToplevel } from "../../../_shared/git.ts";
 import { buildModel } from "../model/model.ts";
 import type { ProjectRow } from "../shared/types.ts";
-import { cleanPathInput, invocationDir, resolveAgentsDir } from "./paths.ts";
+import { cleanPathInput, expandHome, invocationDir, resolveAgentsDir } from "./paths.ts";
 import { createSnapshotReader } from "./snapshot.ts";
 import { loadSavedProjects, samePath } from "./user-config.ts";
 
@@ -25,14 +27,42 @@ export const defaultProjects: ProjectsProvider = Object.assign(() => loadSavedPr
   warning: () => loadSavedProjects().warning,
 });
 
+/** Qué hay en `path`: una carpeta, un archivo u otra cosa (o nada). */
+function kindOf(path: string): "dir" | "file" | null {
+  try {
+    const stat = statSync(path);
+    return stat.isDirectory() ? "dir" : stat.isFile() ? "file" : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * `true` si git corrió en `dir` y falló por una causa distinta de «no es un repo» (ej. no confía en
+ * el dueño de la carpeta). El mensaje se pide en inglés (`LC_ALL=C`) para poder reconocerlo.
+ */
+function gitFailedForOtherReason(dir: string): boolean {
+  try {
+    const out = spawnSync("git", ["-C", dir, "rev-parse", "--show-toplevel"], {
+      encoding: "utf8",
+      timeout: 5000,
+      env: { ...process.env, LC_ALL: "C" },
+    });
+    return out.error == null && out.status != null && out.status !== 0 && !/not a git repository/i.test(out.stderr);
+  } catch {
+    return false;
+  }
+}
+
 export type AddResult = { ok: true; path: string; added: boolean; warning?: string } | { ok: false; error: string };
 
 /** La lista que ve la vista de proyectos: la del proveedor más los repos agregados en esta sesión. */
 export interface ProjectList {
   list(): string[];
   /**
-   * Agrega la carpeta `input` (la raíz de un repo o cualquier subcarpeta suya): se sube a la raíz
-   * del repo y ahí se exige la documentación de la skill. Una ruta que ya figura no se duplica
+   * Agrega la carpeta `input` (la raíz de un repo o cualquier subcarpeta suya; un `~` inicial es el
+   * home del usuario): se sube a la raíz del repo y ahí se exige la documentación de la skill. Una
+   * ruta que es un archivo se rechaza. Una ruta que ya figura no se duplica
    * (`added: false`). Si se pidió guardarla (`save`) y no se pudo, el resultado lleva `warning`:
    * el repo queda en la lista de esta sesión igual.
    */
@@ -63,9 +93,16 @@ export function createProjectList(
     add(input) {
       const cleaned = cleanPathInput(input);
       if (!cleaned) return { ok: false, error: "Escribe la ruta de la carpeta del repo." };
-      const root = gitToplevel(resolve(invocationDir(), cleaned));
+      const target = resolve(invocationDir(), expandHome(cleaned));
+      if (kindOf(target) === "file") return { ok: false, error: `${target} es un archivo, no una carpeta.` };
+      const root = gitToplevel(target);
       const resolved = resolveAgentsDir(root);
-      if (!resolved.ok) return { ok: false, error: resolved.error.replace(/:$/, "") };
+      if (!resolved.ok) {
+        const error = resolved.error.replace(/:$/, "");
+        // Sin docs y con git fallando por otra causa que «no es un repo», la raíz pudo no encontrarse por eso.
+        const note = kindOf(target) === "dir" && gitFailedForOtherReason(target) ? ". Si es un repo de otro usuario, git puede no confiar en la carpeta." : "";
+        return { ok: false, error: error + note };
+      }
       const known = list().find((p) => samePath(p, root));
       if (known) return { ok: true, path: known, added: false };
       for (let i = removed.length - 1; i >= 0; i--) if (samePath(removed[i], root)) removed.splice(i, 1);

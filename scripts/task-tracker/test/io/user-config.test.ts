@@ -24,6 +24,9 @@ beforeEach(() => {
   process.env.ACSUITE_HOME = home;
 });
 
+/** Los respaldos de `projects.json` que hay en la carpeta de config del test. */
+const backups = () => readdirSync(home).filter((name) => name.endsWith(".bak"));
+
 afterEach(() => {
   if (savedHome === undefined) delete process.env.ACSUITE_HOME;
   else process.env.ACSUITE_HOME = savedHome;
@@ -60,14 +63,50 @@ describe("loadSavedProjects", () => {
     expect(warning).toContain("Se ignora");
   });
 
-  test("forma inválida (sin lista, versión desconocida o entradas que no son texto): lista vacía y aviso", () => {
-    for (const data of [[], null, { version: 1 }, { version: 2, projects: [] }, { version: 1, projects: ["/a", 3] }, { projects: ["/a"] }]) {
+  test("forma inválida (sin lista, projects que no es lista o versión desconocida): lista vacía y aviso", () => {
+    for (const data of [[], null, { version: 1 }, { version: 1, projects: "/a" }, { version: 2, projects: [] }, { version: 2, projects: [A] }, { projects: [A] }]) {
       writeFileSync(file, JSON.stringify(data));
       const { paths, warning } = loadSavedProjects();
       expect(paths).toEqual([]);
       expect(warning).toContain(file);
       expect(warning).toContain("Se ignora");
     }
+  });
+
+  test("el aviso de un archivo corrupto anuncia el respaldo con sello al guardar", () => {
+    writeFileSync(file, "{ esto no es json");
+    expect(loadSavedProjects().warning).toContain("projects.json.<AAAAMMDD-HHMMSS>.bak");
+    writeFileSync(file, JSON.stringify({ version: 2, projects: [] }));
+    expect(loadSavedProjects().warning).toContain("projects.json.<AAAAMMDD-HHMMSS>.bak");
+  });
+
+  test("entradas que no son una ruta (no texto o vacías): se filtran, se conservan las buenas y el aviso dice cuántas", () => {
+    writeFileSync(file, JSON.stringify({ version: 1, projects: [B, 3, "", A, null, { path: C }] }));
+    const { paths, warning } = loadSavedProjects();
+    expect(paths).toEqual([B, A]);
+    expect(warning).toContain(file);
+    expect(warning).toContain("se ignoraron 4 entradas");
+    expect(warning).not.toContain("Se ignora.");
+  });
+
+  test("una sola entrada inválida: el aviso va en singular", () => {
+    writeFileSync(file, JSON.stringify({ version: 1, projects: [A, 3] }));
+    const { paths, warning } = loadSavedProjects();
+    expect(paths).toEqual([A]);
+    expect(warning).toContain("se ignoró 1 entrada que no es una ruta");
+  });
+
+  test("solo entradas inválidas: lista vacía, aviso de las ignoradas y sin tratar el archivo como corrupto", () => {
+    writeFileSync(file, JSON.stringify({ version: 1, projects: [3, ""] }));
+    const { paths, warning } = loadSavedProjects();
+    expect(paths).toEqual([]);
+    expect(warning).toContain("se ignoraron 2 entradas");
+    expect(warning).not.toContain(".bak");
+  });
+
+  test("duplicados no cuentan como ignorados", () => {
+    writeFileSync(file, JSON.stringify({ version: 1, projects: [A, A] }));
+    expect(loadSavedProjects()).toEqual({ paths: [A], warning: null });
   });
 
   test("el archivo es una carpeta (no se puede leer): lista vacía y aviso, sin lanzar", () => {
@@ -104,17 +143,45 @@ describe("saveProject", () => {
     expect(readdirSync(home)).toEqual(["projects.json"]);
   });
 
-  test("archivo corrupto: lo copia a projects.json.bak antes de escribir uno nuevo", () => {
+  test("archivo corrupto: lo copia a projects.json.<AAAAMMDD-HHMMSS>.bak antes de escribir uno nuevo", () => {
     writeFileSync(file, "{ esto no es json");
     expect(saveProject(A)).toBeNull();
-    expect(readFileSync(`${file}.bak`, "utf8")).toBe("{ esto no es json");
+    expect(backups()).toHaveLength(1);
+    expect(backups()[0]).toMatch(/^projects\.json\.\d{8}-\d{6}\.bak$/);
+    expect(readFileSync(join(home, backups()[0]), "utf8")).toBe("{ esto no es json");
+    expect(existsSync(`${file}.bak`)).toBe(false);
     expect(loadSavedProjects()).toEqual({ paths: [A], warning: null });
   });
 
-  test("archivo bueno: no se crea .bak", () => {
+  test("un segundo archivo corrupto no pisa el respaldo anterior", () => {
+    writeFileSync(file, "primero");
+    expect(saveProject(A)).toBeNull();
+    writeFileSync(file, "segundo");
+    expect(saveProject(B)).toBeNull();
+    const found = backups();
+    expect(found).toHaveLength(2);
+    expect(found.map((name) => readFileSync(join(home, name), "utf8")).sort()).toEqual(["primero", "segundo"]);
+    expect(loadSavedProjects().paths).toEqual([B]);
+  });
+
+  test("también respalda un archivo con otra versión o sin lista de proyectos", () => {
+    writeFileSync(file, JSON.stringify({ version: 2, projects: [B] }));
+    expect(saveProject(A)).toBeNull();
+    expect(backups()).toHaveLength(1);
+    expect(JSON.parse(readFileSync(join(home, backups()[0]), "utf8"))).toEqual({ version: 2, projects: [B] });
+  });
+
+  test("archivo bueno: no se crea respaldo", () => {
     saveProject(A);
     saveProject(B);
-    expect(existsSync(`${file}.bak`)).toBe(false);
+    expect(backups()).toEqual([]);
+  });
+
+  test("archivo con entradas inválidas: no es corrupto, no se respalda y se reescribe con las buenas", () => {
+    writeFileSync(file, JSON.stringify({ version: 1, projects: [B, 3] }));
+    expect(saveProject(A)).toBeNull();
+    expect(backups()).toEqual([]);
+    expect(JSON.parse(readFileSync(file, "utf8"))).toEqual({ version: 1, projects: [B, A] });
   });
 
   test("error de escritura (ACSUITE_HOME es un archivo): devuelve el mensaje y no lanza", () => {
@@ -169,11 +236,17 @@ describe("removeProject", () => {
     expect(readdirSync(home)).toEqual(["projects.json"]);
   });
 
-  test("archivo corrupto: no figura nada que quitar, así que no se toca ni se crea .bak", () => {
+  test("archivo corrupto: no figura nada que quitar, así que no se toca ni se crea respaldo", () => {
     writeFileSync(file, "{ esto no es json");
     expect(removeProject(A)).toBeNull();
     expect(readFileSync(file, "utf8")).toBe("{ esto no es json");
-    expect(existsSync(`${file}.bak`)).toBe(false);
+    expect(backups()).toEqual([]);
+  });
+
+  test("archivo con entradas inválidas: quita la ruta y las buenas conservan su orden", () => {
+    writeFileSync(file, JSON.stringify({ version: 1, projects: [B, 3, A, C] }));
+    expect(removeProject(A)).toBeNull();
+    expect(JSON.parse(readFileSync(file, "utf8"))).toEqual({ version: 1, projects: [B, C] });
   });
 
   test("el archivo es una carpeta (no se puede leer): devuelve el mensaje, sin pisarlo", () => {
