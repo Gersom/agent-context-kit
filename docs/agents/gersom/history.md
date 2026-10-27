@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 92 — Skill 2.3.0: los flujos que escriben trabajan en una rama nueva y ofrecen el merge
+
+- Los flujos de la skill que escriben en el repo (generar, migrar y actualizar) ahora trabajan en una rama nueva (agent-context-generate, -migrate o -update-X) creada desde la rama de partida, no siguen sin ella (ni sin git, ni con HEAD desacoplado, ni con cambios previos en sus rutas) y, al terminar, hacen el commit con confirmación y preguntan si el agente hace el merge de vuelta (nunca push). Antes, un agente siguió sin rama porque el árbol estaba modificado y el flujo de actualizar terminaba sin ofrecer el merge.
+- El procedimiento vive en docs/working-branch.md de la skill y los tres flujos lo referencian; commits de la skill en inglés. Skill 2.3.0 (minor, comportamiento nuevo; changelog 2.3.md «Sin cambios que aplicar»), tag v2.3.0. En la suite: marcador de rules.md y fixture espejo sincronizados. Tres revisiones independientes (bloqueantes y mejoras corregidos); bun test 1130 pass, typecheck y check limpios. Commits ddff7a2, 29d5d81, 482fbd3, 3022b61 y 5a5c155 (skill) y 93784ed (kit).
+
 ## 2026-10-27 — ✅ Tarea 91 — Skill 2.2.2: la oferta de la suite explica su valor y no narra la instrucción
 
 - La oferta de la suite en la skill ahora explica su valor (acsuite board para que el operador vea las tareas en vivo; acsuite task para que el agente ahorre tokens y baje el riesgo de romper la estructura) y prohíbe narrar que la skill o la versión «piden» ofrecerla; antes un agente dijo «esta versión pide ofrecer una recomendación opcional» sin explicar el beneficio. Se redacta en primera persona y en el idioma de la conversación; los encabezados de update-flow y migration-flow ya no dicen «obligatoria».
