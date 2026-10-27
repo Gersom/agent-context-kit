@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 97 — Board: guardar los repos en los que se ejecuta
+
+- La lista de proyectos de acsuite board se guarda en projects.json dentro de ACSUITE_HOME (por defecto ~/.acsuite), con formato { version: 1, projects: [rutas] }, escritura atómica, sin duplicados y con rutas normalizadas (barras y barra final).
+- Ejecutar el board en un repo (también desde una subcarpeta) registra su raíz git, salvo con --once; la tecla a también guarda. Un archivo corrupto se ignora con aviso y se respalda en .bak antes de reescribirlo; los repos inexistentes quedan con aviso.
+- Commits en la suite: e97a184, c5d02a0.
+
 ## 2026-10-27 — ✅ Tarea 96 — Board: opción de agregar repo en el listado de projects
 
 - Tecla a en la lista de proyectos de acsuite board: abre una línea para escribir la ruta de una carpeta; Enter agrega y Esc cancela.

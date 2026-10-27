@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 99
+**Próximo número de tarea:** 100
 
 ---
 
@@ -48,13 +48,13 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 97 — Board: guardar los repos en los que se ejecuta
+### Tarea 99 — Board: eliminar proyectos inexistentes de la lista
 
-- **Descripción:** Que `acsuite board` guarde los repos en los que se ejecuta, para que aparezcan en el listado de projects.
-- **Decisiones/temas a definir antes de empezar:** Dónde se guarda (archivo de configuración del usuario o por repo) y si se registra solo al ejecutarse o también al agregar a mano.
-- **Bloqueos:** `[Resuelto el 2026-10-27]` — era `[dependencia]` Depende de la Tarea 96.
+- **Descripción:** En acsuite board, permitir quitar de la lista de proyectos (y del archivo guardado) los repos cuya carpeta ya no existe, que hoy quedan como fila con aviso.
+- **Decisiones/temas a definir antes de empezar:** Cómo se quita (tecla en la fila elegida, con confirmación) y si también se pueden quitar repos que sí existen; si se ofrece quitar todos los inexistentes de una vez.
+- **Bloqueos:** `[Resuelto el 2026-10-27]` — era `[dependencia]` Depende de la Tarea 97.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Relacionada con la tarea de agregar repo en el listado de projects: ambas comparten la lista guardada.
+- **Detalles:** La Tarea 97 guarda la lista en ~/.acsuite/projects.json y deja los repos inexistentes con aviso sin borrarlos; esta tarea agrega la forma de quitarlos.
 - **Agregada:** 2026-10-27.
 
 <!-- agent-context-skill:section=blocked -->
