@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 87
+**Próximo número de tarea:** 88
 
 ---
 
@@ -48,13 +48,13 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 86 — Que el agente sepa usar la suite cuando está instalada
+### Tarea 87 — Skill 2.0.8: la recomendación de la suite ofrece acsuite init
 
-- **Descripción:** Hoy, en un proyecto nuevo con la skill y la suite instalada de forma global, el agente no sabe que existe acsuite ni cómo usarlo: AGENTS.md, CLAUDE.md y rules.md no la nombran (solo hay una regla genérica sobre «una herramienta de tareas»). Diseñar cómo se entera: (C) una línea fija en la plantilla de AGENTS.md del tipo «si el comando acsuite existe, úsalo para gestionar tareas (acsuite task --help)», y/o (B) un comando de la suite (acsuite init) que escribe ese párrafo en el proyecto, y/o (A) que la skill detecte acsuite al generar y lo agregue a rules.md. Hecho: decisión tomada y aplicada; un agente en un proyecto nuevo con la suite instalada la usa para las tareas sin que el operador se lo diga.
-- **Decisiones/temas a definir antes de empezar:** Debatir con el operador: ¿qué opción (A, B, C o combinación)? ¿La línea va siempre en la plantilla de AGENTS.md o solo cuando el operador aceptó la suite? Recomendado: C (una línea fija que remite a acsuite task --help, sin duplicar instrucciones) y B después como mejora.
+- **Descripción:** Retocar docs/suite-recommendation.md de la skill (repo aparte, git -C): si el operador acepta la recomendación opcional de la suite, el agente le indica cómo instalarla (npm install -g agent-context-suite@latest o bun add -g agent-context-suite@latest) y, con su OK, ejecuta acsuite init --apply en el proyecto, que agrega a rules.md la sección que enseña al agente a usar acsuite task. Mantener que la recomendación se da una sola vez, solo al terminar los flujos de generar o migrar, sin insistir. Subir el patch a 2.0.8 (plugin.json, SKILL.md, marcador de la plantilla rules.md, changelog con «Sin cambios que aplicar» si no cambian plantillas), tag anotado v2.0.8 y release, y sincronizar el marcador de rules.md y los fixtures espejo en la suite. Hecho: la skill ofrece acsuite init, bun test de la suite pasa y la skill 2.0.8 está publicada.
+- **Decisiones/temas a definir antes de empezar:** Ninguno. Decidido: la skill no nombra la suite en las plantillas generadas; acsuite init escribe un bloque propio de la suite en rules.md.
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Cambiar las plantillas obliga a una skill nueva (2.0.8) con su entrada de changelog y a sincronizar fixtures y el marcador de rules.md en la suite. Relacionada con la T-80 (recomendación opcional de la suite, que solo informa al operador una vez y no deja nada escrito para el agente).
+- **Detalles:** Depende de la T-86 (acsuite init publicado en npm). Hacerla después de publicar esa versión para que lo que la skill recomienda exista.
 - **Agregada:** 2026-10-26.
 
 <!-- agent-context-skill:section=blocked -->
