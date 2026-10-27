@@ -21,6 +21,22 @@ Invocar la skill explícitamente, pidiéndoselo al agente (se llama igual que su
 - **"Usa la skill agent-context-skill"** — dispara la detección automática normal: si el repo ya tiene documentación de esta skill, sigue el flujo de proyecto existente; si no, evalúa si hay contenido de otro sistema para migrar, o dispara el scaffolding normal según el alcance de la tarea.
 - **"Usa la skill agent-context-skill y migra mi proyecto"** — misma detección, pero fuerza el chequeo de migración aunque la heurística de nombres de archivo no encuentre por sí sola suficientes coincidencias como para dispararse (ver "Intención explícita del operador" en `docs/migration-flow.md` del [repo de la skill](https://github.com/Gersom/agent-context-skill)).
 
+## Instalar la suite
+
+No hace falta clonar este repo. Requiere Node 20 o superior (o Bun):
+
+```sh
+npx agent-context-suite@latest board <ruta-del-proyecto>   # sin instalar nada
+bunx agent-context-suite@latest check <ruta-del-proyecto>  # lo mismo con Bun
+
+npm install -g agent-context-suite                         # o instalada, con el comando acsuite
+acsuite board <ruta-del-proyecto>
+```
+
+Para actualizarla: `npm install -g agent-context-suite@latest`. Con `npx` o `bunx`, `@latest` ya trae la versión más reciente.
+
+**Compatibilidad.** Probada en Windows 11 con Node 20, 22 y 24, y con Bun. En Linux y macOS debería funcionar igual (es Node estándar), pero no está comprobado: si encuentras algún problema, abre un [Issue](https://github.com/Gersom/agent-context-suite/issues).
+
 ## Clonar la skill
 
 La skill no está en este repo: vive en [Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill) y se clona dentro de la suite, en `skill/` (ya está en `.gitignore`):
@@ -33,7 +49,7 @@ Sin ese clon todo lo demás funciona, pero los tests de `scripts/skill-checks/` 
 
 ## Un solo comando: acsuite
 
-Las tres herramientas de abajo se invocan desde un único CLI, `acsuite <subcomando>` (`board`, `task` y `check`). Desde la raíz de este repo, `bun run acsuite <subcomando> ...` y los atajos `bun run board`, `bun run task` y `bun run check` son lo mismo:
+Las tres herramientas de abajo se invocan desde un único CLI, `acsuite <subcomando>` (`board`, `task` y `check`). Para desarrollar la suite, desde la raíz de este repo, `bun run acsuite <subcomando> ...` y los atajos `bun run board`, `bun run task` y `bun run check` son lo mismo:
 
 ```sh
 bun run acsuite            # lista los subcomandos
