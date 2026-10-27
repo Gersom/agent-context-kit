@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-26 — ✅ Tarea 83 — Reevaluar la dependencia de la skill respecto de la suite
+
+- Decisión: se mantienen dos repos (la suite no depende de la skill en runtime; solo la usan en desarrollo los tests de scripts/skill-checks). La guía para colaborar pasa a CONTRIBUTING.md (PRs e Issues, requisitos, pruebas, clon de la skill, commits sin T-N) y el README del usuario ya no habla de clonar la skill: termina con una sección «Colaborar» con enlace absoluto.
+- skill-dir.ts resuelve SKILL_DIR, agent-context-skill/ y skill/ (5 tests nuevos) y .gitignore ignora ambas carpetas; rules.md, architecture.md, docs/README.md y philosophy.md actualizados. bun test 1072 pass, typecheck y check limpios. El README llega a la página de npm con la próxima versión. Commits 31972bd y 09d2888 (kit).
+
 ## 2026-10-26 — ✅ Tarea 84 — Quitar la ruta del proyecto de los comandos (la ruta es donde se ejecuta el comando)
 
 - board y check usan por defecto el proyecto de la carpeta de invocación (se sube hasta la raíz de git, como task); la ruta sigue siendo opcional. board deja de usar prompt() (que no existe en Node: fallaba con «prompt is not defined») y gana --help; gitToplevel pasó a scripts/_shared/git.ts y ask-path.ts a resolve-error.ts.
