@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 91 — Skill 2.2.2: la oferta de la suite explica su valor y no narra la instrucción
+
+- La oferta de la suite en la skill ahora explica su valor (acsuite board para que el operador vea las tareas en vivo; acsuite task para que el agente ahorre tokens y baje el riesgo de romper la estructura) y prohíbe narrar que la skill o la versión «piden» ofrecerla; antes un agente dijo «esta versión pide ofrecer una recomendación opcional» sin explicar el beneficio. Se redacta en primera persona y en el idioma de la conversación; los encabezados de update-flow y migration-flow ya no dicen «obligatoria».
+- Skill 2.2.2 (patch, ajuste de redacción; changelog «Sin cambios que aplicar»), tag v2.2.2. En la suite: marcador de rules.md y fixture espejo sincronizados. Revisión independiente sin bloqueantes (mejoras aplicadas); bun test 1130 pass, typecheck y check limpios. Commits a242ccf, 0d28128 y f0e6a2f (skill) y cdda6e1 (kit).
+
 ## 2026-10-27 — ✅ Tarea 90 — Skill 2.2.1: mostrar la recomendación de la suite es obligatorio
 
 - En los flujos de la skill (generar, migrar y actualizar), ofrecer la recomendación de la suite ahora es obligatorio y solo aceptarla es opcional; antes decían «puede llevar» y un agente lo leyó como que mostrarla era opcional. Una actualización sin cambios aplicables también llega al Cierre y la ofrece, y se explicitan los caminos que no cuentan como terminar la actualización.
