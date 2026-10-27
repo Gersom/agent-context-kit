@@ -18,9 +18,10 @@ export function configDir(): string {
   return custom ? resolve(invocationDir(), custom) : join(homedir(), ".acsuite");
 }
 
-/** Dos rutas son la misma: sin distinguir mayúsculas en Windows. */
+/** Dos rutas son la misma: se unifican las barras (`/` o `\`) y la barra final, y en Windows no se distinguen mayúsculas. */
 export function samePath(a: string, b: string): boolean {
-  return process.platform === "win32" ? a.toLowerCase() === b.toLowerCase() : a === b;
+  const [x, y] = [resolve(a), resolve(b)];
+  return process.platform === "win32" ? x.toLowerCase() === y.toLowerCase() : x === y;
 }
 
 /** Lo leído de `projects.json`: ausente, bueno, con contenido que no sirve, o que no se pudo leer. */
@@ -58,7 +59,11 @@ function readSaved(file: string): Saved {
   }
 
   const paths: string[] = [];
-  for (const entry of projects as string[]) if (!paths.some((p) => samePath(p, entry))) paths.push(entry);
+  for (const entry of projects as string[]) {
+    // Una ruta escrita a mano (`D:/a/b/`) se lee en su forma normal (`D:`).
+    const normal = resolve(entry);
+    if (!paths.some((p) => samePath(p, normal))) paths.push(normal);
+  }
   return { state: "ok", paths, warning: null };
 }
 
@@ -98,7 +103,7 @@ export function saveProject(path: string): string | null {
 
     mkdirSync(dir, { recursive: true });
     if (saved.state === "corrupt") copyFileSync(file, `${file}.bak`);
-    writeFileSync(temp, `${JSON.stringify({ version: FORMAT_VERSION, projects: [...saved.paths, path] }, null, 2)}\n`);
+    writeFileSync(temp, `${JSON.stringify({ version: FORMAT_VERSION, projects: [...saved.paths, resolve(path)] }, null, 2)}\n`);
     renameSync(temp, file);
     return null;
   } catch (error) {
