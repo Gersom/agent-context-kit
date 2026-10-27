@@ -48,12 +48,13 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 96 — Board: opción de agregar repo en el listado de projects
+### Tarea 97 — Board: guardar los repos en los que se ejecuta
 
-- **Descripción:** En `acsuite board`, en la vista de listado de projects, agregar la opción de agregar un repo.
-- **Decisiones/temas a definir antes de empezar:** Cómo se ingresa el repo (ruta escrita, selector) y qué se valida (que exista, que tenga docs/agents).
-- **Bloqueos:** `[Resuelto el 2026-10-27]` — era `[dependencia]` Depende de la Tarea 95.
+- **Descripción:** Que `acsuite board` guarde los repos en los que se ejecuta, para que aparezcan en el listado de projects.
+- **Decisiones/temas a definir antes de empezar:** Dónde se guarda (archivo de configuración del usuario o por repo) y si se registra solo al ejecutarse o también al agregar a mano.
+- **Bloqueos:** `[Resuelto el 2026-10-27]` — era `[dependencia]` Depende de la Tarea 96.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Relacionada con la tarea de agregar repo en el listado de projects: ambas comparten la lista guardada.
 - **Agregada:** 2026-10-27.
 
 <!-- agent-context-skill:section=blocked -->
@@ -75,15 +76,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Bloqueos:** [postergada] Hay que debatirla al llegar a esta tarea, tras publicar la primera versión.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Agregada:** 2026-10-26.
-
-### Tarea 97 — Board: guardar los repos en los que se ejecuta
-
-- **Descripción:** Que `acsuite board` guarde los repos en los que se ejecuta, para que aparezcan en el listado de projects.
-- **Decisiones/temas a definir antes de empezar:** Dónde se guarda (archivo de configuración del usuario o por repo) y si se registra solo al ejecutarse o también al agregar a mano.
-- **Bloqueos:** `[dependencia]` Depende de la Tarea 96.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Relacionada con la tarea de agregar repo en el listado de projects: ambas comparten la lista guardada.
-- **Agregada:** 2026-10-27.
 
 <!-- agent-context-skill:section=grouped -->
 ## Tareas agrupadas

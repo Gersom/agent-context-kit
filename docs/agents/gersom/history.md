@@ -11,6 +11,13 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 96 — Board: opción de agregar repo en el listado de projects
+
+- Tecla a en la lista de proyectos de acsuite board: abre una línea para escribir la ruta de una carpeta; Enter agrega y Esc cancela.
+- Acepta la raíz del repo o cualquier subcarpeta (se sube a la raíz git y se exige la documentación de la skill); no duplica, muestra el error sin cerrar la entrada y deja el repo agregado seleccionado sin abrirlo.
+- La lista agregada vive solo en memoria (persistencia: Tarea 97).
+- Commit en la suite: 404f26e.
+
 ## 2026-10-27 — ✅ Tarea 95 — Board: tecla para ir a la vista de listado de projects (repositorios)
 
 - Tecla p en acsuite board: desde cualquier vista de un repo (panel plano, equipo, panel de operador) lleva a la lista de proyectos; en la lista no hace nada.
