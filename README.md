@@ -73,22 +73,12 @@ git clone https://github.com/Gersom/agent-context-skill skill
 
 Sin ese clon todo lo demás funciona, pero los tests de `scripts/skill-checks/` se saltan, y con ellos la comparación del snapshot de plantillas que usa `docs-check` (`scripts/docs-check/test/fixtures/template/`), así que ese snapshot no se valida. Los cambios en la skill se commitean allí (`git -C skill ...`), no en la suite. Si la clonas en otra carpeta, indícala con la variable de entorno `SKILL_DIR`.
 
-## Un solo comando: acsuite
-
-Las tres herramientas de abajo se invocan desde un único CLI, `acsuite <subcomando>` (`board`, `task` y `check`). Para desarrollar la suite, desde la raíz de este repo, `bun run acsuite <subcomando> ...` y los atajos `bun run board`, `bun run task` y `bun run check` son lo mismo:
-
-```sh
-bun run acsuite            # lista los subcomandos
-bun run acsuite board <ruta-del-proyecto>
-```
-
 ## Seguimiento de tareas en la terminal
 
 Este repo incluye una herramienta para ver, en una terminal aparte, el estado de las tareas de cualquier proyecto que use la skill (tarea en progreso, pausadas, pendientes y últimas completadas), redibujándose sola cuando cambian sus archivos:
 
 ```sh
-bun install
-bun run board <ruta-del-proyecto>
+acsuite board <ruta-del-proyecto>
 ```
 
 Uso, atajos y cómo lee los archivos: [`scripts/task-tracker/README.md`](./scripts/task-tracker/README.md).
@@ -98,8 +88,8 @@ Uso, atajos y cómo lee los archivos: [`scripts/task-tracker/README.md`](./scrip
 Una herramienta opcional para consultar y editar las tareas de un proyecto por comandos, sin tocar a mano `handoff.md`, `backlog.md` ni `history.md`; las escrituras exigen `--apply` (sin él muestra el diff):
 
 ```sh
-bun run task status
-bun run task <comando> --help
+acsuite task status
+acsuite task <comando> --help
 ```
 
 Comandos, flags y cómo escribe: [`scripts/task-manager/README.md`](./scripts/task-manager/README.md).
@@ -109,7 +99,7 @@ Comandos, flags y cómo escribe: [`scripts/task-manager/README.md`](./scripts/ta
 Un verificador de solo lectura que revisa si la documentación de agentes de otro repo sirve a la skill, al seguimiento y a la gestión de tareas, y lista errores y avisos con archivo y línea:
 
 ```sh
-bun run check <ruta-del-proyecto>
+acsuite check <ruta-del-proyecto>
 ```
 
 Uso y códigos de hallazgo: [`scripts/docs-check/README.md`](./scripts/docs-check/README.md).
