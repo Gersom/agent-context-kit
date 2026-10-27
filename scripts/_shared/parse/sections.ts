@@ -12,8 +12,8 @@ export const HANDOFF_SECTIONS: string[] = ["in-progress", "paused"];
 export const BACKLOG_SECTIONS: string[] = ["free", "blocked", "grouped"];
 
 export const ANCHOR_RE = new RegExp(`^\\s*<!--\\s*${ANCHOR_PREFIX_PATTERN}:section=([a-z-]+)\\s*-->\\s*$`);
-const H2_RE = /^##(?!#)\s+(.+?)\s*$/;
-const FENCE_RE = /^\s*(```|~~~)/;
+export const H2_RE = /^##(?!#)\s+(.+?)\s*$/;
+export const FENCE_RE = /^\s*(```|~~~)/;
 
 /**
  * Divide el documento en secciones `## `. Cada una se identifica por el ancla de la línea no

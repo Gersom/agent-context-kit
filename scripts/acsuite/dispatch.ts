@@ -5,6 +5,7 @@
 import { run as check } from "../docs-check/src/run.ts";
 import { run as task } from "../task-manager/src/cli/dispatch.ts";
 import { main as board } from "../task-tracker/src/main.ts";
+import { init } from "./init.ts";
 
 /** Una herramienta de la suite: recibe los argumentos que siguen al subcomando y devuelve el código de salida. */
 export type Runner = (argv: string[]) => number | Promise<number>;
@@ -20,6 +21,7 @@ export const SUBCOMMANDS: Record<string, { summary: string; run: Runner }> = {
   },
   task: { summary: "Gestión de tareas: edita handoff, backlog e history (task-manager)", run: task },
   check: { summary: "Verifica la documentación de agentes de un proyecto (docs-check)", run: check },
+  init: { summary: "Agrega a rules.md del proyecto la sección que enseña al agente a usar la suite", run: init },
 };
 
 export function helpText(): string {

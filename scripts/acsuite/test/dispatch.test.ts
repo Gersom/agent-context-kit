@@ -56,8 +56,8 @@ describe("dispatch", () => {
 });
 
 describe("SUBCOMMANDS", () => {
-  test("registra board, task y check, y la ayuda los lista", () => {
-    expect(Object.keys(SUBCOMMANDS)).toEqual(["board", "task", "check"]);
+  test("registra board, task, check e init, y la ayuda los lista", () => {
+    expect(Object.keys(SUBCOMMANDS)).toEqual(["board", "task", "check", "init"]);
     for (const name of Object.keys(SUBCOMMANDS)) expect(helpText()).toContain(name);
   });
 });

@@ -15,15 +15,16 @@ import type { ParsedBacklog, ParsedHandoff, ParsedHistory, ParsedTeamBacklog } f
 import { CliError } from "../cli/errors.ts";
 import type { Workspace } from "./workspace.ts";
 
-/** Cuál de los cuatro archivos es. */
-export type DocKind = "handoff" | "backlog" | "history" | "team-backlog";
+/** Cuál de los archivos es (`rules.md` solo lo lee `acsuite init`, para escribirle el bloque de la suite). */
+export type DocKind = "handoff" | "backlog" | "history" | "team-backlog" | "rules";
 
-/** Ids de las secciones con ancla que se esperan en cada archivo (`history.md` no usa anclas). */
+/** Ids de las secciones con ancla que se esperan en cada archivo (`history.md` y `rules.md` no usan anclas). */
 export const DOC_SECTIONS: Record<DocKind, string[]> = {
   handoff: HANDOFF_SECTIONS,
   backlog: BACKLOG_SECTIONS,
   history: [],
   "team-backlog": TEAM_BACKLOG_SECTIONS,
+  rules: [],
 };
 
 /** Un archivo leído. Si no existe, `exists` es `false` y `raw`/`text` están vacíos (se parsea como vacío). */
