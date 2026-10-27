@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 87 — Skill 2.0.8: la recomendación de la suite ofrece acsuite init
+
+- La recomendación de la suite en la skill (docs/suite-recommendation.md) ahora, si el operador acepta, le ofrece dos caminos: que el agente instale la suite de forma global (bun add -g / npm install -g agent-context-suite@latest) y ejecute acsuite init --apply, o que lo haga el operador; le explica que desde entonces el agente usará acsuite task y que puede ver el tablero con acsuite board dentro del repo; no instala ni ejecuta nada hasta que el operador elige.
+- Skill 2.0.8 (plugin.json, SKILL.md, marcador de la plantilla rules.md y changelog «Sin cambios que aplicar»), tag v2.0.8 y release en GitHub. En la suite: marcador de rules.md y fixture espejo sincronizados. bun test 1130 pass. Commits 5223117 y a89907e (skill) y afa1750 (kit).
+
 ## 2026-10-27 — ✅ Tarea 86 — Que el agente sepa usar la suite cuando está instalada
 
 - Nuevo subcomando acsuite init: agrega a rules.md del proyecto un bloque delimitado (agent-context-suite:start/end) que enseña al agente a usar acsuite task, check y board, insertado al inicio del archivo (tras el título, antes del primer ##, sin depender del idioma de los encabezados). Sin --apply muestra el diff; es idempotente; avisa en multi-operador. Nuevo aviso suite-rules en acsuite check cuando falta el bloque.

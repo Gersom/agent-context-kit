@@ -48,15 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 87 — Skill 2.0.8: la recomendación de la suite ofrece acsuite init
-
-- **Descripción:** Retocar docs/suite-recommendation.md de la skill (repo aparte, git -C): si el operador acepta la recomendación opcional de la suite, el agente le indica cómo instalarla (npm install -g agent-context-suite@latest o bun add -g agent-context-suite@latest) y, con su OK, ejecuta acsuite init --apply en el proyecto, que agrega a rules.md la sección que enseña al agente a usar acsuite task. Mantener que la recomendación se da una sola vez, solo al terminar los flujos de generar o migrar, sin insistir. Subir el patch a 2.0.8 (plugin.json, SKILL.md, marcador de la plantilla rules.md, changelog con «Sin cambios que aplicar» si no cambian plantillas), tag anotado v2.0.8 y release, y sincronizar el marcador de rules.md y los fixtures espejo en la suite. Hecho: la skill ofrece acsuite init, bun test de la suite pasa y la skill 2.0.8 está publicada.
-- **Decisiones/temas a definir antes de empezar:** Ninguno. Decidido: la skill no nombra la suite en las plantillas generadas; acsuite init escribe un bloque propio de la suite en rules.md.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Depende de la T-86 (acsuite init publicado en npm). Hacerla después de publicar esa versión para que lo que la skill recomienda exista.
-- **Agregada:** 2026-10-26.
-
 <!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
