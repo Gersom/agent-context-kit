@@ -1,4 +1,4 @@
-<!-- agent-context-skill:version 2.0.8 — versión de la skill con la que se generaron las Reglas por defecto de este archivo; ignorar al leer, no es contenido. Lo usa la skill para detectar versiones más nuevas (ver docs/version-check.md de la skill). -->
+<!-- agent-context-skill:version 2.0.9 — versión de la skill con la que se generaron las Reglas por defecto de este archivo; ignorar al leer, no es contenido. Lo usa la skill para detectar versiones más nuevas (ver docs/version-check.md de la skill). -->
 # Reglas del proyecto
 
 <!-- agent-context-suite:start -->
@@ -24,7 +24,7 @@ Vienen con la skill y aplican a cualquier proyecto; las reglas de proceso adicio
 
 4. **El código es la fuente de verdad.** Si un archivo de acá (`architecture.md`, `stack.md`, `entities.md`, etc.) contradice lo que el código hace, gana el código: seguirlo y corregir el archivo, salvo que el operador diga explícitamente lo contrario para ese caso.
 
-5. **Commits coherentes:** cada commit representa un trabajo hecho. Una tarea puede tener varios; si toca varios módulos o también documentación, se separa por unidad coherente (ej. uno por módulo, otro para la documentación); si es chica, uno alcanza, a criterio del agente. Los commits del trabajo se hacen durante la tarea, a medida que cada unidad queda hecha. El título lleva el número de tarea como scope de Conventional Commits, `tipo(T-N): descripción` (ej. `feat(T-27): ocultar pausadas vacías`), también el de cierre (`docs(T-N): close task`); los commits esporádicos o extras van sin `(T-N)`. El commit de cierre pasa la tarea a completada (`handoff.md`, `backlog.md` y `history.md`, Reglas 6 y 8). Los commits de otros cambios (ej. agregar tareas al backlog) se hacen cuando el operador lo pide.
+5. **Commits coherentes:** cada commit representa un trabajo hecho. Una tarea puede tener varios; si toca varios módulos o también documentación, se separa por unidad coherente (ej. uno por módulo, otro para la documentación); si es chica, uno alcanza, a criterio del agente. Los commits del trabajo se hacen durante la tarea, a medida que cada unidad queda hecha. El título lleva el número de tarea como scope de Conventional Commits, `tipo(T-N): descripción` (ej. `feat(T-27): hide empty paused tasks`), también el de cierre (`docs(T-N): close task`); los commits esporádicos o extras van sin `(T-N)`. **Los commits se escriben siempre en inglés (título y cuerpo), sea cual sea el idioma de la documentación.** El commit de cierre pasa la tarea a completada (`handoff.md`, `backlog.md` y `history.md`, Reglas 6 y 8). Los commits de otros cambios (ej. agregar tareas al backlog) se hacen cuando el operador lo pide.
 
 ## Trabajo en paralelo (modo multi-operador)
 
