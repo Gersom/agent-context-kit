@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 84
+**Próximo número de tarea:** 85
 
 ---
 
@@ -55,6 +55,15 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Detalles:** Surgió al preparar la instalación de la suite: quien clone el repo para desarrollar tiene que clonar también la skill, y sin ella los tests de skill-checks se saltan. Relacionada con la T-80 (skill 2.0.7, pausada).
+- **Agregada:** 2026-10-26.
+
+### Tarea 84 — Quitar la ruta del proyecto de los comandos (la ruta es donde se ejecuta el comando)
+
+- **Descripción:** Hoy acsuite board y acsuite check piden la ruta del proyecto (board la pregunta si falta; check la exige), mientras que acsuite task ya usa por defecto el repo actual. Hacer que board y check usen por defecto la carpeta donde se ejecuta el comando, como task, para que baste con escribir acsuite board o acsuite check dentro del proyecto. Actualizar la ayuda, los mensajes, los tests, el README (ejemplos sin <ruta-del-proyecto>) y los README de cada herramienta. Hecho: acsuite board y acsuite check funcionan sin argumentos de ruta, desde la raíz del proyecto o desde una subcarpeta, y bun test y typecheck pasan.
+- **Decisiones/temas a definir antes de empezar:** Debatir con el operador: ¿se elimina la ruta del todo o queda como argumento opcional para revisar otro proyecto sin cambiar de carpeta (como --agents en task)? Recomendado: opcional. Definir qué pasa si se ejecuta fuera de un proyecto con documentación de la skill (error claro con qué falta) y si se busca hacia arriba desde una subcarpeta. Definir también si el cambio justifica una versión minor (1.10.0) porque cambia el uso.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Surgió al reescribir el README de la suite: los ejemplos con <ruta-del-proyecto> son más incómodos que simplemente ejecutar el comando dentro del proyecto. Tras hacerlo, publicar una versión nueva (con tag anotado, push con --follow-tags y release) como en la 1.9.1.
 - **Agregada:** 2026-10-26.
 
 <!-- agent-context-skill:section=blocked -->
