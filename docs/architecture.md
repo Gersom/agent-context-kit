@@ -18,11 +18,11 @@ agent-context-suite/
 │   │   ├── index.ts             # Arranque: pasa los argumentos al despachador y fija el código de salida
 │   │   ├── build.ts             # Compila el CLI a `dist/cli.js` para Node, con las dependencias dentro (`bun run build`; `dist/` se ignora en git)
 │   │   ├── dispatch.ts          # Despachador: registro de subcomandos, ayuda, error de uso (2) ante uno desconocido
-│   │   ├── init.ts              # `acsuite init`: agrega a `rules.md` el bloque que enseña al agente a usar la suite (diff sin `--apply`)
+│   │   ├── init.ts              # `acsuite init`: agrega a `rules.md` el bloque que enseña al agente a usar la suite, al inicio y tras el título (diff sin `--apply`)
 │   │   └── test/                # Tests del despachador y de `init`
 │   ├── _shared/               # Código compartido entre scripts (el `_` marca que no es un script: las carpetas sin `_` sí lo son)
 │   │   ├── markers.ts           # Prefijo `agent-context-skill:` de los marcadores de la skill y los prefijos anteriores que se siguen leyendo
-│   │   ├── rules-block.ts       # El bloque de la suite en `rules.md` (marcas, texto, `hasSuiteBlock`, `upsertSuiteBlock`): código puro, sin E/S
+│   │   ├── rules-block.ts       # El bloque de la suite en `rules.md` (marcas, texto, `hasSuiteBlock`, `upsertSuiteBlock`; se inserta tras el título, antes del primer `##`): código puro, sin E/S
 │   │   ├── types.ts             # Tipos del dominio: tarea, campo, sección, entrada de historial, handoff/backlog interpretados
 │   │   ├── parse/               # Markdown → datos: secciones por ancla, bloques, handoff, backlog, history, operators, team-backlog
 │   │   ├── tasks/               # Tag de bloqueo vigente (block-info) y tareas mencionadas en un texto (task-refs)

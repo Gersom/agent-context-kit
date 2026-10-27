@@ -1,6 +1,12 @@
 <!-- agent-context-skill:version 2.0.7 — versión de la skill con la que se generaron las Reglas por defecto de este archivo; ignorar al leer, no es contenido. Lo usa la skill para detectar versiones más nuevas (ver docs/version-check.md de la skill). -->
 # Reglas del proyecto
 
+<!-- agent-context-suite:start -->
+### Herramientas de la suite
+
+Este proyecto usa [agent-context-suite](https://github.com/Gersom/agent-context-suite). No edites a mano `handoff.md`, `backlog.md` ni `history.md`: usa `acsuite task` (el detalle: `acsuite task --help`). Para verificar la documentación, `acsuite check`; para ver el tablero, `acsuite board`.
+<!-- agent-context-suite:end -->
+
 ## Reglas por defecto (fijas — no se editan por proyecto)
 
 Vienen con la skill y aplican a cualquier proyecto; las reglas de proceso adicionales se agregan debajo, no en su reemplazo. Son fijas también en su plantilla (`template/agents/rules.md`, en el repo de la skill). Las Reglas 6 a 9 están al final, en "Al cerrar una tarea".
@@ -53,12 +59,6 @@ Varias personas trabajan a la vez, cada una con su agente. Estas reglas se suman
 ### Qué NO tocar sin autorización explícita
 
 - La estructura de carpetas de `template/` en el repo de la skill (`skill/template/` o `agent-context-skill/template/`): moverla o renombrar archivos rompe las referencias de `questions-flow.md` y `migration-flow.md` y requiere bump major de la skill.
-
-<!-- agent-context-suite:start -->
-### Herramientas de la suite
-
-Este proyecto usa [agent-context-suite](https://github.com/Gersom/agent-context-suite). Aplica la cláusula «Con una herramienta de tareas» de «Al cerrar una tarea»: no edites a mano `handoff.md`, `backlog.md` ni `history.md`; usa `acsuite task` (el detalle: `acsuite task --help`). Para verificar la documentación, `acsuite check`; para ver el tablero, `acsuite board`.
-<!-- agent-context-suite:end -->
 
 ## Al cerrar una tarea (fijas — leer solo al cerrar)
 
