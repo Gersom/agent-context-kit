@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 95
+**Próximo número de tarea:** 98
 
 ---
 
@@ -47,6 +47,31 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador quiera hacer pública la skill, o priorice esta tarea explícitamente.
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
+
+### Tarea 95 — Board: tecla para ir a la vista de listado de projects (repositorios)
+
+- **Descripción:** En el comando `acsuite board`, agregar una tecla que lleve a la vista de listado de projects (repositorios).
+- **Decisiones/temas a definir antes de empezar:** Qué tecla usar y desde qué vistas está disponible.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-27.
+
+### Tarea 96 — Board: opción de agregar repo en el listado de projects
+
+- **Descripción:** En `acsuite board`, en la vista de listado de projects, agregar la opción de agregar un repo.
+- **Decisiones/temas a definir antes de empezar:** Cómo se ingresa el repo (ruta escrita, selector) y qué se valida (que exista, que tenga docs/agents).
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-27.
+
+### Tarea 97 — Board: guardar los repos en los que se ejecuta
+
+- **Descripción:** Que `acsuite board` guarde los repos en los que se ejecuta, para que aparezcan en el listado de projects.
+- **Decisiones/temas a definir antes de empezar:** Dónde se guarda (archivo de configuración del usuario o por repo) y si se registra solo al ejecutarse o también al agregar a mano.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Relacionada con la tarea de agregar repo en el listado de projects: ambas comparten la lista guardada.
+- **Agregada:** 2026-10-27.
 
 <!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
