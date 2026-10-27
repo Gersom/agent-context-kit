@@ -34,6 +34,7 @@ Cada hallazgo lleva archivo, línea (cuando aplica) y un código. **Error:** el 
 | `operators-unreadable` | aviso | Líneas de `operators.md` que no se pudieron leer. |
 | `root-file` | aviso | Falta `AGENTS.md` o `CLAUDE.md`, o no llevan el bloque de la skill ni mencionan `docs/agents`. |
 | `skill-version` | aviso | `rules.md` de la carpeta de agentes sin el marcador de versión de la skill (`<!-- agent-context-skill:version X.Y.Z … -->`) en sus primeras 3 líneas, o con la versión mal formada. Los proyectos generados antes de la 1.9.0 no lo tienen. Si no hay `rules.md`, no dice nada. |
+| `suite-rules` | aviso | `rules.md` sin la sección de agent-context-suite (el bloque entre `<!-- agent-context-suite:start -->` y `<!-- agent-context-suite:end -->`), que enseña al agente a usar la suite. Se agrega con `acsuite init`. Si no hay `rules.md`, no dice nada. |
 | `legacy-marker` | aviso | Marcadores con un prefijo anterior a la skill 2.0.0 (`agent-context-kit:` en anclas, versión y firma; `agent-docs-skill:` en el bloque de `AGENTS.md` y `CLAUDE.md`) en los archivos del operador, `rules.md` o la raíz. Se siguen leyendo; actualízalos a `agent-context-skill:`. |
 | `decisions-index` | aviso | La carpeta `project/decisions/` no tiene `README.md`, un tema no figura en su índice (`- [tema.md](./tema.md) — cuándo leerlo`) o una línea del índice enlaza a un archivo que no existe. |
 | `decisions-legacy` | aviso | `project/decisions.md` o `project/stack.md` sueltos: formato anterior a la skill 2.0.0, hay que moverlos a `project/decisions/`. |
@@ -65,7 +66,7 @@ scripts/docs-check/
 │   ├── lines.ts        # Recorre líneas ignorando comentarios HTML y bloques de código
 │   ├── report.ts       # Informe de texto y JSON
 │   ├── types.ts        # Finding, CheckContext
-│   └── checks/         # Un archivo por familia: files, skill-version, legacy-marker, decisions, anchors, placeholders, tasks, handoff, history
+│   └── checks/         # Un archivo por familia: files, skill-version, suite-rules, legacy-marker, decisions, anchors, placeholders, tasks, handoff, history
 └── test/             # Espejo de src/ + e2e/ con proyectos reales en un directorio temporal
 ```
 

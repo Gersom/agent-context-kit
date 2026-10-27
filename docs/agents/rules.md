@@ -54,6 +54,12 @@ Varias personas trabajan a la vez, cada una con su agente. Estas reglas se suman
 
 - La estructura de carpetas de `template/` en el repo de la skill (`skill/template/` o `agent-context-skill/template/`): moverla o renombrar archivos rompe las referencias de `questions-flow.md` y `migration-flow.md` y requiere bump major de la skill.
 
+<!-- agent-context-suite:start -->
+### Herramientas de la suite
+
+Este proyecto usa [agent-context-suite](https://github.com/Gersom/agent-context-suite). Aplica la cláusula «Con una herramienta de tareas» de «Al cerrar una tarea»: no edites a mano `handoff.md`, `backlog.md` ni `history.md`; usa `acsuite task` (el detalle: `acsuite task --help`). Para verificar la documentación, `acsuite check`; para ver el tablero, `acsuite board`.
+<!-- agent-context-suite:end -->
+
 ## Al cerrar una tarea (fijas — leer solo al cerrar)
 
 **Con una herramienta de tareas:** si el proyecto tiene una que edita `handoff.md`, `backlog.md` e `history.md`, lo que ella ya hace de las Reglas 6, 7, 8 y 9 no se repite a mano ni se vuelve a verificar; sigue valiendo todo lo demás (en particular, que la tarea solo se cierra si el operador lo pide, y la sección «Checks pendientes» del reporte de la Regla 9, que añade el agente).

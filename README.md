@@ -45,7 +45,7 @@ bunx agent-context-suite@latest board
 
 ## Herramientas
 
-La suite trae tres herramientas, que trabajan sobre un proyecto que use la skill. Se usan con el comando `acsuite` (si no la instalaste, antepón `npx agent-context-suite@latest` al subcomando). Sin ruta, usan el proyecto de la carpeta donde ejecutas el comando, subiendo hasta la raíz de su repo git; `board` y `check` aceptan una ruta para revisar otro proyecto (`acsuite check D:/otro-proyecto`).
+La suite trae cuatro herramientas, que trabajan sobre un proyecto que use la skill. Se usan con el comando `acsuite` (si no la instalaste, antepón `npx agent-context-suite@latest` al subcomando). Sin ruta, usan el proyecto de la carpeta donde ejecutas el comando, subiendo hasta la raíz de su repo git; `board` y `check` aceptan una ruta para revisar otro proyecto (`acsuite check D:/otro-proyecto`).
 
 `acsuite` sin argumentos lista los subcomandos, y `acsuite <subcomando> --help` muestra la ayuda de cada uno.
 
@@ -82,6 +82,18 @@ acsuite check
 ```
 
 Uso y códigos de hallazgo: [README de `check`](./scripts/docs-check/README.md).
+
+### `acsuite init`
+
+Agrega a `rules.md` del proyecto la sección que enseña al agente a usar la suite: que no edite a mano `handoff.md`, `backlog.md` ni `history.md`, y que use `acsuite task`, `acsuite check` y `acsuite board`. Solo toca esa sección, entre sus marcas, y no cambia las reglas fijas. Sin `--apply` muestra el diff y no escribe nada; si la sección ya está al día, no hace nada. En un proyecto con varios operadores, `rules.md` es de todos, así que el cambio se aplica a todo el proyecto. Si no la agregas, `acsuite check` lo avisa.
+
+```sh
+acsuite init
+```
+
+```sh
+acsuite init --apply
+```
 
 ## Licencia
 
