@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 100
+**Próximo número de tarea:** 101
 
 ---
 
@@ -47,6 +47,15 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador quiera hacer pública la skill, o priorice esta tarea explícitamente.
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
+
+### Tarea 100 — Board: pulir menores de la lista de proyectos
+
+- **Descripción:** Atender los detalles menores que dejaron las revisiones de las Tareas 97 y 99 en la lista de proyectos de acsuite board.
+- **Decisiones/temas a definir antes de empezar:** Cuáles vale la pena hacer; si la concurrencia entre dos board simultáneos justifica un bloqueo del archivo.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Pendientes: (1) dos board arrancando a la vez pueden perder un alta o una baja de projects.json, y no hay fsync antes del rename; (2) una entrada inválida invalida todo el archivo en vez de filtrarse; (3) tras corromperse el archivo, el aviso no nombra el .bak y una segunda corrupción pisa el anterior; (4) con el archivo corrupto, quitar un proyecto con x solo lo oculta en la sesión; (5) la confirmación de x muestra el nombre y no la ruta (ambiguo con dos repos del mismo nombre); (6) el pie muestra [x] quitar con la lista vacía; (7) el aviso de guardado se trunca al ancho de la terminal y un error del watcher lo pisa; (8) app.ts no tiene tests del flujo interactivo (extraer el manejo de teclas a una función pura); (9) ~ no se expande al agregar una ruta con a, y un fallo de git distinto de «no es repo» da un error confuso.
+- **Agregada:** 2026-10-27.
 
 <!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
