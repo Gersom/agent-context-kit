@@ -1,13 +1,16 @@
 // Tests del script entero (index.ts) corriéndolo como proceso aparte con Bun.spawn.
 
-import { describe, expect, test } from "bun:test";
+import { afterAll, describe, expect, test } from "bun:test";
+import { spawnSync } from "node:child_process";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { FIXTURES } from "../../../_shared/test/helpers.ts";
+import { FIXTURES, requireFixture } from "../../../_shared/test/helpers.ts";
 
 const INDEX = join(import.meta.dir, "..", "..", "index.ts");
 
-/** Corre index.ts con los argumentos dados, sin datos de entrada y sin colores. */
-async function run(args: string[]): Promise<{ stdout: string; stderr: string; code: number }> {
+/** Corre index.ts con los argumentos dados (desde `cwd`, si se indica), sin datos de entrada y sin colores. */
+async function run(args: string[], cwd?: string): Promise<{ stdout: string; stderr: string; code: number }> {
   // Sin variables de `bun run` heredadas: las rutas relativas no deben depender de quién lanzó los tests.
   const env: Record<string, string | undefined> = { ...process.env, NO_COLOR: "1" };
   delete env.INIT_CWD;
@@ -15,6 +18,7 @@ async function run(args: string[]): Promise<{ stdout: string; stderr: string; co
 
   const proc = Bun.spawn([process.execPath, INDEX, ...args], {
     env,
+    cwd,
     stdin: "ignore",
     stdout: "pipe",
     stderr: "pipe",
@@ -55,9 +59,64 @@ describe("index.ts", () => {
     expect(stdout).not.toContain("Ruta del proyecto");
   });
 
-  test("sin argumento y sin datos de entrada: código 1", async () => {
-    const { stderr, code } = await run(["--once"]);
+});
+
+describe("index.ts sin ruta: el proyecto de la carpeta donde se lanza", () => {
+  const created: string[] = [];
+  afterAll(() => created.forEach((dir) => rmSync(dir, { recursive: true, force: true })));
+
+  /** Un proyecto temporal con la documentación del fixture `es-anchors` en docs/agents (y, si se pide, un repo git). */
+  function tempProject({ git, docs = true }: { git: boolean; docs?: boolean }): string {
+    const root = mkdtempSync(join(tmpdir(), "board-cwd-"));
+    created.push(root);
+    mkdirSync(join(root, "src", "app"), { recursive: true });
+    if (docs) {
+      mkdirSync(join(root, "docs", "agents"), { recursive: true });
+      for (const file of ["handoff.md", "backlog.md", "history.md"]) {
+        writeFileSync(join(root, "docs", "agents", file), requireFixture("es-anchors", file));
+      }
+    }
+    if (git) expect(spawnSync("git", ["init", "-q"], { cwd: root }).status).toBe(0);
+    return root;
+  }
+
+  test("desde la raíz del proyecto: pinta el tablero y sale con 0", async () => {
+    const root = tempProject({ git: true });
+    const { stdout, stderr, code } = await run(["--once"], root);
+    expect(stderr).toBe("");
+    expect(code).toBe(0);
+    expect(stdout).toContain("▣ ");
+    expect(stdout).toContain("T-11: Escribir el parser de secciones");
+  });
+
+  test("desde una subcarpeta: sube hasta la raíz del repo git", async () => {
+    const root = tempProject({ git: true });
+    const { stdout, code } = await run(["--once"], join(root, "src", "app"));
+    expect(code).toBe(0);
+    expect(stdout).toContain("T-11: Escribir el parser de secciones");
+  });
+
+  test("sin repo git: usa la carpeta misma", async () => {
+    const root = tempProject({ git: false });
+    const { stdout, code } = await run(["--once"], root);
+    expect(code).toBe(0);
+    expect(stdout).toContain("T-11: Escribir el parser de secciones");
+  });
+
+  test("fuera de un proyecto (sin documentación): código 1, dice qué falta y cómo indicar otra ruta, sin preguntar", async () => {
+    const root = tempProject({ git: false, docs: false });
+    const { stdout, stderr, code } = await run(["--once"], root);
     expect(code).toBe(1);
-    expect(stderr).toContain("No se recibió ninguna ruta");
+    expect(stderr).toContain("No se pudo abrir el proyecto de la carpeta actual");
+    expect(stderr).toContain("No se encontró handoff.md");
+    expect(stderr).toContain("acsuite board <ruta>");
+    expect(stdout).toBe("");
+  });
+
+  test("con ruta, la carpeta de lanzamiento no importa", async () => {
+    const other = tempProject({ git: false, docs: false });
+    const { stdout, code } = await run([join(FIXTURES, "es-anchors"), "--once"], other);
+    expect(code).toBe(0);
+    expect(stdout).toContain("▣ ES ANCHORS");
   });
 });

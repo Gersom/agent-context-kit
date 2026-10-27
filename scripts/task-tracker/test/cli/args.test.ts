@@ -21,6 +21,24 @@ describe("parseArgs", () => {
     expect(parseArgs(["repo", "ana", "--operator", "gersom"]).operator).toBe("gersom");
   });
 
+  test("sin ruta (proyecto de la carpeta actual): pathArg queda sin definir, con o sin flags", () => {
+    expect(parseArgs(["--once"])).toEqual({ once: true, pathArg: undefined, operator: undefined, compact: false, arrows: true });
+    expect(parseArgs(["--compact", "--no-arrows"])).toMatchObject({ pathArg: undefined, operator: undefined, compact: true, arrows: false });
+  });
+
+  test("sin ruta, el operador se indica con --operator", () => {
+    expect(parseArgs(["--operator", "ana"])).toMatchObject({ pathArg: undefined, operator: "ana" });
+    expect(parseArgs(["--once", "--operator=ana"])).toMatchObject({ once: true, pathArg: undefined, operator: "ana" });
+  });
+
+  test("con un solo argumento posicional, es la ruta (compatibilidad con la 1.9)", () => {
+    expect(parseArgs(["ana"])).toMatchObject({ pathArg: "ana", operator: undefined });
+  });
+
+  test("con ruta y operador (board <ruta> <operador>)", () => {
+    expect(parseArgs(["D:/repo", "ana"])).toEqual({ once: false, pathArg: "D:/repo", operator: "ana", compact: false, arrows: true });
+  });
+
   test("el valor de --operator no se toma como ruta", () => {
     expect(parseArgs(["--operator", "ana"]).pathArg).toBeUndefined();
   });

@@ -3,6 +3,7 @@
 // un mensaje en español, sin stack.
 
 import { isAbsolute, resolve } from "node:path";
+import { gitToplevel } from "../../_shared/git.ts";
 import { CliError, UsageError } from "../../task-manager/src/cli/errors.ts";
 import type { Io } from "../../task-manager/src/cli/types.ts";
 import { readRaw } from "../../task-manager/src/workspace/docs.ts";
@@ -114,11 +115,13 @@ export async function run(argv: string[], options: RunOptions = {}): Promise<num
   const io = options.io ?? consoleIo;
   try {
     const args = parseCheckArgs(argv);
-    if (args.help || args.path === null) {
+    if (args.help) {
       HELP.forEach((line) => io.out(line));
       return 0;
     }
-    const { meta, findings } = inspect(args.path, args.operator, options);
+    // Sin ruta, el proyecto de la carpeta de invocación: la raíz de su repo git (o la carpeta misma).
+    const baseDir = options.baseDir ?? invocationDir();
+    const { meta, findings } = inspect(args.path ?? gitToplevel(baseDir), args.operator, { ...options, baseDir });
     const report = buildReport(meta, findings, args.strict);
     if (args.json) io.out(renderJson(report));
     else renderText(report).forEach((line) => io.out(line));

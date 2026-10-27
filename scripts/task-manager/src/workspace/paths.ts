@@ -4,6 +4,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, resolve } from "node:path";
+import { gitToplevel } from "../../../_shared/git.ts";
 import { CliError } from "../cli/errors.ts";
 
 export const OPERATORS_FILE = "operators.md";
@@ -38,17 +39,6 @@ export function isDir(path: string): boolean {
     return statSync(path).isDirectory();
   } catch {
     return false;
-  }
-}
-
-/** Raíz del repo git que contiene `dir`, o `dir` si no está en un repo (o git no responde). */
-export function gitToplevel(dir: string): string {
-  try {
-    const out = spawnSync("git", ["-C", dir, "rev-parse", "--show-toplevel"], { encoding: "utf8", timeout: 5000 });
-    const top = out.status === 0 ? out.stdout.trim() : "";
-    return top ? resolve(top) : dir;
-  } catch {
-    return dir;
   }
 }
 

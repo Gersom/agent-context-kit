@@ -2,13 +2,14 @@
 // docs/agents cumple lo que necesitan la skill, el seguimiento de tareas (`bun run board`) y el
 // gestor de tareas (`bun run task`). Solo lee el proyecto revisado: nunca escribe en él.
 //
-// Uso (desde la raíz de agent-context-suite):
-//   bun run check <ruta>               → raíz del proyecto, carpeta de agentes o de un operador
-//   bun run check <ruta> --operator <carpeta>
+// Uso (desde la raíz de agent-context-suite; la ruta es opcional, por defecto el proyecto de la
+// carpeta actual):
+//   bun run check [ruta]               → raíz del proyecto, carpeta de agentes o de un operador
+//   bun run check [ruta] --operator <carpeta>
 //                                      → en modo multi-operador, revisa a ese operador (por defecto,
 //                                        el de `git config user.email` del proyecto revisado)
-//   bun run check <ruta> --json        → el informe como un único objeto JSON
-//   bun run check <ruta> --strict      → los avisos también hacen fallar
+//   bun run check [ruta] --json        → el informe como un único objeto JSON
+//   bun run check [ruta] --strict      → los avisos también hacen fallar
 //
 // Código de salida: 0 sin errores; 1 con errores (con --strict, también con avisos); 2 mal uso.
 // Cada familia de checks vive en `src/checks/` y se registra en `src/checks/index.ts`.

@@ -1,11 +1,11 @@
-// Línea de comandos: `acsuite check <ruta> [--operator <carpeta>] [--json] [--strict]`. Se interpreta
+// Línea de comandos: `acsuite check [ruta] [--operator <carpeta>] [--json] [--strict]`. Se interpreta
 // con `node:util` `parseArgs` en modo estricto; un flag desconocido o sin valor es un error de uso (2).
 
 import { parseArgs } from "node:util";
 import { UsageError } from "../../task-manager/src/cli/errors.ts";
 
 export interface CheckArgs {
-  /** Raíz del proyecto, carpeta de agentes o carpeta de un operador; `null` solo con `help`. */
+  /** Raíz del proyecto, carpeta de agentes o carpeta de un operador; `null` si no se pasó (se usa el proyecto de la carpeta actual). */
   path: string | null;
   operator: string | undefined;
   json: boolean;
@@ -15,12 +15,13 @@ export interface CheckArgs {
 
 /** Ayuda: uso, flags y códigos de salida. */
 export const HELP: string[] = [
-  "Verifica que la documentación de agentes de OTRO proyecto cumpla lo que necesitan la skill, el",
+  "Verifica que la documentación de agentes de un proyecto cumpla lo que necesitan la skill, el",
   "seguimiento de tareas (`acsuite board`) y el gestor de tareas (`acsuite task`). Solo lee: no escribe nada.",
   "",
-  "Uso: acsuite check <ruta> [--operator <carpeta>] [--json] [--strict]",
+  "Uso: acsuite check [ruta] [--operator <carpeta>] [--json] [--strict]",
   "",
-  "  <ruta>                Raíz del proyecto, carpeta de agentes (docs/agents) o carpeta de un operador.",
+  "  [ruta]                Raíz del proyecto, carpeta de agentes (docs/agents) o carpeta de un operador.",
+  "                        Por defecto, el proyecto de la carpeta actual (la raíz de su repo git).",
   "  --operator <carpeta>  Carpeta del operador (modo multi-operador). Por defecto, el de `git config user.email`.",
   "  --json                Imprime el informe como un único objeto JSON (y nada más) por la salida estándar.",
   "  --strict              Los avisos también hacen fallar (código 1).",
@@ -54,7 +55,7 @@ function usageMessage(caught: unknown): string {
 
 /**
  * @param argv argumentos sin `bun` ni el script (`process.argv.slice(2)`)
- * @throws UsageError flag desconocido o sin valor, falta la ruta o sobran argumentos
+ * @throws UsageError flag desconocido o sin valor, o sobran argumentos
  */
 export function parseCheckArgs(argv: string[]): CheckArgs {
   const { values, positionals } = (() => {
@@ -65,7 +66,6 @@ export function parseCheckArgs(argv: string[]): CheckArgs {
     }
   })();
   const help = values.help === true;
-  if (!help && positionals.length === 0) throw new UsageError("Falta la ruta del proyecto a verificar.");
   if (positionals.length > 1) throw new UsageError(`Sobran argumentos: ${positionals.slice(1).join(" ")}. Pasa una sola ruta.`);
   return {
     path: positionals[0] ?? null,

@@ -24,10 +24,10 @@ describe("parseCheckArgs", () => {
     expect(parseCheckArgs(["p", "--help"])).toMatchObject({ help: true, path: "p" });
   });
 
-  test("sin ruta: UsageError (código 2)", () => {
-    expect(() => parseCheckArgs([])).toThrow(UsageError);
-    expect(() => parseCheckArgs([])).toThrow("Falta la ruta del proyecto a verificar.");
-    expect(() => parseCheckArgs(["--json"])).toThrow("Falta la ruta");
+  test("sin ruta no es un error: path es null y el resto, sus valores por defecto", () => {
+    expect(parseCheckArgs([])).toEqual({ path: null, operator: undefined, json: false, strict: false, help: false });
+    expect(parseCheckArgs(["--json", "--strict"])).toEqual({ path: null, operator: undefined, json: true, strict: true, help: false });
+    expect(parseCheckArgs(["--operator", "ana"])).toMatchObject({ path: null, operator: "ana" });
   });
 
   test("más de una ruta: UsageError que dice cuáles sobran", () => {
@@ -51,7 +51,7 @@ describe("parseCheckArgs", () => {
   });
 
   test("todos los errores de uso salen con código 2", () => {
-    for (const argv of [[], ["a", "b"], ["p", "--nada"], ["p", "--operator"]]) {
+    for (const argv of [["a", "b"], ["p", "--nada"], ["p", "--operator"]]) {
       try {
         parseCheckArgs(argv);
         throw new Error("debía fallar");
@@ -66,8 +66,15 @@ describe("parseCheckArgs", () => {
 describe("HELP", () => {
   test("describe el uso, los flags y los códigos de salida", () => {
     const text = HELP.join("\n");
-    for (const part of ["acsuite check <ruta>", "--operator", "--json", "--strict", "--help", "Código de salida"]) {
+    for (const part of ["acsuite check [ruta]", "--operator", "--json", "--strict", "--help", "Código de salida"]) {
       expect(text).toContain(part);
     }
+  });
+
+  test("dice que la ruta es opcional y que, por defecto, es el proyecto de la carpeta actual", () => {
+    const text = HELP.join("\n");
+    expect(text).toContain("[ruta]");
+    expect(text).not.toContain("<ruta>");
+    expect(text).toContain("Por defecto, el proyecto de la carpeta actual");
   });
 });

@@ -308,18 +308,15 @@ describe("--strict con solo avisos", () => {
 });
 
 describe("mal uso: código 2", () => {
-  test("sin argumentos", async () => {
-    const { code, out, err } = await check([]);
-    expect(code).toBe(2);
-    expect(out).toBe("");
-    expect(err).toContain("Falta la ruta del proyecto a verificar.");
-    expect(err).toContain("acsuite check --help");
-  });
-
   test("flag desconocido", async () => {
     const { code, err } = await check(["algo", "--nada"]);
     expect(code).toBe(2);
     expect(err).toContain("Flag desconocido: --nada.");
+    expect(err).toContain("acsuite check --help");
+  });
+
+  test("sin ruta y con un flag desconocido: sigue siendo mal uso", async () => {
+    expect((await check(["--nada"], { baseDir: project(flatTree()).root })).code).toBe(2);
   });
 
   test("--operator sin valor", async () => {
@@ -335,12 +332,49 @@ describe("mal uso: código 2", () => {
       const { code, out, err } = await check([flag]);
       expect(code).toBe(0);
       expect(err).toBe("");
-      expect(out).toContain("Uso: acsuite check <ruta>");
+      expect(out).toContain("Uso: acsuite check [ruta]");
     }
   });
 
   test("--help gana aunque falte la ruta o haya otros flags", async () => {
     expect((await check(["--help", "--json"])).code).toBe(0);
+  });
+});
+
+describe("sin ruta: el proyecto de la carpeta de invocación (baseDir)", () => {
+  test("baseDir con un proyecto válido (sin git): se revisa esa carpeta", async () => {
+    const p = project(flatTree());
+    const report = await checkJson([], { baseDir: p.root });
+    expect(report).toMatchObject({ code: 0, ok: true, mode: "flat", project: resolve(p.root), findings: [] });
+  });
+
+  test("baseDir con un proyecto multi-operador: se resuelve el operador del correo de git", async () => {
+    const p = project(multiTree());
+    const report = await checkJson([], { baseDir: p.root, email: "ana@mail.com" });
+    expect(report).toMatchObject({ code: 0, mode: "multi", operator: "ana", project: resolve(p.root) });
+  });
+
+  test("las demás opciones siguen valiendo sin ruta", async () => {
+    const p = project(multiTree());
+    const report = await checkJson(["--operator", "gersom"], { baseDir: p.root, email: null });
+    expect(report).toMatchObject({ code: 0, operator: "gersom" });
+  });
+
+  test("baseDir sin documentación: hallazgo workspace comprensible, código 1 y la carpeta revisada en el informe", async () => {
+    const p = project({ "README.md": "# Hola\n" });
+    const { code, out } = await check([], { baseDir: p.root });
+    expect(code).toBe(1);
+    expect(out).toContain("[workspace]");
+    expect(out).toContain("No se encontró la documentación de agentes");
+    expect(out).toContain(join(p.root, "docs", "agents"));
+    expect(out).toContain("Indica la raíz del proyecto o su carpeta de agentes.");
+  });
+
+  test("una ruta explícita gana sobre baseDir", async () => {
+    const good = project(flatTree());
+    const empty = project({ "README.md": "# Hola\n" });
+    const report = await checkJson([good.root], { baseDir: empty.root });
+    expect(report).toMatchObject({ code: 0, project: resolve(good.root) });
   });
 });
 

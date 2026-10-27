@@ -1,6 +1,8 @@
 // Tests del script entero (index.ts) como proceso: código de salida real, salida estándar y de error.
 
 import { afterAll, describe, expect, test } from "bun:test";
+import { spawnSync } from "node:child_process";
+import { realpathSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { flatTree, type TempProject, writeProject } from "../helpers.ts";
 
@@ -15,6 +17,8 @@ function project(tree: Record<string, string>): TempProject {
   return p;
 }
 
+const valid = project(flatTree());
+
 /** Corre index.ts desde `cwd`, sin variables de npm/bun que cambien la carpeta de invocación. */
 async function runCli(args: string[], cwd: string) {
   const env: Record<string, string | undefined> = { ...process.env, NO_COLOR: "1" };
@@ -26,8 +30,6 @@ async function runCli(args: string[], cwd: string) {
 }
 
 describe("index.ts", () => {
-  const valid = project(flatTree());
-
   test("proyecto válido: código 0 y el informe por la salida estándar", async () => {
     const { stdout, stderr, code } = await runCli([valid.root], valid.root);
     expect(code).toBe(0);
@@ -65,13 +67,6 @@ describe("index.ts", () => {
     expect(JSON.parse(stdout).project).toBe(valid.root);
   });
 
-  test("sin argumentos: código 2 y el error por la salida de error", async () => {
-    const { stdout, stderr, code } = await runCli([], valid.root);
-    expect(code).toBe(2);
-    expect(stdout).toBe("");
-    expect(stderr).toContain("Falta la ruta");
-  });
-
   test("flag desconocido: código 2", async () => {
     expect((await runCli([valid.root, "--nada"], valid.root)).code).toBe(2);
   });
@@ -79,6 +74,55 @@ describe("index.ts", () => {
   test("--help: código 0 con la ayuda", async () => {
     const { stdout, code } = await runCli(["--help"], valid.root);
     expect(code).toBe(0);
-    expect(stdout).toContain("Uso: acsuite check <ruta>");
+    expect(stdout).toContain("Uso: acsuite check [ruta]");
+  });
+});
+
+describe("index.ts sin ruta: el proyecto de la carpeta donde se lanza", () => {
+  /** Un proyecto válido que es un repo git (con `src/app` como subcarpeta). */
+  function gitProject(): TempProject {
+    const tree = flatTree();
+    tree["src/app/index.ts"] = "export {};\n";
+    const p = project(tree);
+    expect(spawnSync("git", ["init", "-q"], { cwd: p.root }).status).toBe(0);
+    return p;
+  }
+
+  test("desde la raíz del proyecto: lo revisa y sale con 0", async () => {
+    const p = gitProject();
+    const { stdout, stderr, code } = await runCli(["--json"], p.root);
+    expect(stderr).toBe("");
+    expect(code).toBe(0);
+    expect(JSON.parse(stdout)).toMatchObject({ ok: true, mode: "flat" });
+  });
+
+  test("desde una subcarpeta: sube hasta la raíz del repo git", async () => {
+    const p = gitProject();
+    const { stdout, code } = await runCli(["--json"], join(p.root, "src", "app"));
+    expect(code).toBe(0);
+    expect(realpathSync.native(JSON.parse(stdout).project)).toBe(realpathSync.native(p.root));
+  });
+
+  test("sin repo git: usa la carpeta misma", async () => {
+    const p = project(flatTree());
+    const { stdout, code } = await runCli(["--json"], p.root);
+    expect(code).toBe(0);
+    expect(realpathSync.native(JSON.parse(stdout).project)).toBe(realpathSync.native(p.root));
+  });
+
+  test("fuera de un proyecto (sin documentación de la skill): código 1 y un mensaje que dice qué falta", async () => {
+    const p = project({ "README.md": "# Hola\n" });
+    const { stdout, stderr, code } = await runCli([], p.root);
+    expect(code).toBe(1);
+    expect(stderr).toBe("");
+    expect(stdout).toContain("[workspace]");
+    expect(stdout).toContain("No se encontró la documentación de agentes");
+    expect(stdout).toContain("Indica la raíz del proyecto o su carpeta de agentes.");
+  });
+
+  test("con ruta, la carpeta de lanzamiento no importa", async () => {
+    const other = project({ "README.md": "# Hola\n" });
+    const { code } = await runCli([valid.root], other.root);
+    expect(code).toBe(0);
   });
 });

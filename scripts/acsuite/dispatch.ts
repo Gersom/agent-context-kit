@@ -19,7 +19,7 @@ export const SUBCOMMANDS: Record<string, { summary: string; run: Runner }> = {
     },
   },
   task: { summary: "Gestión de tareas: edita handoff, backlog e history (task-manager)", run: task },
-  check: { summary: "Verifica la documentación de agentes de otro proyecto (docs-check)", run: check },
+  check: { summary: "Verifica la documentación de agentes de un proyecto (docs-check)", run: check },
 };
 
 export function helpText(): string {

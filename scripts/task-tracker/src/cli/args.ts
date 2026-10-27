@@ -1,6 +1,7 @@
-// Argumentos de la línea de comandos: la ruta a vigilar (opcional), el operador cuyo panel abrir
-// de frente en modo multi-operador (segundo argumento, o `--operator <carpeta>` /
-// `--operator=<carpeta>`), `--once` y, para arrancar con la pantalla ya ajustada, `--compact`
+// Argumentos de la línea de comandos: la ruta a vigilar (opcional; sin ella, el proyecto de la
+// carpeta actual), el operador cuyo panel abrir de frente en modo multi-operador (segundo
+// argumento, solo si hay ruta; o `--operator <carpeta>` / `--operator=<carpeta>`, con o sin
+// ruta), `--once` y, para arrancar con la pantalla ya ajustada, `--compact`
 // (una sola tarea por recuadro) y `--no-arrows` (sin flechas del flujo).
 
 export interface CliArgs {
