@@ -13,6 +13,8 @@ import type {
   DrawTrigger,
   Model,
   Plan,
+  ProjectRow,
+  ProjectsRenderMeta,
   RenderMeta,
   TeamBacklogModel,
   TeamModel,
@@ -42,12 +44,14 @@ const UNOWNED_BLUE_RGB = [0x8f, 0xb3, 0xd9] as const;
 type Colors = ReturnType<typeof picocolors.createColors>;
 /** Agrega una fila al recuadro abierto: sangría + tramos con estilo. */
 type Row = (indent: number, ...segments: Segment[]) => void;
+/** Lo que el lienzo necesita de los metadatos: la lista de proyectos no tiene repo en el encabezado. */
+type CanvasMeta = Omit<RenderMeta, "projectName" | "projectDir"> & Partial<Pick<RenderMeta, "projectName" | "projectDir">>;
 
 /**
  * Lienzo de una pantalla: las líneas, los recuadros y el encabezado ya escrito. `subtitle` es lo
  * que va después del nombre del proyecto (el operador en su panel, "equipo" en la vista de equipo).
  */
-function createCanvas(meta: RenderMeta, subtitle?: string) {
+function createCanvas(meta: CanvasMeta, subtitle?: string) {
   const pc: Colors = meta.color === undefined ? picocolors : picocolors.createColors(meta.color);
   const width = screenWidth(meta.width);
   const out: string[] = [];
@@ -68,8 +72,9 @@ function createCanvas(meta: RenderMeta, subtitle?: string) {
   };
 
   // Encabezado
-  line(0, `▣ ${displayProjectName(meta.projectName)}${subtitle ? ` · ${subtitle}` : ""}`, (s) => pc.bold(pc.magenta(s)));
-  line(2, meta.projectDir, secondary);
+  const heading = [meta.projectName ? displayProjectName(meta.projectName) : "", subtitle ?? ""].filter(Boolean).join(" · ");
+  line(0, `▣ ${heading}`, (s) => pc.bold(pc.magenta(s)));
+  if (meta.projectDir) line(2, meta.projectDir, secondary);
   line(2, `Última actualización ${formatTime(meta.updatedAt)} · ${triggerText(meta.trigger)}`, secondary);
   blank();
 
@@ -79,7 +84,7 @@ function createCanvas(meta: RenderMeta, subtitle?: string) {
 type Canvas = ReturnType<typeof createCanvas>;
 
 /** Avisos, notas y pie con las teclas; cierra la pantalla y la devuelve como texto. */
-function finishCanvas({ out, line, blank, secondary, pc, width }: Canvas, meta: RenderMeta, model: { notes?: string[]; warnings: string[] }): string {
+function finishCanvas({ out, line, blank, secondary, pc, width }: Canvas, meta: CanvasMeta, model: { notes?: string[]; warnings: string[] }): string {
   const notes = model.notes ?? [];
   if (notes.length || model.warnings.length) blank();
   for (const note of notes) line(0, `ℹ ${note}`, secondary);
@@ -285,6 +290,72 @@ function summaryLine(op: TeamRow): string {
   return parts.join(" · ");
 }
 
+/** Separación entre las columnas de la lista de proyectos. */
+const PROJECT_GAP = "  ";
+
+/**
+ * Lista de proyectos: el recuadro PROYECTOS, que es el selector (una fila por repo, con el elegido
+ * marcado con `›`): nombre, ruta, operador del correo de git de ese repo, tarea en curso y cuántas
+ * tareas libres y bloqueadas tiene ese operador. Lo que no se sabe sale como `—`; un repo que no
+ * se pudo leer muestra su aviso en lugar de los datos. `warnings`: avisos de la vista (ej. no se
+ * pudo abrir un proyecto).
+ */
+export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, warnings: string[] = []): string {
+  const canvas = createCanvas(meta, "proyectos");
+  const { pc, box, secondary, width } = canvas;
+
+  box(`PROYECTOS (${rows.length})`, "docs/agents", pc.green, (row) => {
+    if (!rows.length) {
+      row(0, { paint: secondary, text: "No hay proyectos para mostrar." });
+      row(0, { paint: secondary, text: "Abre uno con: acsuite board <ruta>" });
+      return;
+    }
+    const currentText = (r: ProjectRow) => (r.work?.current ? shortTaskName(r.work.current.number, r.work.current.title) : r.work ? "Sin tarea en curso" : "—");
+    const widest = (header: string, texts: string[]) => Math.max(visibleLength(header), ...texts.map(visibleLength));
+
+    // Columnas de ancho fijo según su contenido; la ruta y la tarea en curso se reparten el resto.
+    const nameW = Math.min(24, widest("nombre", rows.map((r) => r.name)));
+    const operatorW = Math.min(16, widest("operador", rows.map((r) => r.operator ?? "—")));
+    const freeW = widest("libres", rows.map((r) => String(r.work?.counts.free ?? "—")));
+    const blockedW = widest("bloqueadas", rows.map((r) => String(r.work?.counts.blocked ?? "—")));
+    const room = width - BOX_PADDING - 2 - nameW - operatorW - freeW - blockedW - PROJECT_GAP.length * 5;
+    const pathMax = widest("ruta", rows.map((r) => r.path));
+    const pathW = Math.max(1, Math.min(pathMax, Math.floor(room * 0.45)));
+    const currentW = Math.max(1, room - pathW);
+
+    const fit = (text: string, w: number, alignRight = false): string => {
+      const shown = truncate(plainText(text), w);
+      const pad = " ".repeat(Math.max(0, w - visibleLength(shown)));
+      return alignRight ? pad + shown : shown + pad;
+    };
+
+    const headers = [fit("nombre", nameW), fit("ruta", pathW), fit("operador", operatorW), fit("en curso", currentW), fit("libres", freeW, true), fit("bloqueadas", blockedW, true)];
+    row(0, { paint: secondary, text: `  ${headers.join(PROJECT_GAP)}` });
+
+    for (const project of rows) {
+      const chosen = project.path === meta.selected;
+      const name = { paint: (s: string) => (chosen ? pc.bold(pc.green(s)) : pc.bold(s)), text: `${chosen ? "› " : "  "}${fit(project.name, nameW)}${PROJECT_GAP}` };
+      const path = { paint: secondary, text: fit(project.path, pathW) + PROJECT_GAP };
+      if (project.warning != null) {
+        row(0, name, path, { paint: pc.yellow, text: `! ${project.warning}` });
+        continue;
+      }
+      const { work } = project;
+      row(
+        0,
+        name,
+        path,
+        { paint: project.operator ? undefined : secondary, text: fit(project.operator ?? "—", operatorW) + PROJECT_GAP },
+        { paint: work?.current ? undefined : secondary, text: fit(currentText(project), currentW) + PROJECT_GAP },
+        { paint: work?.counts.free ? pc.cyan : secondary, text: fit(String(work?.counts.free ?? "—"), freeW, true) + PROJECT_GAP },
+        { paint: work?.counts.blocked ? pc.red : secondary, text: fit(String(work?.counts.blocked ?? "—"), blockedW, true) },
+      );
+    }
+  });
+
+  return finishCanvas(canvas, meta, { warnings });
+}
+
 /**
  * Recuadro "SIN DUEÑO": las tareas del team-backlog.md, libres primero y después las bloqueadas.
  * Título y viñeta en un azul pálido, texto de las tareas en el gris de las completadas; solo el
@@ -339,17 +410,24 @@ export function triggerText(trigger: DrawTrigger): string {
  * dicen lo que harán según el estado actual. Si no entra en el ancho se parte en más líneas (así
  * "salir", lo último, nunca queda recortado).
  */
-function footerLines(meta: RenderMeta, width: number): string[] {
+function footerLines(meta: CanvasMeta, width: number): string[] {
   const controls = meta.controls ?? "ctrl-c";
   if (controls === "ctrl-c") return ["[Ctrl+C] salir"];
   if (controls !== "keys") return [];
   const parts: string[] = [];
-  if (meta.multiView === "team") parts.push("[↑/↓] elegir", "[Enter] abrir");
-  if (meta.multiView === "operator") parts.push("[Esc o b] volver al equipo");
-  parts.push(meta.compact ? "[c] expandir" : "[c] compactar");
-  // La vista de equipo no tiene flechas de flujo.
-  if (meta.multiView !== "team") parts.push(meta.arrows === false ? "[f] mostrar flechas" : "[f] ocultar flechas");
-  parts.push("[r] redibujar", "[Ctrl+C o q] salir");
+  if (meta.multiView === "projects") {
+    // La lista de proyectos no se compacta ni tiene flechas de flujo, y `r` la vuelve a leer.
+    parts.push("[↑/↓] elegir", "[Enter] abrir", "[r] releer", "[Ctrl+C o q] salir");
+  } else {
+    if (meta.multiView === "team") parts.push("[↑/↓] elegir", "[Enter] abrir");
+    if (meta.multiView === "operator") parts.push("[Esc o b] volver al equipo");
+    // Desde la raíz de un repo abierto desde la lista (panel plano o vista de equipo), `b`/Esc vuelven a ella.
+    else if (meta.backToProjects) parts.push("[Esc o b] volver a proyectos");
+    parts.push(meta.compact ? "[c] expandir" : "[c] compactar");
+    // La vista de equipo no tiene flechas de flujo.
+    if (meta.multiView !== "team") parts.push(meta.arrows === false ? "[f] mostrar flechas" : "[f] ocultar flechas");
+    parts.push("[r] redibujar", "[Ctrl+C o q] salir");
+  }
 
   const lines: string[] = [];
   let current = "";

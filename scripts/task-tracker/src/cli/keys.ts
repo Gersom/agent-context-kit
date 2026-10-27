@@ -1,6 +1,6 @@
 // Teclas de la terminal interactiva: `q` o Ctrl+C salen, `r` redibuja, `c` compacta o expande los
 // recuadros y `f` oculta o muestra las flechas del flujo. En la vista de equipo (modo
-// multi-operador), ↑/↓ eligen operador, Enter lo abre y `b`, Esc o Retroceso vuelven.
+// multi-operador) y en la lista de proyectos, ↑/↓ eligen, Enter abre y `b`, Esc o Retroceso vuelven.
 
 export type NavKey = "quit" | "redraw" | "up" | "down" | "enter" | "back" | "compact" | "flow";
 

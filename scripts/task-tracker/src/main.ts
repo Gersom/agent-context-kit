@@ -1,6 +1,8 @@
 // Arranque del seguimiento de tareas: interpreta los argumentos, resuelve el proyecto a vigilar
 // y lanza la aplicación. Lo llaman `index.ts` y el despachador `acsuite`.
 
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { gitToplevel } from "../../_shared/git.ts";
 import { startApp } from "./app.ts";
 import { parseArgs } from "./cli/args.ts";
@@ -11,11 +13,13 @@ import type { ResolveOk } from "./shared/types.ts";
 /** Ayuda de `acsuite board`. */
 export const HELP: string[] = [
   "Seguimiento de tareas en la terminal: vigila docs/agents/ de un proyecto y se redibuja al cambiar.",
+  "Sin ruta y fuera de un proyecto con documentación de la skill, abre la lista de proyectos.",
   "",
   "Uso: acsuite board [ruta] [operador] [--operator <carpeta>] [--once] [--compact] [--no-arrows]",
   "",
   "  [ruta]                Raíz del proyecto, carpeta de agentes (docs/agents) o carpeta de un operador.",
-  "                        Por defecto, el proyecto de la carpeta actual.",
+  "                        Por defecto, el proyecto de la carpeta actual; si no tiene documentación,",
+  "                        la lista de proyectos (↑/↓ eligen, Enter abre, Esc o b vuelven a la lista).",
   "  [operador]            Con ruta, abre de frente el panel de ese operador (modo multi-operador).",
   "  --operator <carpeta>  Lo mismo, con o sin ruta.",
   "  --once                Pinta una sola vez y sale.",
@@ -31,10 +35,10 @@ export function main(argv: string[]): void {
   }
   const { once, pathArg, operator, compact, arrows } = parseArgs(argv);
 
+  // `null`: sin proyecto al que abrir de frente, se muestra la lista de proyectos.
   const target = pathArg != null ? resolveFromArg(pathArg, operator) : resolveFromCwd(operator);
-  const { agentsDir, projectName, projectDir, multi } = target;
 
-  startApp({ agentsDir, projectName, projectDir, multi, compact, arrows, once });
+  startApp({ target, compact, arrows, once });
 }
 
 /** Ruta pasada por argumento: si no es válida, se informa y se sale con código 1. */
@@ -47,13 +51,18 @@ function resolveFromArg(input: string, operatorArg: string | undefined): Resolve
 
 /**
  * Sin ruta: el proyecto de la carpeta desde la que se lanzó el comando (la raíz de su repo git,
- * o la carpeta misma si no está en uno). Si no tiene documentación de la skill, se informa qué
- * falta y cómo indicar otra ruta, y se sale con código 1.
+ * o la carpeta misma si no está en uno). Si no tiene documentación de la skill, devuelve `null`
+ * (se abre la lista de proyectos). Con un operador pedido sí es un error: se informa qué falta y
+ * cómo indicar otra ruta, y se sale con código 1.
  */
-function resolveFromCwd(operatorArg: string | undefined): ResolveOk {
+function resolveFromCwd(operatorArg: string | undefined): ResolveOk | null {
   const dir = gitToplevel(invocationDir());
   const result = resolveAgentsDir(dir, undefined, { operator: operatorArg });
   if (result.ok) return result;
+  // Sin operador pedido, que la carpeta no tenga docs de la skill no es un error: se mira la lista
+  // de proyectos. Si la carpeta de agentes existe pero está mal (ej. falta operators.md), sí lo es.
+  const hasAgentsDir = ["docs/agents", "agent-context/agents"].some((sub) => existsSync(join(dir, sub)));
+  if (!operatorArg && !hasAgentsDir) return null;
   console.error(`No se pudo abrir el proyecto de la carpeta actual (${dir}):`);
   printResolveError(result);
   console.error("Si el proyecto está en otra carpeta, indícala: acsuite board <ruta>");

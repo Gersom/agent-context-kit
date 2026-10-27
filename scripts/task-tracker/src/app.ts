@@ -1,37 +1,42 @@
 // Ciclo del tracker: leer los archivos → armar el modelo → pintar, y redibujar cuando cambian
 // (watcher), cuando cambia el tamaño de la terminal, con el atajo `r`, o terminar con `q`/Ctrl+C.
 // En modo multi-operador hay además dos vistas (el equipo y el panel de un operador) y una
-// navegación con ↑/↓, Enter y `b`/Esc (ver cli/nav.ts).
+// navegación con ↑/↓, Enter y `b`/Esc (ver cli/nav.ts). Sin un repo al que abrir de frente, se
+// muestra la lista de proyectos (ver cli/projects-nav.ts): Enter abre uno y `b`/Esc vuelven a ella.
 
 import { parseKeys } from "./cli/keys.ts";
 import { initialNav, type NavRow, navReduce, type NavState, reconcileNav } from "./cli/nav.ts";
+import { initialProjectsNav, type ProjectsNavState, projectsReduce, reconcileProjects } from "./cli/projects-nav.ts";
+import { resolveAgentsDir } from "./io/paths.ts";
+import { defaultProjects, type ProjectsProvider, readProjectRows } from "./io/projects.ts";
 import { createSnapshotReader, RETRY_MS } from "./io/snapshot.ts";
 import { createTeamReader, ROOT_WATCHED_FILES } from "./io/team.ts";
 import { watchDir } from "./io/watch.ts";
 import { buildModel } from "./model/model.ts";
 import { buildTeamModel } from "./model/team.ts";
-import type { Controls, DrawTrigger, MultiInfo, RenderMeta } from "./shared/types.ts";
+import type { Controls, DrawTrigger, MultiInfo, ProjectRow, RenderMeta, ResolveOk } from "./shared/types.ts";
 import { displayProjectName } from "./ui/format.ts";
-import { render, renderTeam } from "./ui/render.ts";
+import { render, renderProjects, renderTeam } from "./ui/render.ts";
+
+/** El repo que se vigila: lo que resuelve `resolveAgentsDir`. */
+type Target = Omit<ResolveOk, "ok">;
 
 /**
  * Arranca el tracker sobre una carpeta de agentes ya resuelta.
- * `multi`: modo multi-operador (`agentsDir` es la raíz con `operators.md`).
+ * `target`: el repo a vigilar (`multi`: modo multi-operador, `agentsDir` es la raíz con
+ * `operators.md`); `null` abre la lista de proyectos.
+ * `listProjects`: de dónde sale la lista de proyectos (se lee al abrir la vista y con `r`).
  * `once`: pinta una sola vez y no vigila (sin atajos de teclado).
  */
 export function startApp({
-  agentsDir,
-  projectName,
-  projectDir,
-  multi,
+  target: initialTarget,
+  listProjects = defaultProjects,
   compact = false,
   arrows = true,
   once,
 }: {
-  agentsDir: string;
-  projectName: string;
-  projectDir: string;
-  multi?: MultiInfo;
+  target: Target | null;
+  listProjects?: ProjectsProvider;
   /** Arranca con los recuadros compactos (una sola tarea por recuadro); la tecla `c` lo alterna. */
   compact?: boolean;
   /** Arranca con las flechas del flujo; la tecla `f` las alterna. */
@@ -40,13 +45,55 @@ export function startApp({
 }): void {
   const ui = { compact, arrows };
   const watcherErrors: string[] = [];
-  const snapshot = multi ? null : createSnapshotReader(agentsDir);
-  const teamReader = multi ? createTeamReader(agentsDir) : null;
+  // El repo abierto (`null`: la lista de proyectos) y lo que depende de él; `open` los intercambia.
+  let target: Target | null = null;
+  let snapshot: ReturnType<typeof createSnapshotReader> | null = null;
+  let teamReader: ReturnType<typeof createTeamReader> | null = null;
   let nav: NavState | null = null;
   let navRows: NavRow[] = [];
+  // `true` si el repo abierto salió de la lista de proyectos: `b`/Esc vuelven a ella.
+  let fromList = false;
+  let projectRows: ProjectRow[] = [];
+  let projectsNav: ProjectsNavState = initialProjectsNav([]);
+  let projectsNotices: string[] = [];
   // Atajos solo con una terminal interactiva de verdad (no con salida o entrada redirigida).
   const interactive = !once && Boolean(process.stdin.isTTY) && Boolean(process.stdout.isTTY);
   const controls: Controls = once ? "none" : interactive ? "keys" : "ctrl-c";
+
+  /** Cambia lo que se muestra: un repo (con sus lectores y vigilantes nuevos) o la lista de proyectos. */
+  function open(next: Target | null): void {
+    for (const stop of stops.values()) stop();
+    stops.clear();
+    watcherErrors.length = 0;
+    target = next;
+    snapshot = next && !next.multi ? createSnapshotReader(next.agentsDir) : null;
+    teamReader = next?.multi ? createTeamReader(next.agentsDir) : null;
+    nav = null;
+    navRows = [];
+    if (!next) loadProjects();
+    if (process.stdout.isTTY && !next?.multi) setTitle();
+  }
+
+  /** Vuelve a leer la lista de proyectos y todos sus repos (solo al abrir la vista y con `r`). */
+  function loadProjects(): void {
+    projectRows = readProjectRows(listProjects());
+    projectsNav = reconcileProjects(projectsNav, projectRows.map((row) => row.path));
+    projectsNotices = [];
+  }
+
+  /** Enter en la lista: abre ese repo en el tablero; si ya no se puede abrir, lo avisa y se queda. */
+  function openProject(path: string): void {
+    projectsNav = { ...projectsNav, opened: null };
+    const resolved = resolveAgentsDir(path);
+    if (!resolved.ok) {
+      projectsNotices = [`No se pudo abrir ${path}: ${resolved.error.replace(/:$/, "")}.`];
+      return draw({ kind: "redraw" });
+    }
+    fromList = true;
+    open(resolved);
+    draw({ kind: "start" });
+    syncWatchers();
+  }
 
   /**
    * Lee los archivos, arma el modelo y redibuja la pantalla. Si un archivo que se venía leyendo
@@ -55,8 +102,18 @@ export function startApp({
    */
   function draw(trigger: DrawTrigger, { isRetry = false }: { isRetry?: boolean } = {}): void {
     const allowRetry = !once && !isRetry;
-    const meta: RenderMeta = { projectName, projectDir, updatedAt: new Date(), trigger, controls, compact: ui.compact, arrows: ui.arrows };
+    const common = { updatedAt: new Date(), trigger, controls, compact: ui.compact, arrows: ui.arrows };
     let screen: string;
+
+    if (!target) {
+      // La lista no se relee al redibujar (cambio de tamaño): solo con `r` o al abrir la vista.
+      projectsNav = reconcileProjects(projectsNav, projectRows.map((row) => row.path));
+      screen = renderProjects(projectRows, { ...common, selected: projectsNav.selected, multiView: "projects" }, projectsNotices);
+      return write(screen);
+    }
+
+    const { agentsDir, projectName, projectDir, multi } = target;
+    const meta: RenderMeta = { ...common, projectName, projectDir, backToProjects: fromList };
 
     if (teamReader && multi) {
       const read = teamReader.read({ allowRetry });
@@ -105,16 +162,22 @@ export function startApp({
       return;
     }
 
+    write(screen);
+  }
+
+  function write(screen: string): void {
     if (!once && process.stdout.isTTY) process.stdout.write("\x1b[2J\x1b[3J\x1b[H");
     process.stdout.write(screen);
   }
 
   function setTitle(suffix?: string): void {
-    process.stdout.write(`\x1b]0;tareas · ${displayProjectName(projectName)}${suffix ? ` · ${suffix}` : ""}\x07`);
+    const name = target ? displayProjectName(target.projectName) : "proyectos";
+    process.stdout.write(`\x1b]0;tareas · ${name}${suffix ? ` · ${suffix}` : ""}\x07`);
   }
 
   // Una instancia de watcher por carpeta vigilada: la de agentes (modo plano) o la raíz y la de
   // cada operador con carpeta (modo multi-operador; se agregan al aparecer en operators.md).
+  // La lista de proyectos no vigila nada.
   const stops = new Map<string, () => void>();
   const onChange = (file: string | null) => draw({ kind: "change", file });
   const onError = (message: string) => {
@@ -122,7 +185,8 @@ export function startApp({
     draw({ kind: "redraw" });
   };
   function syncWatchers(): void {
-    if (once) return;
+    if (once || !target) return;
+    const { agentsDir, multi } = target;
     if (!stops.has(agentsDir)) stops.set(agentsDir, watchDir(agentsDir, onChange, onError, undefined, multi ? ROOT_WATCHED_FILES : undefined));
     if (!multi) return;
     for (const row of navRows) {
@@ -132,8 +196,7 @@ export function startApp({
     }
   }
 
-  if (process.stdout.isTTY && !multi) setTitle();
-
+  open(initialTarget);
   draw({ kind: "start" });
   if (once) return;
   syncWatchers();
@@ -156,12 +219,25 @@ export function startApp({
       for (const key of parseKeys(chunk)) {
         if (key === "quit") return quit();
         if (key === "redraw") {
+          if (!target) loadProjects();
+          draw({ kind: "redraw" });
+        } else if (!target) {
+          const next = projectsReduce(projectsNav, key, projectRows.map((row) => row.path));
+          if (next.opened) openProject(next.opened);
+          else if (next !== projectsNav) {
+            projectsNav = next;
+            draw({ kind: "redraw" });
+          }
+        } else if (key === "back" && fromList && (!target.multi || nav?.view.kind === "team")) {
+          // Desde la raíz del repo (el panel plano o la vista de equipo), de vuelta a la lista.
+          fromList = false;
+          open(null);
           draw({ kind: "redraw" });
         } else if (key === "compact" || key === "flow") {
           if (key === "compact") ui.compact = !ui.compact;
           else ui.arrows = !ui.arrows;
           draw({ kind: "redraw" });
-        } else if (multi && nav) {
+        } else if (target.multi && nav) {
           const next = navReduce(nav, key, navRows);
           if (next !== nav) {
             nav = next;

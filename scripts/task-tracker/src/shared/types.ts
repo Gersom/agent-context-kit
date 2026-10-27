@@ -117,8 +117,10 @@ export interface RenderMeta {
   operator?: string;
   /** Tareas sin dueño (modo multi-operador): se pintan en el recuadro "SIN DUEÑO" debajo de las bloqueadas. */
   teamBacklog?: TeamBacklogModel;
-  /** En modo multi-operador, qué vista es (cambia las teclas que indica el pie). */
-  multiView?: "team" | "operator";
+  /** Qué vista es, si no es el panel de un repo plano (cambia las teclas que indica el pie). */
+  multiView?: "team" | "operator" | "projects";
+  /** `true`: el repo se abrió desde la lista de proyectos, así que `b`/Esc pueden volver a ella. */
+  backToProjects?: boolean;
   /**
    * `true`: los recuadros de tareas, salvo en progreso y pausadas, muestran una sola tarea (la más
    * reciente) y cuántas más hay, para ocupar menos pantalla.
@@ -183,6 +185,32 @@ export interface TeamModel {
   rows: TeamRow[];
   teamBacklog: TeamBacklogModel;
   warnings: string[];
+}
+
+/**
+ * Fila de la lista de proyectos: un repo, el operador de su correo de git y lo que está haciendo.
+ * `work: null` cuando no se sabe (el correo no figura en operators.md o el repo no se pudo leer):
+ * la fila muestra `—` en la tarea y los conteos.
+ */
+export interface ProjectRow {
+  /** Nombre de la carpeta del repo. */
+  name: string;
+  /** Ruta tal como llegó de la lista: con ella se abre el repo y se guarda la selección. */
+  path: string;
+  /** Carpeta del operador del correo de git; `null` si no figura o el repo es plano. */
+  operator: string | null;
+  work: {
+    current: { label: string; number: number; title: string } | null;
+    counts: { free: number; blocked: number };
+  } | null;
+  /** Por qué el repo no se pudo leer; la fila lo muestra en lugar de sus datos. */
+  warning: string | null;
+}
+
+/** Metadatos de la lista de proyectos: no hay un repo en el encabezado, solo qué fila está elegida. */
+export interface ProjectsRenderMeta extends Omit<RenderMeta, "projectName" | "projectDir"> {
+  /** Ruta del proyecto elegido en la lista. */
+  selected: string | null;
 }
 
 /** Metadatos de la vista de equipo: los de siempre más qué fila está elegida y cuál es "tú". */

@@ -103,13 +103,44 @@ describe("index.ts sin ruta: el proyecto de la carpeta donde se lanza", () => {
     expect(stdout).toContain("T-11: Escribir el parser de secciones");
   });
 
-  test("fuera de un proyecto (sin documentación): código 1, dice qué falta y cómo indicar otra ruta, sin preguntar", async () => {
+  test("fuera de un proyecto (sin documentación): abre la lista de proyectos, vacía y con el mensaje de cómo abrir uno", async () => {
     const root = tempProject({ git: false, docs: false });
     const { stdout, stderr, code } = await run(["--once"], root);
+    expect(stderr).toBe("");
+    expect(code).toBe(0);
+    expect(stdout).toContain("▣ proyectos");
+    expect(stdout).toContain("╭─ PROYECTOS (0)");
+    expect(stdout).toContain("No hay proyectos para mostrar.");
+    expect(stdout).toContain("acsuite board <ruta>");
+    expect(stdout).not.toContain("Ctrl+C");
+    expect(stdout).not.toMatch(/\x1b\[/);
+  });
+
+  test("fuera de un proyecto con un operador pedido: sigue siendo un error (código 1) que dice qué falta", async () => {
+    const root = tempProject({ git: false, docs: false });
+    const { stdout, stderr, code } = await run(["--operator", "ana", "--once"], root);
     expect(code).toBe(1);
     expect(stderr).toContain("No se pudo abrir el proyecto de la carpeta actual");
     expect(stderr).toContain("No se encontró handoff.md");
     expect(stderr).toContain("acsuite board <ruta>");
+    expect(stdout).toBe("");
+  });
+
+  test("carpeta de agentes rota (operadores sin operators.md): sigue siendo un error, no una lista vacía", async () => {
+    const root = tempProject({ git: false, docs: false });
+    mkdirSync(join(root, "docs", "agents", "ana"), { recursive: true });
+    writeFileSync(join(root, "docs", "agents", "ana", "handoff.md"), "# Handoff\n");
+    const { stdout, stderr, code } = await run(["--once"], root);
+    expect(code).toBe(1);
+    expect(stderr).toContain("operators.md");
+    expect(stdout).toBe("");
+  });
+
+  test("con una ruta inválida no se abre la lista: código 1", async () => {
+    const root = tempProject({ git: false, docs: false });
+    const { stdout, stderr, code } = await run([join(root, "no-existe"), "--once"], root);
+    expect(code).toBe(1);
+    expect(stderr).toContain("No existe la carpeta");
     expect(stdout).toBe("");
   });
 

@@ -10,7 +10,8 @@
 //
 // Uso (desde la raíz de agent-context-suite):
 //   bun run board                 → vigila el proyecto de la carpeta actual (la raíz de su repo git);
-//                                   sin documentación de la skill ahí, sale con código 1
+//                                   sin documentación de la skill ahí, abre la lista de proyectos
+//                                   (↑/↓ eligen, Enter abre uno, `b` o Esc vuelven a la lista)
 //   bun run board <ruta>          → raíz del proyecto (busca docs/agents/ o agent-context/agents/)
 //                                   o la carpeta que contiene handoff.md
 //   bun run board --once          → pinta una sola vez y sale (útil para probar o en CI)
