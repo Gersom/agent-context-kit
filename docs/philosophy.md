@@ -51,7 +51,7 @@ Como los archivos se editan a mano, las herramientas tienen que convivir con eso
 
 Un término por concepto, en toda la documentación y en los mensajes de los scripts:
 
-- **La skill** (femenino): `agent-context-skill`, el repo de `skill/`.
+- **La skill** (femenino): `agent-context-skill`, el repo que se clona en `skill/` o `agent-context-skill/`.
 - **Operador:** la persona que trabaja con el agente (definido en [`README.md`](./README.md)). «Usuario» solo nombra a quien usa el producto de un proyecto.
 - **Plantilla:** cada archivo de `template/` que la skill copia a un proyecto. «Template» solo nombra la carpeta `template/` o el archivo `template-architecture.md`.
 - **Ronda** (bloque de preguntas de un flujo) y **tanda** (hasta 4 preguntas en una llamada); **recuadro** es la interfaz de `AskUserQuestion`, nunca «widget». Ver `asking-questions.md` de la skill.

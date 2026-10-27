@@ -65,16 +65,6 @@ Sin ruta, `board` y `check` usan el proyecto de la carpeta donde ejecutas el com
 
 `acsuite` sin argumentos lista los subcomandos, y `acsuite <subcomando> --help` muestra la ayuda de cada uno. Detalle de cada herramienta: [`board`](./scripts/task-tracker/README.md), [`task`](./scripts/task-manager/README.md) y [`check`](./scripts/docs-check/README.md).
 
-## Clonar la skill
-
-La skill no está en este repo: vive en [Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill) y se clona dentro de la suite, en `skill/` (ya está en `.gitignore`):
-
-```sh
-git clone https://github.com/Gersom/agent-context-skill skill
-```
-
-Sin ese clon todo lo demás funciona, pero los tests de `scripts/skill-checks/` se saltan, y con ellos la comparación del snapshot de plantillas que usa `docs-check` (`scripts/docs-check/test/fixtures/template/`), así que ese snapshot no se valida. Los cambios en la skill se commitean allí (`git -C skill ...`), no en la suite. Si la clonas en otra carpeta, indícala con la variable de entorno `SKILL_DIR`.
-
 ## Seguimiento de tareas en la terminal
 
 Este repo incluye una herramienta para ver, en una terminal aparte, el estado de las tareas de cualquier proyecto que use la skill (tarea en progreso, pausadas, pendientes y últimas completadas), redibujándose sola cuando cambian sus archivos:
@@ -110,7 +100,6 @@ Revisa el proyecto de la carpeta actual; para otro, pásale la ruta (`acsuite ch
 
 ```
 agent-context-suite/
-├── skill/           # Clon de Gersom/agent-context-skill (otro repo, ignorado por git): SKILL.md, flujos (docs/) y plantillas (template/)
 ├── scripts/         # Herramientas de la suite, no parte de la skill: acsuite (CLI único), task-tracker, task-manager, docs-check y código compartido (_shared/)
 ├── docs/            # Documentación del propio repo: filosofía, arquitectura, diseño y su estado (agents/)
 ├── package.json     # Versión de la suite (SemVer), licencia y comandos de los scripts
@@ -131,3 +120,7 @@ Si la suite o la skill te sirven y quieres apoyar su desarrollo, puedes hacer un
 ## Estado
 
 Proyecto en diseño. Ver [`docs/architecture.md`](./docs/architecture.md) para la estructura vigente. Las tareas pendientes viven en `docs/agents/`.
+
+## Colaborar
+
+Si deseas colaborar con el proyecto, consulta la [guía de colaboración](https://github.com/Gersom/agent-context-suite/blob/main/CONTRIBUTING.md).

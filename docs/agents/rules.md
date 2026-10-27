@@ -35,12 +35,12 @@ Varias personas trabajan a la vez, cada una con su agente. Estas reglas se suman
 
 - Estructura de carpetas y por qué está organizado así → [`../architecture.md`](../architecture.md)
 - Razón de ser y principios de diseño → [`../philosophy.md`](../philosophy.md)
-- Catálogo de plantillas y para qué sirve cada una → `docs/template-architecture.md` del repo de la skill ([Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill), clonado en `skill/`; no está en este repo)
+- Catálogo de plantillas y para qué sirve cada una → `docs/template-architecture.md` del repo de la skill ([Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill), clonado en `skill/` o `agent-context-skill/`; no está en este repo)
 
 ## Reglas específicas de este proyecto
 
-- **Dos repos.** La suite (este repo) tiene las herramientas y su documentación; la skill (`SKILL.md`, flujos y plantillas `.md`, markdown puro, sin código ni build) vive en su propio repo, [Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill), clonado en `skill/` e ignorado por git en la suite (`.gitignore`). Quien clone la suite tiene que clonar también la skill en `skill/` (ver el README raíz); sin ella, los tests de `scripts/skill-checks/` se saltan.
-- **Commits en dos repos (complementa la Regla 5).** Un cambio en la skill se commitea en su repo, con `git -C skill commit` y el mismo formato `tipo(T-N): descripción`; uno en la suite, en la suite. Una tarea que toca ambos tiene commits en los dos. El commit de cierre (`docs(T-N): close task`) va siempre en la suite, porque ahí viven `handoff.md`, `backlog.md` e `history.md`. En `history.md`, la entrada indica el repo de cada commit (ver «Formato» en ese archivo).
+- **Dos repos.** La suite (este repo) tiene las herramientas y su documentación; la skill (`SKILL.md`, flujos y plantillas `.md`, markdown puro, sin código ni build) vive en su propio repo, [Gersom/agent-context-skill](https://github.com/Gersom/agent-context-skill), clonado en `skill/` o `agent-context-skill/` e ignorado por git en la suite (`.gitignore`). Quien clone la suite para tocar la skill o sus tests tiene que clonarla también en una de esas carpetas (ver `CONTRIBUTING.md`); sin ella, los tests de `scripts/skill-checks/` se saltan.
+- **Commits en dos repos (complementa la Regla 5).** Un cambio en la skill se commitea en su repo, con `git -C <carpeta de la skill> commit` (`skill/` o `agent-context-skill/`) y el mismo formato `tipo(T-N): descripción`; uno en la suite, en la suite. Una tarea que toca ambos tiene commits en los dos. El commit de cierre (`docs(T-N): close task`) va siempre en la suite, porque ahí viven `handoff.md`, `backlog.md` e `history.md`. En `history.md`, la entrada indica el repo de cada commit (ver «Formato» en ese archivo).
 - No hay linter/formatter. `scripts/` (TypeScript con Bun, ej. `scripts/task-tracker/`) son herramientas propias de la suite que **no forman parte de la skill distribuida** ni se copian a los repos destino.
 - Dependencias de `scripts/`: en el `package.json` raíz (no uno por script); `bun install` en la raíz; `node_modules/` no se commitea y `bun.lock` sí. Tests con `bun test` desde la raíz.
 - Los scripts nuevos se escriben en **TypeScript** (decisión del operador, 2026-10-05), con el `tsconfig.json` raíz (`strict`). Bun no revisa tipos: `bun run typecheck` (`tsc --noEmit`) tiene que pasar junto con `bun test`.
@@ -52,7 +52,7 @@ Varias personas trabajan a la vez, cada una con su agente. Estas reglas se suman
 
 ### Qué NO tocar sin autorización explícita
 
-- La estructura de carpetas de `template/` en el repo de la skill (`skill/template/`): moverla o renombrar archivos rompe las referencias de `questions-flow.md` y `migration-flow.md` y requiere bump major de la skill.
+- La estructura de carpetas de `template/` en el repo de la skill (`skill/template/` o `agent-context-skill/template/`): moverla o renombrar archivos rompe las referencias de `questions-flow.md` y `migration-flow.md` y requiere bump major de la skill.
 
 ## Al cerrar una tarea (fijas — leer solo al cerrar)
 
