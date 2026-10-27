@@ -1,9 +1,10 @@
 // Teclas de la terminal interactiva: `q` o Ctrl+C salen, `r` redibuja, `c` compacta o expande los
 // recuadros y `f` oculta o muestra las flechas del flujo. En la vista de equipo (modo
 // multi-operador) y en la lista de proyectos, ↑/↓ eligen, Enter abre y `b`, Esc o Retroceso vuelven;
-// `p` lleva a la lista de proyectos desde cualquier vista de un repo y `a` agrega un repo a ella.
+// `p` lleva a la lista de proyectos desde cualquier vista de un repo, `a` agrega un repo a ella y `x`
+// quita de ella el elegido (pide confirmación: ver `parseConfirm`).
 
-export type NavKey = "quit" | "redraw" | "up" | "down" | "enter" | "back" | "compact" | "flow" | "projects" | "add";
+export type NavKey = "quit" | "redraw" | "up" | "down" | "enter" | "back" | "compact" | "flow" | "projects" | "add" | "remove";
 
 /**
  * Teclas de lo que llegó de la terminal en modo raw. Las flechas llegan como secuencias de varios
@@ -20,8 +21,7 @@ export function parseKeys(chunk: string): NavKey[] {
         keys.push("back");
         continue;
       }
-      let end = i + 2;
-      while (end < chunk.length && !/[@-~]/.test(chunk[end])) end++;
+      const end = sequenceEnd(chunk, i);
       const final = chunk[end];
       if (final === "A") keys.push("up");
       else if (final === "B") keys.push("down");
@@ -34,6 +34,32 @@ export function parseKeys(chunk: string): NavKey[] {
   return keys;
 }
 
+/** Índice del último carácter de la secuencia `ESC [ …` o `ESC O …` que empieza en `start`. */
+function sequenceEnd(chunk: string, start: number): number {
+  let end = start + 2;
+  while (end < chunk.length && !/[@-~]/.test(chunk[end])) end++;
+  return end;
+}
+
+/**
+ * Respuesta a una confirmación («¿Quitar…? [Enter] sí · [Esc] no»): Enter acepta, Esc suelto o `n`
+ * cancelan y Ctrl+C sale. Cualquier otra tecla (también las flechas) se ignora; gana la primera
+ * respuesta del bloque, y `null` si no hay ninguna.
+ */
+export function parseConfirm(chunk: string): "accept" | "cancel" | "quit" | null {
+  for (let i = 0; i < chunk.length; i++) {
+    const char = chunk[i];
+    if (char === "\u001b") {
+      const next = chunk[i + 1];
+      if (next !== "[" && next !== "O") return "cancel";
+      i = sequenceEnd(chunk, i);
+    } else if (char === "\u0003") return "quit";
+    else if (char === "\r" || char === "\n") return "accept";
+    else if (char === "n" || char === "N") return "cancel";
+  }
+  return null;
+}
+
 function singleKey(char: string): NavKey | null {
   if (char === "\u0003" || char === "q" || char === "Q") return "quit";
   if (char === "r" || char === "R") return "redraw";
@@ -41,6 +67,7 @@ function singleKey(char: string): NavKey | null {
   if (char === "f" || char === "F") return "flow";
   if (char === "p" || char === "P") return "projects";
   if (char === "a" || char === "A") return "add";
+  if (char === "x" || char === "X") return "remove";
   if (char === "\r" || char === "\n") return "enter";
   if (char === "b" || char === "B" || char === "\u007f" || char === "\b") return "back";
   return null;

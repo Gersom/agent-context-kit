@@ -34,3 +34,10 @@ export function reconcileProjects(state: ProjectsNavState, paths: string[]): Pro
   const opened = state.opened && paths.includes(state.opened) ? state.opened : null;
   return selected === state.selected && opened === state.opened ? state : { selected, opened };
 }
+
+/** La ruta que queda elegida al quitar `removed`: la fila siguiente, o la anterior si era la última (`null` si no queda ninguna). */
+export function neighborAfterRemove(paths: string[], removed: string): string | null {
+  const at = paths.indexOf(removed);
+  if (at < 0) return null;
+  return paths[at + 1] ?? paths[at - 1] ?? null;
+}

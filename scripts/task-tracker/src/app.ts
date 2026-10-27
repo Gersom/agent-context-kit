@@ -6,14 +6,14 @@
 
 import { gitToplevel } from "../../_shared/git.ts";
 import { editLine } from "./cli/line-edit.ts";
-import { parseKeys } from "./cli/keys.ts";
+import { parseConfirm, parseKeys } from "./cli/keys.ts";
 import { initialNav, type NavRow, navReduce, type NavState, reconcileNav } from "./cli/nav.ts";
-import { initialProjectsNav, type ProjectsNavState, projectsReduce, reconcileProjects } from "./cli/projects-nav.ts";
+import { initialProjectsNav, neighborAfterRemove, type ProjectsNavState, projectsReduce, reconcileProjects } from "./cli/projects-nav.ts";
 import { resolveAgentsDir } from "./io/paths.ts";
 import { createProjectList, defaultProjects, type ProjectsProvider, readProjectRows } from "./io/projects.ts";
 import { createSnapshotReader, RETRY_MS } from "./io/snapshot.ts";
 import { createTeamReader, ROOT_WATCHED_FILES } from "./io/team.ts";
-import { saveProject } from "./io/user-config.ts";
+import { removeProject, samePath, saveProject } from "./io/user-config.ts";
 import { watchDir } from "./io/watch.ts";
 import { buildModel } from "./model/model.ts";
 import { buildTeamModel } from "./model/team.ts";
@@ -59,10 +59,13 @@ export function startApp({
   let projectRows: ProjectRow[] = [];
   let projectsNav: ProjectsNavState = initialProjectsNav([]);
   let projectsNotices: string[] = [];
-  // Lista de proyectos: la del proveedor más los repos agregados con `a` (que además se guardan en disco).
-  const projectList = createProjectList(listProjects, { save: saveProject });
+  // Lista de proyectos: la del proveedor más los repos agregados con `a` (que además se guardan en
+  // disco), menos los quitados con `x` (que además se quitan del disco).
+  const projectList = createProjectList(listProjects, { save: saveProject, remove: removeProject });
   // Texto de la ruta que se escribe para agregar un repo; `null` si no se está agregando.
   let adding: string | null = null;
+  // Ruta del proyecto que se pide quitar de la lista, a la espera de confirmar; `null` si no hay nada que confirmar.
+  let confirmRemove: string | null = null;
   // Atajos solo con una terminal interactiva de verdad (no con salida o entrada redirigida).
   const interactive = !once && Boolean(process.stdin.isTTY) && Boolean(process.stdout.isTTY);
   const controls: Controls = once ? "none" : interactive ? "keys" : "ctrl-c";
@@ -104,6 +107,27 @@ export function startApp({
     if (result.warning) projectsNotices.push(`No se pudo guardar la lista: ${result.warning}`);
   }
 
+  /**
+   * Enter al confirmar: quita el proyecto de la lista y de lo guardado (no borra nada del repo). La
+   * selección pasa al vecino (el siguiente, o el anterior si era el último); si no se pudo quitar,
+   * avisa y la lista queda como estaba.
+   */
+  function submitRemove(): void {
+    const path = confirmRemove;
+    confirmRemove = null;
+    if (!path) return;
+    const error = projectList.remove(path);
+    if (error) {
+      projectsNotices = [`No se pudo quitar de la lista: ${error}`];
+      return;
+    }
+    // Sin releer los repos (eso es de `r`): se saca la fila y la selección pasa al vecino.
+    const neighbor = neighborAfterRemove(projectRows.map((row) => row.path), path);
+    projectRows = projectRows.filter((row) => !samePath(row.path, path));
+    projectsNav = reconcileProjects({ selected: projectsNav.selected && samePath(projectsNav.selected, path) ? neighbor : projectsNav.selected, opened: null }, projectRows.map((row) => row.path));
+    projectsNotices = [];
+  }
+
   /** Enter en la lista: abre ese repo en el tablero; si ya no se puede abrir, lo avisa y se queda. */
   function openProject(path: string): void {
     projectsNav = { ...projectsNav, opened: null };
@@ -131,7 +155,8 @@ export function startApp({
     if (!target) {
       // La lista no se relee al redibujar (cambio de tamaño): solo con `r` o al abrir la vista.
       projectsNav = reconcileProjects(projectsNav, projectRows.map((row) => row.path));
-      screen = renderProjects(projectRows, { ...common, selected: projectsNav.selected, multiView: "projects", input: adding }, projectsNotices);
+      const confirmName = confirmRemove ? (projectRows.find((row) => row.path === confirmRemove)?.name ?? confirmRemove) : null;
+      screen = renderProjects(projectRows, { ...common, selected: projectsNav.selected, multiView: "projects", input: adding, confirmRemove: confirmName }, projectsNotices);
       return write(screen);
     }
 
@@ -256,6 +281,15 @@ export function startApp({
         } else if (edit.done === "submit") submitAdding();
         return draw({ kind: "redraw" });
       }
+      if (confirmRemove != null) {
+        // Confirmando: solo Ctrl+C (sale), Enter (quita) y Esc o `n` (cancelan); lo demás se ignora.
+        const answer = parseConfirm(chunk);
+        if (answer === "quit") return quit();
+        if (answer === "accept") submitRemove();
+        else if (answer === "cancel") confirmRemove = null;
+        else return;
+        return draw({ kind: "redraw" });
+      }
       for (const key of parseKeys(chunk)) {
         if (key === "quit") return quit();
         if (key === "redraw") {
@@ -268,6 +302,15 @@ export function startApp({
           const rest = chunk.slice(chunk.search(/[aA]/) + 1);
           if (rest) adding = editLine("", rest).text;
           draw({ kind: "redraw" });
+          return;
+        } else if (!target && key === "remove") {
+          // Sin filas no hay nada que quitar; con una elegida, se pide confirmar antes.
+          if (projectsNav.selected && projectRows.some((row) => row.path === projectsNav.selected)) {
+            confirmRemove = projectsNav.selected;
+            projectsNotices = [];
+            draw({ kind: "redraw" });
+          }
+          // Lo que siga en este mismo bloque no puede contestar la confirmación.
           return;
         } else if (!target) {
           const next = projectsReduce(projectsNav, key, projectRows.map((row) => row.path));

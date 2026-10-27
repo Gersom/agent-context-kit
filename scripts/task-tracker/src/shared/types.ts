@@ -123,6 +123,8 @@ export interface RenderMeta {
   backToProjects?: boolean;
   /** Lista de proyectos: texto de la ruta que se escribe para agregar un repo; `null` si no se agrega. */
   input?: string | null;
+  /** Lista de proyectos: nombre del proyecto cuya salida de la lista se pide confirmar; `null` si no se confirma nada. */
+  confirmRemove?: string | null;
   /**
    * `true`: los recuadros de tareas, salvo en progreso y pausadas, muestran una sola tarea (la más
    * reciente) y cuántas más hay, para ocupar menos pantalla.

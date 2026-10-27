@@ -4,6 +4,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createProjectList, defaultProjects, readProjectRows } from "../../src/io/projects.ts";
+import { removeProject } from "../../src/io/user-config.ts";
 import { requireFixture } from "../../../_shared/test/helpers.ts";
 
 const OPERATORS = `# Operadores
@@ -201,6 +202,67 @@ describe("createProjectList", () => {
     const projects = createProjectList(() => [], { save: (path) => (saved.push(path), null) });
     expect(projects.add(noDocs)).toMatchObject({ ok: false });
     expect(saved).toEqual([]);
+  });
+
+  test("quitar una ruta del proveedor: sale de la lista aunque el proveedor la siga dando, y las demás conservan el orden", () => {
+    const projects = createProjectList(() => [flat, multi, noDocs]);
+    expect(projects.remove(multi)).toBeNull();
+    expect(projects.list()).toEqual([flat, noDocs]);
+  });
+
+  test("quitar una ruta agregada en esta sesión", () => {
+    if (!hasGit) return;
+    const projects = createProjectList(() => [flat]);
+    projects.add(multi);
+    expect(projects.remove(multi)).toBeNull();
+    expect(projects.list()).toEqual([flat]);
+  });
+
+  test("con `remove`: se llama con la ruta; si va bien, la lista cambia", () => {
+    const removed: string[] = [];
+    const projects = createProjectList(() => [flat, multi], { remove: (path) => (removed.push(path), null) });
+    expect(projects.remove(flat)).toBeNull();
+    expect(removed).toEqual([flat]);
+    expect(projects.list()).toEqual([multi]);
+  });
+
+  test("con `remove` que falla: devuelve el mensaje y la lista queda como estaba", () => {
+    const projects = createProjectList(() => [flat, multi], { remove: () => "disco lleno" });
+    expect(projects.remove(flat)).toBe("disco lleno");
+    expect(projects.list()).toEqual([flat, multi]);
+  });
+
+  test("rutas equivalentes (otras barras, barra final): se quita la misma", () => {
+    const projects = createProjectList(() => [flat, multi]);
+    expect(projects.remove(`${flat.split("\\").join("/")}/`)).toBeNull();
+    expect(projects.list()).toEqual([multi]);
+  });
+
+  test("`add` de una ruta quitada la vuelve a admitir, y se vuelve a guardar", () => {
+    if (!hasGit) return;
+    const saved: string[] = [];
+    const projects = createProjectList(() => [multi], { save: (path) => (saved.push(path), null), remove: () => null });
+    expect(projects.remove(multi)).toBeNull();
+    expect(projects.list()).toEqual([]);
+    expect(projects.add(multi)).toEqual({ ok: true, path: multi, added: true });
+    expect(saved).toEqual([multi]);
+    expect(projects.list()).toEqual([multi]);
+  });
+
+  test("con el guardado real: quitar y volver a leer el archivo no la devuelve", () => {
+    const saved = mkdtempSync(join(root, "home-"));
+    const previous = process.env.ACSUITE_HOME;
+    process.env.ACSUITE_HOME = saved;
+    try {
+      writeFileSync(join(saved, "projects.json"), JSON.stringify({ version: 1, projects: [flat, multi] }));
+      const projects = createProjectList(defaultProjects, { remove: removeProject });
+      expect(projects.remove(flat)).toBeNull();
+      expect(projects.list()).toEqual([multi]);
+      expect(defaultProjects()).toEqual([multi]);
+    } finally {
+      if (previous === undefined) delete process.env.ACSUITE_HOME;
+      else process.env.ACSUITE_HOME = previous;
+    }
   });
 
   test("errores: vacía, inexistente y sin documentación de la skill; la lista no cambia", () => {

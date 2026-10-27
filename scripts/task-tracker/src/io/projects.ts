@@ -37,17 +37,26 @@ export interface ProjectList {
    * el repo queda en la lista de esta sesión igual.
    */
   add(input: string): AddResult;
+  /**
+   * Quita la ruta de la lista (sin tocar el repo): si se pidió quitarla de lo guardado (`remove`)
+   * y no se pudo, devuelve el mensaje y la lista no cambia. Si salió bien, `list()` ya no la
+   * devuelve, aunque el proveedor siga dándola. Devuelve `null` si quedó quitada.
+   */
+  remove(path: string): string | null;
 }
 
 export function createProjectList(
   base: ProjectsProvider,
-  { save }: { save?: (path: string) => string | null } = {},
+  { save, remove }: { save?: (path: string) => string | null; remove?: (path: string) => string | null } = {},
 ): ProjectList {
   const extra: string[] = [];
+  // Rutas quitadas en esta sesión: se filtran de la lista aunque el proveedor las vuelva a dar.
+  // `add` de una de ellas la vuelve a admitir.
+  const removed: string[] = [];
   const list = () => {
     const paths = [...base()];
     for (const path of extra) if (!paths.some((p) => samePath(p, path))) paths.push(path);
-    return paths;
+    return paths.filter((p) => !removed.some((r) => samePath(r, p)));
   };
   return {
     list,
@@ -59,9 +68,17 @@ export function createProjectList(
       if (!resolved.ok) return { ok: false, error: resolved.error.replace(/:$/, "") };
       const known = list().find((p) => samePath(p, root));
       if (known) return { ok: true, path: known, added: false };
+      for (let i = removed.length - 1; i >= 0; i--) if (samePath(removed[i], root)) removed.splice(i, 1);
       extra.push(root);
       const warning = save?.(root);
       return warning ? { ok: true, path: root, added: true, warning } : { ok: true, path: root, added: true };
+    },
+    remove(path) {
+      const error = remove?.(path);
+      if (error) return error;
+      for (let i = extra.length - 1; i >= 0; i--) if (samePath(extra[i], path)) extra.splice(i, 1);
+      removed.push(path);
+      return null;
     },
   };
 }

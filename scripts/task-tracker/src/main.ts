@@ -29,7 +29,8 @@ export const HELP: string[] = [
   "  -h, --help            Muestra esta ayuda.",
   "",
   "La lista de proyectos se guarda en projects.json dentro de ~/.acsuite (o de la carpeta de la variable",
-  "ACSUITE_HOME): los repos abiertos de frente (sin --once) y los agregados con la tecla a.",
+  "ACSUITE_HOME): los repos abiertos de frente (sin --once) y los agregados con la tecla a. Con la tecla x",
+  "se quita de la lista el proyecto elegido, tras confirmar con Enter (no se borra nada del repo).",
 ];
 
 export function main(argv: string[]): void {

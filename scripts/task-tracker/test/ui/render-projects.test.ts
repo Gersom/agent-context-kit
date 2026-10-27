@@ -68,7 +68,7 @@ describe("renderProjects", () => {
 
   test("pie: sin controles nada; con teclas, las de la lista; con Ctrl+C, solo salir", () => {
     expect(renderProjects(rows, { ...meta, controls: "none" })).not.toContain("[");
-    expect(renderProjects(rows, { ...meta, controls: "keys", multiView: "projects" })).toContain("[↑/↓] elegir - [Enter] abrir - [a] agregar repo - [r] releer - [Ctrl+C o q] salir");
+    expect(renderProjects(rows, { ...meta, controls: "keys", multiView: "projects" })).toContain("[↑/↓] elegir - [Enter] abrir - [a] agregar repo - [x] quitar - [r] releer - [Ctrl+C o q] salir");
     expect(renderProjects(rows, { ...meta, controls: "keys", multiView: "projects" })).not.toContain("compactar");
     expect(renderProjects(rows, { ...meta, controls: "ctrl-c" })).toContain("[Ctrl+C] salir");
   });
@@ -80,6 +80,34 @@ describe("renderProjects", () => {
     expect(out).not.toContain("[a] agregar repo");
     expect(renderProjects(rows, meta)).not.toContain("Ruta del repo");
     expect(renderProjects([], { ...meta, input: "x" })).toContain("Ruta del repo: x█");
+  });
+
+  test("confirmando quitar: la línea con el nombre dentro del recuadro y el pie de la confirmación", () => {
+    const keys = { ...meta, controls: "keys" as const, multiView: "projects" as const };
+    const out = renderProjects(rows, { ...keys, confirmRemove: "demo-app" });
+    expect(out.split("\n").find((l) => l.includes("¿Quitar"))).toMatch(/^│ ¿Quitar demo-app de la lista\? \[Enter\] sí · \[Esc\] no +│$/);
+    expect(out).toContain("[Enter] quitar - [Esc] cancelar - [Ctrl+C] salir");
+    expect(out).not.toContain("[x] quitar");
+    expect(out).not.toContain("[a] agregar repo");
+    // Sin confirmar, ni la línea ni el pie de la confirmación; el pie normal ofrece [x] quitar.
+    const normal = renderProjects(rows, keys);
+    expect(normal).not.toContain("¿Quitar");
+    expect(normal).not.toContain("[Enter] quitar");
+    expect(normal).toContain("[x] quitar");
+    expect(renderProjects(rows, { ...keys, confirmRemove: null })).not.toContain("¿Quitar");
+  });
+
+  test("sin teclas activas no se ofrece [x] quitar", () => {
+    expect(renderProjects(rows, { ...meta, controls: "ctrl-c" })).not.toContain("[x]");
+    expect(renderProjects(rows, { ...meta, controls: "none" })).not.toContain("[x]");
+  });
+
+  test("la línea de confirmación cabe en el ancho, también con ancho chico y un nombre largo", () => {
+    for (const width of [100, 60, 40]) {
+      for (const line of renderProjects(rows, { ...meta, width, confirmRemove: "un-nombre-de-proyecto-muy-largo-que-no-entra" }).split("\n")) {
+        expect([...line].length).toBeLessThanOrEqual(width);
+      }
+    }
   });
 
   test("una ruta más larga que el ancho se muestra por el final, con el cursor", () => {

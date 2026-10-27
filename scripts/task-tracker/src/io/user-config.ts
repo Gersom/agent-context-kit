@@ -116,6 +116,41 @@ export function saveProject(path: string): string | null {
   }
 }
 
+/**
+ * Quita la raíz de un repo de la lista guardada (las demás conservan su orden). No borra nada del
+ * disco más que esa entrada. Si la ruta no figura, no toca el archivo; eso incluye uno corrupto,
+ * que se lee como lista vacía y no se reescribe (no hay nada que quitar, y reescribirlo perdería
+ * lo que contiene). Escribe de forma atómica (archivo temporal + renombrar) y no pisa un archivo
+ * que no se pudo leer. Devuelve el mensaje del error, o `null` si quedó quitada (o no figuraba).
+ */
+export function removeProject(path: string): string | null {
+  let dir: string;
+  try {
+    dir = configDir();
+  } catch (error) {
+    return `No se pudo ubicar la carpeta de config: ${errorMessage(error)}`;
+  }
+  const file = join(dir, PROJECTS_FILE);
+  const temp = `${file}.${process.pid}.tmp`;
+  try {
+    const saved = readSaved(file);
+    // Ilegible por un error de disco (permisos, es una carpeta...): no se pisa lo que no se pudo leer.
+    if (saved.state === "unreadable") return `${file} no se pudo leer, así que no se sobrescribe.`;
+    if (!saved.paths.some((p) => samePath(p, path))) return null;
+
+    writeFileSync(temp, `${JSON.stringify({ version: FORMAT_VERSION, projects: saved.paths.filter((p) => !samePath(p, path)) }, null, 2)}\n`);
+    renameSync(temp, file);
+    return null;
+  } catch (error) {
+    try {
+      rmSync(temp, { force: true });
+    } catch {
+      // Sin más que hacer: el mensaje del error original es el que importa.
+    }
+    return `${file}: ${errorMessage(error)}`;
+  }
+}
+
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }

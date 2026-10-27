@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { initialProjectsNav, type ProjectsNavState, projectsReduce, reconcileProjects } from "../../src/cli/projects-nav.ts";
+import { initialProjectsNav, neighborAfterRemove, type ProjectsNavState, projectsReduce, reconcileProjects } from "../../src/cli/projects-nav.ts";
 
 const PATHS = ["/repos/ana", "/repos/gersom", "/repos/luis"];
 
@@ -62,5 +62,15 @@ describe("reconcileProjects", () => {
 
   test("lo que se pidió abrir y ya no figura se descarta", () => {
     expect(reconcileProjects(at("/repos/ana", "/repos/otro"), PATHS)).toEqual(at("/repos/ana"));
+  });
+});
+
+describe("neighborAfterRemove", () => {
+  test("elige la siguiente; si era la última, la anterior; si era la única o no figura, null", () => {
+    expect(neighborAfterRemove(["a", "b", "c"], "b")).toBe("c");
+    expect(neighborAfterRemove(["a", "b", "c"], "c")).toBe("b");
+    expect(neighborAfterRemove(["a", "b", "c"], "a")).toBe("b");
+    expect(neighborAfterRemove(["a"], "a")).toBeNull();
+    expect(neighborAfterRemove(["a"], "z")).toBeNull();
   });
 });

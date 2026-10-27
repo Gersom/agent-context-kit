@@ -2,7 +2,7 @@ import { afterAll, afterEach, beforeEach, describe, expect, test } from "bun:tes
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { isAbsolute, join, resolve } from "node:path";
-import { configDir, loadSavedProjects, samePath, saveProject } from "../../src/io/user-config.ts";
+import { configDir, loadSavedProjects, removeProject, samePath, saveProject } from "../../src/io/user-config.ts";
 
 // Rutas de prueba en su forma normal (en Windows llevan unidad y `\`).
 const A = resolve("/a/repo");
@@ -131,6 +131,78 @@ describe("saveProject", () => {
     const error = saveProject(A);
     expect(error).toContain(file);
     expect(readdirSync(home)).toEqual(["projects.json"]);
+  });
+});
+
+describe("removeProject", () => {
+  test("quita la ruta y las demás conservan su orden", () => {
+    writeFileSync(file, JSON.stringify({ version: 1, projects: [B, A, C] }));
+    expect(removeProject(A)).toBeNull();
+    expect(JSON.parse(readFileSync(file, "utf8"))).toEqual({ version: 1, projects: [B, C] });
+    expect(loadSavedProjects()).toEqual({ paths: [B, C], warning: null });
+  });
+
+  test("quitar la última deja una lista válida y vacía", () => {
+    expect(saveProject(A)).toBeNull();
+    expect(removeProject(A)).toBeNull();
+    expect(loadSavedProjects()).toEqual({ paths: [], warning: null });
+  });
+
+  test("una ruta que no figura: no toca el archivo", () => {
+    const text = JSON.stringify({ version: 1, projects: [A, B] });
+    writeFileSync(file, text);
+    expect(removeProject(C)).toBeNull();
+    expect(readFileSync(file, "utf8")).toBe(text);
+  });
+
+  test("sin archivo: no lo crea ni crea la carpeta de config", () => {
+    const nested = join(home, "nueva");
+    process.env.ACSUITE_HOME = nested;
+    expect(removeProject(A)).toBeNull();
+    expect(existsSync(nested)).toBe(false);
+  });
+
+  test("no deja archivos temporales", () => {
+    saveProject(A);
+    saveProject(B);
+    removeProject(A);
+    expect(readdirSync(home)).toEqual(["projects.json"]);
+  });
+
+  test("archivo corrupto: no figura nada que quitar, así que no se toca ni se crea .bak", () => {
+    writeFileSync(file, "{ esto no es json");
+    expect(removeProject(A)).toBeNull();
+    expect(readFileSync(file, "utf8")).toBe("{ esto no es json");
+    expect(existsSync(`${file}.bak`)).toBe(false);
+  });
+
+  test("el archivo es una carpeta (no se puede leer): devuelve el mensaje, sin pisarlo", () => {
+    mkdirSync(file);
+    const error = removeProject(A);
+    expect(error).toContain(file);
+    expect(readdirSync(home)).toEqual(["projects.json"]);
+  });
+
+  test("ACSUITE_HOME es un archivo: no lanza ni lo pisa (según el sistema, no hay lista o no se puede leer)", () => {
+    const blocker = join(root, "es-un-archivo-2");
+    writeFileSync(blocker, "");
+    process.env.ACSUITE_HOME = blocker;
+    const error = removeProject(A);
+    if (error !== null) expect(error).toContain("projects.json");
+    expect(readFileSync(blocker, "utf8")).toBe("");
+  });
+
+  test("rutas equivalentes (barras distintas, barra final): quita la misma ruta", () => {
+    const a = join(root, "repo-d");
+    writeFileSync(file, JSON.stringify({ version: 1, projects: [a, B] }));
+    expect(removeProject(`${a.split("\\").join("/")}/`)).toBeNull();
+    expect(loadSavedProjects().paths).toEqual([B]);
+  });
+
+  test("sin distinguir mayúsculas solo en win32", () => {
+    writeFileSync(file, JSON.stringify({ version: 1, projects: [A, B] }));
+    expect(removeProject(AU)).toBeNull();
+    expect(loadSavedProjects().paths).toEqual(process.platform === "win32" ? [B] : [A, B]);
   });
 });
 

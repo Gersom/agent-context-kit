@@ -360,6 +360,7 @@ export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, war
       );
     }
     if (meta.input != null) row(0, { text: inputLine(meta.input) });
+    if (meta.confirmRemove != null) row(0, { paint: pc.yellow, text: `¿Quitar ${meta.confirmRemove} de la lista? [Enter] sí · [Esc] no` });
   });
 
   return finishCanvas(canvas, meta, { warnings });
@@ -426,7 +427,10 @@ function footerLines(meta: CanvasMeta, width: number): string[] {
   const parts: string[] = [];
   if (meta.multiView === "projects") {
     // La lista de proyectos no se compacta ni tiene flechas de flujo, y `r` la vuelve a leer.
-    parts.push(...(meta.input != null ? ["[Enter] agregar", "[Esc] cancelar", "[Ctrl+C] salir"] : ["[↑/↓] elegir", "[Enter] abrir", "[a] agregar repo", "[r] releer", "[Ctrl+C o q] salir"]));
+    // Agregando o confirmando una salida de la lista, solo valen las teclas de ese paso.
+    if (meta.input != null) parts.push("[Enter] agregar", "[Esc] cancelar", "[Ctrl+C] salir");
+    else if (meta.confirmRemove != null) parts.push("[Enter] quitar", "[Esc] cancelar", "[Ctrl+C] salir");
+    else parts.push("[↑/↓] elegir", "[Enter] abrir", "[a] agregar repo", "[x] quitar", "[r] releer", "[Ctrl+C o q] salir");
   } else {
     if (meta.multiView === "team") parts.push("[↑/↓] elegir", "[Enter] abrir");
     if (meta.multiView === "operator") parts.push("[Esc o b] volver al equipo");

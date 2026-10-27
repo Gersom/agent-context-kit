@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { parseKeys } from "../../src/cli/keys.ts";
+import { parseConfirm, parseKeys } from "../../src/cli/keys.ts";
 
 describe("parseKeys", () => {
   test("q, Q y Ctrl+C salen; r y R redibujan; el resto no hace nada", () => {
     expect(parseKeys("qQ\u0003")).toEqual(["quit", "quit", "quit"]);
     expect(parseKeys("rR")).toEqual(["redraw", "redraw"]);
-    expect(parseKeys("x 1")).toEqual([]);
+    expect(parseKeys("y 1")).toEqual([]);
   });
 
   test("p lleva a la lista de proyectos (mayúscula o minúscula)", () => {
@@ -14,6 +14,10 @@ describe("parseKeys", () => {
 
   test("a pide agregar un repo (mayúscula o minúscula)", () => {
     expect(parseKeys("aA")).toEqual(["add", "add"]);
+  });
+
+  test("x pide quitar de la lista el proyecto elegido (mayúscula o minúscula)", () => {
+    expect(parseKeys("xX")).toEqual(["remove", "remove"]);
   });
 
   test("c compacta o expande y f oculta o muestra las flechas del flujo (mayúscula o minúscula)", () => {
@@ -42,5 +46,27 @@ describe("parseKeys", () => {
 
   test("varias teclas en una misma lectura, en orden", () => {
     expect(parseKeys("\u001b[B\u001b[B\r")).toEqual(["down", "down", "enter"]);
+  });
+});
+
+describe("parseConfirm", () => {
+  test("Enter acepta; Esc suelto, n y N cancelan; Ctrl+C sale", () => {
+    expect(parseConfirm("\r")).toBe("accept");
+    expect(parseConfirm("\n")).toBe("accept");
+    expect(parseConfirm("\u001b")).toBe("cancel");
+    expect(parseConfirm("nN")).toBe("cancel");
+    expect(parseConfirm("\u0003")).toBe("quit");
+  });
+
+  test("las demás teclas se ignoran: letras (también q y b), Retroceso, flechas y otras secuencias", () => {
+    for (const chunk of ["q", "x", "y", "b", "a", "r", " ", "\u007f", "\u001b[A", "\u001bOB", "\u001b[3~", "\u001b[1;5Aq"]) {
+      expect(parseConfirm(chunk)).toBeNull();
+    }
+  });
+
+  test("gana la primera respuesta del bloque, tras ignorar lo que no contesta", () => {
+    expect(parseConfirm("q\u001b[A\r")).toBe("accept");
+    expect(parseConfirm("yn\r")).toBe("cancel");
+    expect(parseConfirm("\r\u0003")).toBe("accept");
   });
 });
