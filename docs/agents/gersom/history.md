@@ -11,6 +11,13 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 100 — Board: pulir menores de la lista de proyectos
+
+- Pulido de la lista de proyectos de acsuite board: las entradas inválidas de projects.json se filtran con aviso con conteo, y el respaldo de un archivo corrupto lleva sello de tiempo sin pisar anteriores.
+- Al agregar con a se expande ~ y se explican mejor una ruta que es un archivo o un fallo de confianza de git; la confirmación de x muestra nombre y ruta y [x] quitar solo aparece con filas.
+- En el pie de la vista de equipo ya no salen [c] compactar ni el volver a proyectos duplicado (tampoco en el panel plano).
+- Commit en la suite: 0119502.
+
 ## 2026-10-27 — ✅ Tarea 99 — Board: eliminar proyectos inexistentes de la lista
 
 - Tecla x en la lista de proyectos de acsuite board: pide confirmación (Enter acepta; Esc o n cancelan) y quita el proyecto elegido de la lista y de projects.json, sin borrar nada del disco; vale para cualquier fila.
