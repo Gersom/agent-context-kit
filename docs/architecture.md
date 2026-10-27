@@ -43,7 +43,7 @@ agent-context-suite/
 │       ├── index.ts             # Arranque: llama a `main` de `src/main.ts` (argumentos, ruta a vigilar o su pregunta, y app)
 │       ├── src/
 │       │   ├── app.ts             # Ciclo leer → modelo → pintar; watcher, resize, atajos (q, r, Ctrl+C)
-│       │   ├── cli/               # Argumentos (--once, ruta, operador), pregunta interactiva de la ruta, teclas (incl. flechas) y navegación de la vista de equipo (estado puro)
+│       │   ├── cli/               # Argumentos (--once, ruta, operador), pregunta interactiva de la ruta, teclas (incl. flechas) y navegación de la vista de equipo (estado puro), teclas de la lista de proyectos (`projects-keys.ts`: reductor puro que devuelve los efectos que `app.ts` ejecuta)
 │       │   ├── io/                # Rutas, operador (modo multi: operators.md + correo de git), lectura del equipo, lectura de archivos, watcher y lectura con memoria
 │       │   ├── model/             # Modelo de pantalla: arma lo que se pinta con lo que interpretó el parseo (un operador, o el equipo y el team-backlog)
 │       │   ├── ui/                # Pintado con picocolors (recuadros por tipo de tarea; selector EQUIPO y SIN DUEÑO en modo multi) y utilidades de formato

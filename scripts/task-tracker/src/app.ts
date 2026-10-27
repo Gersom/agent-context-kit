@@ -6,10 +6,10 @@
 
 import { basename } from "node:path";
 import { gitToplevel } from "../../_shared/git.ts";
-import { editLine } from "./cli/line-edit.ts";
-import { parseConfirm, parseKeys } from "./cli/keys.ts";
+import { parseKeys } from "./cli/keys.ts";
 import { compactApplies, initialNav, type NavRow, navReduce, type NavState, reconcileNav } from "./cli/nav.ts";
-import { initialProjectsNav, neighborAfterRemove, type ProjectsNavState, projectsReduce, reconcileProjects } from "./cli/projects-nav.ts";
+import { projectsKeysReduce } from "./cli/projects-keys.ts";
+import { initialProjectsNav, neighborAfterRemove, type ProjectsNavState, reconcileProjects } from "./cli/projects-nav.ts";
 import { resolveAgentsDir } from "./io/paths.ts";
 import { createProjectList, defaultProjects, type ProjectsProvider, readProjectRows } from "./io/projects.ts";
 import { createSnapshotReader, RETRY_MS } from "./io/snapshot.ts";
@@ -94,9 +94,9 @@ export function startApp({
     projectsNotices = warning ? [warning] : [];
   }
 
-  /** Enter con una ruta escrita: la agrega y la elige; si no sirve, avisa y deja la entrada abierta. */
-  function submitAdding(): void {
-    const result = projectList.add(adding ?? "");
+  /** Enter con una ruta escrita (`text`): la agrega y la elige; si no sirve, avisa y deja la entrada abierta. */
+  function submitAdding(text: string): void {
+    const result = projectList.add(text);
     if (!result.ok) {
       projectsNotices = [result.error];
       return;
@@ -109,14 +109,11 @@ export function startApp({
   }
 
   /**
-   * Enter al confirmar: quita el proyecto de la lista y de lo guardado (no borra nada del repo). La
-   * selección pasa al vecino (el siguiente, o el anterior si era el último); si no se pudo quitar,
+   * Enter al confirmar: quita el proyecto `path` de la lista y de lo guardado (no borra nada del repo).
+   * La selección pasa al vecino (el siguiente, o el anterior si era el último); si no se pudo quitar,
    * avisa y la lista queda como estaba.
    */
-  function submitRemove(): void {
-    const path = confirmRemove;
-    confirmRemove = null;
-    if (!path) return;
+  function submitRemove(path: string): void {
     const error = projectList.remove(path);
     if (error) {
       projectsNotices = [error];
@@ -271,56 +268,47 @@ export function startApp({
     // En modo raw Ctrl+C no genera SIGINT: llega como el carácter \u0003 (ver keys.ts).
     process.stdin.setRawMode(true);
     process.stdin.setEncoding("utf8");
+    /**
+     * Atiende un bloque de teclas en la lista de proyectos (ver projects-keys.ts), desde la tecla
+     * `from`. Devuelve desde qué tecla sigue el bloque, o `null` si no queda nada (o se salió).
+     */
+    function projectsKeys(chunk: string, from: number): number | null {
+      const result = projectsKeysReduce({ nav: projectsNav, adding, confirmRemove }, chunk, { paths: projectRows.map((row) => row.path) }, from);
+      projectsNav = result.state.nav;
+      adding = result.state.adding;
+      confirmRemove = result.state.confirmRemove;
+      for (const action of result.actions) {
+        if (action.kind === "quit") {
+          quit();
+          return null;
+        }
+        if (action.kind === "redraw") draw({ kind: "redraw" });
+        else if (action.kind === "reload") loadProjects();
+        else if (action.kind === "clearNotices") projectsNotices = [];
+        else if (action.kind === "open") openProject(action.path);
+        else if (action.kind === "submitAdd") submitAdding(action.text);
+        else submitRemove(action.path);
+      }
+      return result.resume;
+    }
+
     process.stdin.on("data", (chunk: string) => {
-      if (adding != null) {
-        // Escribiendo una ruta: todo es texto, salvo Ctrl+C (sale), Enter (agrega) y Esc (cancela).
-        if (chunk.includes("")) return quit();
-        const edit = editLine(adding, chunk);
-        adding = edit.text;
-        if (edit.done === "cancel") {
-          adding = null;
-          projectsNotices = [];
-        } else if (edit.done === "submit") submitAdding();
-        return draw({ kind: "redraw" });
-      }
-      if (confirmRemove != null) {
-        // Confirmando: solo Ctrl+C (sale), Enter (quita) y Esc o `n` (cancelan); lo demás se ignora.
-        const answer = parseConfirm(chunk);
-        if (answer === "quit") return quit();
-        if (answer === "accept") submitRemove();
-        else if (answer === "cancel") confirmRemove = null;
-        else return;
-        return draw({ kind: "redraw" });
-      }
-      for (const key of parseKeys(chunk)) {
+      // Cada tecla va a la lista de proyectos o al repo abierto según lo que haya en pantalla en ese
+      // momento: una tecla puede cambiarlo (Enter abre un repo; `p` y `b` vuelven a la lista).
+      const keys = parseKeys(chunk);
+      let at = 0;
+      while (true) {
+        if (!target) {
+          const resume = projectsKeys(chunk, at);
+          if (resume == null) return;
+          at = resume;
+          continue;
+        }
+        if (at >= keys.length) return;
+        const key = keys[at++];
         if (key === "quit") return quit();
         if (key === "redraw") {
-          if (!target) loadProjects();
           draw({ kind: "redraw" });
-        } else if (!target && key === "add") {
-          adding = "";
-          projectsNotices = [];
-          // Lo que siga en este mismo bloque ya es la ruta, no teclas de navegación.
-          const rest = chunk.slice(chunk.search(/[aA]/) + 1);
-          if (rest) adding = editLine("", rest).text;
-          draw({ kind: "redraw" });
-          return;
-        } else if (!target && key === "remove") {
-          // Sin filas no hay nada que quitar; con una elegida, se pide confirmar antes.
-          if (projectsNav.selected && projectRows.some((row) => row.path === projectsNav.selected)) {
-            confirmRemove = projectsNav.selected;
-            projectsNotices = [];
-            draw({ kind: "redraw" });
-          }
-          // Lo que siga en este mismo bloque no puede contestar la confirmación.
-          return;
-        } else if (!target) {
-          const next = projectsReduce(projectsNav, key, projectRows.map((row) => row.path));
-          if (next.opened) openProject(next.opened);
-          else if (next !== projectsNav) {
-            projectsNav = next;
-            draw({ kind: "redraw" });
-          }
         } else if (key === "projects") {
           // Desde cualquier vista de un repo, a la lista de proyectos (se vuelve a leer al abrirla).
           fromList = false;
