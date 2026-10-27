@@ -97,7 +97,7 @@ describe("renderText", () => {
 
   test("sin errores: «Listo para trabajar…»", () => {
     const lines = renderText(buildReport(META, [], false));
-    expect(lines.at(-1)).toBe("Listo para trabajar con la skill y con `bun run task`.");
+    expect(lines.at(-1)).toBe("Listo para trabajar con la skill y con `acsuite task`.");
   });
 
   test("con errores: no dice «Listo» y pide corregir", () => {

@@ -126,7 +126,7 @@ export async function run(argv: string[], options: RunOptions = {}): Promise<num
   } catch (caught) {
     if (caught instanceof CliError) {
       io.err(`Error: ${caught.message}`);
-      if (caught instanceof UsageError) io.err("Usa `bun run check --help` para ver el uso.");
+      if (caught instanceof UsageError) io.err("Usa `acsuite check --help` para ver el uso.");
       return caught.exitCode;
     }
     io.err(`Error inesperado: ${(caught as Error)?.stack ?? caught}`);

@@ -118,7 +118,7 @@ export const checkDuplicateNumbers: Check = (ctx) => {
   return findings;
 };
 
-/** Líneas `###`/`####` con pinta de header de tarea que el parseo no reconoce (no la verá ni el seguimiento ni `bun run task`). */
+/** Líneas `###`/`####` con pinta de header de tarea que el parseo no reconoce (no la verá ni el seguimiento ni `acsuite task`). */
 export const checkTaskHeadings: Check = ({ docs }) => {
   const findings: Finding[] = [];
   for (const doc of [docs.handoff, docs.backlog]) {

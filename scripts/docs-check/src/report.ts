@@ -59,7 +59,7 @@ export function renderText(report: Report): string[] {
 
   lines.push("", `${plural(report.errors, "error", "errores")}, ${plural(report.warnings, "aviso", "avisos")}`);
   if (report.errors === 0) {
-    lines.push("Listo para trabajar con la skill y con `bun run task`.");
+    lines.push("Listo para trabajar con la skill y con `acsuite task`.");
     if (report.warnings > 0) {
       lines.push(
         report.strict
@@ -68,7 +68,7 @@ export function renderText(report: Report): string[] {
       );
     }
   } else {
-    lines.push("Corrige los errores: sin eso el seguimiento (`bun run board`) y `bun run task` no pueden trabajar bien con este proyecto.");
+    lines.push("Corrige los errores: sin eso el seguimiento (`acsuite board`) y `acsuite task` no pueden trabajar bien con este proyecto.");
   }
   return lines;
 }

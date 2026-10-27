@@ -39,7 +39,7 @@ describe("ayuda", () => {
     for (const argv of [[], ["--help"], ["-h"], ["help"]]) {
       const { code, out } = await exec(argv, [probe([])]);
       expect(code).toBe(0);
-      expect(out).toContain("Uso: bun run task <comando>");
+      expect(out).toContain("Uso: acsuite task <comando>");
       expect(out).toMatch(/probe\s+Comando de prueba/);
       expect(out).toContain("--dry-run");
       expect(out).toContain("--agents <ruta>");
@@ -50,7 +50,7 @@ describe("ayuda", () => {
     for (const argv of [["probe", "--help"], ["help", "probe"]]) {
       const { code, out } = await exec(argv, [probe([])]);
       expect(code).toBe(0);
-      expect(out).toContain("Uso: bun run task probe <x> [--titulo <t>]");
+      expect(out).toContain("Uso: acsuite task probe <x> [--titulo <t>]");
       expect(out).toContain("--detalles <texto|->");
       expect(out).toContain("--fuerza");
     }
@@ -75,7 +75,7 @@ describe("errores y códigos de salida", () => {
     expect(code).toBe(2);
     expect(out).toBe("");
     expect(err).toContain("Error: Comando desconocido: «nada». Comandos: probe.");
-    expect(err).toContain("bun run task --help");
+    expect(err).toContain("acsuite task --help");
   });
 
   test("flags sin comando: falta el comando (código 2)", async () => {

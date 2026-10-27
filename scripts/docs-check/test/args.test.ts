@@ -66,7 +66,7 @@ describe("parseCheckArgs", () => {
 describe("HELP", () => {
   test("describe el uso, los flags y los códigos de salida", () => {
     const text = HELP.join("\n");
-    for (const part of ["bun run check <ruta>", "--operator", "--json", "--strict", "--help", "Código de salida"]) {
+    for (const part of ["acsuite check <ruta>", "--operator", "--json", "--strict", "--help", "Código de salida"]) {
       expect(text).toContain(part);
     }
   });

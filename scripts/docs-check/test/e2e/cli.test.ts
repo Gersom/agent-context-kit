@@ -79,6 +79,6 @@ describe("index.ts", () => {
   test("--help: código 0 con la ayuda", async () => {
     const { stdout, code } = await runCli(["--help"], valid.root);
     expect(code).toBe(0);
-    expect(stdout).toContain("Uso: bun run check <ruta>");
+    expect(stdout).toContain("Uso: acsuite check <ruta>");
   });
 });

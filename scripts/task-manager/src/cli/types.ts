@@ -70,13 +70,13 @@ export interface WorkspaceRequest {
   allowFolderless?: boolean;
 }
 
-/** Un comando de `bun run task <nombre>`. Se registra en `commands/index.ts`. */
+/** Un comando de `acsuite task <nombre>`. Se registra en `commands/index.ts`. */
 export interface Command {
-  /** Lo que se escribe tras `bun run task`, en minúsculas. */
+  /** Lo que se escribe tras `acsuite task`, en minúsculas. */
   name: string;
   /** Una línea para el listado de la ayuda. */
   summary: string;
-  /** Forma de uso para `bun run task <nombre> --help`, ej. `show <N>`. */
+  /** Forma de uso para `acsuite task <nombre> --help`, ej. `show <N>`. */
   usage: string;
   flags?: Record<string, FlagSpec>;
   /**

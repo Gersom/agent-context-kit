@@ -1,4 +1,4 @@
-// Despachador: `bun run task <comando> [argumentos] [flags]`. Busca el comando en el registro,
+// Despachador: `acsuite task <comando> [argumentos] [flags]`. Busca el comando en el registro,
 // interpreta los flags (globales y propios), arma el contexto (operador, archivos y escritura
 // perezosos: solo se resuelven si el comando los pide) y devuelve el código de salida. Los errores
 // esperables (`CliError`) salen como un mensaje en español, sin stack.
@@ -43,7 +43,7 @@ const SILENT_IO: Io = { out: () => {}, err: () => {} };
 /** Entrada estándar por defecto; sin nada redirigido (terminal interactiva) falla en vez de quedarse esperando. */
 async function defaultReadStdin(): Promise<string> {
   if (process.stdin.isTTY) {
-    throw new UsageError("El valor `-` lee la entrada estándar, pero no hay nada redirigido: usa `... | bun run task ...` o un heredoc.");
+    throw new UsageError("El valor `-` lee la entrada estándar, pero no hay nada redirigido: usa `... | acsuite task ...` o un heredoc.");
   }
   return text(process.stdin);
 }
@@ -80,7 +80,7 @@ export async function run(argv: string[], options: RunOptions = {}): Promise<num
   } catch (caught) {
     if (caught instanceof CliError) {
       io.err(`Error: ${caught.message}`);
-      if (caught instanceof UsageError) io.err("Usa `bun run task --help` para ver los comandos y flags.");
+      if (caught instanceof UsageError) io.err("Usa `acsuite task --help` para ver los comandos y flags.");
       return caught.exitCode;
     }
     io.err(`Error inesperado: ${(caught as Error)?.stack ?? caught}`);

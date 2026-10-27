@@ -313,7 +313,7 @@ describe("mal uso: código 2", () => {
     expect(code).toBe(2);
     expect(out).toBe("");
     expect(err).toContain("Falta la ruta del proyecto a verificar.");
-    expect(err).toContain("bun run check --help");
+    expect(err).toContain("acsuite check --help");
   });
 
   test("flag desconocido", async () => {
@@ -335,7 +335,7 @@ describe("mal uso: código 2", () => {
       const { code, out, err } = await check([flag]);
       expect(code).toBe(0);
       expect(err).toBe("");
-      expect(out).toContain("Uso: bun run check <ruta>");
+      expect(out).toContain("Uso: acsuite check <ruta>");
     }
   });
 

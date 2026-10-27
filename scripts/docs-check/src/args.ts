@@ -1,4 +1,4 @@
-// Línea de comandos: `bun run check <ruta> [--operator <carpeta>] [--json] [--strict]`. Se interpreta
+// Línea de comandos: `acsuite check <ruta> [--operator <carpeta>] [--json] [--strict]`. Se interpreta
 // con `node:util` `parseArgs` en modo estricto; un flag desconocido o sin valor es un error de uso (2).
 
 import { parseArgs } from "node:util";
@@ -16,9 +16,9 @@ export interface CheckArgs {
 /** Ayuda: uso, flags y códigos de salida. */
 export const HELP: string[] = [
   "Verifica que la documentación de agentes de OTRO proyecto cumpla lo que necesitan la skill, el",
-  "seguimiento de tareas (`bun run board`) y el gestor de tareas (`bun run task`). Solo lee: no escribe nada.",
+  "seguimiento de tareas (`acsuite board`) y el gestor de tareas (`acsuite task`). Solo lee: no escribe nada.",
   "",
-  "Uso: bun run check <ruta> [--operator <carpeta>] [--json] [--strict]",
+  "Uso: acsuite check <ruta> [--operator <carpeta>] [--json] [--strict]",
   "",
   "  <ruta>                Raíz del proyecto, carpeta de agentes (docs/agents) o carpeta de un operador.",
   "  --operator <carpeta>  Carpeta del operador (modo multi-operador). Por defecto, el de `git config user.email`.",

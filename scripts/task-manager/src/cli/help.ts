@@ -21,7 +21,7 @@ export function renderHelp(commands: Command[]): string[] {
     "Gestiona las tareas (handoff.md, backlog.md, history.md y team-backlog.md) con ediciones quirúrgicas.",
     "Es opcional: sin este script, los archivos se editan a mano.",
     "",
-    "Uso: bun run task <comando> [argumentos] [flags]",
+    "Uso: acsuite task <comando> [argumentos] [flags]",
     "",
     "Comandos:",
     ...table([...commands.map((c): [string, string] => [c.writes ? `${c.name} *` : c.name, c.summary]), ["help [comando]", "Muestra esta ayuda o la de un comando"]]),
@@ -31,7 +31,7 @@ export function renderHelp(commands: Command[]): string[] {
     "",
     "Un flag de texto con valor `-` lee su contenido de la entrada estándar (ej. `--detalles -`).",
     "Los comandos que escriben (marcados con *) no escriben nada sin --apply: solo muestran el diff.",
-    "Para más detalle de un comando: bun run task <comando> --help",
+    "Para más detalle de un comando: acsuite task <comando> --help",
   ];
 }
 
@@ -39,7 +39,7 @@ export function renderHelp(commands: Command[]): string[] {
 export function renderCommandHelp(command: Command): string[] {
   const own = Object.entries(command.flags ?? {}).map(([name, spec]) => flagLine(name, spec));
   return [
-    `Uso: bun run task ${command.usage}`,
+    `Uso: acsuite task ${command.usage}`,
     "",
     command.summary,
     ...(command.writes
