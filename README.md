@@ -2,14 +2,6 @@
 
 Suite de herramientas para trabajar con la skill [agent-context-skill](https://github.com/Gersom/agent-context-skill), que genera documentación de contexto de proyecto para que **cualquier agente de IA** (Claude Code, Cursor, Copilot, etc.) entienda en qué momento está un proyecto, qué falta, qué se hizo y por qué — sin depender de la memoria de una sola conversación. La skill vive en su propio repo (`agent-context-skill`); este repo tiene las herramientas (seguimiento, gestión y verificación de tareas).
 
-## Herramientas
-
-La suite trae tres herramientas, que se usan con el comando `acsuite`:
-
-- **`acsuite board`**: tablero de tareas en vivo en la terminal (en progreso, pausadas, pendientes y últimas completadas), que se redibuja cuando cambian los archivos.
-- **`acsuite task`**: consulta y edita las tareas sin tocar a mano `handoff.md`, `backlog.md` ni `history.md`.
-- **`acsuite check`**: verifica que la documentación de agentes del proyecto esté en orden, con errores y avisos por archivo y línea.
-
 ## Instalar la suite
 
 ### Requisitos
@@ -51,50 +43,45 @@ bunx agent-context-suite@latest board
 
 **Compatibilidad.** Probada en Windows 11 con Node 20, 22 y 24, y con Bun. En Linux y macOS debería funcionar igual (es Node estándar), pero no está comprobado: si encuentras algún problema, abre un [Issue](https://github.com/Gersom/agent-context-suite/issues).
 
-## Uso de los comandos
+## Herramientas
 
-Los tres subcomandos trabajan sobre un proyecto que use la skill. Con la suite instalada (si no, antepón `npx agent-context-suite@latest` al subcomando):
+La suite trae tres herramientas, que trabajan sobre un proyecto que use la skill. Se usan con el comando `acsuite` (si no la instalaste, antepón `npx agent-context-suite@latest` al subcomando). Sin ruta, usan el proyecto de la carpeta donde ejecutas el comando, subiendo hasta la raíz de su repo git; `board` y `check` aceptan una ruta para revisar otro proyecto (`acsuite check D:/otro-proyecto`).
 
-| Comando | Qué hace | Ejemplo |
-|---|---|---|
-| `acsuite board [ruta]` | Tablero de tareas en vivo en la terminal (en progreso, pausadas, pendientes y últimas completadas) | `acsuite board` |
-| `acsuite task <comando>` | Consulta y edita las tareas sin tocar a mano `handoff.md`, `backlog.md` ni `history.md`; las escrituras exigen `--apply` | `acsuite task status` |
-| `acsuite check [ruta]` | Verifica que la documentación de agentes del proyecto esté en orden, con errores y avisos por archivo y línea | `acsuite check` |
+`acsuite` sin argumentos lista los subcomandos, y `acsuite <subcomando> --help` muestra la ayuda de cada uno.
 
-Sin ruta, `board` y `check` usan el proyecto de la carpeta donde ejecutas el comando (como `task`): se sube desde ahí hasta la raíz del repo git. Si quieres revisar otro proyecto, pásale la ruta (`acsuite check D:/otro-proyecto`).
+### `acsuite board`
 
-`acsuite` sin argumentos lista los subcomandos, y `acsuite <subcomando> --help` muestra la ayuda de cada uno. Detalle de cada herramienta: [`board`](./scripts/task-tracker/README.md), [`task`](./scripts/task-manager/README.md) y [`check`](./scripts/docs-check/README.md).
-
-## Seguimiento de tareas en la terminal
-
-Este repo incluye una herramienta para ver, en una terminal aparte, el estado de las tareas de cualquier proyecto que use la skill (tarea en progreso, pausadas, pendientes y últimas completadas), redibujándose sola cuando cambian sus archivos:
+Tablero de tareas en vivo en la terminal: la tarea en progreso, las pausadas, las pendientes y las últimas completadas. Se redibuja solo cuando cambian los archivos, así que conviene dejarlo en una terminal aparte mientras un agente trabaja.
 
 ```sh
 acsuite board
 ```
 
-Vigila el proyecto de la carpeta actual; para otro, pásale la ruta (`acsuite board D:/otro-proyecto`). Uso, atajos y cómo lee los archivos: [`scripts/task-tracker/README.md`](./scripts/task-tracker/README.md).
+Uso, atajos y cómo lee los archivos: [README de `board`](./scripts/task-tracker/README.md).
 
-## Gestión de tareas desde la terminal
+### `acsuite task`
 
-Una herramienta opcional para consultar y editar las tareas de un proyecto por comandos, sin tocar a mano `handoff.md`, `backlog.md` ni `history.md`; las escrituras exigen `--apply` (sin él muestra el diff):
+Consulta y edita las tareas sin tocar a mano `handoff.md`, `backlog.md` ni `history.md`. Las escrituras exigen `--apply`; sin él solo muestra el diff.
 
 ```sh
 acsuite task status
+```
+
+```sh
 acsuite task <comando> --help
 ```
 
-Comandos, flags y cómo escribe: [`scripts/task-manager/README.md`](./scripts/task-manager/README.md).
+Comandos, flags y cómo escribe: [README de `task`](./scripts/task-manager/README.md).
 
-## Verificar un proyecto antes de trabajar en él
+### `acsuite check`
 
-Un verificador de solo lectura que revisa si la documentación de agentes de otro repo sirve a la skill, al seguimiento y a la gestión de tareas, y lista errores y avisos con archivo y línea:
+Verificador de solo lectura: revisa que la documentación de agentes del proyecto sirva a la skill, al tablero y a la gestión de tareas, y lista errores y avisos con archivo y línea.
 
 ```sh
 acsuite check
 ```
 
-Revisa el proyecto de la carpeta actual; para otro, pásale la ruta (`acsuite check D:/otro-proyecto`). Uso y códigos de hallazgo: [`scripts/docs-check/README.md`](./scripts/docs-check/README.md).
+Uso y códigos de hallazgo: [README de `check`](./scripts/docs-check/README.md).
 
 ## Licencia
 
