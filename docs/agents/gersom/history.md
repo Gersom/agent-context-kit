@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ❌ Tarea 102 — Board: menores descartados y pegados en la lista de proyectos
+
+- El operador descartó estos menores de la lista de proyectos (carrera de dos escrituras, x con archivo corrupto, aviso truncado, casos raros de pegado y tests del flujo de app.ts): son improbables en uso normal y no justifican el trabajo.
+
 ## 2026-10-27 — ✅ Tarea 101 — Board: menores pendientes de la lista de proyectos
 
 - Pulido de la lista de proyectos de acsuite board: c ya no actúa en la vista de equipo y se eliminó el campo backToProjects; el error de git con dubious ownership explica que la carpeta es de otro usuario.

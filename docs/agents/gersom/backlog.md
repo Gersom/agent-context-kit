@@ -48,15 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 102 — Board: menores descartados y pegados en la lista de proyectos
-
-- **Descripción:** Registro de los menores que se descartaron al cerrar la Tarea 101 y de los casos raros de pegado en el manejo de teclas de la lista de proyectos.
-- **Decisiones/temas a definir antes de empezar:** Si alguno justifica hacerse; los tres primeros se descartaron a propósito.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Descartados: (1) dos board escribiendo a la vez pueden pisar un alta o baja de projects.json (sin bloqueo de archivo ni fsync); (2) con el archivo corrupto, quitar con x solo oculta el proyecto en la sesión; (3) el aviso de guardado se trunca al ancho de la terminal y, en las vistas de un repo, un error del watcher lo pisa. Pegados (ya existían antes del refactor): (4) una flecha arriba y la tecla a en el mismo bloque dejan una a de más en la ruta, porque se busca la a con chunk.search; (5) Enter o Esc justo después de a en el mismo bloque no actúan; (6) Ctrl+C después de a o x en el mismo bloque no sale; (7) el flujo de app.ts que ejecuta las acciones no tiene tests.
-- **Agregada:** 2026-10-27.
-
 <!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
