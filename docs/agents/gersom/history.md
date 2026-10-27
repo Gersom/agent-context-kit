@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 90 — Skill 2.2.1: mostrar la recomendación de la suite es obligatorio
+
+- En los flujos de la skill (generar, migrar y actualizar), ofrecer la recomendación de la suite ahora es obligatorio y solo aceptarla es opcional; antes decían «puede llevar» y un agente lo leyó como que mostrarla era opcional. Una actualización sin cambios aplicables también llega al Cierre y la ofrece, y se explicitan los caminos que no cuentan como terminar la actualización.
+- Skill 2.2.1 (patch, ajuste de redacción; changelog «Sin cambios que aplicar»), tag v2.2.1. En la suite: marcador de rules.md y fixture espejo sincronizados. Revisión independiente sin bloqueantes (cinco mejoras aplicadas); bun test 1130 pass, typecheck y check limpios. Commits 0cb0dd8, cbecbda y 8af7a7f (skill) y 7127172 (kit).
+
 ## 2026-10-27 — ✅ Tarea 89 — Skill 2.2.0: el flujo de actualizar también recomienda la suite
 
 - El flujo de actualizar de la skill (update-flow.md) ahora ofrece al terminar la recomendación opcional de la suite, una vez y solo si rules.md no tiene el bloque de la suite; antes solo se ofrecía al generar o migrar, así que un proyecto que solo se actualizaba nunca se enteraba. suite-recommendation.md lo recoge en «Cuándo se abre».
