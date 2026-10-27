@@ -11,6 +11,7 @@ Es una herramienta de este repo, no parte de la skill: no se copia a los repos d
 Desde la raíz de este repo (con `bun install` hecho):
 
 ```sh
+bun run check                                     # el proyecto de la carpeta actual
 bun run check D:/proyectos/mi-app                 # raíz del proyecto
 bun run check D:/proyectos/mi-app/docs/agents     # o su carpeta de agentes
 bun run check D:/proyectos/mi-app --operator ana  # modo multi-operador: otro operador
@@ -18,7 +19,7 @@ bun run check D:/proyectos/mi-app --json          # informe como un único objet
 bun run check D:/proyectos/mi-app --strict        # los avisos también hacen fallar
 ```
 
-La ruta es obligatoria. Acepta la raíz del proyecto, la carpeta de agentes (`docs/agents/` o `agent-context/agents/`) o la carpeta de un operador. Sin `--operator`, el operador sale de `git config user.email` del proyecto revisado.
+La ruta es opcional: sin ella se revisa el proyecto de la carpeta desde la que lanzas el comando (se sube hasta la raíz del repo git, o se usa la carpeta misma si no está en uno); si ahí no hay documentación de la skill, el informe lo dice con un error `workspace` y sale con código 1. Acepta la raíz del proyecto, la carpeta de agentes (`docs/agents/` o `agent-context/agents/`) o la carpeta de un operador. Sin `--operator`, el operador sale de `git config user.email` del proyecto revisado.
 
 **Códigos de salida:** `0` sin errores; `1` con errores (con `--strict`, también con avisos); `2` mal uso de la línea de comandos.
 

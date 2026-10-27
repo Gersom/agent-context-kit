@@ -20,17 +20,19 @@ Es una herramienta de este repo, no parte de la skill: no se copia a los repos d
 Desde la raíz de este repo:
 
 ```sh
-bun run board                         # pregunta la ruta a vigilar
+bun run board                         # el proyecto de la carpeta actual
 bun run board D:/proyectos/mi-app     # raíz del proyecto
 bun run board D:/proyectos/mi-app --once   # pinta una sola vez y sale
 bun run board D:/proyectos/mi-app ana      # modo multi-operador: abre de frente el panel de «ana»
+bun run board --operator ana          # lo mismo, sin ruta (proyecto de la carpeta actual)
 bun run board D:/proyectos/mi-app --compact --no-arrows   # arranca compacto y sin flechas
 ```
 
+- **Sin ruta:** `acsuite board [ruta]` vigila el proyecto de la carpeta desde la que lanzas el comando: sube hasta la raíz del repo git (o usa la carpeta misma si no está en un repo). Si ahí no hay documentación de la skill, sale con código 1 y te dice que indiques otra con `acsuite board <ruta>`; ya no pregunta la ruta.
 - **Qué ruta acepta:** la raíz del proyecto (busca adentro `docs/agents/` o `agent-context/agents/`) o directamente la carpeta que contiene `handoff.md`. Las rutas relativas se resuelven desde la carpeta en la que lanzaste el comando, y se pueden pegar con comillas (Windows las agrega al arrastrar una carpeta a la terminal).
 - **Varios proyectos a la vez:** cada instancia es independiente (sin archivos de bloqueo, puertos ni estado compartido), así que puedes tener una terminal por proyecto. El título de la ventana muestra el nombre del proyecto.
 - **`--once`:** pinta una vez y sale, sin vigilar ni atajos. Sirve para probar o para scripts.
-- **Operador:** en modo multi-operador (ver abajo), un segundo argumento (o `--operator <carpeta>`) abre de frente el panel de ese operador; sin él se abre la vista de equipo.
+- **Operador:** en modo multi-operador (ver abajo), un segundo argumento tras la ruta (o `--operator <carpeta>`, con o sin ruta) abre de frente el panel de ese operador; sin él se abre la vista de equipo.
 
 ### Modo multi-operador
 

@@ -41,11 +41,11 @@ Para actualizarla, repite el comando con `@latest` (`npm install -g agent-contex
 Con `npx` o `bunx` se descarga, se ejecuta y termina, sin dejar instalado el comando `acsuite`, así que cada vez se escribe completo:
 
 ```sh
-npx agent-context-suite@latest board <ruta-del-proyecto>
-bunx agent-context-suite@latest board <ruta-del-proyecto>   # igual, con Bun
+npx agent-context-suite@latest board
+bunx agent-context-suite@latest board   # igual, con Bun
 ```
 
-`@latest` trae siempre la versión más reciente.
+`@latest` trae siempre la versión más reciente. Sin ruta, usa el proyecto de la carpeta donde lo ejecutas; si quieres otro, pásale su ruta al final (`npx agent-context-suite@latest board D:/otro-proyecto`).
 
 **Nombres.** El *paquete* (lo que escribes con `npm install`, `npx` o `bunx`) es `agent-context-suite`; el *comando* (una vez instalada) es `acsuite`.
 
@@ -57,9 +57,11 @@ Los tres subcomandos trabajan sobre un proyecto que use la skill. Con la suite i
 
 | Comando | Qué hace | Ejemplo |
 |---|---|---|
-| `acsuite board <ruta>` | Tablero de tareas en vivo en la terminal (en progreso, pausadas, pendientes y últimas completadas) | `acsuite board D:/mi-app` |
+| `acsuite board [ruta]` | Tablero de tareas en vivo en la terminal (en progreso, pausadas, pendientes y últimas completadas) | `acsuite board` |
 | `acsuite task <comando>` | Consulta y edita las tareas sin tocar a mano `handoff.md`, `backlog.md` ni `history.md`; las escrituras exigen `--apply` | `acsuite task status` |
-| `acsuite check <ruta>` | Verifica que la documentación de agentes del proyecto esté en orden, con errores y avisos por archivo y línea | `acsuite check D:/mi-app` |
+| `acsuite check [ruta]` | Verifica que la documentación de agentes del proyecto esté en orden, con errores y avisos por archivo y línea | `acsuite check` |
+
+Sin ruta, `board` y `check` usan el proyecto de la carpeta donde ejecutas el comando (como `task`): se sube desde ahí hasta la raíz del repo git. Si quieres revisar otro proyecto, pásale la ruta (`acsuite check D:/otro-proyecto`).
 
 `acsuite` sin argumentos lista los subcomandos, y `acsuite <subcomando> --help` muestra la ayuda de cada uno. Detalle de cada herramienta: [`board`](./scripts/task-tracker/README.md), [`task`](./scripts/task-manager/README.md) y [`check`](./scripts/docs-check/README.md).
 
@@ -78,10 +80,10 @@ Sin ese clon todo lo demás funciona, pero los tests de `scripts/skill-checks/` 
 Este repo incluye una herramienta para ver, en una terminal aparte, el estado de las tareas de cualquier proyecto que use la skill (tarea en progreso, pausadas, pendientes y últimas completadas), redibujándose sola cuando cambian sus archivos:
 
 ```sh
-acsuite board <ruta-del-proyecto>
+acsuite board
 ```
 
-Uso, atajos y cómo lee los archivos: [`scripts/task-tracker/README.md`](./scripts/task-tracker/README.md).
+Vigila el proyecto de la carpeta actual; para otro, pásale la ruta (`acsuite board D:/otro-proyecto`). Uso, atajos y cómo lee los archivos: [`scripts/task-tracker/README.md`](./scripts/task-tracker/README.md).
 
 ## Gestión de tareas desde la terminal
 
@@ -99,10 +101,10 @@ Comandos, flags y cómo escribe: [`scripts/task-manager/README.md`](./scripts/ta
 Un verificador de solo lectura que revisa si la documentación de agentes de otro repo sirve a la skill, al seguimiento y a la gestión de tareas, y lista errores y avisos con archivo y línea:
 
 ```sh
-acsuite check <ruta-del-proyecto>
+acsuite check
 ```
 
-Uso y códigos de hallazgo: [`scripts/docs-check/README.md`](./scripts/docs-check/README.md).
+Revisa el proyecto de la carpeta actual; para otro, pásale la ruta (`acsuite check D:/otro-proyecto`). Uso y códigos de hallazgo: [`scripts/docs-check/README.md`](./scripts/docs-check/README.md).
 
 ## Estructura del repositorio
 
