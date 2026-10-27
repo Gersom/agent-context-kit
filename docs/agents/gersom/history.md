@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 89 — Skill 2.2.0: el flujo de actualizar también recomienda la suite
+
+- El flujo de actualizar de la skill (update-flow.md) ahora ofrece al terminar la recomendación opcional de la suite, una vez y solo si rules.md no tiene el bloque de la suite; antes solo se ofrecía al generar o migrar, así que un proyecto que solo se actualizaba nunca se enteraba. suite-recommendation.md lo recoge en «Cuándo se abre».
+- Skill 2.2.0 (minor, comportamiento nuevo; changelog 2.2.md «Sin cambios que aplicar»), tag v2.2.0. En la suite: marcador de rules.md y fixture espejo sincronizados. Revisión independiente sin bloqueantes (dos mejoras aplicadas); bun test 1130 pass, typecheck y check limpios. Commits caa90c5, ca828a3 y bfa2f01 (skill) y ac3a464 (kit).
+
 ## 2026-10-27 — ✅ Tarea 88 — Skill 2.1.0: los commits se escriben siempre en inglés
 
 - La Regla 5 de la plantilla rules.md de la skill ahora fija que los commits se escriben siempre en inglés (título y cuerpo), sea cual sea el idioma de la documentación, y su ejemplo pasa a inglés; antes no decía nada y el ejemplo en español hacía que los agentes commitearan en español.
