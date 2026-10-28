@@ -26,6 +26,7 @@ export const HELP: string[] = [
   "  --once                Pinta una sola vez y sale.",
   "  --compact             Arranca con un solo recuadro por tarea.",
   "  --no-arrows           Arranca sin las flechas del flujo.",
+  "  --follow              Modo observador: espera a que marques un proyecto con el mod de Claude (acsuite-active-project) y lo abre.",
   "  -h, --help            Muestra esta ayuda.",
   "",
   "La lista de proyectos se guarda en projects.json dentro de ~/.acsuite (o de la carpeta de la variable",

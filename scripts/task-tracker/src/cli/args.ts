@@ -2,10 +2,12 @@
 // carpeta actual), el operador cuyo panel abrir de frente en modo multi-operador (segundo
 // argumento, solo si hay ruta; o `--operator <carpeta>` / `--operator=<carpeta>`, con o sin
 // ruta), `--once` y, para arrancar con la pantalla ya ajustada, `--compact`
-// (una sola tarea por recuadro) y `--no-arrows` (sin flechas del flujo).
+// (una sola tarea por recuadro) y `--no-arrows` (sin flechas del flujo). `--follow` activa el
+// modo observador: espera el proyecto que marque el mod de Claude y lo abre.
 
 export interface CliArgs {
   once: boolean;
+  follow: boolean;
   pathArg: string | undefined;
   operator: string | undefined;
   compact: boolean;
@@ -24,6 +26,7 @@ export function parseArgs(argv: string[]): CliArgs {
   }
   return {
     once: argv.includes("--once"),
+    follow: argv.includes("--follow"),
     pathArg: positional[0],
     operator: operator || positional[1] || undefined,
     compact: argv.includes("--compact"),

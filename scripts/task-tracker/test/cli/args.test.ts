@@ -3,7 +3,7 @@ import { parseArgs } from "../../src/cli/args.ts";
 
 describe("parseArgs", () => {
   test("sin argumentos", () => {
-    expect(parseArgs([])).toEqual({ once: false, pathArg: undefined, operator: undefined, compact: false, arrows: true });
+    expect(parseArgs([])).toEqual({ once: false, follow: false, pathArg: undefined, operator: undefined, compact: false, arrows: true });
   });
 
   test("ruta y --once", () => {
@@ -22,7 +22,7 @@ describe("parseArgs", () => {
   });
 
   test("sin ruta (proyecto de la carpeta actual): pathArg queda sin definir, con o sin flags", () => {
-    expect(parseArgs(["--once"])).toEqual({ once: true, pathArg: undefined, operator: undefined, compact: false, arrows: true });
+    expect(parseArgs(["--once"])).toEqual({ once: true, follow: false, pathArg: undefined, operator: undefined, compact: false, arrows: true });
     expect(parseArgs(["--compact", "--no-arrows"])).toMatchObject({ pathArg: undefined, operator: undefined, compact: true, arrows: false });
   });
 
@@ -36,7 +36,7 @@ describe("parseArgs", () => {
   });
 
   test("con ruta y operador (board <ruta> <operador>)", () => {
-    expect(parseArgs(["D:/repo", "ana"])).toEqual({ once: false, pathArg: "D:/repo", operator: "ana", compact: false, arrows: true });
+    expect(parseArgs(["D:/repo", "ana"])).toEqual({ once: false, follow: false, pathArg: "D:/repo", operator: "ana", compact: false, arrows: true });
   });
 
   test("el valor de --operator no se toma como ruta", () => {
@@ -45,6 +45,12 @@ describe("parseArgs", () => {
 
   test("--operator sin valor se ignora", () => {
     expect(parseArgs(["repo", "--operator"]).operator).toBeUndefined();
+  });
+
+  test("--follow activa el modo observador, con o sin ruta; por defecto está apagado", () => {
+    expect(parseArgs([]).follow).toBe(false);
+    expect(parseArgs(["--follow"])).toMatchObject({ follow: true, pathArg: undefined, operator: undefined });
+    expect(parseArgs(["repo", "--follow", "--compact"])).toMatchObject({ follow: true, pathArg: "repo", compact: true });
   });
 
   test("--compact arranca con los recuadros compactos y --no-arrows sin flechas", () => {
