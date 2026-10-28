@@ -48,14 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 107 — Documentar y versionar el modo observador
-
-- **Descripción:** Documentar el mod y el modo observador (README del board, architecture.md) y subir la versión de la suite según docs/releasing.md.
-- **Decisiones/temas a definir antes de empezar:** Si el cambio es minor; si el mod se documenta aquí o en su propio README.
-- **Bloqueos:** `[Resuelto el 2026-10-27]` — era `[dependencia]` Depende de las Tareas 104, 105 y 106.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Agregada:** 2026-10-27.
-
 <!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 

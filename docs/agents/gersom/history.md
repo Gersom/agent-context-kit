@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-28 — ✅ Tarea 107 — Documentar y versionar el modo observador
+
+- Documentado el modo observador y el mod acsuite-active-project: sección «Modo observador» y tabla de atajos completa en el README del board, árbol y descripciones en docs/architecture.md, y sección breve en el README de la raíz con enlace al README del mod.
+- De paso: mensajes del board alineados con el botón [ ● Mark ], README del mod con el JSON escapado y corrección del texto desactualizado de «sin ruta».
+- Versión 1.13.0 de la suite con el tag anotado local v1.13.0 (sin push). Commits en la suite: 33c445f y 745e117.
+
 ## 2026-10-27 — ✅ Tarea 111 — Mejoras UX del mod acsuite-active-project
 
 - Banda del mod acsuite-active-project con el diseño de agent-radar: «Active Project» a la izquierda y un único botón [ ● Mark ] a la derecha; cede ante una encuesta y conserva las bandas de otros hooks.
