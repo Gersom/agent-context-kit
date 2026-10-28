@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ❌ Tarea 110 — Pruebas automáticas de startApp (teclas y observador con TTY simulada)
+
+- Decisión del operador (2026-10-28): el riesgo es bajo y el cableado de startApp (teclas y observador) se verifica a mano; no vale el costo de simular una TTY.
+
 ## 2026-10-27 — ✅ Tarea 106 — Board: aviso cuando el repo no tiene la skill iniciada
 
 - Aviso del modo observador cuando el repo marcado no tiene la skill iniciada: «Este repo no tiene la skill iniciada: <ruta>. Instálala desde https://github.com/Gersom/agent-context-skill»; los demás errores siguen genéricos.

@@ -48,14 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 110 — Pruebas automáticas de startApp (teclas y observador con TTY simulada)
-
-- **Descripción:** Surgió al cerrar la Tarea 105; falta detallarla.
-- **Decisiones/temas a definir antes de empezar:** Ninguno.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Agregada:** 2026-10-27.
-
 ### Tarea 107 — Documentar y versionar el modo observador
 
 - **Descripción:** Documentar el mod y el modo observador (README del board, architecture.md) y subir la versión de la suite según docs/releasing.md.
