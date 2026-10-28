@@ -285,16 +285,17 @@ describe("renderProjects como tarjetas", () => {
       .filter((l) => l.startsWith("│"))
       .map((l) => l.slice(2, -2).trimEnd());
 
-  test("tres líneas por proyecto, sin línea en blanco entre uno y otro", () => {
+  test("tres líneas por proyecto, con una línea en blanco entre uno y otro", () => {
     const lines = cardLines(rows, 60, { selected: rows[0].path });
-    expect(lines).toHaveLength(rows.length * 3);
+    expect(lines).toHaveLength(rows.length * 4 - 1);
     expect(lines.slice(0, 3)).toEqual(["› demo-app · 2 libres · 1 bloqueadas", "  /repos/demo-app", "  ana · T-12: Implementar el parser"]);
-    expect(lines.slice(3, 6)).toEqual(["  plano · 0 libres · 0 bloqueadas", "  /repos/plano", "  — · Sin tarea en curso"]);
+    expect(lines[3]).toBe("");
+    expect(lines.slice(4, 7)).toEqual(["  plano · 0 libres · 0 bloqueadas", "  /repos/plano", "  — · Sin tarea en curso"]);
   });
 
   test("repo ajeno sin datos: «—» en los conteos, operador y tarea", () => {
     const lines = cardLines(rows, 60);
-    expect(lines.slice(6, 9)).toEqual(["  ajeno · — libres · — bloqueadas", "  /repos/ajeno", "  — · —"]);
+    expect(lines.slice(8, 11)).toEqual(["  ajeno · — libres · — bloqueadas", "  /repos/ajeno", "  — · —"]);
   });
 
   test("el elegido lleva «›» y solo él", () => {
@@ -303,7 +304,7 @@ describe("renderProjects como tarjetas", () => {
     expect(lines[0].startsWith("› ")).toBe(true);
     const other = cardLines(longRows, 60, { selected: "/repos/plano" });
     expect(other[0].startsWith("  ")).toBe(true);
-    expect(other[3].startsWith("› plano")).toBe(true);
+    expect(other[4].startsWith("› plano")).toBe(true);
   });
 
   test("si la línea del nombre no cabe se recorta el nombre por el final y se conservan los conteos", () => {
@@ -329,8 +330,8 @@ describe("renderProjects como tarjetas", () => {
     const lines = cardLines(longRows, 40);
     expect(lines[2]).toBe("  gersom · T-12: Implementar el par…");
     // El ilegible: solo el nombre, la ruta y el aviso (recortado al ancho).
-    expect(lines.slice(9, 12)).toEqual(["  roto",expect.stringMatching(/^ {2}….*-roto$/), "  ! No existe la carpeta: /repos/ro…"]);
-    expect(cardLines(longRows, 80)[11]).toBe("  ! No existe la carpeta: /repos/roto");
+    expect(lines.slice(12, 15)).toEqual(["  roto",expect.stringMatching(/^ {2}….*-roto$/), "  ! No existe la carpeta: /repos/ro…"]);
+    expect(cardLines(longRows, 80)[14]).toBe("  ! No existe la carpeta: /repos/roto");
     const narrow = cardLines([{ ...longRows[3], warning: "un aviso muy largo que no cabe en una pantalla angosta" }], 40);
     expect(narrow[2]).toMatch(/^ {2}! un aviso.*…$/);
     expect(visibleLength(narrow[2])).toBe(36);

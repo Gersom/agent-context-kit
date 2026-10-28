@@ -463,8 +463,8 @@ export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, war
 }
 
 /**
- * Lista de proyectos para terminales angostas: una tarjeta de tres líneas por repo, sin línea en
- * blanco entre una y otra ni encabezados:
+ * Lista de proyectos para terminales angostas: una tarjeta de tres líneas por repo, con una línea
+ * en blanco entre una y otra y sin encabezados:
  *
  *   › nombre · 3 libres · 3 bloqueadas
  *     /ruta/del/repo
@@ -476,7 +476,8 @@ export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, war
  */
 function projectCards(rows: ProjectRow[], selected: string | null, { pc, width, secondary }: Canvas, row: Row): void {
   const inner = Math.max(1, width - BOX_PADDING);
-  for (const project of rows) {
+  for (const [index, project] of rows.entries()) {
+    if (index > 0) row(0, { text: "" });
     const chosen = project.path === selected;
     const marker = chosen ? "› " : "  ";
     const paintName = (s: string) => (chosen ? pc.bold(pc.green(s)) : pc.bold(s));
