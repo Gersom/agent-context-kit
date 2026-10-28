@@ -1,0 +1,8 @@
+{
+  "name": "acsuite-active-project",
+  "version": "0.2.0",
+  "description": "Marca el proyecto de esta sesión como el activo para el modo observador de acsuite board, con un botón o con /board.",
+  "license": "MIT",
+  "author": { "name": "Gersom Alaja" },
+  "repository": "https://github.com/Gersom/agent-context-suite"
+}

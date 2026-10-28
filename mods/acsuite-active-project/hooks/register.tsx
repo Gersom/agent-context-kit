@@ -7,11 +7,14 @@ async function configDir($: Dollar): Promise<string> {
   const custom = await $.env.get('ACSUITE_HOME')
   if (custom) return custom
   const home = (await $.env.get('USERPROFILE')) ?? (await $.env.get('HOME'))
-  if (!home) throw new Error('sin ACSUITE_HOME, USERPROFILE ni HOME')
+  if (!home) throw new Error('no hay ACSUITE_HOME, USERPROFILE ni HOME')
   return `${home}/.acsuite`
 }
 
-/** Guarda el cwd de esta sesión y la hora; devuelve la ruta del archivo. */
+/**
+ * Guarda el directorio de esta sesión y la hora en `active-project.json`; el board sube a la raíz
+ * del repo al agregarlo. Devuelve la ruta del archivo.
+ */
 async function mark($: Dollar): Promise<string> {
   const file = `${await configDir($)}/active-project.json`
   const path = await $.session.cwd()
@@ -31,9 +34,9 @@ export const register: Register = on => {
 
   on('command.run', { command: 'board' }, async $ => {
     try {
-      return { text: `Proyecto guardado en ${await mark($)}` }
+      return { text: `Proyecto marcado para el board (${await mark($)}).` }
     } catch (err) {
-      return { text: `No se pudo guardar: ${(err as Error).message}` }
+      return { text: `No se pudo marcar el proyecto: ${(err as Error).message}` }
     }
   })
 
@@ -52,7 +55,7 @@ export const register: Register = on => {
               await mark($)
               $.ui.toast('Proyecto marcado para el board')
             } catch (err) {
-              $.ui.toast(`No se pudo guardar: ${(err as Error).message}`)
+              $.ui.toast(`No se pudo marcar el proyecto: ${(err as Error).message}`)
             }
           }}
         />

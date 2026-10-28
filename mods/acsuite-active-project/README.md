@@ -1,0 +1,39 @@
+# acsuite-active-project
+
+Mod de Claude Code para la suite [agent-context-suite](https://github.com/Gersom/agent-context-suite). Sirve para que el modo observador de `acsuite board` sepa en qué proyecto estás trabajando cuando tienes varias sesiones abiertas.
+
+## Qué hace
+
+Guarda el directorio de la sesión y la hora en `active-project.json`, dentro de la carpeta de config de la suite (`ACSUITE_HOME` si está definida, si no `~/.acsuite`):
+
+```json
+{ "path": "D:\personal\mi-proyecto", "at": "2026-10-28T01:07:20.960Z" }
+```
+
+Se usa de dos formas, con el mismo resultado:
+
+- **Botón** «Marcar este proyecto», en la banda sobre el prompt.
+- **Comando** `/board`.
+
+El mod no cambia nada más: no vigila pestañas ni escribe por su cuenta, solo guarda cuando lo pides. El board (cuando está en modo observador) lee el archivo, sube a la raíz del repo y abre ese proyecto.
+
+## Instalar
+
+Desde GitHub, en una sesión de terminal:
+
+```
+/plugin install acsuite-active-project --marketplace Gersom/agent-context-suite
+```
+
+En la app de escritorio: **+** junto al prompt, **Plugins**, **Add marketplace** con `Gersom/agent-context-suite` y luego **Add plugin**.
+
+Para usar la carpeta de un clon de la suite, sin instalar, agrega su carpeta `mods` a `CLAUDE_CODE_PLUGIN_DIRS` en el bloque `env` de `~/.claude/settings.json` (varias rutas se separan con `;` en Windows y `:` en macOS y Linux). Solo lo ven las sesiones que se abran después del cambio.
+
+## Desarrollo
+
+Con la carpeta del mod como directorio de trabajo:
+
+```
+claude plugin validate .
+claude plugin test .
+```
