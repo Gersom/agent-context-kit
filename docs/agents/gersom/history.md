@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 104 — Mod de Claude: botón y /board que guardan el proyecto activo
+
+- Mod mods/acsuite-active-project/ (v0.2.0): comando /board y botón en la banda sobre el prompt que guardan {path, at} en active-project.json (ACSUITE_HOME o ~/.acsuite); incluye README, 2 pruebas (claude plugin test) y marketplace.json en la raíz.
+- Verificado por el operador en una sesión nueva de otro proyecto. Guarda el cwd tal cual (el board sube a la raíz); el mod queda en este repo y su separación va en la Tarea 108.
+- Commits: 0579454 (mod) y 89e4f1e (marketplace), ambos en la suite.
+
 ## 2026-10-27 — ✅ Tarea 103 — Prueba mínima del mod de proyecto activo
 
 - Mod de prueba mods/active-project-probe/: comando /board y banda con botón que guardan {path, at} en ~/.acsuite/active-project.json (ACSUITE_HOME).

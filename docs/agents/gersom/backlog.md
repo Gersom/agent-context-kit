@@ -48,15 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 104 — Mod de Claude: botón y /board que guardan el proyecto activo
-
-- **Descripción:** Convertir la prueba mínima en el mod definitivo: un botón y el comando /board que, al usarse en una sesión, guardan el repo de esa sesión como proyecto activo en la config de la suite.
-- **Decisiones/temas a definir antes de empezar:** Dónde vive el mod (este repo o aparte) y cómo se distribuye; si se guarda la raíz del repo (git toplevel) o el cwd tal cual.
-- **Bloqueos:** `[Resuelto el 2026-10-27]` — era `[dependencia]` Depende de la Tarea 103 (la prueba mínima confirma que el mod puede escribir y que el botón se dibuja).
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Botón y comando comparten la misma lógica. Escritura atómica (temporal y renombrar) para que el board nunca lea un JSON a medias. El botón es el camino cómodo; el comando es la alternativa que no depende de cómo la app dibuje la interfaz.
-- **Agregada:** 2026-10-27.
-
 ### Tarea 105 — Board: modo observador del proyecto activo
 
 - **Descripción:** Agregar al board un modo observador (tecla o flag): al entrar borra lo guardado en la config, muestra que espera un clic en el mod de Claude y, cuando aparece una ruta nueva, abre ese repo, agregándolo a la lista de proyectos si no está.
@@ -106,7 +97,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 - **Descripción:** Mover mods/acsuite-active-project/ a un repo propio (con su marketplace.json y README) para instalarlo con /plugin install sin depender del repo de la suite.
 - **Decisiones/temas a definir antes de empezar:** Nombre y visibilidad del repo; qué queda en la suite (solo documentación del uso con el board); cómo se actualiza la entrada de CLAUDE_CODE_PLUGIN_DIRS o la instalación.
-- **Bloqueos:** [postergada] Por ahora el mod vive en mods/ de la suite y alcanza para usarlo (decisión del operador, 2026-10-28). Depende de la Tarea 104.
+- **Bloqueos:** `[postergada]` Por ahora el mod vive en mods/ de la suite y alcanza para usarlo (decisión del operador, 2026-10-28). Retomarla cuando se quiera distribuir el mod por separado. `[Resuelto el 2026-10-27]` — era `[postergada]` Por ahora el mod vive en mods/ de la suite y alcanza para usarlo (decisión del operador, 2026-10-28). Depende de la Tarea 104.
 - **Disparador:** cuando el operador quiera distribuir el mod por separado.
 - **Detalles:** Surgida al planear la Tarea 104. Pasos probables: crear el repo, mover la carpeta con su historial si conviene, mover el marketplace.json, ajustar el README y la ruta en ~/.claude/settings.json.
 - **Agregada:** 2026-10-27.
