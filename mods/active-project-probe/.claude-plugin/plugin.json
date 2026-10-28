@@ -1,0 +1,5 @@
+{
+  "name": "active-project-probe",
+  "version": "0.1.0",
+  "description": "Prueba: guarda el proyecto de la sesión en la config de acsuite con /board o un botón."
+}
