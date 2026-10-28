@@ -35,11 +35,21 @@ describe("parseKeys", () => {
     expect(parseKeys("\u001bOA\u001bOB")).toEqual(["up", "down"]);
   });
 
-  test("Enter abre; b, B, Retroceso y un Esc suelto vuelven", () => {
+  test("e lleva a la vista de equipo (mayúscula o minúscula)", () => {
+    expect(parseKeys("eE")).toEqual(["team", "team"]);
+  });
+
+  test("Enter abre", () => {
     expect(parseKeys("\r")).toEqual(["enter"]);
     expect(parseKeys("\n")).toEqual(["enter"]);
-    expect(parseKeys("bB\u007f")).toEqual(["back", "back", "back"]);
-    expect(parseKeys("\u001b")).toEqual(["back"]);
+  });
+
+  test("b, B, Retroceso y un Esc suelto ya no son teclas del tablero", () => {
+    expect(parseKeys("bB")).toEqual([]);
+    expect(parseKeys("\u007f\b")).toEqual([]);
+    expect(parseKeys("\u001b")).toEqual([]);
+    expect(parseKeys("\u001bq")).toEqual(["quit"]);
+    expect(parseKeys("u001b[Ae")).toEqual(["up", "team"]);
   });
 
   test("otras secuencias (flechas laterales, teclas con parámetros) se ignoran enteras", () => {

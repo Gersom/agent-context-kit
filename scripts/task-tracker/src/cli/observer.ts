@@ -13,11 +13,11 @@ export interface ObserverState {
 
 /**
  * `true` si la tecla no vale con el observador activo y un repo abierto: no se puede salir de la
- * vista del tablero (ni a la lista de proyectos con `p`, ni a la lista o al equipo con `b`/Esc).
- * Para eso hay que salir antes del modo observador con `o`.
+ * vista del tablero (ni a la lista de proyectos con `p`, ni al equipo con `e`). Para eso hay que
+ * salir antes del modo observador con `o`.
  */
 export function ignoredWithObserver(key: NavKey): boolean {
-  return key === "projects" || key === "back";
+  return key === "projects" || key === "team";
 }
 
 /**

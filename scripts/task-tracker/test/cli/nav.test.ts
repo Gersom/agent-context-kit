@@ -50,8 +50,9 @@ describe("navReduce en la vista de equipo", () => {
     expect(navReduce(team("luis"), "enter", ROWS)).toEqual(team("luis"));
   });
 
-  test("volver, salir y redibujar no cambian la vista de equipo; sin operadores abribles ↑/↓ no hacen nada", () => {
-    expect(navReduce(team("ana"), "back", ROWS)).toEqual(team("ana"));
+  test("equipo, salir y redibujar no cambian la vista de equipo; sin operadores abribles ↑/↓ no hacen nada", () => {
+    const state = team("ana");
+    expect(navReduce(state, "team", ROWS)).toBe(state);
     expect(navReduce(team("ana"), "redraw", ROWS)).toEqual(team("ana"));
     expect(navReduce(team(null), "down", [{ folder: "luis", folderless: true }])).toEqual(team(null));
   });
@@ -60,8 +61,8 @@ describe("navReduce en la vista de equipo", () => {
 describe("navReduce en el panel de un operador", () => {
   const panel: NavState = { view: { kind: "operator", folder: "gersom" }, selected: "gersom" };
 
-  test("volver regresa al equipo con ese operador elegido", () => {
-    expect(navReduce(panel, "back", ROWS)).toEqual(team("gersom"));
+  test("equipo regresa a la vista de equipo con ese operador elegido", () => {
+    expect(navReduce(panel, "team", ROWS)).toEqual(team("gersom"));
   });
 
   test("las flechas y Enter no hacen nada dentro del panel", () => {

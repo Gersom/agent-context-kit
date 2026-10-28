@@ -584,9 +584,8 @@ function footerLines(meta: CanvasMeta, width: number): string[] {
     else parts.push("[↑/↓] elegir", "[Enter] abrir", "[a] agregar repo", ...(meta.hasRows ? ["[x] quitar"] : []), "[r] releer", observe, "[Ctrl+C o q] salir");
   } else {
     if (meta.multiView === "team") parts.push("[↑/↓] elegir", "[Enter] abrir");
-    // Con el observador activo no se sale de la vista del tablero: ni `[p]` ni volver (ver `ignoredWithObserver`).
-    if (meta.multiView === "operator" && !meta.observer) parts.push("[Esc o b] volver al equipo");
-    // Desde la raíz de un repo abierto desde la lista, `b`/Esc también vuelven a ella, pero el pie solo ofrece `[p]`.
+    // Con el observador activo no se sale de la vista del tablero: ni `[e]` ni `[p]` (ver `ignoredWithObserver`).
+    if (meta.multiView === "operator" && !meta.observer) parts.push("[e] equipo");
     if (!meta.observer) parts.push("[p] proyectos");
     // La vista de equipo no ofrece compactar (la tecla `c` no hace nada ahí) ni tiene flechas de flujo.
     if (meta.multiView !== "team") {

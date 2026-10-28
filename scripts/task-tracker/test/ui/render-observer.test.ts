@@ -58,9 +58,10 @@ describe("modo observador: pie", () => {
     expect(on).toContain("[r] redibujar - [o] salir del modo observador");
   });
 
-  test("activo, el panel de un operador no ofrece volver al equipo; apagado, sí", () => {
-    expect(render(model, { ...repoMeta, multiView: "operator" })).toContain("[Esc o b] volver al equipo");
+  test("activo, el panel de un operador no ofrece [e] equipo; apagado, sí", () => {
+    expect(render(model, { ...repoMeta, multiView: "operator" })).toContain("[e] equipo");
     const on = render(model, { ...repoMeta, multiView: "operator", observer: { notice: null } });
+    expect(on).not.toContain("[e]");
     expect(on).not.toContain("volver");
     expect(on).not.toContain("[p] proyectos");
   });
@@ -69,6 +70,7 @@ describe("modo observador: pie", () => {
     const team = { rows: [], teamBacklog: { present: false as const, free: [], blocked: [], warnings: [] }, warnings: [] };
     const on = renderTeam(team, { ...repoMeta, multiView: "team", selected: null, preferred: null, observer: { notice: null } });
     expect(on).not.toContain("[p] proyectos");
+    expect(on).not.toContain("[e]");
     expect(on).toContain("[↑/↓] elegir - [Enter] abrir");
   });
 

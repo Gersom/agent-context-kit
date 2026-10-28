@@ -98,9 +98,10 @@ describe("renderTeam", () => {
     expect(renderTeam(team, { ...meta, controls: "none" })).not.toContain("↑/↓");
   });
 
-  test("el pie de equipo no anuncia compactar/expandir ni volver a proyectos, tampoco con compact activo", () => {
+  test("el pie de equipo no anuncia [e], compactar/expandir ni volver a proyectos, tampoco con compact activo", () => {
     for (const compact of [false, true]) {
       const out = renderTeam(team, { ...meta, controls: "keys", multiView: "team", compact });
+      expect(out).not.toContain("[e]");
       expect(out).not.toContain("[c]");
       expect(out).not.toContain("compactar");
       expect(out).not.toContain("expandir");
@@ -154,8 +155,10 @@ describe("render del panel de un operador en modo multi", () => {
     expect(panel({ teamBacklog: { ...teamBacklog, present: false } })).not.toContain("SIN DUEÑO");
   });
 
-  test("pie del panel: cómo volver al equipo", () => {
-    expect(panel({ controls: "keys", width: 140 })).toContain("[Esc o b] volver al equipo - [p] proyectos - [c] compactar - [f] ocultar flechas - [r] redibujar - [o] observar - [Ctrl+C o q] salir");
+  test("pie del panel: cómo ir al equipo", () => {
+    const out = panel({ controls: "keys", width: 140 });
+    expect(out).toContain("[e] equipo - [p] proyectos - [c] compactar - [f] ocultar flechas - [r] redibujar - [o] observar - [Ctrl+C o q] salir");
+    expect(out).not.toContain("volver");
   });
 
   test("los avisos del team-backlog salen con los del panel", () => {

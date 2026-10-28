@@ -30,9 +30,9 @@ describe("observerFailureNotice", () => {
 });
 
 describe("ignoredWithObserver", () => {
-  test("ir a proyectos y volver se ignoran", () => {
+  test("ir a proyectos y al equipo se ignoran", () => {
     expect(ignoredWithObserver("projects")).toBe(true);
-    expect(ignoredWithObserver("back")).toBe(true);
+    expect(ignoredWithObserver("team")).toBe(true);
   });
 
   test("el resto de las teclas del tablero siguen valiendo", () => {

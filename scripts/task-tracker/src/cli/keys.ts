@@ -1,16 +1,17 @@
 // Teclas de la terminal interactiva: `q` o Ctrl+C salen, `r` redibuja, `c` compacta o expande los
 // recuadros y `f` oculta o muestra las flechas del flujo. En la vista de equipo (modo
-// multi-operador) y en la lista de proyectos, ↑/↓ eligen, Enter abre y `b`, Esc o Retroceso vuelven;
-// `p` lleva a la lista de proyectos desde cualquier vista de un repo, `a` agrega un repo a ella y `x`
-// quita de ella el elegido (pide confirmación: ver `parseConfirm`). `o` activa o desactiva el modo
-// observador (abre solo el proyecto que marca el mod de Claude: ver observer.ts).
+// multi-operador) y en la lista de proyectos, ↑/↓ eligen y Enter abre; `e` lleva de un panel de
+// operador a la vista de equipo; `p` lleva a la lista de proyectos desde cualquier vista de un repo,
+// `a` agrega un repo a ella y `x` quita de ella el elegido (pide confirmación: ver `parseConfirm`).
+// `o` activa o desactiva el modo observador (abre solo el proyecto que marca el mod de Claude: ver
+// observer.ts).
 
-export type NavKey = "quit" | "redraw" | "up" | "down" | "enter" | "back" | "compact" | "flow" | "projects" | "add" | "remove" | "observe";
+export type NavKey = "quit" | "redraw" | "up" | "down" | "enter" | "team" | "compact" | "flow" | "projects" | "add" | "remove" | "observe";
 
 /**
  * Teclas de lo que llegó de la terminal en modo raw. Las flechas llegan como secuencias de varios
- * caracteres (`ESC [ A`, o `ESC O A` en algunas terminales); un Esc suelto (sin nada después) es
- * "volver". Las secuencias que no se conocen (otras teclas especiales) se ignoran enteras.
+ * caracteres (`ESC [ A`, o `ESC O A` en algunas terminales); un Esc suelto (sin nada después) no es
+ * una tecla del tablero. Las secuencias que no se conocen (otras teclas especiales) se ignoran enteras.
  */
 export function parseKeys(chunk: string): NavKey[] {
   const keys: NavKey[] = [];
@@ -18,10 +19,7 @@ export function parseKeys(chunk: string): NavKey[] {
     const char = chunk[i];
     if (char === "\u001b") {
       const next = chunk[i + 1];
-      if (next !== "[" && next !== "O") {
-        keys.push("back");
-        continue;
-      }
+      if (next !== "[" && next !== "O") continue;
       const end = sequenceEnd(chunk, i);
       const final = chunk[end];
       if (final === "A") keys.push("up");
@@ -71,6 +69,6 @@ function singleKey(char: string): NavKey | null {
   if (char === "x" || char === "X") return "remove";
   if (char === "o" || char === "O") return "observe";
   if (char === "\r" || char === "\n") return "enter";
-  if (char === "b" || char === "B" || char === "\u007f" || char === "\b") return "back";
+  if (char === "e" || char === "E") return "team";
   return null;
 }

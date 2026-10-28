@@ -39,9 +39,9 @@ describe("projectsReduce", () => {
     expect(projectsReduce(gone, "enter", PATHS)).toBe(gone);
   });
 
-  test("volver, compactar, flechas del flujo, redibujar y salir no cambian el estado", () => {
+  test("equipo, compactar, flechas del flujo, redibujar y salir no cambian el estado", () => {
     const state = at("/repos/ana");
-    for (const key of ["back", "compact", "flow", "redraw", "quit"] as const) expect(projectsReduce(state, key, PATHS)).toBe(state);
+    for (const key of ["team", "compact", "flow", "redraw", "quit"] as const) expect(projectsReduce(state, key, PATHS)).toBe(state);
   });
 });
 

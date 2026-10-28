@@ -6,12 +6,12 @@
 // Atajos (terminal interactiva): `q` o Ctrl+C salen, `r` redibuja, `c` compacta o expande los
 // recuadros (una sola tarea por recuadro, salvo en progreso y pausadas) y `f` oculta o muestra las
 // flechas del flujo. En modo multi-operador, ↑/↓ eligen operador en la vista de equipo, Enter
-// abre su panel y `b` o Esc vuelven al equipo.
+// abre su panel y `e` vuelve al equipo.
 //
 // Uso (desde la raíz de agent-context-suite):
 //   bun run board                 → vigila el proyecto de la carpeta actual (la raíz de su repo git);
 //                                   sin documentación de la skill ahí, abre la lista de proyectos
-//                                   (↑/↓ eligen, Enter abre uno, `b` o Esc vuelven a la lista)
+//                                   (↑/↓ eligen, Enter abre uno, `p` va a la lista de proyectos)
 //   bun run board <ruta>          → raíz del proyecto (busca docs/agents/ o agent-context/agents/)
 //                                   o la carpeta que contiene handoff.md
 //   bun run board --once          → pinta una sola vez y sale (útil para probar o en CI)

@@ -40,7 +40,7 @@ export function initialNav({ operator, preferred }: { operator?: string; preferr
 export function navReduce(state: NavState, key: NavKey, rows: NavRow[]): NavState {
   const options = selectable(rows);
   if (state.view.kind === "operator") {
-    return key === "back" ? { view: { kind: "team" }, selected: state.view.folder } : state;
+    return key === "team" ? { view: { kind: "team" }, selected: state.view.folder } : state;
   }
   if (key === "up" || key === "down") {
     if (!options.length) return state;

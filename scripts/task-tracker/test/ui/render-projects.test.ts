@@ -379,18 +379,18 @@ describe("pie de un repo abierto desde la lista", () => {
   });
   const repo = { projectName: "demo-app", projectDir: "/repos/demo-app", updatedAt: meta.updatedAt, trigger: meta.trigger, color: false, width: 120, controls: "keys" as const };
 
-  test("el panel plano ofrece solo [p] proyectos (`b`/Esc, con el repo abierto desde la lista, siguen funcionando, pero no se anuncian)", () => {
+  test("el panel plano ofrece solo [p] proyectos, sin [e] equipo", () => {
     expect(render(model, repo)).toContain("[p] proyectos - [c] compactar");
-    expect(render(model, repo)).not.toContain("volver a proyectos");
-    expect(render(model, repo)).not.toContain("[Esc o b]");
+    expect(render(model, repo)).not.toContain("volver");
+    expect(render(model, repo)).not.toContain("[e]");
   });
 
-  test("la vista de equipo: solo [p] proyectos, sin volver a proyectos ni [c]", () => {
+  test("la vista de equipo: solo [p] proyectos, sin volver ni [e] ni [c]", () => {
     const team = { rows: [], teamBacklog: { present: false as const, free: [], blocked: [], warnings: [] }, warnings: [] };
     const out = renderTeam(team, { ...repo, multiView: "team", selected: null, preferred: null });
     expect(out).toContain("[↑/↓] elegir - [Enter] abrir - [p] proyectos - [r] redibujar - [o] observar - [Ctrl+C o q] salir");
-    expect(out).not.toContain("volver a proyectos");
-    expect(out).not.toContain("[Esc o b]");
+    expect(out).not.toContain("volver");
+    expect(out).not.toContain("[e]");
     expect(out).not.toContain("[c]");
     expect(out).not.toContain("[f]");
   });
@@ -400,9 +400,9 @@ describe("pie de un repo abierto desde la lista", () => {
     expect(render(model, { ...repo, multiView: "operator" })).toContain("[p] proyectos");
   });
 
-  test("en el panel de un operador `b` vuelve al equipo, no a la lista", () => {
+  test("en el panel de un operador `e` lleva al equipo y `p` a la lista", () => {
     const out = render(model, { ...repo, multiView: "operator" });
-    expect(out).toContain("[Esc o b] volver al equipo");
-    expect(out).not.toContain("volver a proyectos");
+    expect(out).toContain("[e] equipo - [p] proyectos");
+    expect(out).not.toContain("volver");
   });
 });

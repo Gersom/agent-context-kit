@@ -1,8 +1,8 @@
 // Ciclo del tracker: leer los archivos → armar el modelo → pintar, y redibujar cuando cambian
 // (watcher), cuando cambia el tamaño de la terminal, con el atajo `r`, o terminar con `q`/Ctrl+C.
 // En modo multi-operador hay además dos vistas (el equipo y el panel de un operador) y una
-// navegación con ↑/↓, Enter y `b`/Esc (ver cli/nav.ts). Sin un repo al que abrir de frente, se
-// muestra la lista de proyectos (ver cli/projects-nav.ts): Enter abre uno y `b`/Esc vuelven a ella.
+// navegación con ↑/↓, Enter y `e` (ver cli/nav.ts). Sin un repo al que abrir de frente, se
+// muestra la lista de proyectos (ver cli/projects-nav.ts): Enter abre uno y `p` vuelve a ella.
 
 import { mkdirSync } from "node:fs";
 import { basename } from "node:path";
@@ -63,8 +63,6 @@ export function startApp({
   let teamReader: ReturnType<typeof createTeamReader> | null = null;
   let nav: NavState | null = null;
   let navRows: NavRow[] = [];
-  // `true` si el repo abierto salió de la lista de proyectos: `b`/Esc vuelven a ella.
-  let fromList = false;
   let projectRows: ProjectRow[] = [];
   let projectsNav: ProjectsNavState = initialProjectsNav([]);
   let projectsNotices: string[] = [];
@@ -153,7 +151,6 @@ export function startApp({
       projectsNotices = [`No se pudo abrir ${path}: ${resolved.error.replace(/:$/, "")}.`];
       return draw({ kind: "redraw" });
     }
-    fromList = true;
     open(resolved);
     draw({ kind: "start" });
     syncWatchers();
@@ -317,7 +314,6 @@ export function startApp({
     observerNotice = null;
     if (observerWaiting) {
       observerWaiting = false;
-      fromList = false;
       open(null);
     }
     draw({ kind: "redraw" });
@@ -358,7 +354,6 @@ export function startApp({
     // La vista de la lista se reemplaza: no queda una ruta a medio escribir ni una confirmación pendiente.
     adding = null;
     confirmRemove = null;
-    fromList = true;
     observerWaiting = false;
     open(resolved);
     draw({ kind: "start" });
@@ -425,7 +420,7 @@ export function startApp({
 
     process.stdin.on("data", (chunk: string) => {
       // Cada tecla va a la lista de proyectos o al repo abierto según lo que haya en pantalla en ese
-      // momento: una tecla puede cambiarlo (Enter abre un repo; `p` y `b` vuelven a la lista).
+      // momento: una tecla puede cambiarlo (Enter abre un repo; `p` vuelve a la lista).
       const keys = parseKeys(chunk);
       let at = 0;
       while (true) {
@@ -448,7 +443,7 @@ export function startApp({
         if (at >= keys.length) return;
         const key = keys[at++];
         if (key === "quit") return quit();
-        // Con el observador activo no se sale de la vista del tablero: ni a proyectos ni al equipo (`o` primero).
+        // Con el observador activo no se sale de la vista del tablero: ni a proyectos (`p`) ni al equipo (`e`); `o` primero.
         if (observer && ignoredWithObserver(key)) continue;
         if (key === "redraw") {
           draw({ kind: "redraw" });
@@ -456,12 +451,6 @@ export function startApp({
           toggleObserver();
         } else if (key === "projects") {
           // Desde cualquier vista de un repo, a la lista de proyectos (se vuelve a leer al abrirla).
-          fromList = false;
-          open(null);
-          draw({ kind: "redraw" });
-        } else if (key === "back" && fromList && (!target.multi || nav?.view.kind === "team")) {
-          // Desde la raíz del repo (el panel plano o la vista de equipo), de vuelta a la lista.
-          fromList = false;
           open(null);
           draw({ kind: "redraw" });
         } else if (key === "compact" || key === "flow") {
