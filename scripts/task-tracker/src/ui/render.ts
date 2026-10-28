@@ -468,7 +468,7 @@ export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, war
  *
  *   › nombre · 3 libres · 3 bloqueadas
  *     /ruta/del/repo
- *     operador · tarea en curso
+ *     operador · tarea en curso   (sin operador, solo la tarea en curso)
  *
  * Si algo no entra, se recorta el nombre (conservando los conteos), la ruta por el principio y la
  * tercera línea por el final. Un repo que no se pudo leer lleva solo el nombre y, en la tercera
@@ -504,10 +504,10 @@ function projectCards(rows: ProjectRow[], selected: string | null, { pc, width, 
       { paint: work?.counts.blocked ? pc.red : secondary, text: `${blocked} bloqueadas` },
     );
     row(2, path);
+    // Sin operador (repo plano o correo no registrado) la línea es solo la tarea en curso, sin «— ·».
     row(
       2,
-      { paint: operator ? undefined : secondary, text: operator ? truncate(operator, OPERATOR_MAX_WIDTH) : "—" },
-      { paint: secondary, text: " · " },
+      ...(operator ? [{ text: truncate(operator, OPERATOR_MAX_WIDTH) }, { paint: secondary, text: " · " }] : []),
       { paint: work?.current ? undefined : secondary, text: currentText(project) },
     );
   }

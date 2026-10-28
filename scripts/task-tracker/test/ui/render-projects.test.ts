@@ -290,12 +290,12 @@ describe("renderProjects como tarjetas", () => {
     expect(lines).toHaveLength(rows.length * 4 - 1);
     expect(lines.slice(0, 3)).toEqual(["› demo-app · 2 libres · 1 bloqueadas", "  /repos/demo-app", "  ana · T-12: Implementar el parser"]);
     expect(lines[3]).toBe("");
-    expect(lines.slice(4, 7)).toEqual(["  plano · 0 libres · 0 bloqueadas", "  /repos/plano", "  — · Sin tarea en curso"]);
+    expect(lines.slice(4, 7)).toEqual(["  plano · 0 libres · 0 bloqueadas", "  /repos/plano", "  Sin tarea en curso"]);
   });
 
   test("repo ajeno sin datos: «—» en los conteos, operador y tarea", () => {
     const lines = cardLines(rows, 60);
-    expect(lines.slice(8, 11)).toEqual(["  ajeno · — libres · — bloqueadas", "  /repos/ajeno", "  — · —"]);
+    expect(lines.slice(8, 11)).toEqual(["  ajeno · — libres · — bloqueadas", "  /repos/ajeno", "  —"]);
   });
 
   test("el elegido lleva «›» y solo él", () => {
