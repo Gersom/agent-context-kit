@@ -27,38 +27,54 @@ export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     await $.command.register({
       name: 'board',
-      description: 'Marca este proyecto como el activo para el board de acsuite',
+      description: 'Mark this project as the active one for the acsuite board',
     })
     return next(e)
   })
 
   on('command.run', { command: 'board' }, async $ => {
     try {
-      return { text: `Proyecto marcado para el board (${await mark($)}).` }
+      return { text: `Project marked for the board (${await mark($)}).` }
     } catch (err) {
-      return { text: `No se pudo marcar el proyecto: ${(err as Error).message}` }
+      return { text: `Could not mark the project: ${(err as Error).message}` }
     }
   })
 
+  // La banda es una línea: el nombre a la izquierda y el botón a la derecha. Solo el nombre se corta si falta ancho; el botón nunca se encoge.
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
-    if (e.props.hasSurvey) return next(e)
+    // Las bandas de otros hooks se conservan; una encuesta se queda con la banda para ella.
+    const below = await next(e)
+
+    if (e.props.hasSurvey) return below
+
     const { Box, Button, Text } = $.ui.resolve(e)
 
     return (
-      <Box>
-        <Text dimColor>acsuite board: </Text>
-        <Button
-          key="mark"
-          label="Marcar este proyecto"
-          onPress={async () => {
-            try {
-              await mark($)
-              $.ui.toast('Proyecto marcado para el board')
-            } catch (err) {
-              $.ui.toast(`No se pudo marcar el proyecto: ${(err as Error).message}`)
-            }
-          }}
-        />
+      <Box flexDirection="column">
+        <Box>
+          <Box flexGrow={1} flexShrink={1}>
+            <Text wrap="truncate-end" bold dimColor>
+              Active Project
+            </Text>
+          </Box>
+          <Box flexShrink={0} marginLeft={2}>
+            <Button
+              key="mark"
+              plain
+              dimColor
+              label="[ ● Mark ]"
+              onPress={async () => {
+                try {
+                  await mark($)
+                  $.ui.toast('Project marked for the board')
+                } catch (err) {
+                  $.ui.toast(`Could not mark the project: ${(err as Error).message}`)
+                }
+              }}
+            />
+          </Box>
+        </Box>
+        {below}
       </Box>
     )
   })
