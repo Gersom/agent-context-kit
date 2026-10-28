@@ -9,7 +9,7 @@ import { basename } from "node:path";
 import { gitToplevel } from "../../_shared/git.ts";
 import { parseKeys } from "./cli/keys.ts";
 import { compactApplies, initialNav, type NavRow, navReduce, type NavState, reconcileNav } from "./cli/nav.ts";
-import { type ObserverState, observerStep, startObserver } from "./cli/observer.ts";
+import { ignoredWithObserver, type ObserverState, observerStep, startObserver } from "./cli/observer.ts";
 import { projectsKeysReduce } from "./cli/projects-keys.ts";
 import { initialProjectsNav, neighborAfterRemove, type ProjectsNavState, reconcileProjects } from "./cli/projects-nav.ts";
 import { ACTIVE_PROJECT_FILE, clearActiveProject, readActiveProject } from "./io/active-project.ts";
@@ -343,10 +343,16 @@ export function startApp({
       return draw({ kind: "redraw" });
     }
     const warning = result.warning ? ` ${result.warning}` : "";
-    const resolved = resolveAgentsDir(result.path);
+    let resolved = resolveAgentsDir(result.path);
     if (!resolved.ok) {
       observerNotice = `No se pudo abrir ${path}: ${resolved.error.replace(/:$/, "")}.${warning}`;
       return draw({ kind: "redraw" });
+    }
+    // Repo multi-operador: se abre de frente el tablero del operador actual (el del correo de git),
+    // como `board <ruta> --operator X`. Si no figura, queda la vista de equipo; si no se puede, también.
+    if (resolved.multi?.preferred && !resolved.multi.operator) {
+      const own = resolveAgentsDir(result.path, undefined, { operator: resolved.multi.preferred });
+      if (own.ok) resolved = own;
     }
     observerNotice = result.warning ?? null;
     if (target && samePath(target.projectDir, result.path)) return draw({ kind: "redraw" });
@@ -443,6 +449,8 @@ export function startApp({
         if (at >= keys.length) return;
         const key = keys[at++];
         if (key === "quit") return quit();
+        // Con el observador activo no se sale de la vista del tablero: ni a proyectos ni al equipo (`o` primero).
+        if (observer && ignoredWithObserver(key)) continue;
         if (key === "redraw") {
           draw({ kind: "redraw" });
         } else if (key === "observe") {

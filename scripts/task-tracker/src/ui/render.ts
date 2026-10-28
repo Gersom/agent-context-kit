@@ -105,10 +105,10 @@ function finishCanvas({ out, line, blank, secondary, pc, width }: Canvas, meta: 
 }
 
 /** Línea de estado del modo observador (ver `RenderMeta.observer`). */
-const OBSERVER_STATUS = "Observando: esperando que marques un proyecto con el mod de Claude (botón «Marcar este proyecto» o /board)";
+const OBSERVER_STATUS = "Observando: el board cambia solo de proyecto cuando pulsas el botón «Marcar este proyecto» del mod de Claude o escribes /board.";
 
 /** Lo que dice la vista de espera del modo observador (ver `renderObserver`). */
-const OBSERVER_WAITING = "Esperando que marques un proyecto con el mod de Claude (botón «Marcar este proyecto» o /board).";
+const OBSERVER_WAITING = "Esperando: el board cambiará solo de proyecto cuando pulses el botón «Marcar este proyecto» del mod de Claude o escribas /board.";
 
 /** Parte `text` en líneas de a lo sumo `width` caracteres, cortando en los espacios. */
 function wrapWords(text: string, width: number): string[] {
@@ -488,9 +488,10 @@ function footerLines(meta: CanvasMeta, width: number): string[] {
     else parts.push("[↑/↓] elegir", "[Enter] abrir", "[a] agregar repo", ...(meta.hasRows ? ["[x] quitar"] : []), "[r] releer", observe, "[Ctrl+C o q] salir");
   } else {
     if (meta.multiView === "team") parts.push("[↑/↓] elegir", "[Enter] abrir");
-    if (meta.multiView === "operator") parts.push("[Esc o b] volver al equipo");
+    // Con el observador activo no se sale de la vista del tablero: ni `[p]` ni volver (ver `ignoredWithObserver`).
+    if (meta.multiView === "operator" && !meta.observer) parts.push("[Esc o b] volver al equipo");
     // Desde la raíz de un repo abierto desde la lista, `b`/Esc también vuelven a ella, pero el pie solo ofrece `[p]`.
-    parts.push("[p] proyectos");
+    if (!meta.observer) parts.push("[p] proyectos");
     // La vista de equipo no ofrece compactar (la tecla `c` no hace nada ahí) ni tiene flechas de flujo.
     if (meta.multiView !== "team") {
       parts.push(meta.compact ? "[c] expandir" : "[c] compactar");

@@ -1,5 +1,18 @@
 import { describe, expect, test } from "bun:test";
-import { observerStep, startObserver } from "../../src/cli/observer.ts";
+import type { NavKey } from "../../src/cli/keys.ts";
+import { ignoredWithObserver, observerStep, startObserver } from "../../src/cli/observer.ts";
+
+describe("ignoredWithObserver", () => {
+  test("ir a proyectos y volver se ignoran", () => {
+    expect(ignoredWithObserver("projects")).toBe(true);
+    expect(ignoredWithObserver("back")).toBe(true);
+  });
+
+  test("el resto de las teclas del tablero siguen valiendo", () => {
+    const rest: NavKey[] = ["quit", "redraw", "up", "down", "enter", "compact", "flow", "observe"];
+    for (const key of rest) expect(ignoredWithObserver(key)).toBe(false);
+  });
+});
 
 describe("startObserver", () => {
   test("arranca en el instante dado", () => {

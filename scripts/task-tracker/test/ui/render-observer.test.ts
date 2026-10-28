@@ -4,7 +4,7 @@ import { render, renderObserver, renderProjects, renderTeam } from "../../src/ui
 import { buildModel } from "../../src/model/model.ts";
 import { fixture } from "../../../_shared/test/helpers.ts";
 
-const STATUS = "Observando: esperando que marques un proyecto con el mod de Claude (botón «Marcar este proyecto» o /board)";
+const STATUS = "Observando: el board cambia solo de proyecto cuando pulsas el botón «Marcar este proyecto» del mod de Claude o escribes /board.";
 
 const projectsMeta: ProjectsRenderMeta = {
   updatedAt: new Date(2026, 9, 6, 12, 0, 0),
@@ -46,6 +46,28 @@ describe("modo observador: pie", () => {
     const team = { rows: [], teamBacklog: { present: false as const, free: [], blocked: [], warnings: [] }, warnings: [] };
     expect(renderTeam(team, { ...repoMeta, multiView: "team", selected: null, preferred: null })).toContain("[o] observar");
     expect(render(model, { ...repoMeta, multiView: "operator", observer: { notice: null } })).toContain("[o] salir del modo observador");
+  });
+
+  test("activo, el panel de un repo no ofrece [p] proyectos; apagado, sí", () => {
+    expect(render(model, repoMeta)).toContain("[p] proyectos");
+    const on = render(model, { ...repoMeta, observer: { notice: null } });
+    expect(on).not.toContain("[p] proyectos");
+    expect(on).toContain("[c] ");
+    expect(on).toContain("[r] redibujar - [o] salir del modo observador");
+  });
+
+  test("activo, el panel de un operador no ofrece volver al equipo; apagado, sí", () => {
+    expect(render(model, { ...repoMeta, multiView: "operator" })).toContain("[Esc o b] volver al equipo");
+    const on = render(model, { ...repoMeta, multiView: "operator", observer: { notice: null } });
+    expect(on).not.toContain("volver");
+    expect(on).not.toContain("[p] proyectos");
+  });
+
+  test("activo, la vista de equipo no ofrece [p] proyectos pero sí elegir y abrir", () => {
+    const team = { rows: [], teamBacklog: { present: false as const, free: [], blocked: [], warnings: [] }, warnings: [] };
+    const on = renderTeam(team, { ...repoMeta, multiView: "team", selected: null, preferred: null, observer: { notice: null } });
+    expect(on).not.toContain("[p] proyectos");
+    expect(on).toContain("[↑/↓] elegir - [Enter] abrir");
   });
 
   test("agregando o confirmando quitar, la lista solo ofrece las teclas de ese paso", () => {
@@ -122,7 +144,7 @@ describe("modo observador: línea de estado", () => {
 });
 
 describe("modo observador: vista de espera", () => {
-  const WAITING = "Esperando que marques un proyecto con el mod de Claude (botón «Marcar este proyecto» o /board).";
+  const WAITING = "Esperando: el board cambiará solo de proyecto cuando pulses el botón «Marcar este proyecto» del mod de Claude o escribas /board.";
   const waitingMeta = { updatedAt: projectsMeta.updatedAt, trigger: projectsMeta.trigger, color: false, width: 160, controls: "keys" as const, observer: { notice: null } };
 
   /** El texto de las líneas desde `start` hasta la próxima línea en blanco, unido con espacios. */

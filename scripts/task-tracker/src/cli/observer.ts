@@ -2,11 +2,21 @@
 // Puro y sin I/O: recibe lo leído de `active-project.json` y dice si hay algo nuevo que abrir.
 
 import type { ActiveProject } from "../io/active-project.ts";
+import type { NavKey } from "./keys.ts";
 
 /** `since`: cuándo arrancó el observador; `lastAt`: la marca más reciente ya atendida (ms desde la época). */
 export interface ObserverState {
   since: number;
   lastAt: number;
+}
+
+/**
+ * `true` si la tecla no vale con el observador activo y un repo abierto: no se puede salir de la
+ * vista del tablero (ni a la lista de proyectos con `p`, ni a la lista o al equipo con `b`/Esc).
+ * Para eso hay que salir antes del modo observador con `o`.
+ */
+export function ignoredWithObserver(key: NavKey): boolean {
+  return key === "projects" || key === "back";
 }
 
 /** Estado inicial: lo marcado antes de `now` no cuenta, solo lo posterior. */
