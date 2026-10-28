@@ -36,7 +36,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Decisiones/temas a definir antes de empezar:** Qué fricciones se vieron al usarlos (flags largos, texto libre, `--apply`, pausar/empezar en varios pasos); si conviene fusionar o renombrar comandos; qué se mantiene por compatibilidad.
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Surgida al usar el script en las Tareas 24 y 32. Límites conocidos: block/unblock no soportan tareas agrupadas ni team-backlog.md; add y start sin --json. Surgido al hacer la Tarea 36: `step` ya edita de forma puntual (marcar, desmarcar y reemplazar una subsección), pero no permite cambiar el texto o la nota de un paso, agregar o quitar pasos, ni reabrir uno con motivo (lo pide la Tarea 35), y admite solo una de `--falta`/`--decisiones`/`--proximo` por ejecución.
+- **Detalles:** Surgida al usar el script en las Tareas 24 y 32. Límites conocidos: block/unblock no soportan tareas agrupadas ni team-backlog.md; add y start sin --json. Surgido al hacer la Tarea 36: `step` ya edita de forma puntual (marcar, desmarcar y reemplazar una subsección), pero no permite cambiar el texto o la nota de un paso, agregar o quitar pasos, ni reabrir uno con motivo (lo pide la Tarea 35), y admite solo una de `--falta`/`--decisiones`/`--proximo` por ejecución. Actualización (T113): `edit` ya cubre cambiar el texto de una tarea; sigue pendiente cambiar el texto de un paso del plan, agregar o quitar pasos y reabrir uno con motivo.
 - **Agregada:** 2026-10-08.
 
 ### Tarea 4 — Deploy en skills.sh
@@ -57,15 +57,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** Pedida por el operador al ver que la tabla se corta con poco ancho. Revisar también cómo se comporta al redimensionar la terminal.
 - **Agregada:** 2026-10-28.
 
-### Tarea 113 — Comando para modificar el contenido de una tarea del backlog
-
-- **Descripción:** Agregar al task-manager un comando (ej. `edit`) que modifique el título y los campos de una tarea del backlog (descripción, decisiones, bloqueos, disparador, detalles) sin cambiar su estado: una tarea libre sigue libre y una bloqueada sigue bloqueada. Flujo esperado: primero `show` para ver todos sus datos y luego `edit` para cambiarlos.
-- **Decisiones/temas a definir antes de empezar:** Forma de los flags (uno por campo, como en `add`, con `-` para leer de la entrada estándar); si cambiar el título renombra también las referencias de otras tareas; si soporta tareas agrupadas y las del team-backlog.md (como `block`/`unblock`, hoy no las soportan); qué pasa con el campo Bloqueos (editar su texto sin mover la tarea); y si `show` ya muestra todo lo que `edit` puede cambiar.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Pedida por el operador: a veces una tarea se agrega sin detalles y, con el avance de otras tareas, se definen después; hoy solo se puede editar `backlog.md` a mano. Solo cambia contenido, nunca el estado. `acsuite task show` ya existe como solo lectura y es la base del paso de ver. Relacionada con la Tarea 34 (reevaluar los comandos del task-manager).
-- **Agregada:** 2026-10-28.
-
 ### Tarea 114 — Pasar los flags y tags de los comandos del task-manager a inglés y fijar la regla
 
 - **Descripción:** Los comandos ya están en inglés, pero los flags (--titulo, --descripcion, --decisiones, --bloqueo, --disparador, --detalles, --motivo, --tag) y los tags de bloqueo (dependencia, postergada) están en español. Pasar a inglés los nombres de los flags (--title, --description, --decisions, --blocker, --trigger, --details, --reason) y el vocabulario fijo que el script reconoce (valores de --tag y tags de bloqueo: dependency, postponed), y agregar a rules.md la regla: cada comando, flag y palabra clave va en inglés, sea cual sea el idioma del usuario. El texto libre que escribe la persona (título, descripción, motivo, detalles) sigue en su idioma y no se traduce.
@@ -73,6 +64,15 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Detalles:** Pedida por el operador al diseñar la T113. El comando edit (T113) nace ya con flags en inglés, así que esta tarea no debe tocarlo. Hay que actualizar add, block, unblock, close, start, step, pause y resume, sus tests, el README del task-manager y las referencias de docs y de la skill que citen los flags.
+- **Agregada:** 2026-10-28.
+
+### Tarea 115 — Quitar de step los flags de edición de texto (ahora en edit)
+
+- **Descripción:** Con el comando edit (T113) cubriendo todo cambio de texto, dejar step con una sola función: marcar un paso hecho o retroceder (--undo) y mantener al día «Qué falta» y «Próximo paso concreto» cuando siguen con el texto automático. Quitar de step los flags --falta, --decisiones y --proximo, y actualizar la Regla 7 de rules.md, los avisos de step, sus tests y el README.
+- **Decisiones/temas a definir antes de empezar:** Si los flags se quitan de golpe o pasan antes por un período de aviso (deprecación); qué dice el aviso de step cuando «Qué falta» o «Próximo paso» tienen texto propio (hoy manda a --falta/--proximo y debería mandar a edit); coordinar con la T114 (flags en inglés) y la T34 (reevaluar comandos).
+- **Bloqueos:** `[Resuelto el 2026-10-28]` — era `[dependencia]` depende de que la Tarea 113 (comando edit) esté resuelta.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Acordada con el operador al diseñar la T113: edit absorbe la edición de texto del handoff y step se queda solo con marcar o retroceder pasos. Se hace aparte porque quitar flags rompe a quien ya los usa (Regla 7, avisos, tests y README los mencionan).
 - **Agregada:** 2026-10-28.
 
 <!-- agent-context-skill:section=blocked -->
@@ -103,15 +103,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador quiera distribuir el mod por separado.
 - **Detalles:** Surgida al planear la Tarea 104. Pasos probables: crear el repo, mover la carpeta con su historial si conviene, mover el marketplace.json, ajustar el README y la ruta en ~/.claude/settings.json.
 - **Agregada:** 2026-10-27.
-
-### Tarea 115 — Quitar de step los flags de edición de texto (ahora en edit)
-
-- **Descripción:** Con el comando edit (T113) cubriendo todo cambio de texto, dejar step con una sola función: marcar un paso hecho o retroceder (--undo) y mantener al día «Qué falta» y «Próximo paso concreto» cuando siguen con el texto automático. Quitar de step los flags --falta, --decisiones y --proximo, y actualizar la Regla 7 de rules.md, los avisos de step, sus tests y el README.
-- **Decisiones/temas a definir antes de empezar:** Si los flags se quitan de golpe o pasan antes por un período de aviso (deprecación); qué dice el aviso de step cuando «Qué falta» o «Próximo paso» tienen texto propio (hoy manda a --falta/--proximo y debería mandar a edit); coordinar con la T114 (flags en inglés) y la T34 (reevaluar comandos).
-- **Bloqueos:** [dependencia] depende de que la Tarea 113 (comando edit) esté resuelta.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Acordada con el operador al diseñar la T113: edit absorbe la edición de texto del handoff y step se queda solo con marcar o retroceder pasos. Se hace aparte porque quitar flags rompe a quien ya los usa (Regla 7, avisos, tests y README los mencionan).
-- **Agregada:** 2026-10-28.
 
 <!-- agent-context-skill:section=grouped -->
 ## Tareas agrupadas

@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-28 — ✅ Tarea 113 — Comando para modificar el contenido de una tarea del backlog
+
+- Nuevo comando `edit` del task-manager: modifica el contenido de una tarea (título, descripción, decisiones, bloqueo, disparador, detalles y, en el handoff, «Qué falta», «Decisiones a medio camino» y «Próximo paso concreto») sin cambiar su estado ni su lugar. Funciona en backlog, team-backlog y handoff (en curso y pausadas); history queda solo lectura.
+- Flags en inglés. `--blocker` conserva el tag y el historial `[Resuelto ...]` y rechaza lo que cambiaría la sección; también se rechazan líneas que rompan la estructura del handoff. Revisado con un revisor aparte (7 hallazgos corregidos); 1436 tests y typecheck pasan.
+- Commits en la suite: c915864, 7d163a8 y 2c0ddcb.
+
 ## 2026-10-28 — ✅ Tarea 107 — Documentar y versionar el modo observador
 
 - Documentado el modo observador y el mod acsuite-active-project: sección «Modo observador» y tabla de atajos completa en el README del board, árbol y descripciones en docs/architecture.md, y sección breve en el README de la raíz con enlace al README del mod.
