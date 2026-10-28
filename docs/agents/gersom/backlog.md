@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 108
+**Próximo número de tarea:** 109
 
 ---
 
@@ -100,6 +100,15 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Decisiones/temas a definir antes de empezar:** Si el cambio es minor; si el mod se documenta aquí o en su propio README.
 - **Bloqueos:** [dependencia] Depende de las Tareas 104, 105 y 106.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-27.
+
+### Tarea 108 — Separar el mod acsuite-active-project en su propio repo
+
+- **Descripción:** Mover mods/acsuite-active-project/ a un repo propio (con su marketplace.json y README) para instalarlo con /plugin install sin depender del repo de la suite.
+- **Decisiones/temas a definir antes de empezar:** Nombre y visibilidad del repo; qué queda en la suite (solo documentación del uso con el board); cómo se actualiza la entrada de CLAUDE_CODE_PLUGIN_DIRS o la instalación.
+- **Bloqueos:** [postergada] Por ahora el mod vive en mods/ de la suite y alcanza para usarlo (decisión del operador, 2026-10-28). Depende de la Tarea 104.
+- **Disparador:** cuando el operador quiera distribuir el mod por separado.
+- **Detalles:** Surgida al planear la Tarea 104. Pasos probables: crear el repo, mover la carpeta con su historial si conviene, mover el marketplace.json, ajustar el README y la ruta en ~/.claude/settings.json.
 - **Agregada:** 2026-10-27.
 
 <!-- agent-context-skill:section=grouped -->
