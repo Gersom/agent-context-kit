@@ -39,12 +39,12 @@ export function main(argv: string[]): void {
     console.log(HELP.join("\n"));
     return;
   }
-  const { once, pathArg, operator, compact, arrows } = parseArgs(argv);
+  const { once, pathArg, operator, compact, arrows, follow } = parseArgs(argv);
 
   // `null`: sin proyecto al que abrir de frente, se muestra la lista de proyectos.
   const target = pathArg != null ? resolveFromArg(pathArg, operator) : resolveFromCwd(operator);
 
-  startApp({ target, compact, arrows, once });
+  startApp({ target, compact, arrows, follow, once });
 }
 
 /** Ruta pasada por argumento: si no es válida, se informa y se sale con código 1. */

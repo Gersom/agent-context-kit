@@ -86,8 +86,13 @@ type Canvas = ReturnType<typeof createCanvas>;
 /** Avisos, notas y pie con las teclas; cierra la pantalla y la devuelve como texto. */
 function finishCanvas({ out, line, blank, secondary, pc, width }: Canvas, meta: CanvasMeta, model: { notes?: string[]; warnings: string[] }): string {
   const notes = model.notes ?? [];
-  if (notes.length || model.warnings.length) blank();
+  if (notes.length || meta.observer || model.warnings.length) blank();
   for (const note of notes) line(0, `ℹ ${note}`, secondary);
+  if (meta.observer) {
+    // El estado fijo se parte en palabras si no entra, para no perder el final («o /board»).
+    wrapWords(OBSERVER_STATUS, width - 2).forEach((text, i) => line(0, `${i === 0 ? "ℹ" : " "} ${text}`, pc.cyan));
+    if (meta.observer.notice) line(0, `! ${meta.observer.notice}`, pc.yellow);
+  }
   for (const warning of model.warnings) line(0, `! ${warning}`, pc.yellow);
 
   const footer = footerLines(meta, width);
@@ -96,6 +101,26 @@ function finishCanvas({ out, line, blank, secondary, pc, width }: Canvas, meta: 
     for (const text of footer) line(0, text, secondary);
   }
   return out.join("\n") + "\n";
+}
+
+/** Línea de estado del modo observador (ver `RenderMeta.observer`). */
+const OBSERVER_STATUS = "Observando: esperando que marques un proyecto con el mod de Claude (botón «Marcar este proyecto» o /board)";
+
+/** Parte `text` en líneas de a lo sumo `width` caracteres, cortando en los espacios. */
+function wrapWords(text: string, width: number): string[] {
+  const lines: string[] = [];
+  let current = "";
+  for (const word of text.split(" ")) {
+    const joined = current ? `${current} ${word}` : word;
+    if (current && visibleLength(joined) > width) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = joined;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
 }
 
 /** Etapas por las que pasa una tarea, de arriba abajo en la pantalla (ver `arrowText`). */
@@ -433,12 +458,13 @@ function footerLines(meta: CanvasMeta, width: number): string[] {
   if (controls === "ctrl-c") return ["[Ctrl+C] salir"];
   if (controls !== "keys") return [];
   const parts: string[] = [];
+  const observe = meta.observer ? "[o] salir del modo observador" : "[o] observar";
   if (meta.multiView === "projects") {
     // La lista de proyectos no se compacta ni tiene flechas de flujo, y `r` la vuelve a leer.
     // Agregando o confirmando una salida de la lista, solo valen las teclas de ese paso.
     if (meta.input != null) parts.push("[Enter] agregar", "[Esc] cancelar", "[Ctrl+C] salir");
     else if (meta.confirmRemove != null) parts.push("[Enter] quitar", "[Esc] cancelar", "[Ctrl+C] salir");
-    else parts.push("[↑/↓] elegir", "[Enter] abrir", "[a] agregar repo", ...(meta.hasRows ? ["[x] quitar"] : []), "[r] releer", "[Ctrl+C o q] salir");
+    else parts.push("[↑/↓] elegir", "[Enter] abrir", "[a] agregar repo", ...(meta.hasRows ? ["[x] quitar"] : []), "[r] releer", observe, "[Ctrl+C o q] salir");
   } else {
     if (meta.multiView === "team") parts.push("[↑/↓] elegir", "[Enter] abrir");
     if (meta.multiView === "operator") parts.push("[Esc o b] volver al equipo");
@@ -449,7 +475,7 @@ function footerLines(meta: CanvasMeta, width: number): string[] {
       parts.push(meta.compact ? "[c] expandir" : "[c] compactar");
       parts.push(meta.arrows === false ? "[f] mostrar flechas" : "[f] ocultar flechas");
     }
-    parts.push("[r] redibujar", "[Ctrl+C o q] salir");
+    parts.push("[r] redibujar", observe, "[Ctrl+C o q] salir");
   }
 
   const lines: string[] = [];

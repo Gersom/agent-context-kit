@@ -20,6 +20,10 @@ describe("parseKeys", () => {
     expect(parseKeys("xX")).toEqual(["remove", "remove"]);
   });
 
+  test("o activa o desactiva el modo observador (mayúscula o minúscula)", () => {
+    expect(parseKeys("oO")).toEqual(["observe", "observe"]);
+  });
+
   test("c compacta o expande y f oculta o muestra las flechas del flujo (mayúscula o minúscula)", () => {
     expect(parseKeys("cC")).toEqual(["compact", "compact"]);
     expect(parseKeys("fF")).toEqual(["flow", "flow"]);

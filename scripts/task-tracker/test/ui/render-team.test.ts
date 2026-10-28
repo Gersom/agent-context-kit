@@ -74,7 +74,7 @@ describe("renderTeam", () => {
 
   test("avisos y pie con las teclas del selector", () => {
     expect(out).toContain("! [mia] handoff.md no existe (¿se está reescribiendo?).");
-    expect(renderTeam(team, { ...meta, controls: "keys", multiView: "team" })).toContain("[↑/↓] elegir - [Enter] abrir - [p] proyectos - [r] redibujar - [Ctrl+C o q] salir");
+    expect(renderTeam(team, { ...meta, controls: "keys", multiView: "team" })).toContain("[↑/↓] elegir - [Enter] abrir - [p] proyectos - [r] redibujar - [o] observar - [Ctrl+C o q] salir");
     expect(renderTeam(team, { ...meta, controls: "none" })).not.toContain("↑/↓");
   });
 
@@ -135,7 +135,7 @@ describe("render del panel de un operador en modo multi", () => {
   });
 
   test("pie del panel: cómo volver al equipo", () => {
-    expect(panel({ controls: "keys", width: 120 })).toContain("[Esc o b] volver al equipo - [p] proyectos - [c] compactar - [f] ocultar flechas - [r] redibujar - [Ctrl+C o q] salir");
+    expect(panel({ controls: "keys", width: 140 })).toContain("[Esc o b] volver al equipo - [p] proyectos - [c] compactar - [f] ocultar flechas - [r] redibujar - [o] observar - [Ctrl+C o q] salir");
   });
 
   test("los avisos del team-backlog salen con los del panel", () => {

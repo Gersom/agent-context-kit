@@ -4,17 +4,20 @@
 // navegación con ↑/↓, Enter y `b`/Esc (ver cli/nav.ts). Sin un repo al que abrir de frente, se
 // muestra la lista de proyectos (ver cli/projects-nav.ts): Enter abre uno y `b`/Esc vuelven a ella.
 
+import { mkdirSync } from "node:fs";
 import { basename } from "node:path";
 import { gitToplevel } from "../../_shared/git.ts";
 import { parseKeys } from "./cli/keys.ts";
 import { compactApplies, initialNav, type NavRow, navReduce, type NavState, reconcileNav } from "./cli/nav.ts";
+import { type ObserverState, observerStep, startObserver } from "./cli/observer.ts";
 import { projectsKeysReduce } from "./cli/projects-keys.ts";
 import { initialProjectsNav, neighborAfterRemove, type ProjectsNavState, reconcileProjects } from "./cli/projects-nav.ts";
+import { ACTIVE_PROJECT_FILE, clearActiveProject, readActiveProject } from "./io/active-project.ts";
 import { resolveAgentsDir } from "./io/paths.ts";
 import { createProjectList, defaultProjects, type ProjectsProvider, readProjectRows } from "./io/projects.ts";
 import { createSnapshotReader, RETRY_MS } from "./io/snapshot.ts";
 import { createTeamReader, ROOT_WATCHED_FILES } from "./io/team.ts";
-import { failureMessage, removeProject, samePath, saveProject } from "./io/user-config.ts";
+import { configDir, failureMessage, removeProject, samePath, saveProject } from "./io/user-config.ts";
 import { watchDir } from "./io/watch.ts";
 import { buildModel } from "./model/model.ts";
 import { buildTeamModel } from "./model/team.ts";
@@ -31,12 +34,15 @@ type Target = Omit<ResolveOk, "ok">;
  * `operators.md`); `null` abre la lista de proyectos.
  * `listProjects`: de dónde sale la lista de proyectos (se lee al abrir la vista y con `r`).
  * `once`: pinta una sola vez y no vigila (sin atajos de teclado).
+ * `follow`: arranca con el modo observador activo (solo en una sesión interactiva; con `once` o sin
+ * terminal se ignora). La tecla `o` lo alterna.
  */
 export function startApp({
   target: initialTarget,
   listProjects = defaultProjects,
   compact = false,
   arrows = true,
+  follow = false,
   once,
 }: {
   target: Target | null;
@@ -45,6 +51,8 @@ export function startApp({
   compact?: boolean;
   /** Arranca con las flechas del flujo; la tecla `f` las alterna. */
   arrows?: boolean;
+  /** Arranca con el modo observador activo; la tecla `o` lo alterna. */
+  follow?: boolean;
   once: boolean;
 }): void {
   const ui = { compact, arrows };
@@ -67,6 +75,12 @@ export function startApp({
   let adding: string | null = null;
   // Ruta del proyecto que se pide quitar de la lista, a la espera de confirmar; `null` si no hay nada que confirmar.
   let confirmRemove: string | null = null;
+  // Modo observador: `null` si está apagado. Es independiente de `stops` (que `open` vacía al cambiar
+  // de repo): sigue vigilando `active-project.json` aunque se abra otro repo.
+  let observer: ObserverState | null = null;
+  let stopObserver: (() => void) | null = null;
+  // Último aviso del observador (ej. el proyecto marcado no se pudo abrir); `null` si no hay.
+  let observerNotice: string | null = null;
   // Atajos solo con una terminal interactiva de verdad (no con salida o entrada redirigida).
   const interactive = !once && Boolean(process.stdin.isTTY) && Boolean(process.stdout.isTTY);
   const controls: Controls = once ? "none" : interactive ? "keys" : "ctrl-c";
@@ -128,6 +142,7 @@ export function startApp({
 
   /** Enter en la lista: abre ese repo en el tablero; si ya no se puede abrir, lo avisa y se queda. */
   function openProject(path: string): void {
+    observerNotice = null;
     projectsNav = { ...projectsNav, opened: null };
     const resolved = resolveAgentsDir(path);
     if (!resolved.ok) {
@@ -147,7 +162,14 @@ export function startApp({
    */
   function draw(trigger: DrawTrigger, { isRetry = false }: { isRetry?: boolean } = {}): void {
     const allowRetry = !once && !isRetry;
-    const common = { updatedAt: new Date(), trigger, controls, compact: ui.compact, arrows: ui.arrows };
+    const common = {
+      updatedAt: new Date(),
+      trigger,
+      controls,
+      compact: ui.compact,
+      arrows: ui.arrows,
+      ...(observer ? { observer: { notice: observerNotice } } : {}),
+    };
     let screen: string;
 
     if (!target) {
@@ -242,6 +264,80 @@ export function startApp({
     }
   }
 
+  /** `o`: activa el modo observador, o lo desactiva si ya estaba activo. */
+  function toggleObserver(): void {
+    if (observer) exitObserver();
+    else enterObserver();
+  }
+
+  /**
+   * Activa el modo observador: borra el `active-project.json` que haya (lo marcado antes no cuenta) y
+   * vigila la carpeta de config hasta que el mod de Claude escriba uno nuevo.
+   */
+  function enterObserver(): void {
+    stopObserver?.();
+    // El watcher necesita la carpeta; puede no existir si nunca se guardó nada.
+    try {
+      mkdirSync(configDir(), { recursive: true });
+    } catch {
+      // Si no se puede crear, `watchDir` lo avisa por `onError`.
+    }
+    clearActiveProject();
+    observer = startObserver(Date.now());
+    observerNotice = null;
+    // Un fallo del watcher se avisa en el propio observador: `watcherErrors` no sale en la lista de proyectos.
+    const onObserverError = (message: string) => {
+      observerNotice = message;
+      draw({ kind: "redraw" });
+    };
+    stopObserver = watchDir(configDir(), onActiveChange, onObserverError, undefined, [ACTIVE_PROJECT_FILE]);
+    draw({ kind: "redraw" });
+  }
+
+  /** Desactiva el modo observador. */
+  function exitObserver(): void {
+    stopObserver?.();
+    stopObserver = null;
+    observer = null;
+    observerNotice = null;
+    draw({ kind: "redraw" });
+  }
+
+  /** Cambió `active-project.json`: si trae un proyecto marcado más nuevo que el último atendido, lo abre. */
+  function onActiveChange(): void {
+    if (!observer) return;
+    const step = observerStep(observer, readActiveProject());
+    observer = step.state;
+    if (step.open) followProject(step.open);
+  }
+
+  /**
+   * Abre el proyecto marcado `path` (agregándolo a la lista si no estaba). Si no se puede, lo avisa
+   * en la pantalla actual y se sigue observando.
+   */
+  function followProject(path: string): void {
+    const result = projectList.add(path);
+    if (!result.ok) {
+      observerNotice = `No se pudo abrir ${path}: ${result.error}.`;
+      return draw({ kind: "redraw" });
+    }
+    const warning = result.warning ? ` ${result.warning}` : "";
+    const resolved = resolveAgentsDir(result.path);
+    if (!resolved.ok) {
+      observerNotice = `No se pudo abrir ${path}: ${resolved.error.replace(/:$/, "")}.${warning}`;
+      return draw({ kind: "redraw" });
+    }
+    observerNotice = result.warning ?? null;
+    if (target && samePath(target.projectDir, result.path)) return draw({ kind: "redraw" });
+    // La vista de la lista se reemplaza: no queda una ruta a medio escribir ni una confirmación pendiente.
+    adding = null;
+    confirmRemove = null;
+    fromList = true;
+    open(resolved);
+    draw({ kind: "start" });
+    syncWatchers();
+  }
+
   open(initialTarget);
   if (initialTarget && !once) {
     // Un repo abierto de frente se agrega solo a la lista guardada (con `--once` no se escribe nada).
@@ -253,9 +349,12 @@ export function startApp({
   draw({ kind: "start" });
   if (once) return;
   syncWatchers();
+  // `--follow` solo vale en una sesión interactiva (con `once` ya se salió arriba).
+  if (follow && interactive) enterObserver();
 
   const quit = () => {
     for (const stop of stops.values()) stop();
+    stopObserver?.();
     if (interactive) process.stdin.setRawMode(false);
     process.stdout.write("\n");
     process.exit(0);
@@ -286,6 +385,7 @@ export function startApp({
         else if (action.kind === "reload") loadProjects();
         else if (action.kind === "clearNotices") projectsNotices = [];
         else if (action.kind === "open") openProject(action.path);
+        else if (action.kind === "observe") toggleObserver();
         else if (action.kind === "submitAdd") submitAdding(action.text);
         else submitRemove(action.path);
       }
@@ -309,6 +409,8 @@ export function startApp({
         if (key === "quit") return quit();
         if (key === "redraw") {
           draw({ kind: "redraw" });
+        } else if (key === "observe") {
+          toggleObserver();
         } else if (key === "projects") {
           // Desde cualquier vista de un repo, a la lista de proyectos (se vuelve a leer al abrirla).
           fromList = false;

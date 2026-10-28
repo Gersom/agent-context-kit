@@ -31,6 +31,7 @@ export interface ProjectsKeysContext {
  * - `submitAdd`: agregar la ruta `text`. Si no sirve, app.ts avisa y deja `adding` como está (la
  *   entrada sigue abierta); si sirve, pone `adding` en `null`.
  * - `submitRemove`: quitar de la lista el proyecto en `path` (la confirmación ya se limpió en el estado).
+ * - `observe`: activar o desactivar el modo observador (`o`); app.ts redibuja por su cuenta.
  */
 export type ProjectsAction =
   | { kind: "quit" }
@@ -39,7 +40,8 @@ export type ProjectsAction =
   | { kind: "clearNotices" }
   | { kind: "open"; path: string }
   | { kind: "submitAdd"; text: string }
-  | { kind: "submitRemove"; path: string };
+  | { kind: "submitRemove"; path: string }
+  | { kind: "observe" };
 
 export interface ProjectsKeysResult {
   state: ProjectsKeysState;
@@ -57,7 +59,7 @@ export interface ProjectsKeysResult {
  * bloque (para seguir uno que quedó a medias, ver `resume`).
  * - Escribiendo una ruta: todo es texto, salvo Ctrl+C (sale), Enter (agrega) y Esc (cancela).
  * - Confirmando: solo Ctrl+C (sale), Enter (quita) y Esc o `n` (cancelan); lo demás se ignora.
- * - Si no: `q` o Ctrl+C salen, `r` relee, `a` abre la entrada de la ruta (lo que siga en el bloque ya
+ * - Si no: `q` o Ctrl+C salen, `r` relee, `o` alterna el observador, `a` abre la entrada de la ruta (lo que siga en el bloque ya
  *   es la ruta), `x` pide confirmar quitar el elegido (lo que siga en el bloque no puede contestar),
  *   y ↑/↓/Enter navegan. Las demás teclas se ignoran.
  */
@@ -92,6 +94,11 @@ export function projectsKeysReduce(state: ProjectsKeysState, chunk: string, ctx:
     const next = i + 1 < keys.length ? i + 1 : null;
     if (key === "quit") return result({}, [{ kind: "quit" }]);
     if (key === "redraw") return result({}, [{ kind: "reload" }, { kind: "redraw" }], next);
+    if (key === "observe") {
+      // No cambia las filas ni la vista: el bloque sigue con la tecla siguiente.
+      actions.push({ kind: "observe" });
+      continue;
+    }
     if (key === "add") {
       // Lo que siga en este mismo bloque ya es la ruta, no teclas de navegación.
       const rest = chunk.slice(chunk.search(/[aA]/) + 1);

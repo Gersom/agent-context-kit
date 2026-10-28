@@ -2,9 +2,10 @@
 // recuadros y `f` oculta o muestra las flechas del flujo. En la vista de equipo (modo
 // multi-operador) y en la lista de proyectos, ↑/↓ eligen, Enter abre y `b`, Esc o Retroceso vuelven;
 // `p` lleva a la lista de proyectos desde cualquier vista de un repo, `a` agrega un repo a ella y `x`
-// quita de ella el elegido (pide confirmación: ver `parseConfirm`).
+// quita de ella el elegido (pide confirmación: ver `parseConfirm`). `o` activa o desactiva el modo
+// observador (abre solo el proyecto que marca el mod de Claude: ver observer.ts).
 
-export type NavKey = "quit" | "redraw" | "up" | "down" | "enter" | "back" | "compact" | "flow" | "projects" | "add" | "remove";
+export type NavKey = "quit" | "redraw" | "up" | "down" | "enter" | "back" | "compact" | "flow" | "projects" | "add" | "remove" | "observe";
 
 /**
  * Teclas de lo que llegó de la terminal en modo raw. Las flechas llegan como secuencias de varios
@@ -68,6 +69,7 @@ function singleKey(char: string): NavKey | null {
   if (char === "p" || char === "P") return "projects";
   if (char === "a" || char === "A") return "add";
   if (char === "x" || char === "X") return "remove";
+  if (char === "o" || char === "O") return "observe";
   if (char === "\r" || char === "\n") return "enter";
   if (char === "b" || char === "B" || char === "\u007f" || char === "\b") return "back";
   return null;

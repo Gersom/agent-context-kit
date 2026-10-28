@@ -68,7 +68,7 @@ describe("renderProjects", () => {
 
   test("pie: sin controles nada; con teclas, las de la lista; con Ctrl+C, solo salir", () => {
     expect(renderProjects(rows, { ...meta, controls: "none" })).not.toContain("[");
-    expect(renderProjects(rows, { ...meta, controls: "keys", multiView: "projects" })).toContain("[↑/↓] elegir - [Enter] abrir - [a] agregar repo - [x] quitar - [r] releer - [Ctrl+C o q] salir");
+    expect(renderProjects(rows, { ...meta, controls: "keys", multiView: "projects", width: 140 })).toContain("[↑/↓] elegir - [Enter] abrir - [a] agregar repo - [x] quitar - [r] releer - [o] observar - [Ctrl+C o q] salir");
     expect(renderProjects(rows, { ...meta, controls: "keys", multiView: "projects" })).not.toContain("compactar");
     expect(renderProjects(rows, { ...meta, controls: "ctrl-c" })).toContain("[Ctrl+C] salir");
   });
@@ -106,7 +106,7 @@ describe("renderProjects", () => {
     const keys = { ...meta, controls: "keys" as const, multiView: "projects" as const };
     const empty = renderProjects([], keys);
     expect(empty).not.toContain("[x]");
-    expect(empty).toContain("[↑/↓] elegir - [Enter] abrir - [a] agregar repo - [r] releer - [Ctrl+C o q] salir");
+    expect(empty).toContain("[↑/↓] elegir - [Enter] abrir - [a] agregar repo - [r] releer - [o] observar - [Ctrl+C o q] salir");
     expect(renderProjects(rows.slice(0, 1), keys)).toContain("[a] agregar repo - [x] quitar - [r] releer");
   });
 
@@ -185,7 +185,7 @@ describe("pie de un repo abierto desde la lista", () => {
   test("la vista de equipo: solo [p] proyectos, sin volver a proyectos ni [c]", () => {
     const team = { rows: [], teamBacklog: { present: false as const, free: [], blocked: [], warnings: [] }, warnings: [] };
     const out = renderTeam(team, { ...repo, multiView: "team", selected: null, preferred: null });
-    expect(out).toContain("[↑/↓] elegir - [Enter] abrir - [p] proyectos - [r] redibujar - [Ctrl+C o q] salir");
+    expect(out).toContain("[↑/↓] elegir - [Enter] abrir - [p] proyectos - [r] redibujar - [o] observar - [Ctrl+C o q] salir");
     expect(out).not.toContain("volver a proyectos");
     expect(out).not.toContain("[Esc o b]");
     expect(out).not.toContain("[c]");

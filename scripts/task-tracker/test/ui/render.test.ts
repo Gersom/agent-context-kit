@@ -197,15 +197,15 @@ describe("render", () => {
   });
 
   test("pie según los controles disponibles", () => {
-    expect(screen("minimal", { controls: "keys" })).toContain("[c] compactar - [f] ocultar flechas - [r] redibujar - [Ctrl+C o q] salir");
-    expect(screen("minimal", { controls: "keys", compact: true, arrows: false })).toContain("[c] expandir - [f] mostrar flechas - [r] redibujar - [Ctrl+C o q] salir");
+    expect(screen("minimal", { controls: "keys", width: 140 })).toContain("[c] compactar - [f] ocultar flechas - [r] redibujar - [o] observar - [Ctrl+C o q] salir");
+    expect(screen("minimal", { controls: "keys", compact: true, arrows: false, width: 140 })).toContain("[c] expandir - [f] mostrar flechas - [r] redibujar - [o] observar - [Ctrl+C o q] salir");
     expect(screen("minimal")).toContain("[Ctrl+C] salir");
     expect(screen("minimal", { controls: "none" })).not.toContain("Ctrl+C");
   });
 
   test("el pie se parte en más líneas si no entra, y «salir» nunca se recorta", () => {
-    const full = "[Esc o b] volver al equipo - [p] proyectos - [c] compactar - [f] ocultar flechas - [r] redibujar - [Ctrl+C o q] salir";
-    expect(screen("minimal", { controls: "keys", multiView: "operator", width: 120 })).toContain(full);
+    const full = "[Esc o b] volver al equipo - [p] proyectos - [c] compactar - [f] ocultar flechas - [r] redibujar - [o] observar - [Ctrl+C o q] salir";
+    expect(screen("minimal", { controls: "keys", multiView: "operator", width: 140 })).toContain(full);
     const narrow = screen("minimal", { controls: "keys", multiView: "operator", width: 60 }).split("\n");
     const at = narrow.findIndex((l) => l.startsWith("[Esc o b]"));
     const footer = narrow.slice(at).filter(Boolean);

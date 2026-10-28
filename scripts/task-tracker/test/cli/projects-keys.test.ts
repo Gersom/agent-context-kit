@@ -75,6 +75,34 @@ describe("projectsKeysReduce: lista", () => {
   });
 });
 
+describe("projectsKeysReduce: observar con o", () => {
+  test("o y O piden alternar el observador, sin tocar el estado", () => {
+    expect(projectsKeysReduce(list(), "o", CTX)).toEqual({ state: list(), actions: [{ kind: "observe" }], resume: null });
+    expect(projectsKeysReduce(list(), "O", CTX).actions).toEqual([{ kind: "observe" }]);
+    expect(projectsKeysReduce(list(null), "o", { paths: [] })).toEqual({ state: list(null), actions: [{ kind: "observe" }], resume: null });
+  });
+
+  test("el bloque sigue después de o: las demás teclas se atienden en orden", () => {
+    const result = projectsKeysReduce(list(), "o\u001b[Bq", CTX);
+    expect(result.actions).toEqual([{ kind: "observe" }, { kind: "redraw" }, { kind: "quit" }]);
+    expect(result.state.nav.selected).toBe("/repos/gersom");
+  });
+
+  test("escribiendo una ruta, la o es texto", () => {
+    expect(projectsKeysReduce(adding("~/"), "oO", CTX)).toEqual({ state: adding("~/oO"), actions: [{ kind: "redraw" }], resume: null });
+  });
+
+  test("a con texto pegado: la o es texto, no una tecla", () => {
+    const result = projectsKeysReduce(list(), "a/repos/o", CTX);
+    expect(result.state.adding).toBe("/repos/o");
+    expect(result.actions).toEqual([{ kind: "clearNotices" }, { kind: "redraw" }]);
+  });
+
+  test("confirmando quitar, la o se ignora", () => {
+    expect(projectsKeysReduce(confirming("/repos/gersom"), "o", CTX)).toEqual({ state: confirming("/repos/gersom"), actions: [], resume: null });
+  });
+});
+
 describe("projectsKeysReduce: agregar con a", () => {
   test("a abre la entrada vacía, borra los avisos y redibuja", () => {
     expect(projectsKeysReduce(list(), "a", CTX)).toEqual({ state: adding(""), actions: [{ kind: "clearNotices" }, { kind: "redraw" }], resume: null });

@@ -126,6 +126,11 @@ export interface RenderMeta {
   /** Lista de proyectos: `true` si hay filas (sin ellas el pie no ofrece `[x] quitar`); `renderProjects` lo completa. */
   hasRows?: boolean;
   /**
+   * Modo observador: presente si está activo (ausente = apagado). `notice`: el último aviso, por
+   * ejemplo que el proyecto marcado no se pudo abrir; `null` si no hay.
+   */
+  observer?: { notice: string | null };
+  /**
    * `true`: los recuadros de tareas, salvo en progreso y pausadas, muestran una sola tarea (la más
    * reciente) y cuántas más hay, para ocupar menos pantalla.
    */
