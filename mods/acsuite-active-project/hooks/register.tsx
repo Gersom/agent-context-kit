@@ -12,12 +12,12 @@ async function configDir($: Dollar): Promise<string> {
 }
 
 /**
- * Guarda el directorio de esta sesión y la hora en `active-project.json`; el board sube a la raíz
+ * Guarda la raíz del proyecto de esta sesión (no la carpeta a la que un `cd` la haya movido) y la hora en `active-project.json`; el board sube a la raíz
  * del repo al agregarlo. Devuelve la ruta del archivo.
  */
 async function mark($: Dollar): Promise<string> {
   const file = `${await configDir($)}/active-project.json`
-  const path = await $.session.cwd()
+  const path = await $.session.root()
   const at = new Date(await $.clock.now()).toISOString()
   await $.fs.write(file, JSON.stringify({ path, at }, null, 2))
   return file

@@ -10,7 +10,7 @@ const BOARD = {
 test('/board guarda el directorio de la sesión y la hora', async ($, on) => {
   const writes: { path: string; text: string }[] = []
   on('env.get', (_, e) => ({ value: e.name === 'ACSUITE_HOME' ? '/cfg' : undefined }))
-  on('session.cwd', () => ({ value: '/proyectos/uno' }))
+  on('session.root', () => ({ value: '/proyectos/uno' }))
   on('clock.now', () => ({ value: Date.UTC(2026, 9, 28, 1, 2, 3) }))
   on('fs.write', (_, e) => {
     writes.push({ path: e.path, text: e.text })
@@ -30,7 +30,7 @@ test('/board guarda el directorio de la sesión y la hora', async ($, on) => {
 
 test('/board avisa si no puede guardar', async ($, on) => {
   on('env.get', () => ({ value: '/cfg' }))
-  on('session.cwd', () => ({ value: '/proyectos/uno' }))
+  on('session.root', () => ({ value: '/proyectos/uno' }))
   on('clock.now', () => ({ value: 0 }))
   on('fs.write', () => ({ deny: 'sin permiso' }))
 
