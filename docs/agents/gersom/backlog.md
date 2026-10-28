@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 114
+**Próximo número de tarea:** 115
 
 ---
 
@@ -64,6 +64,15 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Detalles:** Pedida por el operador: a veces una tarea se agrega sin detalles y, con el avance de otras tareas, se definen después; hoy solo se puede editar `backlog.md` a mano. Solo cambia contenido, nunca el estado. `acsuite task show` ya existe como solo lectura y es la base del paso de ver. Relacionada con la Tarea 34 (reevaluar los comandos del task-manager).
+- **Agregada:** 2026-10-28.
+
+### Tarea 114 — Pasar los flags y tags de los comandos del task-manager a inglés y fijar la regla
+
+- **Descripción:** Los comandos ya están en inglés, pero los flags (--titulo, --descripcion, --decisiones, --bloqueo, --disparador, --detalles, --motivo, --tag) y los tags de bloqueo (dependencia, postergada) están en español. Pasar a inglés los nombres de los flags (--title, --description, --decisions, --blocker, --trigger, --details, --reason) y el vocabulario fijo que el script reconoce (valores de --tag y tags de bloqueo: dependency, postponed), y agregar a rules.md la regla: cada comando, flag y palabra clave va en inglés, sea cual sea el idioma del usuario. El texto libre que escribe la persona (título, descripción, motivo, detalles) sigue en su idioma y no se traduce.
+- **Decisiones/temas a definir antes de empezar:** Si los nombres en español siguen aceptándose como alias por compatibilidad o se quitan; cómo se tratan los tags ya escritos en los backlog.md existentes (BLOCKING_TAGS ya acepta dependency y postponed); qué pasa con la salida y los mensajes del script (¿también en inglés o siguen en el idioma de la documentación?); en qué sección de rules.md va la regla; avisar al resto de operadores, porque rules.md se aplica a todos.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Pedida por el operador al diseñar la T113. El comando edit (T113) nace ya con flags en inglés, así que esta tarea no debe tocarlo. Hay que actualizar add, block, unblock, close, start, step, pause y resume, sus tests, el README del task-manager y las referencias de docs y de la skill que citen los flags.
 - **Agregada:** 2026-10-28.
 
 <!-- agent-context-skill:section=blocked -->
