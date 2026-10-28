@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 105 — Board: modo observador del proyecto activo
+
+- Modo observador del board: tecla o y flag --follow. Al entrar borra active-project.json y muestra una vista de espera propia; cuando el mod acsuite-active-project marca un proyecto (botón o /board, con at posterior), abre ese repo agregándolo a la lista si no estaba, entra al tablero del operador del correo de git en repos multi-operador y sigue observando; con el observador activo se ignoran p y b/Esc (se sale con o).
+- Lectura tolerante del archivo (ilegible o inválido = no hace nada). Módulos nuevos: io/active-project.ts y cli/observer.ts; el mod pasó a guardar session.root (v0.2.1) porque session.cwd lo mueve un cd. bunfig.toml deja las pruebas de mods/ fuera de bun test. Verificado por el operador en la app; startApp sigue sin pruebas automáticas (necesita TTY).
+- Commits en la suite: 53f05a9, f2a4f8d, b7ec69e, 15f95c7, c9d547f, 90f7040, 25dcc4c.
+
 ## 2026-10-27 — ✅ Tarea 104 — Mod de Claude: botón y /board que guardan el proyecto activo
 
 - Mod mods/acsuite-active-project/ (v0.2.0): comando /board y botón en la banda sobre el prompt que guardan {path, at} en active-project.json (ACSUITE_HOME o ~/.acsuite); incluye README, 2 pruebas (claude plugin test) y marketplace.json en la raíz.

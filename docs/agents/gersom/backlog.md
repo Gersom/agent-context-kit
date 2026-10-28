@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 109
+**Próximo número de tarea:** 111
 
 ---
 
@@ -48,13 +48,29 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 105 — Board: modo observador del proyecto activo
+### Tarea 109 — Normalizar el título y el modo de la vista del board
 
-- **Descripción:** Agregar al board un modo observador (tecla o flag): al entrar borra lo guardado en la config, muestra que espera un clic en el mod de Claude y, cuando aparece una ruta nueva, abre ese repo, agregándolo a la lista de proyectos si no está.
-- **Decisiones/temas a definir antes de empezar:** Qué tecla y qué flag lo activan; qué tecla sale del modo; cómo se ve la pantalla de espera.
-- **Bloqueos:** `[Resuelto el 2026-10-27]` — era `[dependencia]` Depende de la Tarea 103 (define el formato y la ubicación del archivo de estado).
+- **Descripción:** Unificar el encabezado de cada vista del board: en modo observador arriba del todo debe decir «MODO OBSERVADOR» (además del mensaje de abajo); la lista dice «PROYECTOS» en mayúsculas; la vista de tareas dice «TAREAS» con el nombre del proyecto debajo y, en la misma línea, a su lado, la ruta; la vista de equipo dice «EQUIPO» con el mismo formato.
+- **Decisiones/temas a definir antes de empezar:** Cómo se ve la ruta larga en terminales angostas (recorte); si el título cambia también el de la ventana de la terminal; si el encabezado actual de cada vista se reemplaza o se conserva.
+- **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Reglas acordadas: (1) al entrar se borra lo guardado, así nunca abre un repo que no se pidió; (2) sigue observando tras el primer clic, y cada clic en otra sesión cambia el repo; (3) una tecla en la terminal del board sale del modo; (4) usar open() de app.ts, projectList.add() y un watcher del archivo (watch.ts); (5) leer el archivo con tolerancia a escritura a medias.
+- **Detalles:** Surgida al probar el modo observador (Tarea 105). Vistas afectadas: observador (renderObserver), lista de proyectos (renderProjects), tareas por operador (render) y equipo (renderTeam), todas en scripts/task-tracker/src/ui/render.ts.
+- **Agregada:** 2026-10-27.
+
+### Tarea 106 — Board: aviso cuando el repo no tiene la skill iniciada
+
+- **Descripción:** En el modo observador, si el repo elegido no tiene la skill iniciada (no se puede agregar), mostrar «este repo no tiene la skill iniciada» y el enlace de la skill en GitHub, en vez de fallar en silencio.
+- **Decisiones/temas a definir antes de empezar:** Confirmar la URL del enlace (Gersom/agent-context-skill) y dónde se muestra el aviso.
+- **Bloqueos:** `[Resuelto el 2026-10-27]` — era `[dependencia]` Depende de la Tarea 105 (el modo observador).
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-27.
+
+### Tarea 110 — Pruebas automáticas de startApp (teclas y observador con TTY simulada)
+
+- **Descripción:** Surgió al cerrar la Tarea 105; falta detallarla.
+- **Decisiones/temas a definir antes de empezar:** Ninguno.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Agregada:** 2026-10-27.
 
 <!-- agent-context-skill:section=blocked -->
@@ -76,14 +92,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Bloqueos:** [postergada] Hay que debatirla al llegar a esta tarea, tras publicar la primera versión.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Agregada:** 2026-10-26.
-
-### Tarea 106 — Board: aviso cuando el repo no tiene la skill iniciada
-
-- **Descripción:** En el modo observador, si el repo elegido no tiene la skill iniciada (no se puede agregar), mostrar «este repo no tiene la skill iniciada» y el enlace de la skill en GitHub, en vez de fallar en silencio.
-- **Decisiones/temas a definir antes de empezar:** Confirmar la URL del enlace (Gersom/agent-context-skill) y dónde se muestra el aviso.
-- **Bloqueos:** [dependencia] Depende de la Tarea 105 (el modo observador).
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Agregada:** 2026-10-27.
 
 ### Tarea 107 — Documentar y versionar el modo observador
 
