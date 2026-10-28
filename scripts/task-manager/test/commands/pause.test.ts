@@ -203,7 +203,9 @@ describe("resume", () => {
   test("ida y vuelta con `Origen`, textos propios y la tarea en medio de varias pausadas", async () => {
     const p = project({ folders: ["gersom"], ...IDLE });
     await exec(["start", "--team", "Migrar el CI", "--plan", "-", "--apply"], p, { stdin: "Paso 1 — a\nPaso 2 — b" });
-    await exec(["step", "2", "--decisiones", "- Uno.\n- Dos.", "--apply"], p);
+    await exec(["step", "2", "--apply"], p);
+    expect((await exec(["edit", "20", "--decisions=- Uno.\n- Dos.", "--apply"], p)).code).toBe(0);
+    expect(handoff(p)).toContain("- Uno.");
     const before = handoff(p);
     await exec([...PAUSE, "--apply"], p);
     const mid = JSON.parse((await exec(["status", "--json"], p)).out);

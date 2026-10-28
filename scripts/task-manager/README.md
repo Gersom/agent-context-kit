@@ -49,7 +49,7 @@ bun run task <comando> --agents D:/proyectos/mi-app --operator ana
 | `show <N>` | El bloque completo de una tarea y de dónde salió. |
 | `add` `*` | Agrega una tarea a tu `backlog.md` (con el siguiente número) o, con `--team`, al `team-backlog.md`. |
 | `start <N>` `*` | Empieza una tarea: la saca del backlog y arma «Tarea en progreso» en el `handoff.md`. Con `--team "<título>"`, la toma del `team-backlog.md`. |
-| `step [<N \| texto>...]` `*` | Marca (o con `--undo` desmarca) pasos del plan de la tarea en curso y pone al día «Qué falta» y «Próximo paso concreto». |
+| `step <N \| texto>...` `*` | Marca (o con `--undo` desmarca) pasos del plan de la tarea en curso y pone al día «Qué falta» y «Próximo paso concreto». |
 | `pause` `*` | Pasa la tarea en curso a «Tareas pausadas» y deja «Sin tarea en curso». |
 | `resume <N>` `*` | Inverso de `pause`: la pausada vuelve a «Tarea en progreso». |
 | `block <N>` `*` | Bloquea una tarea libre del backlog (`Bloqueos` + la mueve a «bloqueadas / pospuestas»). |
@@ -206,15 +206,15 @@ Empieza una tarea, **en una sola operación** sobre todos los archivos (o ningun
 ### `step`
 
 ```sh
-bun run task step [<N | texto>...] [--undo] [--falta <texto>] [--decisiones <texto>] [--proximo <texto>] [--json] [--apply]
+bun run task step <N | texto>... [--undo] [--json] [--apply]
 ```
 
 Marca pasos del «Plan» de la tarea en curso (Regla 7 de `rules.md`: el handoff se pone al día en cada paso):
 
 - Cada argumento es el **número** del paso (posición en el plan, desde 1) o **parte de su texto** (sin distinguir mayúsculas ni acentos; si coincide con varios, error que los lista). Se pueden pasar varios. `--undo` los desmarca. Un paso que ya estaba en ese estado avisa y no cambia nada.
-- «Qué falta» y «Próximo paso concreto» se reescriben **solos solo si siguen con el texto que puso el script**: el de `start` (`Todos los pasos del plan.`, el primer paso) o el que `step` generó antes (`Pasos pendientes:` con la lista de los pasos sin hacer; `Plan completo: falta cerrar la tarea.` al terminar). Un texto que alguien escribió no se pisa: se avisa y se actualiza con `--falta` / `--proximo`. «Decisiones a medio camino» nunca cambia solo (`--decisiones`).
-- `--falta`, `--decisiones` y `--proximo` (admiten `-` para stdin; uno solo por ejecución) reemplazan el cuerpo de esa subsección, también sin marcar ningún paso (`step --proximo "..."`). Los comentarios HTML del principio de la subsección se conservan.
-- Las subsecciones se reconocen por su título en español o inglés. Sin plan (sin checkboxes) no hay pasos que marcar; sí se pueden actualizar los textos.
+- «Qué falta» y «Próximo paso concreto» se reescriben **solos solo si siguen con el texto que puso el script**: el de `start` (`Todos los pasos del plan.`, el primer paso) o el que `step` generó antes (`Pasos pendientes:` con la lista de los pasos sin hacer; `Plan completo: falta cerrar la tarea.` al terminar). Un texto que alguien escribió no se pisa: se avisa y se actualiza con `edit --missing` / `--next`. «Decisiones a medio camino» nunca cambia solo.
+- `step` solo marca y desmarca pasos. Para cambiar un texto a mano («Qué falta», «Decisiones a medio camino», «Próximo paso concreto») se usa `edit` (ver la sección `edit`).
+- Las subsecciones se reconocen por su título en español o inglés. Sin plan (sin checkboxes) no hay pasos que marcar.
 
 ### `pause`
 

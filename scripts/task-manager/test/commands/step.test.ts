@@ -95,27 +95,41 @@ describe("step", () => {
     expect(snapshot(p.root)).toEqual(before);
   });
 
-  test("--falta, --decisiones y --proximo reemplazan el texto (también por stdin); sin marcar ningún paso", async () => {
+  test("--falta, --decisiones y --proximo ya no existen: flag desconocido y no se escribe nada", async () => {
     const p = await started();
-    await exec(["step", "--falta", "Probar y cerrar.", "--proximo", "Correr los tests.", "--apply"], p);
-    await exec(["step", "--decisiones", "-", "--apply"], p, { stdin: "- Usar bun test.\n- Sin RED.\n" });
-    const text = handoff(p);
-    expect(text).toContain("- [ ] Paso 1 — Escribir"); // nada marcado
-    expect(text).toContain("### Qué falta\n\nProbar y cerrar.\n");
-    expect(text).toContain("### Decisiones a medio camino\n\n- Usar bun test.\n- Sin RED.\n\n### Próximo paso concreto\n\nCorrer los tests.\n");
+    const before = snapshot(p.root);
+    for (const flag of ["--falta", "--decisiones", "--proximo"]) {
+      expect((await exec(["step", "1", flag, "x", "--apply"], p)).code).toBe(2);
+      expect((await exec(["step", flag, "x", "--apply"], p)).code).toBe(2);
+    }
+    expect(snapshot(p.root)).toEqual(before);
   });
 
-  test("un texto que alguien escribió no se pisa solo: avisa y respeta los flags", async () => {
+  test("un texto que alguien escribió (con `edit`) no se pisa solo: avisa y cita `edit` con --missing / --next", async () => {
     const p = await started();
-    await exec(["step", "--falta", "Texto propio.", "--proximo", "Otro texto propio.", "--apply"], p);
+    await exec(["edit", "1", "--missing", "Texto propio.", "--next", "Otro texto propio.", "--apply"], p);
     const auto = await exec(["step", "1", "--apply"], p);
     expect(auto.out).toContain("Aviso: «Qué falta» tiene un texto propio y no lo toqué");
-    expect(auto.out).toContain("--proximo");
+    expect(auto.out).toContain("`edit 1 --missing`");
+    expect(auto.out).toContain("`edit 1 --next`");
+    expect(auto.out).toContain("(Regla 7)");
+    expect(auto.out).not.toContain("--falta");
+    expect(auto.out).not.toContain("--proximo");
     expect(handoff(p)).toContain("### Qué falta\n\nTexto propio.\n");
     expect(handoff(p)).toContain("### Próximo paso concreto\n\nOtro texto propio.\n");
-    await exec(["step", "2", "--falta", "Quedan 2.", "--apply"], p);
-    expect(handoff(p)).toContain("### Qué falta\n\nQuedan 2.\n");
+    await exec(["step", "2", "--apply"], p);
+    expect(handoff(p)).toContain("### Qué falta\n\nTexto propio.\n");
     expect(handoff(p)).toContain("### Próximo paso concreto\n\nOtro texto propio.\n");
+  });
+
+  test("--json: con texto propio, `updated` queda vacío y `notes` cita `edit`", async () => {
+    const p = await started();
+    await exec(["edit", "1", "--missing", "Texto propio.", "--next", "Otro texto propio.", "--apply"], p);
+    const json = JSON.parse((await exec(["step", "1", "--json", "--apply"], p)).out);
+    expect(json.updated).toEqual([]);
+    expect(json.notes).toHaveLength(2);
+    expect(json.notes[0]).toContain("`edit 1 --missing`");
+    expect(json.notes[1]).toContain("`edit 1 --next`");
   });
 
   test("conserva los comentarios HTML del principio de la subsección y el resto del archivo", async () => {
@@ -140,10 +154,12 @@ describe("step", () => {
   });
 
   describe("errores: no se escribe nada", () => {
-    test("sin argumentos ni flags de texto, o --undo sin paso", async () => {
+    test("sin argumentos, o --undo sin paso: error de uso", async () => {
       const p = await started();
-      expect((await exec(["step", "--apply"], p)).code).toBe(2);
-      expect((await exec(["step", "--undo", "--falta", "x", "--apply"], p)).code).toBe(2);
+      const bare = await exec(["step", "--apply"], p);
+      expect(bare.code).toBe(2);
+      expect(bare.err).toContain("Indica qué paso marcar: `step <N | texto>`");
+      expect((await exec(["step", "--undo", "--apply"], p)).code).toBe(2);
     });
 
     test("paso inexistente o ambiguo", async () => {
@@ -163,9 +179,6 @@ describe("step", () => {
       const noPlan = project({ folders: ["gersom"], ...IDLE });
       await exec(["start", "1", "--apply"], noPlan);
       expect((await exec(["step", "1", "--apply"], noPlan)).err).toContain("no tiene plan");
-      // Pero sí se puede actualizar un texto de una tarea sin plan.
-      expect((await exec(["step", "--falta", "Casi.", "--apply"], noPlan)).code).toBe(0);
-      expect(handoff(noPlan)).toContain("### Qué falta\n\nCasi.\n");
     });
 
     test("carpeta de otro operador: se niega", async () => {

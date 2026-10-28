@@ -1,9 +1,8 @@
 // `step`: marca (o con `--undo` desmarca) pasos del «Plan» de la tarea en curso y pone al día los
 // textos de handoff.md que dependen del avance (Regla 7 de rules.md): «Qué falta» y «Próximo paso
 // concreto». Esos dos se reescriben solos únicamente si siguen con el texto que dejó el script
-// (el de `start` o el que `step` mismo generó); un texto que alguien escribió no se toca sin el flag
-// correspondiente (`--falta`, `--proximo`; `--decisiones` nunca es automático). Sin `--apply` solo
-// muestra el diff.
+// (el de `start` o el que `step` mismo generó); un texto que alguien escribió no se toca: para
+// cambiarlo a mano está `edit` (`--missing`, `--next`). Sin `--apply` solo muestra el diff.
 
 import type { PlanStep } from "../../../_shared/types.ts";
 import { CliError, UsageError } from "../cli/errors.ts";
@@ -14,11 +13,9 @@ import { normalizeTitle } from "../query/find.ts";
 import { relFile } from "../query/format.ts";
 import { requireDoc } from "../workspace/docs.ts";
 import { requireOwnFolder } from "../workspace/ownership.ts";
-import { textFlag } from "../write/flags.ts";
 import { findPart } from "../write/handoff.ts";
 import { emitWriteJson, JSON_FLAG } from "../write/json.ts";
 import { detectLanguage, STRINGS, type Strings } from "../write/language.ts";
-import { normalizeText } from "../write/render.ts";
 import { headerLabels } from "../write/samples.ts";
 
 /** Qué paso es el que se pidió: un número (posición, desde 1) o parte del texto del paso. */
@@ -50,35 +47,24 @@ function generated(S: Strings, pending: string[]): Record<"missing" | "next", st
 export const step: Command = {
   name: "step",
   summary: "Marca pasos del plan de la tarea en curso y actualiza «Qué falta» y «Próximo paso concreto»; escribe con --apply",
-  usage: "step [<N | texto>...] [--undo] [--falta <texto>] [--decisiones <texto>] [--proximo <texto>] [--json] [--apply]",
+  usage: "step <N | texto>... [--undo] [--json] [--apply]",
   writes: true,
   flags: {
     undo: { type: "boolean", description: "Desmarcar los pasos indicados en vez de marcarlos." },
-    falta: { type: "string", valueName: "texto", stdin: true, description: "Texto de «Qué falta» (reemplaza al actual). Sin él, se actualiza solo si seguía con el texto automático." },
-    decisiones: { type: "string", valueName: "texto", stdin: true, description: "Texto de «Decisiones a medio camino» (reemplaza al actual; nunca cambia solo)." },
-    proximo: { type: "string", valueName: "texto", stdin: true, description: "Texto de «Próximo paso concreto» (reemplaza al actual). Sin él, se actualiza solo si seguía con el texto automático." },
     json: JSON_FLAG,
   },
   run(ctx) {
     const { flags, io } = ctx;
     const ws = ctx.workspace();
     requireOwnFolder(ws);
-    const given: Record<"missing" | "decisions" | "next", string | undefined> = {
-      missing: textFlag(flags, "falta"),
-      decisions: textFlag(flags, "decisiones"),
-      next: textFlag(flags, "proximo"),
-    };
     const undo = flags.undo === true;
-    if (!ctx.args.length && !Object.values(given).some(Boolean)) {
-      throw new UsageError("Indica qué paso marcar (`step <N | texto>`) o qué texto actualizar (`--falta`, `--decisiones`, `--proximo`).");
-    }
-    if (undo && !ctx.args.length) throw new UsageError("--undo necesita indicar qué paso desmarcar: `step <N | texto> --undo`.");
+    if (!ctx.args.length) throw new UsageError("Indica qué paso marcar: `step <N | texto>`.");
 
     const docs = ctx.docs();
     const handoff = requireDoc(docs.handoff, "handoff.md");
     const { task, steps, subsections } = handoff.parsed.inProgress;
     if (!task) throw new CliError("No hay tarea en curso: «Tarea en progreso» dice «Sin tarea en curso». No se escribió nada.");
-    if (ctx.args.length && !steps.length) throw new CliError(`La Tarea ${task.number} no tiene plan (checkboxes) en «Tarea en progreso»: no hay pasos que marcar. No se escribió nada.`);
+    if (!steps.length) throw new CliError(`La Tarea ${task.number} no tiene plan (checkboxes) en «Tarea en progreso»: no hay pasos que marcar. No se escribió nada.`);
 
     const want = !undo;
     const targets = [...new Set(ctx.args.map((arg) => resolveStep(arg, steps)))];
@@ -97,19 +83,18 @@ export const step: Command = {
       Object.values(STRINGS).flatMap((strings) => (part === "missing" ? [strings.missingWithPlan, strings.missingNoPlan] : [strings.nextNoPlan]));
 
     const updated: string[] = [];
-    const stale: Array<{ label: string; flag: string }> = [];
-    for (const part of ["missing", "decisions", "next"] as const) {
+    const stale: Array<{ label: string; command: string }> = [];
+    for (const part of ["missing", "next"] as const) {
       const sub = findPart(subsections, part);
-      let text = given[part] && normalizeText(given[part]);
-      if (!text && toggled.length && part !== "decisions" && sub) {
-        // Sigue con el texto del script (el de `start` o el generado antes por `step`): se pone al día.
-        const current = sub.body.trim();
-        if (current === before[part] || defaults(part).includes(current)) text = after[part];
-        else stale.push({ label: sub.title, flag: part === "missing" ? "--falta" : "--proximo" });
+      if (!toggled.length || !sub) continue;
+      // Sigue con el texto del script (el de `start` o el generado antes por `step`): se pone al día.
+      const current = sub.body.trim();
+      if (current !== before[part] && !defaults(part).includes(current)) {
+        stale.push({ label: sub.title, command: `edit ${task.number} --${part}` });
+        continue;
       }
-      if (!text) continue;
-      if (!sub) throw new CliError(`«Tarea en progreso» no tiene la subsección «${STRINGS.es[part]}»: agrégala a mano antes de actualizarla. No se escribió nada.`);
-      if (sub.body.trim() === text) continue;
+      const text = after[part];
+      if (current === text) continue;
       edits.push(replaceSubsectionBody(handoff.text, sub.range!, text));
       updated.push(sub.title);
     }
@@ -122,7 +107,7 @@ export const step: Command = {
         steps: steps.map((s, i) => ({ index: i + 1, text: s.text, done: toggled.includes(i) ? want : s.done, changed: toggled.includes(i) })),
         plan: { done, total: steps.length, nextStep: pendingAfter[0] ?? null },
         updated,
-        notes: [...notes, ...stale.map(({ label }) => `«${label}» tiene texto propio: no se actualizó solo.`)],
+        notes: [...notes, ...stale.map(({ label, command }) => `«${label}» tiene texto propio: no se actualizó solo; si ya no vale, actualízalo con \`${command}\` (Regla 7).`)],
       });
       return;
     }
@@ -132,6 +117,6 @@ export const step: Command = {
       if (steps.length) io.out(`Plan ${done}/${steps.length}${pendingAfter[0] ? ` — siguiente: ${pendingAfter[0]}` : " — completo"} (${relFile(ws, handoff.path)}).`);
       if (updated.length) io.out(`Actualizado: ${updated.join(", ")}.`);
     }
-    for (const { label, flag } of stale) io.out(`Aviso: «${label}» tiene un texto propio y no lo toqué; si ya no vale, actualízalo con ${flag} (Regla 7).`);
+    for (const { label, command } of stale) io.out(`Aviso: «${label}» tiene un texto propio y no lo toqué; si ya no vale, actualízalo con \`${command}\` (Regla 7).`);
   },
 };
