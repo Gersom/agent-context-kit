@@ -49,7 +49,7 @@ describe("parseKeys", () => {
     expect(parseKeys("\u007f\b")).toEqual([]);
     expect(parseKeys("\u001b")).toEqual([]);
     expect(parseKeys("\u001bq")).toEqual(["quit"]);
-    expect(parseKeys("u001b[Ae")).toEqual(["up", "team"]);
+    expect(parseKeys("\u001b[Ae")).toEqual(["up", "team"]);
   });
 
   test("otras secuencias (flechas laterales, teclas con parámetros) se ignoran enteras", () => {
