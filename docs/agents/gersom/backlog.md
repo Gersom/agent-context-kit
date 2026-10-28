@@ -56,15 +56,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Agregada:** 2026-10-27.
 
-### Tarea 111 — Mejoras UX del mod acsuite-active-project
-
-- **Descripción:** Llevar el mod mods/acsuite-active-project al mismo diseño que el mod agent-radar (D:\personal\claude-mods\mods\agent-radar): banda de una línea sobre el prompt con el nombre a la izquierda y los botones a la derecha, botón para ocultarla y comando para devolverla.
-- **Decisiones/temas a definir antes de empezar:** Qué partes del diseño de agent-radar se copian (banda con nombre y botones, botón de ocultar con $.store, ancho/recorte, cesión ante la encuesta, i18n español/inglés); qué botones lleva (Marcar, Ocultar, ¿estado del último marcado?); si el nombre en pantalla es «acsuite board» o «Active Project».
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Referencia: README y hooks/ de agent-radar (banda: «Agent Radar   [ ◧ Detail ] [ ● ON ] [ ✕ Hide ]»; Hide guarda bandHidden en $.store y se revierte con /agent-radar show; los botones nunca se encogen, se corta primero el nombre con …; cede ante hasSurvey). Hoy el mod tiene una banda simple «acsuite board: [Marcar este proyecto]» sin ocultar y sin estado. Relacionada con la Tarea 108 (si el mod se separa en su repo, conviene hacerla antes o después sin duplicar trabajo).
-- **Agregada:** 2026-10-27.
-
 <!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 

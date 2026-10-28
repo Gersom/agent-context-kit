@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 111 — Mejoras UX del mod acsuite-active-project
+
+- Banda del mod acsuite-active-project con el diseño de agent-radar: «Active Project» a la izquierda y un único botón [ ● Mark ] a la derecha; cede ante una encuesta y conserva las bandas de otros hooks.
+- Sin Hide, sin cambio de idioma y sin $.store; los textos de usuario quedan fijos en inglés. Mod 0.3.0 con 6 pruebas nuevas de la banda (8 en total), README actualizado. Verificado por el operador.
+- Commit en la suite: c494991.
+
 ## 2026-10-27 — ❌ Tarea 110 — Pruebas automáticas de startApp (teclas y observador con TTY simulada)
 
 - Decisión del operador (2026-10-28): el riesgo es bajo y el cableado de startApp (teclas y observador) se verifica a mano; no vale el costo de simular una TTY.
