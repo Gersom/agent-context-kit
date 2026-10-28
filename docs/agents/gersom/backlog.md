@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 113
+**Próximo número de tarea:** 114
 
 ---
 
@@ -55,6 +55,15 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Detalles:** Pedida por el operador al ver que la tabla se corta con poco ancho. Revisar también cómo se comporta al redimensionar la terminal.
+- **Agregada:** 2026-10-28.
+
+### Tarea 113 — Comando para modificar el contenido de una tarea del backlog
+
+- **Descripción:** Agregar al task-manager un comando (ej. `edit`) que modifique el título y los campos de una tarea del backlog (descripción, decisiones, bloqueos, disparador, detalles) sin cambiar su estado: una tarea libre sigue libre y una bloqueada sigue bloqueada. Flujo esperado: primero `show` para ver todos sus datos y luego `edit` para cambiarlos.
+- **Decisiones/temas a definir antes de empezar:** Forma de los flags (uno por campo, como en `add`, con `-` para leer de la entrada estándar); si cambiar el título renombra también las referencias de otras tareas; si soporta tareas agrupadas y las del team-backlog.md (como `block`/`unblock`, hoy no las soportan); qué pasa con el campo Bloqueos (editar su texto sin mover la tarea); y si `show` ya muestra todo lo que `edit` puede cambiar.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Pedida por el operador: a veces una tarea se agrega sin detalles y, con el avance de otras tareas, se definen después; hoy solo se puede editar `backlog.md` a mano. Solo cambia contenido, nunca el estado. `acsuite task show` ya existe como solo lectura y es la base del paso de ver. Relacionada con la Tarea 34 (reevaluar los comandos del task-manager).
 - **Agregada:** 2026-10-28.
 
 <!-- agent-context-skill:section=blocked -->
