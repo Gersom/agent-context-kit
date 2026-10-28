@@ -25,6 +25,7 @@ import type {
 import type { HistoryEntry, TaskRef } from "../../../_shared/types.ts";
 import { BOX_PADDING, boxBottom, boxRow, boxTop, type Paint, type Segment } from "./box.ts";
 import { displayProjectName, plainText, progressBar, shortTaskName, truncate, visibleLength } from "./format.ts";
+import { currentText, OPERATOR_MAX_WIDTH, PROJECT_GAP, projectColumns, projectViewMode, truncateStart } from "./project-columns.ts";
 
 /** Ancho mínimo de la pantalla, aunque la terminal sea más angosta. */
 const MIN_WIDTH = 40;
@@ -379,15 +380,13 @@ function summaryLine(op: TeamRow): string {
   return parts.join(" · ");
 }
 
-/** Separación entre las columnas de la lista de proyectos. */
-const PROJECT_GAP = "  ";
-
 /**
- * Lista de proyectos: el recuadro PROYECTOS, que es el selector (una fila por repo, con el elegido
+ * Lista de proyectos: el recuadro PROYECTOS, que es el selector (un repo por entrada, con el elegido
  * marcado con `›`): nombre, ruta, operador del correo de git de ese repo, tarea en curso y cuántas
  * tareas libres y bloqueadas tiene ese operador. Lo que no se sabe sale como `—`; un repo que no
- * se pudo leer muestra su aviso en lugar de los datos. `warnings`: avisos de la vista (ej. no se
- * pudo abrir un proyecto).
+ * se pudo leer muestra su aviso en lugar de los datos. Con terminales anchas es una tabla (una fila
+ * por repo); con angostas, una tarjeta de tres líneas por repo (ver `projectViewMode`). `warnings`:
+ * avisos de la vista (ej. no se pudo abrir un proyecto).
  */
 export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, warnings: string[] = []): string {
   const canvas = createCanvas(meta, { title: "PROYECTOS" });
@@ -415,18 +414,19 @@ export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, war
       if (meta.input != null) row(0, { text: inputLine(meta.input) });
       return;
     }
-    const currentText = (r: ProjectRow) => (r.work?.current ? shortTaskName(r.work.current.number, r.work.current.title) : r.work ? "Sin tarea en curso" : "—");
-    const widest = (header: string, texts: string[]) => Math.max(visibleLength(header), ...texts.map(visibleLength));
+    // Debajo de la tabla o de las tarjetas: la ruta que se escribe y la confirmación de quitar.
+    const footer = () => {
+      if (meta.input != null) row(0, { text: inputLine(meta.input) });
+      if (meta.confirmRemove != null) row(0, { paint: pc.yellow, text: confirmLine(meta.confirmRemove) });
+    };
+    if (projectViewMode(rows, width) === "cards") {
+      projectCards(rows, meta.selected, canvas, row);
+      footer();
+      return;
+    }
 
     // Columnas de ancho fijo según su contenido; la ruta y la tarea en curso se reparten el resto.
-    const nameW = Math.min(24, widest("nombre", rows.map((r) => r.name)));
-    const operatorW = Math.min(16, widest("operador", rows.map((r) => r.operator ?? "—")));
-    const freeW = widest("libres", rows.map((r) => String(r.work?.counts.free ?? "—")));
-    const blockedW = widest("bloqueadas", rows.map((r) => String(r.work?.counts.blocked ?? "—")));
-    const room = width - BOX_PADDING - 2 - nameW - operatorW - freeW - blockedW - PROJECT_GAP.length * 5;
-    const pathMax = widest("ruta", rows.map((r) => r.path));
-    const pathW = Math.max(1, Math.min(pathMax, Math.floor(room * 0.45)));
-    const currentW = Math.max(1, room - pathW);
+    const { nameW, pathW, operatorW, currentW, freeW, blockedW } = projectColumns(rows, width);
 
     const fit = (text: string, w: number, alignRight = false): string => {
       const shown = truncate(plainText(text), w);
@@ -456,11 +456,60 @@ export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, war
         { paint: work?.counts.blocked ? pc.red : secondary, text: fit(String(work?.counts.blocked ?? "—"), blockedW, true) },
       );
     }
-    if (meta.input != null) row(0, { text: inputLine(meta.input) });
-    if (meta.confirmRemove != null) row(0, { paint: pc.yellow, text: confirmLine(meta.confirmRemove) });
+    footer();
   });
 
   return finishCanvas(canvas, { ...meta, hasRows: rows.length > 0 }, { warnings });
+}
+
+/**
+ * Lista de proyectos para terminales angostas: una tarjeta de tres líneas por repo, sin línea en
+ * blanco entre una y otra ni encabezados:
+ *
+ *   › nombre · 3 libres · 3 bloqueadas
+ *     /ruta/del/repo
+ *     operador · tarea en curso
+ *
+ * Si algo no entra, se recorta el nombre (conservando los conteos), la ruta por el principio y la
+ * tercera línea por el final. Un repo que no se pudo leer lleva solo el nombre y, en la tercera
+ * línea, su aviso.
+ */
+function projectCards(rows: ProjectRow[], selected: string | null, { pc, width, secondary }: Canvas, row: Row): void {
+  const inner = Math.max(1, width - BOX_PADDING);
+  for (const project of rows) {
+    const chosen = project.path === selected;
+    const marker = chosen ? "› " : "  ";
+    const paintName = (s: string) => (chosen ? pc.bold(pc.green(s)) : pc.bold(s));
+    const name = plainText(project.name);
+    const path = { paint: secondary, text: truncateStart(plainText(project.path), inner - 2) };
+
+    if (project.warning != null) {
+      row(0, { paint: paintName, text: marker + truncate(name, Math.max(1, inner - 2)) });
+      row(2, path);
+      row(2, { paint: pc.yellow, text: `! ${project.warning}` });
+      continue;
+    }
+
+    const { work, operator } = project;
+    const free = String(work?.counts.free ?? "—");
+    const blocked = String(work?.counts.blocked ?? "—");
+    const counts = ` · ${free} libres · ${blocked} bloqueadas`;
+    row(
+      0,
+      { paint: paintName, text: marker + truncate(name, Math.max(1, inner - 2 - visibleLength(counts))) },
+      { paint: secondary, text: " · " },
+      { paint: work?.counts.free ? pc.cyan : secondary, text: `${free} libres` },
+      { paint: secondary, text: " · " },
+      { paint: work?.counts.blocked ? pc.red : secondary, text: `${blocked} bloqueadas` },
+    );
+    row(2, path);
+    row(
+      2,
+      { paint: operator ? undefined : secondary, text: operator ? truncate(operator, OPERATOR_MAX_WIDTH) : "—" },
+      { paint: secondary, text: " · " },
+      { paint: work?.current ? undefined : secondary, text: currentText(project) },
+    );
+  }
 }
 
 /**

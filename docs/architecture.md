@@ -49,7 +49,7 @@ agent-context-suite/
 │       │   ├── cli/               # Argumentos (--once, --follow, ruta, operador), pregunta interactiva de la ruta, teclas (incl. flechas) y navegación de la vista de equipo (estado puro), teclas de la lista de proyectos (`projects-keys.ts`: reductor puro que devuelve los efectos que `app.ts` ejecuta), modo observador (`observer.ts`: cuándo abrir lo marcado, qué teclas se ignoran y el aviso si no se puede abrir; puro, sin E/S)
 │       │   ├── io/                # Rutas, operador (modo multi: operators.md + correo de git), lectura del equipo, lectura de archivos, watcher y lectura con memoria, proyecto activo (`active-project.ts`: lee y borra el `active-project.json` que escribe el mod de Claude)
 │       │   ├── model/             # Modelo de pantalla: arma lo que se pinta con lo que interpretó el parseo (un operador, o el equipo y el team-backlog)
-│       │   ├── ui/                # Pintado con picocolors (recuadros por tipo de tarea; selector EQUIPO y SIN DUEÑO en modo multi) y utilidades de formato
+│       │   ├── ui/                # Pintado con picocolors (recuadros por tipo de tarea; selector EQUIPO y SIN DUEÑO en modo multi), utilidades de formato y `project-columns.ts` (anchos de la lista de proyectos y si se dibuja como tabla o como tarjetas según el ancho)
 │       │   └── shared/            # Tipos de pantalla y de lectura de archivos (types.ts) y formato de hora (time.ts)
 │       └── test/                # Tests de `bun test` en espejo de src/ + e2e/ (script entero)
 │

@@ -1,6 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import type { ProjectRow, ProjectsRenderMeta } from "../../src/shared/types.ts";
 import { render, renderProjects, renderTeam } from "../../src/ui/render.ts";
+import { visibleLength } from "../../src/ui/format.ts";
+import { MIN_CURRENT_WIDTH, MIN_PATH_WIDTH, projectColumns, projectViewMode, truncateStart } from "../../src/ui/project-columns.ts";
 import { buildModel } from "../../src/model/model.ts";
 import { fixture } from "../../../_shared/test/helpers.ts";
 
@@ -162,6 +164,198 @@ describe("renderProjects", () => {
     expect(colored).toContain("\x1b[32m");
     expect(colored).toContain("\x1b[36m");
     expect(colored).toContain("\x1b[31m");
+  });
+});
+
+// Filas largas: nombre de más de 24 columnas y rutas largas (lo que más aprieta a la tabla).
+const longName = "un-nombre-de-proyecto-muy-largo-que-no-entra";
+const longPath = `/repos/${"carpeta/".repeat(6)}${longName}`;
+const longRows: ProjectRow[] = [
+  {
+    name: longName,
+    path: longPath,
+    operator: "gersom",
+    work: { current: { label: "Tarea", number: 12, title: "Implementar el parser de los anchors" }, counts: { free: 3, blocked: 3 } },
+    warning: null,
+  },
+  { name: "plano", path: "/repos/plano", operator: null, work: { current: null, counts: { free: 0, blocked: 0 } }, warning: null },
+  { name: "ajeno", path: "/repos/ajeno", operator: null, work: null, warning: null },
+  { name: "roto", path: `${longPath}-roto`, operator: null, work: null, warning: "No existe la carpeta: /repos/roto" },
+];
+// Nombre largo pero rutas cortas: la tabla le da a cada columna lo que pide su contenido.
+const mediumRows: ProjectRow[] = [{ ...longRows[0], path: "/repos/largo" }, longRows[1], longRows[2]];
+const longMeta: ProjectsRenderMeta = { ...meta, selected: longPath };
+const lengthOf = (line: string) => visibleLength(line);
+/** Primer ancho (entre 40 y 300) en el que la lista se dibuja como tabla. */
+const threshold = (list: ProjectRow[]) => {
+  for (let width = 40; width <= 300; width++) if (projectViewMode(list, width) === "table") return width;
+  throw new Error("nunca llega a tabla");
+};
+
+describe("projectViewMode", () => {
+  test("el umbral sale del contenido: filas cortas llegan a tabla con menos ancho que filas largas", () => {
+    expect(threshold(rows)).toBeLessThan(threshold(longRows));
+    expect(threshold(rows)).toBeLessThanOrEqual(100);
+    expect(threshold(longRows)).toBeGreaterThan(100);
+    expect(threshold(longRows)).toBeLessThan(140);
+  });
+
+  test("en el borde: un ancho antes son tarjetas; desde el umbral, tabla con la ruta y «en curso» en sus mínimos", () => {
+    for (const list of [rows, mediumRows, longRows]) {
+      const edge = threshold(list);
+      expect(projectViewMode(list, edge - 1)).toBe("cards");
+      expect(projectViewMode(list, edge)).toBe("table");
+      expect(projectViewMode(list, edge + 40)).toBe("table");
+      const cols = projectColumns(list, edge);
+      expect(cols.pathW).toBeGreaterThanOrEqual(Math.min(cols.pathMax, MIN_PATH_WIDTH));
+      expect(cols.currentW).toBeGreaterThanOrEqual(Math.min(cols.currentMax, MIN_CURRENT_WIDTH));
+      // Un ancho antes, una de las dos columnas se queda por debajo de su mínimo.
+      const before = projectColumns(list, edge - 1);
+      expect(before.pathW < Math.min(before.pathMax, MIN_PATH_WIDTH) || before.currentW < Math.min(before.currentMax, MIN_CURRENT_WIDTH)).toBe(true);
+    }
+  });
+
+  test("con rutas largas la ruta llega justo a su mínimo en el umbral", () => {
+    const cols = projectColumns(longRows, threshold(longRows));
+    expect(cols.pathW).toBeGreaterThanOrEqual(MIN_PATH_WIDTH);
+    expect(cols.pathW).toBeLessThanOrEqual(MIN_PATH_WIDTH + 1);
+  });
+
+  test("más ancho nunca vuelve a tarjetas", () => {
+    let table = false;
+    for (let width = 40; width <= 300; width++) {
+      const mode = projectViewMode(longRows, width);
+      if (table) expect(mode).toBe("table");
+      table ||= mode === "table";
+    }
+  });
+});
+
+describe("renderProjects según el ancho", () => {
+  const headerRe = /nombre +ruta +operador +en curso +libres +bloqueadas/;
+
+  test("terminal ancha: tabla con todos los encabezados completos", () => {
+    for (const [list, width] of [[longRows, 140], [mediumRows, 100]] as const) {
+      const out = renderProjects(list, { ...longMeta, width });
+      expect(out.split("\n").some((l) => headerRe.test(l))).toBe(true);
+      expect(out).not.toMatch(/ · \d+ libres · /);
+    }
+  });
+
+  test("terminal angosta: tarjetas, sin encabezados de columnas", () => {
+    for (const width of [100, 80, 60, 50, 40]) {
+      const out = renderProjects(longRows, { ...longMeta, width });
+      expect(out).not.toMatch(headerRe);
+      expect(out).not.toMatch(/│ +(nombre|ruta|operador)/);
+      expect(out).toContain("· 3 libres · 3 bloqueadas");
+    }
+  });
+
+  test("en todos los anchos ninguna línea supera el ancho de la pantalla, con entrada y confirmación", () => {
+    const keys = { ...longMeta, controls: "keys" as const, multiView: "projects" as const };
+    const extras = [{}, { input: longPath }, { confirmRemove: { name: longName, path: longPath } }];
+    for (const width of [300, 140, 120, 118, 117, 100, 80, 70, 60, 50, 45, 40]) {
+      for (const list of [rows, longRows, mediumRows]) {
+        for (const extra of extras) {
+          for (const line of renderProjects(list, { ...keys, ...extra, width }, ["No se pudo abrir " + longPath]).split("\n")) {
+            expect(lengthOf(line)).toBeLessThanOrEqual(width);
+          }
+        }
+      }
+    }
+  });
+
+  test("sin color no hay ANSI en ningún modo; con color, las tarjetas pintan elegido y conteos", () => {
+    for (const width of [140, 80, 40]) expect(renderProjects(longRows, { ...longMeta, width })).not.toMatch(/\x1b/);
+    const colored = renderProjects(longRows, { ...longMeta, width: 80, color: true });
+    const unselected = renderProjects(longRows, { ...longMeta, width: 80, color: true, selected: null });
+    const greens = (s: string) => s.split("\x1b[32m").length;
+    expect(greens(colored)).toBeGreaterThan(greens(unselected));
+    expect(colored).toContain("\x1b[36m");
+    expect(colored).toContain("\x1b[31m");
+    expect(colored).toContain("\x1b[33m");
+  });
+});
+
+describe("renderProjects como tarjetas", () => {
+  /** Las líneas de contenido del recuadro, sin los bordes. */
+  const cardLines = (list: ProjectRow[], width: number, extra: Partial<ProjectsRenderMeta> = {}) =>
+    renderProjects(list, { ...longMeta, width, ...extra })
+      .split("\n")
+      .filter((l) => l.startsWith("│"))
+      .map((l) => l.slice(2, -2).trimEnd());
+
+  test("tres líneas por proyecto, sin línea en blanco entre uno y otro", () => {
+    const lines = cardLines(rows, 60, { selected: rows[0].path });
+    expect(lines).toHaveLength(rows.length * 3);
+    expect(lines.slice(0, 3)).toEqual(["› demo-app · 2 libres · 1 bloqueadas", "  /repos/demo-app", "  ana · T-12: Implementar el parser"]);
+    expect(lines.slice(3, 6)).toEqual(["  plano · 0 libres · 0 bloqueadas", "  /repos/plano", "  — · Sin tarea en curso"]);
+  });
+
+  test("repo ajeno sin datos: «—» en los conteos, operador y tarea", () => {
+    const lines = cardLines(rows, 60);
+    expect(lines.slice(6, 9)).toEqual(["  ajeno · — libres · — bloqueadas", "  /repos/ajeno", "  — · —"]);
+  });
+
+  test("el elegido lleva «›» y solo él", () => {
+    const lines = cardLines(longRows, 60);
+    expect(lines.filter((l) => l.startsWith("›"))).toHaveLength(1);
+    expect(lines[0].startsWith("› ")).toBe(true);
+    const other = cardLines(longRows, 60, { selected: "/repos/plano" });
+    expect(other[0].startsWith("  ")).toBe(true);
+    expect(other[3].startsWith("› plano")).toBe(true);
+  });
+
+  test("si la línea del nombre no cabe se recorta el nombre por el final y se conservan los conteos", () => {
+    for (const width of [60, 50, 40]) {
+      const [first] = cardLines(longRows, width);
+      expect(first).toMatch(/^› un-n.*… · 3 libres · 3 bloqueadas$/);
+      expect(visibleLength(first)).toBeLessThanOrEqual(width - 4);
+    }
+    // Si cabe, va entero y sin «…».
+    expect(cardLines(longRows, 80)[0]).toBe(`› ${longName} · 3 libres · 3 bloqueadas`);
+  });
+
+  test("la ruta se recorta por el principio y deja el final", () => {
+    for (const width of [60, 50, 40]) {
+      const second = cardLines(longRows, width)[1];
+      expect(second).toMatch(/^ {2}….*no-entra$/);
+      expect(visibleLength(second)).toBe(width - 4);
+    }
+    expect(cardLines(longRows, 80)[1]).toMatch(/^ {2}….*no-entra$/);
+  });
+
+  test("la tercera línea recorta por el final y el repo ilegible muestra su aviso", () => {
+    const lines = cardLines(longRows, 40);
+    expect(lines[2]).toBe("  gersom · T-12: Implementar el par…");
+    // El ilegible: solo el nombre, la ruta y el aviso (recortado al ancho).
+    expect(lines.slice(9, 12)).toEqual(["  roto",expect.stringMatching(/^ {2}….*-roto$/), "  ! No existe la carpeta: /repos/ro…"]);
+    expect(cardLines(longRows, 80)[11]).toBe("  ! No existe la carpeta: /repos/roto");
+    const narrow = cardLines([{ ...longRows[3], warning: "un aviso muy largo que no cabe en una pantalla angosta" }], 40);
+    expect(narrow[2]).toMatch(/^ {2}! un aviso.*…$/);
+    expect(visibleLength(narrow[2])).toBe(36);
+  });
+
+  test("debajo de las tarjetas siguen la ruta que se escribe y la confirmación de quitar", () => {
+    const out = renderProjects(longRows, { ...longMeta, width: 60, input: "/repos/nuevo" });
+    expect(out).toContain("Ruta del repo: /repos/nuevo█");
+    const confirm = renderProjects(longRows, { ...longMeta, width: 80, confirmRemove: { name: "demo", path: "/repos/demo" } });
+    expect(confirm).toContain("¿Quitar demo (/repos/demo) de la lista?");
+  });
+
+  test("el borde derecho queda alineado en cada fila de tarjetas", () => {
+    for (const width of [80, 60, 40]) {
+      const box = renderProjects(longRows, { ...longMeta, width }).split("\n").filter((l) => l.startsWith("│"));
+      for (const line of box) expect(visibleLength(line)).toBe(width);
+    }
+  });
+});
+
+describe("truncateStart", () => {
+  test("deja el final con «…» delante y respeta el ancho", () => {
+    expect(truncateStart("/repos/abc/final", 10)).toBe("…abc/final");
+    expect(truncateStart("/repos/abc/final", 16)).toBe("/repos/abc/final");
+    expect(truncateStart("/repos/abc/final", 1)).toBe("…");
   });
 });
 
