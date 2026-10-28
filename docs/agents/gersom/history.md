@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-28 — ✅ Tarea 112 — Mejorar la UX de la tabla de listado de proyectos del board con poco ancho
+
+- La lista de proyectos del board ya no se corta con poco ancho: con terminales anchas se muestra la tabla y con angostas una tarjeta de tres líneas por proyecto (nombre · libres · bloqueadas / ruta / operador · en curso), con una línea en blanco entre proyectos. El modo sale de los anchos reales de la tabla: ruta ≥ 24 columnas y en curso ≥ 22.
+- En las tarjetas la ruta se recorta por el principio, el operador se omite si no hay y el aviso de un repo ilegible va en la tercera línea. Función pura en ui/project-columns.ts; README y architecture.md actualizados. Revisado con un revisor aparte; 1468 tests, typecheck y check pasan.
+- Commits en la suite: bd7ecc9, b180310 y d681b1b. Queda como Tarea 116 que la vista siga la selección cuando no cabe en el alto de la terminal.
+
 ## 2026-10-28 — ✅ Tarea 114 — Pasar los flags y tags de los comandos del task-manager a inglés y fijar la regla
 
 - Los flags de `add`, `block`, `close`, `start` y `pause` pasaron a inglés, sin alias (`--title`, `--description`, `--decisions`, `--blocker`, `--trigger`, `--details`, `--reason`, `--summary`, `--new`, `--mode`, `--waiting-for`, `--missing`, `--next`). `block --tag` acepta solo `dependency|postponed`; el tag que se escribe en el archivo sigue el idioma de la documentación y la lectura acepta ambos idiomas.

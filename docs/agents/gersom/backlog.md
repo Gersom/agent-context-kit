@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 116
+**Próximo número de tarea:** 117
 
 ---
 
@@ -48,13 +48,13 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 112 — Mejorar la UX de la tabla de listado de proyectos del board con poco ancho
+### Tarea 116 — Board: que la vista siga la selección cuando no cabe en el alto de la terminal
 
-- **Descripción:** La tabla de la lista de proyectos del board (scripts/task-tracker) se corta cuando la terminal tiene poco ancho. Hacer que se adapte: truncar o abreviar columnas con criterio, priorizar las importantes y que nada quede cortado a media palabra o desalineado.
-- **Decisiones/temas a definir antes de empezar:** Qué columnas tienen prioridad cuando falta ancho; si se truncan con elipsis, se ocultan o se pasa a un formato de una línea por proyecto; ancho mínimo soportado.
+- **Descripción:** El board redibuja todo el texto sin recortar por el alto de la terminal. Con la lista de proyectos en tarjetas (3 líneas por proyecto, T112) o con muchos proyectos, el principio se sale de la pantalla y la selección con ↑/↓ no se ve. Hacer que la vista se desplace para mantener visible la fila elegida, o recortar al alto disponible.
+- **Decisiones/temas a definir antes de empezar:** Si se recorta solo la lista de proyectos o todas las vistas; cómo se indica que hay más filas arriba o abajo; de dónde se toma el alto (process.stdout.rows) y qué hacer con --once.
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Pedida por el operador al ver que la tabla se corta con poco ancho. Revisar también cómo se comporta al redimensionar la terminal.
+- **Detalles:** Hallazgo de la revisión de la T112: no hay ningún manejo de stdout.rows en scripts/task-tracker/src. Antes la tabla gastaba una línea por proyecto; las tarjetas triplican el alto.
 - **Agregada:** 2026-10-28.
 
 <!-- agent-context-skill:section=blocked -->
