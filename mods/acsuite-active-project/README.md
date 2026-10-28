@@ -12,7 +12,7 @@ Guarda la raíz del proyecto de la sesión (donde arrancó, no la carpeta a la q
 
 Se usa de dos formas, con el mismo resultado:
 
-- **Botón** `[ ● Mark ]`, en una banda de una línea sobre el prompt: el nombre `Active Project` a la izquierda y el botón a la derecha. Si falta ancho, solo se corta el nombre; el botón no se encoge. Sigue el diseño de la banda de agent-radar, pero mínima: sin más botones. La banda cede su lugar a una encuesta y conserva las bandas de otros mods.
+- **Botón** `[ ● Mark this project as active ]`, en una banda de una línea sobre el prompt: el nombre `Active Project` a la izquierda y el botón a la derecha. Si falta ancho, solo se corta el nombre; el botón no se encoge. Sigue el diseño de la banda de agent-radar, pero mínima: sin más botones. La banda cede su lugar a una encuesta y conserva las bandas de otros mods.
 - **Comando** `/board`.
 
 Los textos del mod (botón, avisos y respuesta del comando) están en inglés, sin cambio de idioma.

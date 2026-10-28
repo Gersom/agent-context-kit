@@ -62,7 +62,7 @@ export const register: Register = on => {
               key="mark"
               plain
               dimColor
-              label="[ ● Mark ]"
+              label="[ ● Mark this project as active ]"
               onPress={async () => {
                 try {
                   await mark($)

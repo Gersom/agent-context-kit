@@ -73,7 +73,7 @@ El pie de la pantalla lista las teclas que valen en la vista actual como `[tecla
 
 ### Modo observador
 
-Pensado para quien tiene varias sesiones de Claude Code abiertas: el board espera a que marques un proyecto desde Claude y cambia solo a ese proyecto. La marca la hace el mod `acsuite-active-project`, con su botón `[ ● Mark ]` sobre el prompt o con el comando `/board`; cómo instalarlo está en el [README del mod](../../mods/acsuite-active-project/README.md).
+Pensado para quien tiene varias sesiones de Claude Code abiertas: el board espera a que marques un proyecto desde Claude y cambia solo a ese proyecto. La marca la hace el mod `acsuite-active-project`, con su botón `[ ● Mark this project as active ]` sobre el prompt o con el comando `/board`; cómo instalarlo está en el [README del mod](../../mods/acsuite-active-project/README.md).
 
 Se activa con `--follow` al lanzar el board o con la tecla `o` (que también lo desactiva). Solo funciona en una terminal interactiva: con `--once` o sin terminal, `--follow` se ignora y el board arranca normal.
 

@@ -67,7 +67,7 @@ Si trabajas con varias sesiones de Claude Code a la vez, el board puede cambiar 
 acsuite board --follow
 ```
 
-Se marca desde Claude con el mod `acsuite-active-project`, con su botón `[ ● Mark ]` o con `/board`. Se instala con una línea, `/plugin install acsuite-active-project --marketplace Gersom/agent-context-suite`; los demás pasos y el detalle están en el [README del mod](./mods/acsuite-active-project/README.md), y el modo observador del board, en su [README](./scripts/task-tracker/README.md#modo-observador).
+Se marca desde Claude con el mod `acsuite-active-project`, con su botón `[ ● Mark this project as active ]` o con `/board`. Se instala con una línea, `/plugin install acsuite-active-project --marketplace Gersom/agent-context-suite`; los demás pasos y el detalle están en el [README del mod](./mods/acsuite-active-project/README.md), y el modo observador del board, en su [README](./scripts/task-tracker/README.md#modo-observador).
 
 ### `acsuite task`
 

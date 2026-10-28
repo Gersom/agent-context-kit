@@ -84,7 +84,7 @@ test('la banda es una línea: el nombre y el botón Mark, en terminal y en escri
 
       const buttons = await ui.findAll({ type: 'Button' })
       expect(buttons).toHaveLength(1)
-      expect(await ui.find({ type: 'Button', key: 'mark', text: /^\[ ● Mark \]$/ })).toBeDefined()
+      expect(await ui.find({ type: 'Button', key: 'mark', text: /^\[ ● Mark this project as active \]$/ })).toBeDefined()
       expect(await ui.find({ type: 'Button', text: /Hide/ })).toBeUndefined()
       await ui.unmount()
     }
@@ -173,7 +173,7 @@ test('en ancho muy estrecho el botón sigue completo y el nombre es lo que se co
   const ui = await band($, 12)
 
   // El botón no se encoge: su texto sigue entero.
-  expect(await ui.find({ type: 'Button', key: 'mark', text: /^\[ ● Mark \]$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'mark', text: /^\[ ● Mark this project as active \]$/ })).toBeDefined()
 
   // El nombre es el único con `truncate-end`; el motor de pruebas no dibuja el «…», así que se comprueba la propiedad.
   const name = await ui.find({ type: 'Text', text: /^Active Project$/ })
