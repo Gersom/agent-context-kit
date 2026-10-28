@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-28 — ✅ Tarea 115 — Quitar de step los flags de edición de texto (ahora en edit)
+
+- `step` quedó con una sola función: marcar o desmarcar (`--undo`) pasos del plan y mantener al día «Qué falta» y «Próximo paso concreto» cuando siguen con el texto automático. Se quitaron sus flags `--falta`, `--decisiones` y `--proximo`, de golpe y sin período de aviso: el texto se cambia con `edit`.
+- El aviso de texto propio ahora manda a `edit <N> --missing` o `--next`. `pause` conserva sus flags (otra función). Tests y README actualizados; revisado con un revisor aparte (2 observaciones corregidas); 1437 tests y typecheck pasan.
+- Commit en la suite: 3b6f6dc.
+
 ## 2026-10-28 — ✅ Tarea 113 — Comando para modificar el contenido de una tarea del backlog
 
 - Nuevo comando `edit` del task-manager: modifica el contenido de una tarea (título, descripción, decisiones, bloqueo, disparador, detalles y, en el handoff, «Qué falta», «Decisiones a medio camino» y «Próximo paso concreto») sin cambiar su estado ni su lugar. Funciona en backlog, team-backlog y handoff (en curso y pausadas); history queda solo lectura.
