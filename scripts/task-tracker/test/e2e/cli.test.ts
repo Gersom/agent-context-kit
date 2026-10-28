@@ -42,7 +42,9 @@ describe("index.ts", () => {
   test("--once contra un fixture: pinta los recuadros de los tres archivos y sale con código 0, sin atajos", async () => {
     const { stdout, code } = await run([join(FIXTURES, "es-anchors"), "--once"]);
     expect(code).toBe(0);
-    expect(stdout).toContain("▣ ES ANCHORS");
+    const [title, location] = stdout.split("\n");
+    expect(title).toBe("TAREAS");
+    expect(location).toBe(`  ES ANCHORS   ${join(FIXTURES, "es-anchors")}`);
     for (const box of ["─ history.md ─╮", "╭─ EN PROGRESO", "╭─ LIBRES", "╭─ BLOQUEADAS"]) expect(stdout).toContain(box);
     expect(stdout).toContain("T-11: Escribir el parser de secciones");
     expect(stdout).toContain("Tarea 12 — Implementar el parser de anclas");
@@ -92,7 +94,7 @@ describe("index.ts sin ruta: el proyecto de la carpeta donde se lanza", () => {
     const { stdout, stderr, code } = await run(["--once"], root);
     expect(stderr).toBe("");
     expect(code).toBe(0);
-    expect(stdout).toContain("▣ ");
+    expect(stdout.startsWith("TAREAS\n  ")).toBe(true);
     expect(stdout).toContain("T-11: Escribir el parser de secciones");
   });
 
@@ -115,7 +117,7 @@ describe("index.ts sin ruta: el proyecto de la carpeta donde se lanza", () => {
     const { stdout, stderr, code } = await run(["--once"], root);
     expect(stderr).toBe("");
     expect(code).toBe(0);
-    expect(stdout).toContain("▣ proyectos");
+    expect(stdout.startsWith("PROYECTOS\n  Última actualización")).toBe(true);
     expect(stdout).toContain("╭─ PROYECTOS (0)");
     expect(stdout).toContain("No hay proyectos para mostrar.");
     expect(stdout).toContain("acsuite board <ruta>");
@@ -214,6 +216,6 @@ describe("index.ts sin ruta: el proyecto de la carpeta donde se lanza", () => {
     const other = tempProject({ git: false, docs: false });
     const { stdout, code } = await run([join(FIXTURES, "es-anchors"), "--once"], other);
     expect(code).toBe(0);
-    expect(stdout).toContain("▣ ES ANCHORS");
+    expect(stdout.startsWith("TAREAS\n  ES ANCHORS   ")).toBe(true);
   });
 });

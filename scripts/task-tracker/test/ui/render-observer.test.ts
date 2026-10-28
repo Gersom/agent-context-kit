@@ -157,7 +157,9 @@ describe("modo observador: vista de espera", () => {
   test("título, texto de espera y pie, sin recuadros de tareas ni la línea de estado", () => {
     const out = renderObserver(waitingMeta);
     const lines = out.split("\n");
-    expect(lines[0]).toBe("▣ Modo observador");
+    // El título es MODO OBSERVADOR, sin la línea extra ni línea de nombre/ruta.
+    expect(lines.slice(0, 3)).toEqual(["MODO OBSERVADOR", "  Última actualización 12:00:00 · al iniciar", ""]);
+    expect(out.match(/MODO OBSERVADOR/g)).toHaveLength(1);
     expect(out).toContain(WAITING);
     expect(out).toContain("[o] salir del modo observador - [Ctrl+C o q] salir");
     expect(out).not.toContain("[o] observar");

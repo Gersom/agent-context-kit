@@ -30,18 +30,65 @@ const rowWith = (out: string, text: string) => {
 };
 
 describe("render", () => {
-  test("encabezado: nombre del repo en mayúsculas, ruta del repo y última actualización", () => {
+  test("encabezado: título TAREAS, nombre del repo en mayúsculas con su ruta al lado y última actualización", () => {
     const lines = screen("es-anchors").split("\n");
     expect(lines.slice(0, 3)).toEqual([
-      "▣ DEMO APP",
-      "  /proyectos/demo-app",
+      "TAREAS",
+      "  DEMO APP   /proyectos/demo-app",
+      "  Última actualización 14:30:00 · al iniciar",
+    ]);
+    expect(lines[3]).toBe("");
+  });
+
+  test("encabezado en modo multi-operador: el operador va junto al nombre, antes de la ruta", () => {
+    const lines = screen("es-anchors", { operator: "ana" }).split("\n");
+    expect(lines.slice(0, 3)).toEqual([
+      "TAREAS",
+      "  DEMO APP · ana   /proyectos/demo-app",
       "  Última actualización 14:30:00 · al iniciar",
     ]);
   });
 
-  test("encabezado en modo multi-operador: agrega el operador al título, donde la ruta larga no lo recorta", () => {
-    const lines = screen("es-anchors", { operator: "ana" }).split("\n");
-    expect(lines.slice(0, 2)).toEqual(["▣ DEMO APP · ana", "  /proyectos/demo-app"]);
+  test("encabezado con el observador activo y un repo abierto: la línea extra MODO OBSERVADOR arriba del todo", () => {
+    const lines = screen("es-anchors", { operator: "ana", observer: { notice: null } }).split("\n");
+    expect(lines.slice(0, 4)).toEqual([
+      "MODO OBSERVADOR",
+      "TAREAS",
+      "  DEMO APP · ana   /proyectos/demo-app",
+      "  Última actualización 14:30:00 · al iniciar",
+    ]);
+    // Apagado, esa línea no existe.
+    expect(screen("es-anchors", { observer: undefined }).split("\n")[0]).toBe("TAREAS");
+  });
+
+  test("encabezado en un ancho estrecho: el nombre no se pierde y se recorta la ruta", () => {
+    const path = "/proyectos/un/camino/bastante/largo/hasta/demo-app";
+    for (const width of [60, 40]) {
+      const lines = screen("es-anchors", { operator: "ana", projectDir: path, width }).split("\n");
+      const location = lines[1];
+      expect(location.startsWith("  DEMO APP · ana   /proyectos/")).toBe(true);
+      expect(location.endsWith("…")).toBe(true);
+      expect(visibleLength(location)).toBe(width);
+      expect(lines[2].startsWith("  Última actualización 14:30:00 · al ")).toBe(true);
+    }
+  });
+
+  test("encabezado: si ni el nombre cabe junto a una ruta, se muestra solo el nombre recortado", () => {
+    const projectName = "un-proyecto-con-un-nombre-realmente-largo";
+    const lines = screen("es-anchors", { projectName, operator: "ana", width: 40 }).split("\n");
+    expect(lines[1]).toBe(`  ${"UN PROYECTO CON UN NOMBRE REALMENTE LARGO · ana".slice(0, 37)}…`);
+    expect(lines[1]).not.toContain("/proyectos");
+  });
+
+  test("encabezado: el título va en negrita y magenta, el nombre sin color y la ruta en el tono secundario", () => {
+    const lines = screen("es-anchors", { color: true, observer: { notice: null } }).split("\n");
+    expect(lines[0]).toBe("\x1b[1m\x1b[35mMODO OBSERVADOR\x1b[39m\x1b[22m");
+    expect(lines[1]).toBe("\x1b[1m\x1b[35mTAREAS\x1b[39m\x1b[22m");
+    expect(lines[2]).toBe("  DEMO APP   \x1b[38;5;250m/proyectos/demo-app\x1b[39m");
+  });
+
+  test("encabezado sin color: ni una secuencia ANSI en toda la pantalla, también con el observador", () => {
+    expect(screen("es-anchors", { operator: "ana", observer: { notice: null } })).not.toMatch(/\x1b/);
   });
 
   test("un recuadro por tipo, en el orden del flujo de una tarea, con el título a la izquierda y el archivo a la derecha", () => {

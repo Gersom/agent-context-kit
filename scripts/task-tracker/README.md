@@ -39,7 +39,7 @@ bun run board D:/proyectos/mi-app --compact --no-arrows   # arranca compacto y s
 Si la carpeta de agentes tiene `operators.md` (varias personas trabajando en paralelo, ver `docs/multi-operator.md` de la skill), el script lo detecta solo y vigila toda la carpeta: cada operador con carpeta, `operators.md` y `team-backlog.md`. Sin `operators.md`, todo funciona como antes.
 
 - **Vista de equipo** (la inicial, sin operador): el recuadro EQUIPO es un selector con una fila por operador (su tarea en curso con el avance del plan; debajo, sus libres, bloqueadas y la última tarea que cerró) y, debajo, el recuadro SIN DUEÑO con las tareas de `team-backlog.md`. El operador de `git config user.email` queda marcado `(tú)` y preseleccionado; los `(solo team-backlog)` aparecen pero no se pueden abrir.
-- **Panel de un operador:** la pantalla de siempre (completadas, en progreso, pausadas, libres y bloqueadas) con el recuadro SIN DUEÑO debajo de BLOQUEADAS. El título muestra el operador (`▣ MI APP · ana`).
+- **Panel de un operador:** la pantalla de siempre (completadas, en progreso, pausadas, libres y bloqueadas) con el recuadro SIN DUEÑO debajo de BLOQUEADAS. El encabezado muestra el operador junto al nombre del proyecto (`MI APP · ana`).
 - **Navegación:** `↑`/`↓` eligen, `Enter` abre el panel y `b` o `Esc` vuelven al equipo. Con `--once` o sin terminal no hay selector: se pinta la vista que pediste (el panel del operador indicado, o la de equipo) y se sale.
 - **Operador que no existe o no tiene carpeta** (por argumento): falla con código 1 y lista los operadores con carpeta. Un correo de git que no figura no es un error: solo no hay fila preseleccionada.
 - **Pasar directamente la carpeta de un operador** (`docs/agents/ana`) también abre su panel.
@@ -65,8 +65,8 @@ El pie de la pantalla lista las teclas que valen en la vista actual como `[tecla
 ## Qué muestra
 
 ```
-▣ MI APP
-  D:\proyectos\mi-app
+TAREAS
+  MI APP   D:\proyectos\mi-app
   Última actualización 18:42:10 · se modificó handoff.md
 
 ╭─ LIBRES (3) ─────────────────────────── backlog.md ─╮

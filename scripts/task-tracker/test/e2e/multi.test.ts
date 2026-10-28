@@ -77,7 +77,10 @@ describe("index.ts en modo multi-operador", () => {
   test("sin operador: vista de equipo con EQUIPO, el operador del correo de git y SIN DUEÑO", async () => {
     const { stdout, code } = await run([repo, "--once"]);
     expect(code).toBe(0);
-    expect(stdout).toContain("· equipo");
+    const [title, location] = stdout.split("\n");
+    expect(title).toBe("EQUIPO");
+    expect(location).toMatch(/^ {2}[A-Z0-9 ]+ {3}\S/); // nombre del proyecto y ruta, sin operador
+    expect(location).not.toContain(" · ");
     expect(stdout).toContain("╭─ EQUIPO (3)");
     expect(stdout).toMatch(/luis\s+\(solo team-backlog\)/);
     expect(stdout).toContain("╭─ SIN DUEÑO (2)");
@@ -89,7 +92,9 @@ describe("index.ts en modo multi-operador", () => {
   test("con operador como segundo argumento: abre su panel, con SIN DUEÑO encima de BLOQUEADAS", async () => {
     const { stdout, code } = await run([repo, "ana", "--once"]);
     expect(code).toBe(0);
-    expect(stdout).toContain("· ana");
+    const [title, location] = stdout.split("\n");
+    expect(title).toBe("TAREAS");
+    expect(location).toMatch(/^ {2}[A-Z0-9 ]+ · ana {3}\S/);
     expect(stdout).not.toContain("EQUIPO (");
     expect(stdout).toContain("╭─ EN PROGRESO");
     expect(stdout.indexOf("╭─ SIN DUEÑO")).toBeLessThan(stdout.indexOf("╭─ BLOQUEADAS"));
@@ -109,7 +114,7 @@ describe("index.ts en modo multi-operador", () => {
   test("--operator equivale al segundo argumento y no distingue mayúsculas", async () => {
     const { stdout, code } = await run([repo, "--operator", "GERSOM", "--once"]);
     expect(code).toBe(0);
-    expect(stdout).toContain("· gersom");
+    expect(stdout.split("\n")[1]).toMatch(/^ {2}[A-Z0-9 ]+ · gersom {3}\S/);
   });
 
   test("operador que no existe o sin carpeta: código 1 con la lista de operadores", async () => {
@@ -124,6 +129,6 @@ describe("index.ts en modo multi-operador", () => {
   test("la carpeta de un operador pasada como ruta abre su panel", async () => {
     const { stdout, code } = await run([join(repo, "docs", "agents", "ana"), "--once"]);
     expect(code).toBe(0);
-    expect(stdout).toContain("· ana");
+    expect(stdout.split("\n")[1]).toMatch(/^ {2}[A-Z0-9 ]+ · ana {3}\S/);
   });
 });

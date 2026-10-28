@@ -44,9 +44,29 @@ describe("renderTeam", () => {
   const out = renderTeam(team, meta);
   const lines = out.split("\n");
 
-  test("encabezado con «equipo» y recuadro EQUIPO con operators.md", () => {
-    expect(lines[0]).toBe("▣ DEMO APP · equipo");
+  test("encabezado EQUIPO, con el nombre del proyecto y su ruta (sin operador), y recuadro EQUIPO con operators.md", () => {
+    expect(lines.slice(0, 3)).toEqual([
+      "EQUIPO",
+      "  DEMO APP   /proyectos/demo-app",
+      "  Última actualización 12:00:00 · al iniciar",
+    ]);
     expect(out).toMatch(/╭─ EQUIPO \(4\) ─+ operators\.md ─╮/);
+  });
+
+  test("encabezado: la línea extra MODO OBSERVADOR solo con el observador activo", () => {
+    expect(out).not.toContain("MODO OBSERVADOR");
+    const on = renderTeam(team, { ...meta, observer: { notice: null } }).split("\n");
+    expect(on.slice(0, 3)).toEqual(["MODO OBSERVADOR", "EQUIPO", "  DEMO APP   /proyectos/demo-app"]);
+  });
+
+  test("encabezado en un ancho estrecho: el nombre no se pierde y se recorta la ruta", () => {
+    const projectDir = "/proyectos/un/camino/bastante/largo/hasta/demo-app";
+    for (const width of [60, 40]) {
+      const location = renderTeam(team, { ...meta, projectDir, width }).split("\n")[1];
+      expect(location.startsWith("  DEMO APP   /proyectos/")).toBe(true);
+      expect(location.endsWith("…")).toBe(true);
+      expect([...location]).toHaveLength(width);
+    }
   });
 
   test("una fila por operador: tarea en curso con su plan, sin tarea, solo team-backlog y sin handoff", () => {
@@ -126,7 +146,7 @@ describe("render del panel de un operador en modo multi", () => {
     expect(out.indexOf("╭─ SIN DUEÑO (2)")).toBeGreaterThan(-1);
     expect(out.indexOf("╭─ SIN DUEÑO (2)")).toBeLessThan(out.indexOf("╭─ BLOQUEADAS"));
     expect(out).toContain("   ↓ se toma");
-    expect(out).toContain("▣ DEMO APP · ana");
+    expect(out.split("\n").slice(0, 2)).toEqual(["TAREAS", "  DEMO APP · ana   /proyectos/demo-app"]);
   });
 
   test("sin team-backlog (modo plano) no aparece el recuadro", () => {

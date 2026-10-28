@@ -29,10 +29,18 @@ describe("renderProjects", () => {
   const out = renderProjects(rows, meta);
   const lines = out.split("\n");
 
-  test("encabezado sin repo y recuadro PROYECTOS con la cantidad", () => {
-    expect(lines[0]).toBe("▣ proyectos");
-    expect(lines[1]).toContain("Última actualización");
+  test("encabezado PROYECTOS sin línea de nombre/ruta y recuadro PROYECTOS con la cantidad", () => {
+    expect(lines[0]).toBe("PROYECTOS");
+    expect(lines[1]).toBe("  Última actualización 12:00:00 · al iniciar");
+    expect(lines[2]).toBe("");
     expect(out).toMatch(/╭─ PROYECTOS \(4\) ─+ docs\/agents ─╮/);
+  });
+
+  test("encabezado: la línea extra MODO OBSERVADOR solo con el observador activo; sin color no hay ANSI", () => {
+    expect(out).not.toContain("MODO OBSERVADOR");
+    const on = renderProjects(rows, { ...meta, observer: { notice: null } }).split("\n");
+    expect(on.slice(0, 3)).toEqual(["MODO OBSERVADOR", "PROYECTOS", "  Última actualización 12:00:00 · al iniciar"]);
+    expect(out).not.toMatch(/\x1b/);
   });
 
   test("encabezado de columnas: nombre, ruta, operador, en curso, libres y bloqueadas", () => {

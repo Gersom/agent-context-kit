@@ -48,11 +48,26 @@ type Row = (indent: number, ...segments: Segment[]) => void;
 /** Lo que el lienzo necesita de los metadatos: la lista de proyectos no tiene repo en el encabezado. */
 type CanvasMeta = Omit<RenderMeta, "projectName" | "projectDir"> & Partial<Pick<RenderMeta, "projectName" | "projectDir">>;
 
+/** Separación entre el nombre del proyecto (y operador) y su ruta en el encabezado. */
+const LOCATION_GAP = "   ";
+/** Título de la línea extra del encabezado con el observador activo, y de su vista de espera. */
+const OBSERVER_TITLE = "MODO OBSERVADOR";
+
 /**
- * Lienzo de una pantalla: las líneas, los recuadros y el encabezado ya escrito. `subtitle` es lo
- * que va después del nombre del proyecto (el operador en su panel, "equipo" en la vista de equipo).
+ * Encabezado de una pantalla: `title` en mayúsculas; `location`, si la pantalla es de un repo, agrega
+ * la línea con el nombre del proyecto, el operador (si lo hay) y la ruta; `observerLine: false`
+ * quita la línea extra del modo observador (la vista de espera ya lo lleva como título).
  */
-function createCanvas(meta: CanvasMeta, subtitle?: string) {
+interface Header {
+  title: string;
+  location?: { operator?: string };
+  observerLine?: boolean;
+}
+
+/**
+ * Lienzo de una pantalla: las líneas, los recuadros y el encabezado ya escrito (ver `Header`).
+ */
+function createCanvas(meta: CanvasMeta, header: Header) {
   const pc: Colors = meta.color === undefined ? picocolors : picocolors.createColors(meta.color);
   const width = screenWidth(meta.width);
   const out: string[] = [];
@@ -73,9 +88,25 @@ function createCanvas(meta: CanvasMeta, subtitle?: string) {
   };
 
   // Encabezado
-  const heading = [meta.projectName ? displayProjectName(meta.projectName) : "", subtitle ?? ""].filter(Boolean).join(" · ");
-  line(0, `▣ ${heading}`, (s) => pc.bold(pc.magenta(s)));
-  if (meta.projectDir) line(2, meta.projectDir, secondary);
+  const title = (s: string) => pc.bold(pc.magenta(s));
+  if (meta.observer && header.observerLine !== false) line(0, OBSERVER_TITLE, title);
+  line(0, header.title, title);
+  if (header.location) {
+    // El nombre se mantiene entero; si no cabe con la ruta, se recorta la ruta (si ni el nombre cabe, también).
+    const name = plainText(
+      [meta.projectName ? displayProjectName(meta.projectName) : "", header.location.operator ?? ""].filter(Boolean).join(" · "),
+    );
+    const dir = plainText(meta.projectDir ?? "");
+    const room = width - 2 - visibleLength(name) - LOCATION_GAP.length;
+    // Con menos de 2 caracteres de sitio, la ruta quedaría en un «…» suelto: mejor omitirla.
+    if (name && dir && room >= 2) {
+      out.push(`  ${name}${LOCATION_GAP}${secondary(truncate(dir, room))}`);
+    } else if (name) {
+      line(2, name);
+    } else if (dir) {
+      line(2, dir, secondary);
+    }
+  }
   line(2, `Última actualización ${formatTime(meta.updatedAt)} · ${triggerText(meta.trigger)}`, secondary);
   blank();
 
@@ -154,7 +185,7 @@ export function arrowText(from: Stage, to: Stage): string {
  * completadas, con una línea de flecha entre los que se muestran. Ver `RenderMeta`.
  */
 export function render(model: Model, meta: RenderMeta): string {
-  const canvas = createCanvas(meta, meta.operator);
+  const canvas = createCanvas(meta, { title: "TAREAS", location: { operator: meta.operator } });
   const { pc, width, box, line, secondary, completedGreen } = canvas;
 
   const stages: { id: Stage; shown: boolean; draw: () => void }[] = [
@@ -277,7 +308,7 @@ export function render(model: Model, meta: RenderMeta): string {
  * operador, con el elegido marcado con `›` y el del correo de git con `(tú)`), y las tareas sin dueño.
  */
 export function renderTeam(team: TeamModel, meta: TeamRenderMeta): string {
-  const canvas = createCanvas(meta, "equipo");
+  const canvas = createCanvas(meta, { title: "EQUIPO", location: {} });
   const { pc, box, secondary } = canvas;
 
   box(`EQUIPO (${team.rows.length})`, "operators.md", pc.green, (row) => {
@@ -313,7 +344,7 @@ export function renderTeam(team: TeamModel, meta: TeamRenderMeta): string {
  * esta (sin tareas): qué se espera, el aviso del observador si hay (`observer.notice`) y el pie.
  */
 export function renderObserver(meta: ObserverRenderMeta): string {
-  const canvas = createCanvas(meta, "Modo observador");
+  const canvas = createCanvas(meta, { title: OBSERVER_TITLE, observerLine: false });
   const { pc, width, line } = canvas;
   // El texto se parte en palabras si no entra, para no perder el final («o /board»).
   for (const text of wrapWords(OBSERVER_WAITING, width)) line(0, text, pc.cyan);
@@ -344,7 +375,7 @@ const PROJECT_GAP = "  ";
  * pudo abrir un proyecto).
  */
 export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, warnings: string[] = []): string {
-  const canvas = createCanvas(meta, "proyectos");
+  const canvas = createCanvas(meta, { title: "PROYECTOS" });
   const { pc, box, secondary, width } = canvas;
   // La ruta que se escribe se muestra por el final (donde está el cursor), no por el principio.
   const inputLine = (text: string): string => {
