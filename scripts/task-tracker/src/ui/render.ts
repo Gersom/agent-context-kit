@@ -50,13 +50,13 @@ type CanvasMeta = Omit<RenderMeta, "projectName" | "projectDir"> & Partial<Pick<
 
 /** Separación entre el nombre del proyecto (y operador) y su ruta en el encabezado. */
 const LOCATION_GAP = "   ";
-/** Título de la línea extra del encabezado con el observador activo, y de su vista de espera. */
+/** Lo que se suma al título con el observador activo (`TAREAS · MODO OBSERVADOR`), y título de su vista de espera. */
 const OBSERVER_TITLE = "MODO OBSERVADOR";
 
 /**
  * Encabezado de una pantalla: `title` en mayúsculas; `location`, si la pantalla es de un repo, agrega
  * la línea con el nombre del proyecto, el operador (si lo hay) y la ruta; `observerLine: false`
- * quita la línea extra del modo observador (la vista de espera ya lo lleva como título).
+ * quita el sufijo del modo observador (la vista de espera ya lo lleva como título).
  */
 interface Header {
   title: string;
@@ -89,8 +89,8 @@ function createCanvas(meta: CanvasMeta, header: Header) {
 
   // Encabezado
   const title = (s: string) => pc.bold(pc.magenta(s));
-  if (meta.observer && header.observerLine !== false) line(0, OBSERVER_TITLE, title);
-  line(0, header.title, title);
+  const observing = meta.observer && header.observerLine !== false;
+  line(0, `▣ ${header.title}${observing ? ` · ${OBSERVER_TITLE}` : ""}`, title);
   if (header.location) {
     // El nombre se mantiene entero; si no cabe con la ruta, se recorta la ruta (si ni el nombre cabe, también).
     const name = plainText(

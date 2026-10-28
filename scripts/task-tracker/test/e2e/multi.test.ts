@@ -78,7 +78,7 @@ describe("index.ts en modo multi-operador", () => {
     const { stdout, code } = await run([repo, "--once"]);
     expect(code).toBe(0);
     const [title, location] = stdout.split("\n");
-    expect(title).toBe("EQUIPO");
+    expect(title).toBe("▣ EQUIPO");
     expect(location).toMatch(/^ {2}[A-Z0-9 ]+ {3}\S/); // nombre del proyecto y ruta, sin operador
     expect(location).not.toContain(" · ");
     expect(stdout).toContain("╭─ EQUIPO (3)");
@@ -93,7 +93,7 @@ describe("index.ts en modo multi-operador", () => {
     const { stdout, code } = await run([repo, "ana", "--once"]);
     expect(code).toBe(0);
     const [title, location] = stdout.split("\n");
-    expect(title).toBe("TAREAS");
+    expect(title).toBe("▣ TAREAS");
     expect(location).toMatch(/^ {2}[A-Z0-9 ]+ · ana {3}\S/);
     expect(stdout).not.toContain("EQUIPO (");
     expect(stdout).toContain("╭─ EN PROGRESO");

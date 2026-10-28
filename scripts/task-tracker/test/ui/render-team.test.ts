@@ -46,17 +46,17 @@ describe("renderTeam", () => {
 
   test("encabezado EQUIPO, con el nombre del proyecto y su ruta (sin operador), y recuadro EQUIPO con operators.md", () => {
     expect(lines.slice(0, 3)).toEqual([
-      "EQUIPO",
+      "▣ EQUIPO",
       "  DEMO APP   /proyectos/demo-app",
       "  Última actualización 12:00:00 · al iniciar",
     ]);
     expect(out).toMatch(/╭─ EQUIPO \(4\) ─+ operators\.md ─╮/);
   });
 
-  test("encabezado: la línea extra MODO OBSERVADOR solo con el observador activo", () => {
+  test("encabezado: el título lleva el sufijo · MODO OBSERVADOR solo con el observador activo", () => {
     expect(out).not.toContain("MODO OBSERVADOR");
     const on = renderTeam(team, { ...meta, observer: { notice: null } }).split("\n");
-    expect(on.slice(0, 3)).toEqual(["MODO OBSERVADOR", "EQUIPO", "  DEMO APP   /proyectos/demo-app"]);
+    expect(on.slice(0, 2)).toEqual(["▣ EQUIPO · MODO OBSERVADOR", "  DEMO APP   /proyectos/demo-app"]);
   });
 
   test("encabezado en un ancho estrecho: el nombre no se pierde y se recorta la ruta", () => {
@@ -146,7 +146,7 @@ describe("render del panel de un operador en modo multi", () => {
     expect(out.indexOf("╭─ SIN DUEÑO (2)")).toBeGreaterThan(-1);
     expect(out.indexOf("╭─ SIN DUEÑO (2)")).toBeLessThan(out.indexOf("╭─ BLOQUEADAS"));
     expect(out).toContain("   ↓ se toma");
-    expect(out.split("\n").slice(0, 2)).toEqual(["TAREAS", "  DEMO APP · ana   /proyectos/demo-app"]);
+    expect(out.split("\n").slice(0, 2)).toEqual(["▣ TAREAS", "  DEMO APP · ana   /proyectos/demo-app"]);
   });
 
   test("sin team-backlog (modo plano) no aparece el recuadro", () => {

@@ -65,7 +65,7 @@ El pie de la pantalla lista las teclas que valen en la vista actual como `[tecla
 ## Qué muestra
 
 ```
-TAREAS
+▣ TAREAS
   MI APP   D:\proyectos\mi-app
   Última actualización 18:42:10 · se modificó handoff.md
 
