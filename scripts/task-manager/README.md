@@ -1,6 +1,6 @@
 # task-manager
 
-Gestiona las tareas de un proyecto que usa la skill `agent-context-skill` editando de forma **quirúrgica** sus archivos (`handoff.md`, `backlog.md`, `history.md` y, en modo multi-operador, `team-backlog.md`), en lugar de que un agente o una persona los edite a mano. Los comandos de negocio se van sumando por etapas; hoy están la infraestructura, dos comandos de diagnóstico, los de lectura (`status`, `next`, `show`) y los de escritura que llevan una tarea por todo su ciclo de vida (`add`, `start`, `step`, `pause`, `resume`, `block`, `unblock` y `close`, que la cierra con las Reglas 6 a 9 de `rules.md`).
+Gestiona las tareas de un proyecto que usa la skill `agent-context-skill` editando de forma **quirúrgica** sus archivos (`handoff.md`, `backlog.md`, `history.md` y, en modo multi-operador, `team-backlog.md`), en lugar de que un agente o una persona los edite a mano. Los comandos de negocio se van sumando por etapas; hoy están la infraestructura, dos comandos de diagnóstico, los de lectura (`status`, `next`, `show`) y los de escritura que llevan una tarea por todo su ciclo de vida (`add`, `edit`, `start`, `step`, `pause`, `resume`, `block`, `unblock` y `close`, que la cierra con las Reglas 6 a 9 de `rules.md`).
 
 Es **opcional** y es una herramienta de este repo, no parte de la skill: no se copia a los repos destino (principio 4 de [`docs/philosophy.md`](../../docs/philosophy.md)). Sin ella, los archivos se editan a mano igual.
 
@@ -172,7 +172,7 @@ Reglas de seguridad que aplica el **núcleo** (no cada comando) a todo comando q
 - **`--apply` obligatorio.** Sin él, el comando calcula todo, verifica el resultado y muestra el diff, pero no escribe. Con `--dry-run` tampoco escribe aunque se pase `--apply`.
 - **Solo la carpeta propia.** Si la carpeta resuelta no es la del correo de `git config user.email` (otro operador, o no se pudo verificar), el comando se niega con un error claro, sin escribir ni mostrar el diff: las carpetas de otros operadores son de solo lectura. En el repo plano no hay otros operadores. **Excepción:** lo que solo cambia el `team-backlog.md` (`add --team`) es un archivo compartido y no lo exige.
 - **Todo por `planChanges`/`commitChanges`:** verificación de legibilidad (anclas y secciones), detección de cambios concurrentes, escritura atómica, CRLF/LF respetados, todo o nada entre los archivos que toca un comando.
-- **`--json`:** los comandos de escritura nuevos (`step`, `pause`, `resume`, `block`, `unblock`, `close`) lo aceptan: en vez del diff y los mensajes imprimen `{ schema, command, applied, dryRun, pending, files: [{ file, changed, written }], ...datos del comando }`. `applied`: se escribió algún archivo; `pending`: había cambios y falta `--apply`. (`add` y `start` todavía no lo tienen.)
+- **`--json`:** los comandos de escritura nuevos (`edit`, `step`, `pause`, `resume`, `block`, `unblock`, `close`) lo aceptan: en vez del diff y los mensajes imprimen `{ schema, command, applied, dryRun, pending, files: [{ file, changed, written }], ...datos del comando }`. `applied`: se escribió algún archivo; `pending`: había cambios y falta `--apply`. (`add` y `start` todavía no lo tienen.)
 - **Números sin repetir:** antes de numerar, «Próximo número de tarea» tiene que ser mayor que la tarea más alta que ya existe en handoff, backlog (con grupos) e history; si no, error que lo explica (no se elige otro número por cuenta propia).
 
 ### `add`
@@ -254,6 +254,28 @@ Mueve tareas de «bloqueadas / pospuestas» al final de «Tareas libres» (Regla
 - **Sin número**, revisa todas las bloqueadas: desbloquea solas las cuyo motivo nombra `Tarea N` y **todas esas tareas figuran cerradas en `history.md`** (las mismas que `status` marca «candidata a desbloquear»), y las que ya no tenían un bloqueo vigente (solo se mueven). Lista aparte las de **revisión manual** (el motivo no nombra una tarea: texto libre, o nombra una de otro operador con `T-N@operador`) y las que **siguen bloqueadas** (alguna tarea mencionada no está cerrada). Nada de eso se toca.
 - **Con número**, desbloquea esa tarea sin más condiciones (la revisión manual ya la hizo quien lo pide); error si no está bloqueada.
 - Si no hay nada que desbloquear, lo dice y no escribe.
+
+### `edit`
+
+```sh
+bun run task edit <N | título de una tarea del team-backlog> [--title <texto>] [--description <texto>] [--decisions <texto>] [--blocker <texto>] [--trigger <texto>] [--details <texto>] [--missing <texto>] [--next <texto>] [--json] [--apply]
+```
+
+Modifica el **contenido** de una tarea y nunca su estado ni su lugar: una libre sigue libre, una bloqueada sigue bloqueada, la que está en curso o pausada sigue ahí. Es el par de `show`: primero se ve la tarea completa con `show`, después se cambia lo que falte con `edit`. Solo cambia los campos cuyo flag se pasa (todos admiten `-` para leer de la entrada estándar; un flag vacío es un error, no borra el campo) y, si el campo no existe (típicamente `Detalles`), lo agrega antes de `Agregada`.
+
+| Dónde está la tarea | Qué se puede editar |
+|---|---|
+| `backlog.md` (libre, bloqueada, agrupada) | `--title`, `--description`, `--decisions`, `--blocker`, `--trigger`, `--details` |
+| `team-backlog.md` (por título) | lo mismo, sin `--trigger`; el título nuevo debe seguir siendo único |
+| `handoff.md`, en curso o pausada | `--title`, `--description`, `--details` y las subsecciones de avance: `--missing` («Qué falta»), `--decisions` («Decisiones a medio camino»), `--next` («Próximo paso concreto»). `--blocker` y `--trigger` no aplican |
+| `history.md` | nada: es un registro de solo lectura |
+
+- **`--blocker` no cambia el estado.** La sección la decide el tag al inicio de `Bloqueos`. En una libre, un valor con tag `[dependencia]`/`[postergada]` se rechaza (usa `block`). En una bloqueada, un valor con tag se respeta (sirve para pasar de `dependencia` a `postergada`) y uno sin tag conserva el tag actual y cambia solo el motivo; dejarlo en «Ninguno» se rechaza (usa `unblock`).
+- No toca los checkboxes del plan (eso es de `step`) ni las tareas de otro operador. Una descripción en curso mezclada con campos o comentarios da error en vez de adivinar qué reemplazar.
+- El título cambia solo el texto: conserva el número, el nivel del header y la etiqueta. En las tareas con número, las referencias entre tareas van por número, así que no se rompen. En el team-backlog el título es la identidad de la tarea (no tiene número): las referencias por título quedan huérfanas, así que `edit --title` sobre una de ellas imprime un `Aviso:` recordando revisarlas.
+- Un valor que empieza con un tag `[...]` en `--description`, `--decisions`, `--details` o `--trigger` se rechaza en el backlog y el team-backlog (el parser lo leería como tag de bloqueo). En una tarea en curso, `--description`, `--missing`, `--decisions` y `--next` rechazan líneas que empiecen con `#` o con un checkbox (`- [ ]`, `- [x]`), porque crearían subsecciones o pasos del plan.
+- `--blocker` conserva siempre el historial `[Resuelto ...]` que ya tuviera el campo, detrás del valor nuevo.
+- Si no hay nada que cambiar (los valores ya eran esos), con `--apply` imprime «Sin cambios».
 
 ### `close`
 
@@ -343,7 +365,7 @@ scripts/task-manager/
 │   ├── query/        # Consulta reutilizable: dónde vive una tarea, estado del operador, próximo número, formato
 │   ├── workspace/    # Ruta de agentes, operador (operators.md + correo de git), espacio de trabajo y lectura de archivos
 │   ├── edit/         # Ediciones por rango, ubicar/sacar un bloque en una sección (`layout.ts`), verificación de legibilidad, diff, escritura atómica y cambios de varios archivos
-│   └── write/        # Lo que escriben los comandos: idioma y etiquetas, formato de los bloques y del handoff, contador de número de tarea, lectura de «Tarea en progreso» (`handoff.ts`), campo `Bloqueos` (`blocking.ts`), qué desbloquear y cómo (`unblocking.ts`, lo comparten `unblock` y `close`), entrada de `history.md` (`history.ts`), bloque de una tarea nueva (`new-task.ts`) y `--json` de los que escriben
+│   └── write/        # Lo que escriben los comandos: idioma y etiquetas, formato de los bloques y del handoff, contador de número de tarea, lectura de «Tarea en progreso» (`handoff.ts`), campo `Bloqueos` (`blocking.ts`), qué desbloquear y cómo (`unblocking.ts`, lo comparten `unblock` y `close`), entrada de `history.md` (`history.ts`), bloque de una tarea nueva (`new-task.ts`), edición del contenido de una tarea sin cambiar su estado (`task-edit.ts`, la usa `edit`) y `--json` de los que escriben
 └── test/             # Tests de `bun test` en espejo de src/ + e2e/ (script entero); trabajan en directorios temporales
 ```
 
