@@ -1,5 +1,6 @@
-// `block <N> --tag <dependencia|postergada> --motivo <texto>`: bloquea una tarea libre de tu
-// `backlog.md`. Pone su campo `Bloqueos` en `` `[tag]` motivo `` (si ya traía un `[Resuelto ...]` de un
+// `block <N> --tag <dependency|postponed> --reason <texto>`: bloquea una tarea libre de tu
+// `backlog.md`. Pone su campo `Bloqueos` en `` `[tag]` motivo `` (el tag en el idioma del proyecto:
+// `dependencia`/`postergada` o `dependency`/`postponed`; si ya traía un `[Resuelto ...]` de un
 // bloqueo anterior, queda después: el vigente va primero) y mueve su bloque de «Tareas libres» al
 // final de «Tareas bloqueadas / pospuestas». Sin `--apply` solo muestra el diff.
 
@@ -27,11 +28,11 @@ const WHERE: Record<string, string> = {
 export const block: Command = {
   name: "block",
   summary: "Bloquea una tarea libre del backlog y la mueve a «bloqueadas / pospuestas»; escribe con --apply",
-  usage: "block <N | T-N> --tag <dependencia|postergada> --motivo <texto> [--json] [--apply]",
+  usage: "block <N | T-N> --tag <dependency|postponed> --reason <texto> [--json] [--apply]",
   writes: true,
   flags: {
-    tag: { type: "string", valueName: "tag", description: "`dependencia` (no se puede empezar técnicamente) o `postergada` (conviene esperar). Obligatorio." },
-    motivo: {
+    tag: { type: "string", valueName: "tag", description: "`dependency` (no se puede empezar técnicamente) o `postponed` (conviene esperar). Se escribe en el idioma del proyecto. Obligatorio." },
+    reason: {
       type: "string",
       valueName: "texto",
       stdin: true,
@@ -41,14 +42,17 @@ export const block: Command = {
   },
   run(ctx) {
     const { flags, io } = ctx;
-    if (ctx.args.length !== 1 || !ctx.args[0].trim()) throw new UsageError("Indica la tarea: `block <N> --tag <dependencia|postergada> --motivo <texto>`.");
+    if (ctx.args.length !== 1 || !ctx.args[0].trim()) throw new UsageError("Indica la tarea: `block <N> --tag <dependency|postponed> --reason <texto>`.");
     const target = parseTarget(ctx.args[0]);
     if (target.kind === "title") throw new UsageError(`«${ctx.args[0]}» no es un número de tarea: \`block <N>\`.`);
     if (target.operator) throw new CliError(`block solo bloquea tareas de tu propia carpeta; «${ctx.args[0]}» es de otro operador (solo lectura). No se escribió nada.`);
     const tagFlag = requiredFlag(flags, "tag");
     const tag = parseTagFlag(tagFlag);
-    if (!tag) throw new UsageError(`--tag debe ser \`dependencia\` o \`postergada\` (recibí «${tagFlag}»).`);
-    const reason = requiredFlag(flags, "motivo");
+    if (!tag) {
+      const spanish = /^`?\[?(dependencia|postergada)\]?`?$/i.test(tagFlag.trim());
+      throw new UsageError(`--tag debe ser \`dependency\` o \`postponed\` (recibí «${tagFlag}»)${spanish ? ": los valores en español ya no valen, el flag va en inglés (el archivo se escribe en el idioma del proyecto)" : ""}.`);
+    }
+    const reason = requiredFlag(flags, "reason");
 
     const ws = ctx.workspace();
     requireOwnFolder(ws);
@@ -92,7 +96,8 @@ export const block: Command = {
     const { lang, notice } = detectLanguage([task.label, ...headerLabels(docs)]);
     const text = backlog.text;
     const range = trimRange(text, location.range);
-    const moved = withBlockers(text, range, task.fields, STRINGS[lang].fields.blockers, blockedValue(tag, reason, kept));
+    const written = STRINGS[lang].tags[tag];
+    const moved = withBlockers(text, range, task.fields, STRINGS[lang].fields.blockers, blockedValue(written, reason, kept));
 
     const removal = removeBlocks(text, [...free.tasks, ...free.groups], [task], STRINGS[lang].emptySection);
     const destinationEdit = insertBlock(text, destination.bodyRange, moved, {
@@ -102,11 +107,11 @@ export const block: Command = {
     const result = ctx.commit([{ doc: backlog, edits: [...removal, destinationEdit] }], { quiet: flags.json === true });
 
     if (flags.json === true) {
-      emitWriteJson(ctx, "block", result, { task: { number: task.number, title: task.title }, tag, reason, notice });
+      emitWriteJson(ctx, "block", result, { task: { number: task.number, title: task.title }, tag: written, reason, notice });
       return;
     }
     if (result.files.some((file) => file.written)) {
-      io.out(`Tarea ${task.number} bloqueada (${tag}): pasó de «Tareas libres» a «Tareas bloqueadas / pospuestas» de ${relFile(ws, backlog.path)}.`);
+      io.out(`Tarea ${task.number} bloqueada (${written}): pasó de «Tareas libres» a «Tareas bloqueadas / pospuestas» de ${relFile(ws, backlog.path)}.`);
     }
     if (notice) io.out(`Aviso: ${notice}`);
   },

@@ -57,7 +57,7 @@ interface Source {
 export const start: Command = {
   name: "start",
   summary: "Empieza una tarea: la saca del backlog y arma «Tarea en progreso» en el handoff; escribe con --apply",
-  usage: "start <N | T-N> [--plan -] [--modo <texto>] [--force] [--apply]   |   start --team \"<título>\" [--plan -] [--modo <texto>] [--force] [--apply]",
+  usage: "start <N | T-N> [--plan -] [--mode <texto>] [--force] [--apply]   |   start --team \"<título>\" [--plan -] [--mode <texto>] [--force] [--apply]",
   writes: true,
   flags: {
     team: { type: "boolean", description: "Tomar la tarea del team-backlog.md (por título): recibe el siguiente número y el handoff lleva `Origen: team-backlog`." },
@@ -67,7 +67,7 @@ export const start: Command = {
       stdin: true,
       description: "Plan: un paso por línea (con `-`, de la entrada estándar). Se agrega siempre el paso final «Documentar cierre de tarea». Sin plan, no se escribe esa subsección.",
     },
-    modo: { type: "string", valueName: "texto", description: "Modo de ejecución acordado del plan (solo con --plan)." },
+    mode: { type: "string", valueName: "texto", description: "Modo de ejecución acordado del plan (solo con --plan)." },
     force: { type: "boolean", description: "Empezar una tarea aunque esté en «bloqueadas / pospuestas» (queda constancia en la salida)." },
   },
   run(ctx) {
@@ -82,9 +82,9 @@ export const start: Command = {
     const planText = textFlag(flags, "plan");
     const plan = planText ? parsePlan(planText) : null;
     if (planText && !plan?.length) throw new UsageError("--plan no trae ningún paso: escribe uno por línea.");
-    const mode = textFlag(flags, "modo");
-    if (mode && !plan) throw new UsageError("--modo solo tiene sentido con --plan.");
-    if (mode) singleLine("modo", mode);
+    const mode = textFlag(flags, "mode");
+    if (mode && !plan) throw new UsageError("--mode solo tiene sentido con --plan.");
+    if (mode) singleLine("mode", mode);
 
     const docs = ctx.docs();
     const handoff = requireDoc(docs.handoff, "handoff.md");

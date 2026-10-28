@@ -1,5 +1,5 @@
 // El bloque de una tarea nueva de `backlog.md` (`### Tarea N — título` y sus campos), con las
-// palabras que el archivo ya usa. Lo usan `add` y `close --nueva`.
+// palabras que el archivo ya usa. Lo usan `add` y `close --new`.
 
 import type { Task } from "../../../_shared/types.ts";
 import type { Docs } from "../workspace/docs.ts";

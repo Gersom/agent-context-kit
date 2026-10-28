@@ -29,7 +29,7 @@ export function renderHelp(commands: Command[]): string[] {
     "Flags globales:",
     ...table(Object.entries(GLOBAL_FLAGS).map(([name, spec]) => flagLine(name, spec))),
     "",
-    "Un flag de texto con valor `-` lee su contenido de la entrada estándar (ej. `--detalles -`).",
+    "Un flag de texto con valor `-` lee su contenido de la entrada estándar (ej. `--details -`).",
     "Los comandos que escriben (marcados con *) no escriben nada sin --apply: solo muestran el diff.",
     "Para más detalle de un comando: acsuite task <comando> --help",
   ];

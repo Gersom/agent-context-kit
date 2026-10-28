@@ -16,7 +16,7 @@ afterAll(() => projects.forEach((p) => p.cleanup()));
 
 const IDLE = { contents: { "handoff.md": HANDOFF_IDLE, "backlog.md": BACKLOG_RICH, "history.md": HISTORY_RICH }, teamBacklogText: TEAM_RICH };
 const backlog = (p: Project) => readIn(p, "gersom", "backlog.md");
-const BLOCK = ["block", "1", "--tag", "dependencia", "--motivo", "depende de la Tarea 2"];
+const BLOCK = ["block", "1", "--tag", "dependency", "--reason", "depende de la Tarea 2"];
 
 describe("block", () => {
   test("sin --apply muestra el diff y no escribe nada", async () => {
@@ -53,7 +53,7 @@ describe("block", () => {
 
   test("una tarea que traía un `[Resuelto ...]` lo conserva después del bloqueo vigente", async () => {
     const p = project({ folders: ["gersom"], ...IDLE });
-    await exec(["block", "3", "--tag", "[postergada]", "--motivo", "esperar el rediseño", "--apply"], p);
+    await exec(["block", "3", "--tag", "[postponed]", "--reason", "esperar el rediseño", "--apply"], p);
     expect(backlog(p)).toContain("- **Bloqueos:** `[postergada]` esperar el rediseño `[Resuelto el 2026-09-24]` — era `[postergada]`.\n- **Disparador:**");
     const state = JSON.parse((await exec(["status", "--json"], p)).out);
     expect(state.blocked.at(-1)).toMatchObject({ number: 3, tag: "postergada", reason: "esperar el rediseño" });
@@ -62,13 +62,13 @@ describe("block", () => {
   test("una tarea sin campo `Bloqueos` lo recibe tras la descripción", async () => {
     const raw = BACKLOG_RICH.replace("### Tarea 18 — Revisar los links\n\n- **Disparador:** antes del release.", "### Tarea 18 — Revisar los links\n\n- **Descripción:** links.\n- **Disparador:** antes del release.");
     const p = project({ folders: ["gersom"], ...IDLE, contents: { ...IDLE.contents, "backlog.md": raw } });
-    await exec(["block", "18", "--tag", "postergada", "--motivo", "después", "--apply"], p);
+    await exec(["block", "18", "--tag", "postponed", "--reason", "después", "--apply"], p);
     expect(backlog(p)).toContain("### Tarea 18 — Revisar los links\n\n- **Descripción:** links.\n- **Bloqueos:** `[postergada]` después\n- **Disparador:** antes del release.");
   });
 
   test("si era la única libre, «libres» queda con «Ninguna.» y «bloqueadas» deja de estar vacía", async () => {
     const p = project({ folders: ["gersom"], contents: { "handoff.md": HANDOFF_EMPTY, "backlog.md": BACKLOG_ONE, "history.md": "# History\n" } });
-    await exec(["block", "7", "--tag", "dependencia", "--motivo", "falta la API", "--apply"], p);
+    await exec(["block", "7", "--tag", "dependency", "--reason", "falta la API", "--apply"], p);
     const text = backlog(p);
     expect(text).toContain("## Tareas libres\n\nNinguna.\n\n<!-- agent-context-skill:section=blocked -->\n## Tareas bloqueadas / pospuestas\n\n### Tarea 7 — La única");
     expect(text).toContain("- **Bloqueos:** `[dependencia]` falta la API");
@@ -82,24 +82,31 @@ describe("block", () => {
     expect(JSON.parse((await exec([...BLOCK, "--json", "--apply"], p)).out)).toMatchObject({ applied: true });
   });
 
+  test("--json: `tag` sigue el idioma del proyecto (`dependency` en inglés, `dependencia` en español)", async () => {
+    const en = project({ folders: ["gersom"], contents: { "handoff.md": HANDOFF_IDLE_EN, "backlog.md": BACKLOG_EN, "history.md": HISTORY_EN } });
+    expect(JSON.parse((await exec(["block", "4", "--tag", "dependency", "--reason", "needs Task 5", "--json"], en)).out)).toMatchObject({ command: "block", tag: "dependency", task: { number: 4 } });
+    const es = project({ folders: ["gersom"], ...IDLE });
+    expect(JSON.parse((await exec([...BLOCK, "--json"], es)).out)).toMatchObject({ command: "block", tag: "dependencia", task: { number: 1 } });
+  });
+
   describe("errores: no se escribe nada", () => {
     test("uso: falta tarea, tag o motivo; tag inválido", async () => {
       const p = project({ folders: ["gersom"], ...IDLE });
       const before = snapshot(p.root);
-      expect((await exec(["block", "--tag", "dependencia", "--motivo", "x", "--apply"], p)).code).toBe(2);
-      expect((await exec(["block", "1", "--motivo", "x", "--apply"], p)).code).toBe(2);
-      expect((await exec(["block", "1", "--tag", "dependencia", "--apply"], p)).code).toBe(2);
-      const bad = await exec(["block", "1", "--tag", "urgente", "--motivo", "x", "--apply"], p);
+      expect((await exec(["block", "--tag", "dependency", "--reason", "x", "--apply"], p)).code).toBe(2);
+      expect((await exec(["block", "1", "--reason", "x", "--apply"], p)).code).toBe(2);
+      expect((await exec(["block", "1", "--tag", "dependency", "--apply"], p)).code).toBe(2);
+      const bad = await exec(["block", "1", "--tag", "urgente", "--reason", "x", "--apply"], p);
       expect(bad.code).toBe(2);
-      expect(bad.err).toContain("`dependencia` o `postergada`");
-      expect((await exec(["block", "algo", "--tag", "dependencia", "--motivo", "x", "--apply"], p)).code).toBe(2);
+      expect(bad.err).toContain("`dependency` o `postponed`");
+      expect((await exec(["block", "algo", "--tag", "dependency", "--reason", "x", "--apply"], p)).code).toBe(2);
       expect(snapshot(p.root)).toEqual(before);
     });
 
     test("la tarea no es libre: bloqueada, agrupada, pausada, cerrada, de otro operador o inexistente", async () => {
       const p = project({ folders: ["gersom", "ana"], ...IDLE });
       const before = snapshot(p.root);
-      const run = (n: string) => exec(["block", n, "--tag", "dependencia", "--motivo", "x", "--apply"], p);
+      const run = (n: string) => exec(["block", n, "--tag", "dependency", "--reason", "x", "--apply"], p);
       expect((await run("6")).err).toContain("ya está en «bloqueadas / pospuestas» (dependencia: depende de la Tarea 11.)");
       expect((await run("14")).err).toContain("tarea agrupada (grupo «Documentar los planes»)");
       expect((await run("8")).err).toContain("está pausada");
@@ -115,10 +122,80 @@ describe("block", () => {
     });
   });
 
+  test("--tag dependency / postponed escribe el tag en el idioma del proyecto: español en uno en español", async () => {
+    const p = project({ folders: ["gersom"], ...IDLE });
+    await exec(["block", "1", "--tag", "dependency", "--reason", "depende de la Tarea 2", "--apply"], p);
+    await exec(["block", "18", "--tag", "postponed", "--reason", "después", "--apply"], p);
+    expect(backlog(p)).toContain("- **Bloqueos:** `[dependencia]` depende de la Tarea 2\n");
+    expect(backlog(p)).toContain("- **Bloqueos:** `[postergada]` después\n");
+    expect(backlog(p)).not.toContain("[dependency]");
+    expect(backlog(p)).not.toContain("[postponed]");
+  });
+
+  test("--tag dependency / postponed escribe el tag en el idioma del proyecto: inglés en uno en inglés", async () => {
+    const p = project({ folders: ["gersom"], contents: { "handoff.md": HANDOFF_IDLE_EN, "backlog.md": BACKLOG_EN, "history.md": HISTORY_EN } });
+    expect((await exec(["block", "4", "--tag", "postponed", "--reason", "wait for the redesign", "--apply"], p)).code).toBe(0);
+    expect(backlog(p)).toContain("- **Blockers:** `[postponed]` wait for the redesign\n");
+    expect(backlog(p)).not.toContain("[postergada]");
+  });
+
+  test("un proyecto en inglés: block escribe `[dependency]`, status lo lee y unblock / close la desbloquean", async () => {
+    const raw = BACKLOG_EN.replace(
+      "- **Added:** 2026-10-01.\n\n<!-- agent-context-skill:section=blocked -->",
+      "- **Added:** 2026-10-01.\n\n### Task 3 — Publish the glossary\n\n- **Description:** publish it.\n- **Blockers:** None.\n- **Trigger:** after the translation.\n- **Added:** 2026-10-01.\n\n<!-- agent-context-skill:section=blocked -->",
+    );
+    const p = project({ folders: ["gersom"], contents: { "handoff.md": HANDOFF_IDLE_EN, "backlog.md": raw, "history.md": HISTORY_EN } });
+    const status = async () => JSON.parse((await exec(["status", "--json"], p)).out);
+    const numbers = (tasks: Array<{ number: number }>) => tasks.map((t) => t.number);
+
+    expect((await exec(["block", "3", "--tag", "dependency", "--reason", "needs Task 4", "--apply"], p)).code).toBe(0);
+    expect(backlog(p)).toContain("- **Blockers:** `[dependency]` needs Task 4\n");
+    expect((await status()).blocked.at(-1)).toMatchObject({ number: 3, tag: "dependency", reason: "needs Task 4" });
+
+    // unblock a mano
+    expect((await exec(["unblock", "3", "--apply"], p)).code).toBe(0);
+    let state = await status();
+    expect(numbers(state.free)).toContain(3);
+    expect(numbers(state.blocked)).not.toContain(3);
+
+    // y la desbloquea close al cerrar la tarea de la que depende
+    await exec(["block", "3", "--tag", "dependency", "--reason", "needs Task 4", "--apply"], p);
+    expect(numbers((await status()).blocked)).toContain(3);
+    await exec(["start", "4", "--apply"], p);
+    const closed = await exec(["close", "--done", "--summary", "Translated.", "--apply"], p);
+    expect(closed.code).toBe(0);
+    expect(closed.out).toContain("- Task 3 — Publish the glossary");
+    state = await status();
+    expect(numbers(state.free)).toContain(3);
+    expect(numbers(state.blocked)).not.toContain(3);
+  });
+
+  test("--tag con los valores en español (o inventados) es un error de uso y no escribe nada", async () => {
+    const p = project({ folders: ["gersom"], ...IDLE });
+    const before = snapshot(p.root);
+    for (const value of ["dependencia", "postergada", "[dependencia]", "urgente"]) {
+      const { code, err } = await exec(["block", "1", "--tag", value, "--reason", "x", "--apply"], p);
+      expect(code).toBe(2);
+      expect(err).toContain("`dependency` o `postponed`");
+    }
+    const spanish = await exec(["block", "1", "--tag", "dependencia", "--reason", "x", "--apply"], p);
+    expect(spanish.err).toContain("los valores en español ya no valen");
+    expect(snapshot(p.root)).toEqual(before);
+  });
+
+  test("los flags en español (--motivo) son desconocidos: código 2 y no se escribe nada", async () => {
+    const p = project({ folders: ["gersom"], ...IDLE });
+    const before = snapshot(p.root);
+    const { code, err } = await exec(["block", "1", "--tag", "dependency", "--motivo", "x", "--apply"], p);
+    expect(code).toBe(2);
+    expect(err).toContain("Flag desconocido: --motivo.");
+    expect(snapshot(p.root)).toEqual(before);
+  });
+
   test("un proyecto en inglés y CRLF", async () => {
     const crlf = (text: string) => text.replace(/\n/g, "\r\n");
     const p = project({ folders: ["gersom"], contents: { "handoff.md": crlf(HANDOFF_IDLE_EN), "backlog.md": crlf(BACKLOG_EN), "history.md": crlf(HISTORY_EN) } });
-    expect((await exec(["block", "4", "--tag", "dependency", "--motivo", "needs Task 5", "--apply"], p)).code).toBe(0);
+    expect((await exec(["block", "4", "--tag", "dependency", "--reason", "needs Task 5", "--apply"], p)).code).toBe(0);
     const text = backlog(p);
     expect(text.replace(/\r\n/g, "")).not.toContain("\n");
     expect(text).toContain("## Free tasks\r\n\r\nNone.\r\n");
@@ -198,7 +275,7 @@ describe("unblock", () => {
 
   test("block + unblock: ida y vuelta (el historial queda como `Resuelto`)", async () => {
     const p = project({ folders: ["gersom"], ...IDLE });
-    await exec(["block", "1", "--tag", "dependencia", "--motivo", "depende de la Tarea 11", "--apply"], p);
+    await exec(["block", "1", "--tag", "dependency", "--reason", "depende de la Tarea 11", "--apply"], p);
     await exec(["unblock", "1", "--apply"], p);
     expect(backlog(p)).toContain("### Tarea 1 — Probar el flujo completo\n\n- **Descripción:** CUERPO-1\n- **Bloqueos:** `[Resuelto el 2026-10-07]` — era `[dependencia]` depende de la Tarea 11\n");
     const state = JSON.parse((await exec(["status", "--json"], p)).out);

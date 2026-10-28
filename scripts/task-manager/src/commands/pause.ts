@@ -22,21 +22,21 @@ import { headerLabels } from "../write/samples.ts";
 export const pause: Command = {
   name: "pause",
   summary: "Pasa la tarea en curso a «Tareas pausadas» y deja «Sin tarea en curso»; escribe con --apply",
-  usage: "pause --motivo <texto> --espera <texto> [--falta <texto>] [--decisiones <texto>] [--proximo <texto>] [--json] [--apply]",
+  usage: "pause --reason <texto> --waiting-for <texto> [--missing <texto>] [--decisions <texto>] [--next <texto>] [--json] [--apply]",
   writes: true,
   flags: {
-    motivo: { type: "string", valueName: "texto", stdin: true, description: "Por qué se pausó. Obligatorio." },
-    espera: { type: "string", valueName: "texto", stdin: true, description: "Qué espera para retomarse. Obligatorio." },
-    falta: { type: "string", valueName: "texto", stdin: true, description: "Reemplaza el texto de «Qué falta» al pausar." },
-    decisiones: { type: "string", valueName: "texto", stdin: true, description: "Reemplaza el texto de «Decisiones a medio camino» al pausar." },
-    proximo: { type: "string", valueName: "texto", stdin: true, description: "Reemplaza el texto de «Próximo paso concreto» al pausar." },
+    reason: { type: "string", valueName: "texto", stdin: true, description: "Por qué se pausó. Obligatorio." },
+    "waiting-for": { type: "string", valueName: "texto", stdin: true, description: "Qué espera para retomarse. Obligatorio." },
+    missing: { type: "string", valueName: "texto", stdin: true, description: "Reemplaza el texto de «Qué falta» al pausar." },
+    decisions: { type: "string", valueName: "texto", stdin: true, description: "Reemplaza el texto de «Decisiones a medio camino» al pausar." },
+    next: { type: "string", valueName: "texto", stdin: true, description: "Reemplaza el texto de «Próximo paso concreto» al pausar." },
     json: JSON_FLAG,
   },
   run(ctx) {
     const { flags, io } = ctx;
     if (ctx.args.length) throw new UsageError("`pause` no lleva argumentos: pausa la tarea en curso (solo hay una).");
-    const why = requiredFlag(flags, "motivo");
-    const waits = requiredFlag(flags, "espera");
+    const why = requiredFlag(flags, "reason");
+    const waits = requiredFlag(flags, "waiting-for");
     const ws = ctx.workspace();
     requireOwnFolder(ws);
     const docs = ctx.docs();
@@ -61,9 +61,9 @@ export const pause: Command = {
     if (current.planLines) fields.push(`- **${S.plan}:**\n${current.planLines.map((line) => `  ${line}`).join("\n")}`);
     if (current.mode) fields.push(renderField(S.mode, current.mode));
     for (const [label, value] of [
-      [S.missing, override("falta", current.missing)],
-      [S.decisions, override("decisiones", current.decisions)],
-      [S.next, override("proximo", current.next)],
+      [S.missing, override("missing", current.missing)],
+      [S.decisions, override("decisions", current.decisions)],
+      [S.next, override("next", current.next)],
       [S.why, why],
       [S.waits, waits],
     ] as const) {

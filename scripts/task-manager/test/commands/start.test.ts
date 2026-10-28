@@ -112,7 +112,7 @@ describe("start <N>", () => {
 
   test("con plan por stdin y modo: un paso por línea, el paso de cierre al final y el modo", async () => {
     const p = project({ folders: ["gersom"], ...IDLE });
-    await exec(["start", "T-3", "--plan", "-", "--modo", "uno a la vez, con confirmación", "--apply"], p, {
+    await exec(["start", "T-3", "--plan", "-", "--mode", "uno a la vez, con confirmación", "--apply"], p, {
       stdin: "Paso 1 — Escribir\n- [ ] Paso 2 — Probar\n\nPaso 3 — Cerrar\n",
     });
     const handoff = read(p, "gersom", "handoff.md");
@@ -252,9 +252,9 @@ describe("start <N>", () => {
       expect(other.err).toContain("de otro operador");
     });
 
-    test("--modo sin --plan, o un plan sin pasos", async () => {
+    test("--mode sin --plan, o un plan sin pasos", async () => {
       const p = project({ folders: ["gersom"], ...IDLE });
-      expect((await exec(["start", "1", "--modo", "seguidos", "--apply"], p)).err).toContain("--modo solo tiene sentido con --plan");
+      expect((await exec(["start", "1", "--mode", "seguidos", "--apply"], p)).err).toContain("--mode solo tiene sentido con --plan");
       expect((await exec(["start", "1", "--plan", "-", "--apply"], p, { stdin: "- [ ] \n\n" })).err).toContain("--plan no trae ningún paso");
     });
 
@@ -398,7 +398,7 @@ describe("start --team", () => {
 
   test("con plan y modo", async () => {
     const p = project({ folders: ["gersom"], ...IDLE });
-    await exec(["start", "--team", "Revisar el copy", "--plan", "Paso 1 — leer", "--modo", "seguidos", "--apply"], p);
+    await exec(["start", "--team", "Revisar el copy", "--plan", "Paso 1 — leer", "--mode", "seguidos", "--apply"], p);
     const handoff = read(p, "gersom", "handoff.md");
     expect(handoff).toContain("Tarea 20 — Revisar el copy del onboarding\n\nCUERPO-TEAM-1\n\n- **Origen:** team-backlog\n\n### Plan\n\n- [ ] Paso 1 — leer\n- [ ] Documentar cierre de tarea\n\n**Modo de ejecución acordado:** seguidos\n");
   });
@@ -476,5 +476,16 @@ describe("start --team", () => {
     expect(cap.err.join("\n")).toContain("No se escribió ningún archivo");
     expect(read(p, "gersom", "handoff.md")).toBe(HANDOFF_IDLE);
     expect(read(p, "gersom", "backlog.md")).toBe(BACKLOG_RICH);
+  });
+});
+
+describe("flags en español", () => {
+  test("--modo es desconocido: código 2 y no se escribe nada", async () => {
+    const p = project({ folders: ["gersom"], ...IDLE });
+    const before = snapshot(p.root);
+    const { code, err } = await exec(["start", "1", "--plan", "-", "--modo", "uno a la vez", "--apply"], p, { stdin: "Paso 1" });
+    expect(code).toBe(2);
+    expect(err).toContain("Flag desconocido: --modo.");
+    expect(snapshot(p.root)).toEqual(before);
   });
 });

@@ -31,7 +31,7 @@ const IDLE = { contents: { "handoff.md": HANDOFF_IDLE, "backlog.md": BACKLOG_RIC
 const handoff = (p: Project) => readIn(p, "gersom", "handoff.md");
 const backlog = (p: Project) => readIn(p, "gersom", "backlog.md");
 const history = (p: Project) => readIn(p, "gersom", "history.md");
-const DONE = ["close", "--done", "--resumen", "Se hizo lo pedido."];
+const DONE = ["close", "--done", "--summary", "Se hizo lo pedido."];
 
 /** Proyecto con una tarea libre ya empezada (con un plan de un paso, ya marcado). */
 async function started(task = "1"): Promise<Project> {
@@ -103,13 +103,13 @@ describe("close --done", () => {
 
   test("el resumen en varias líneas son viñetas; las que ya lo son se conservan", async () => {
     const p = await started();
-    await exec(["close", "--done", "--resumen", "Qué se hizo.\n- Ya viñeta\n  - Sub\nPor qué.", "--apply"], p);
+    await exec(["close", "--done", "--summary", "Qué se hizo.\n- Ya viñeta\n  - Sub\nPor qué.", "--apply"], p);
     expect(history(p)).toContain("## 2026-10-07 — ✅ Tarea 1 — Probar el flujo completo\n\n- Qué se hizo.\n- Ya viñeta\n  - Sub\n- Por qué.\n\n## 2026-10-07 — ✅ Tarea 11");
   });
 
   test("el resumen puede venir por la entrada estándar", async () => {
     const p = await started();
-    await exec(["close", "--done", "--resumen", "-", "--apply"], p, { stdin: "Largo\nen dos líneas" });
+    await exec(["close", "--done", "--summary", "-", "--apply"], p, { stdin: "Largo\nen dos líneas" });
     expect(history(p)).toContain("- Largo\n- en dos líneas\n");
   });
 
@@ -124,7 +124,7 @@ describe("close --done", () => {
 describe("close --discarded", () => {
   test("entrada ❌ con el motivo; el reporte lo trae breve (su primera línea)", async () => {
     const p = await started();
-    const { out } = await exec(["close", "--discarded", "--motivo", "Ya no hace falta.\nLo cubre la Tarea 15.", "--apply"], p);
+    const { out } = await exec(["close", "--discarded", "--reason", "Ya no hace falta.\nLo cubre la Tarea 15.", "--apply"], p);
     expect(out).toContain("Tarea 1 cerrada (descartada)");
     expect(out).toContain("**Tareas descartadas:**\n- Tarea 1 — Probar el flujo completo — Ya no hace falta.\n");
     expect(out).not.toContain("**Tareas resueltas:**");
@@ -136,7 +136,7 @@ describe("close --discarded", () => {
   test("un motivo largo se recorta en el reporte, pero entero en history.md", async () => {
     const p = await started();
     const reason = `${"palabra ".repeat(40)}final`;
-    const { out } = await exec(["close", "--discarded", "--motivo", reason, "--apply"], p);
+    const { out } = await exec(["close", "--discarded", "--reason", reason, "--apply"], p);
     const line = out.split("\n").find((l) => l.startsWith("- Tarea 1 — "))!;
     expect(line.endsWith("…")).toBe(true);
     expect(line.length).toBeLessThan(190);
@@ -144,10 +144,10 @@ describe("close --discarded", () => {
   });
 });
 
-describe("--nueva", () => {
+describe("--new", () => {
   test("agrega tareas nuevas a «libres» con los números de «Próximo número de tarea» (que pasa a N+k) y las reporta", async () => {
     const p = await started();
-    const { out } = await exec([...DONE, "--nueva", "Revisar el README", "--nueva", "Probar en Linux", "--apply"], p);
+    const { out } = await exec([...DONE, "--new", "Revisar el README", "--new", "Probar en Linux", "--apply"], p);
     expect(out).toContain("**Tareas nuevas:**\n- Tarea 20 — Revisar el README\n- Tarea 21 — Probar en Linux");
     const text = backlog(p);
     expect(text).toContain("**Próximo número de tarea:** 22");
@@ -162,14 +162,14 @@ describe("--nueva", () => {
   test("un título vacío o de varias líneas es un error de uso", async () => {
     const p = await started();
     const before = snapshot(p.root);
-    expect((await exec([...DONE, "--nueva", "  ", "--apply"], p)).code).toBe(2);
-    expect((await exec([...DONE, "--nueva", "a\nb", "--apply"], p)).code).toBe(2);
+    expect((await exec([...DONE, "--new", "  ", "--apply"], p)).code).toBe(2);
+    expect((await exec([...DONE, "--new", "a\nb", "--apply"], p)).code).toBe(2);
     expect(snapshot(p.root)).toEqual(before);
   });
 
   test("avisa si «Tareas libres» queda con más de 15 tareas, sin agrupar", async () => {
     const p = await started();
-    const titles = Array.from({ length: 10 }, (_, i) => ["--nueva", `Tarea extra ${i + 1}`]).flat();
+    const titles = Array.from({ length: 10 }, (_, i) => ["--new", `Tarea extra ${i + 1}`]).flat();
     const { out } = await exec([...DONE, ...titles, "--apply"], p);
     // 4 libres tras empezar la 1 (incluidas las 2 del grupo) + 2 desbloqueadas (6 y 16) + 10 nuevas.
     expect(out).toContain("Aviso: «Tareas libres» queda con 16 tareas (más de 15): evalúa agruparlas (Agrupamiento en backlog.md, Regla 8). No agrupo automáticamente.");
@@ -194,8 +194,8 @@ describe("Origen: team-backlog", () => {
   test("una pausada con `Origen` también lo conserva", async () => {
     const p = project({ folders: ["gersom"], ...IDLE });
     await exec(["start", "--team", "Migrar el CI", "--apply"], p);
-    await exec(["pause", "--motivo", "Otra prioridad.", "--espera", "Nada.", "--apply"], p);
-    await exec(["close", "20", "--discarded", "--motivo", "Se hace en otro repo.", "--apply"], p);
+    await exec(["pause", "--reason", "Otra prioridad.", "--waiting-for", "Nada.", "--apply"], p);
+    await exec(["close", "20", "--discarded", "--reason", "Se hace en otro repo.", "--apply"], p);
     expect(history(p)).toContain("## 2026-10-07 — ❌ Tarea 20 — Migrar el CI\n\n- **Origen:** team-backlog\n- Se hace en otro repo.");
   });
 });
@@ -204,13 +204,13 @@ describe("cerrar una pausada", () => {
   async function paused(): Promise<Project> {
     const p = project({ folders: ["gersom"], ...IDLE });
     await exec(["start", "1", "--apply"], p);
-    await exec(["pause", "--motivo", "Otra prioridad.", "--espera", "Nada.", "--apply"], p);
+    await exec(["pause", "--reason", "Otra prioridad.", "--waiting-for", "Nada.", "--apply"], p);
     return p;
   }
 
   test("`close <N>` saca su bloque de «Tareas pausadas» (las demás pausadas quedan) y no toca «Tarea en progreso»", async () => {
     const p = await paused();
-    const { code, out } = await exec(["close", "1", "--done", "--resumen", "Hecha.", "--apply"], p);
+    const { code, out } = await exec(["close", "1", "--done", "--summary", "Hecha.", "--apply"], p);
     expect(code).toBe(0);
     expect(out).toContain("**Tareas resueltas:**\n- Tarea 1 — Probar el flujo completo");
     const text = handoff(p);
@@ -233,13 +233,13 @@ describe("cerrar una pausada", () => {
     const p = await paused();
     await exec(["start", "3", "--apply"], p);
     const inProgress = handoff(p).slice(handoff(p).indexOf("## Tarea en progreso"), handoff(p).indexOf("<!-- agent-context-skill:section=paused -->"));
-    expect((await exec(["close", "1", "--done", "--resumen", "Hecha.", "--apply"], p)).code).toBe(0);
+    expect((await exec(["close", "1", "--done", "--summary", "Hecha.", "--apply"], p)).code).toBe(0);
     expect(handoff(p)).toContain(inProgress);
   });
 });
 
 describe("descartar una tarea sin empezar (libre o bloqueada)", () => {
-  const DISCARD = (n: string, ...more: string[]) => ["close", n, "--discarded", "--motivo", "Ya no hace falta.", ...more, "--apply"];
+  const DISCARD = (n: string, ...more: string[]) => ["close", n, "--discarded", "--reason", "Ya no hace falta.", ...more, "--apply"];
 
   test("una libre: entrada ❌ en history, bloque fuera de «libres», handoff intacto", async () => {
     const p = project({ folders: ["gersom"], ...IDLE });
@@ -304,9 +304,9 @@ describe("descartar una tarea sin empezar (libre o bloqueada)", () => {
     expect(snapshot(p.root)).toEqual(before);
   });
 
-  test("--nueva con la descartada en «libres» (la última): las nuevas ocupan su lugar, sin ediciones solapadas", async () => {
+  test("--new con la descartada en «libres» (la última): las nuevas ocupan su lugar, sin ediciones solapadas", async () => {
     const p = project({ folders: ["gersom"], ...IDLE });
-    const { code, err, out } = await exec(DISCARD("18", "--nueva", "Revisar el README"), p);
+    const { code, err, out } = await exec(DISCARD("18", "--new", "Revisar el README"), p);
     expect(err).toBe("");
     expect(code).toBe(0);
     expect(out).toContain("**Tareas nuevas:**\n- Tarea 20 — Revisar el README");
@@ -319,9 +319,9 @@ describe("descartar una tarea sin empezar (libre o bloqueada)", () => {
     expect((await exec(["anchors"], p)).code).toBe(0);
   });
 
-  test("--nueva con la descartada en «libres» que no es la última: se borra y las nuevas van al final", async () => {
+  test("--new con la descartada en «libres» que no es la última: se borra y las nuevas van al final", async () => {
     const p = project({ folders: ["gersom"], ...IDLE });
-    const { code, err } = await exec(DISCARD("1", "--nueva", "Una nueva"), p);
+    const { code, err } = await exec(DISCARD("1", "--new", "Una nueva"), p);
     expect(err).toBe("");
     expect(code).toBe(0);
     const text = backlog(p);
@@ -334,9 +334,9 @@ describe("descartar una tarea sin empezar (libre o bloqueada)", () => {
     expect((await exec(["anchors"], p)).code).toBe(0);
   });
 
-  test("la única libre con --nueva: la nueva reemplaza a la descartada", async () => {
+  test("la única libre con --new: la nueva reemplaza a la descartada", async () => {
     const p = project({ folders: ["gersom"], contents: { "handoff.md": HANDOFF_EMPTY, "backlog.md": BACKLOG_ONE, "history.md": "# History\n" } });
-    const { code, err } = await exec(DISCARD("7", "--nueva", "Otra"), p);
+    const { code, err } = await exec(DISCARD("7", "--new", "Otra"), p);
     expect(err).toBe("");
     expect(code).toBe(0);
     const text = backlog(p);
@@ -349,7 +349,7 @@ describe("descartar una tarea sin empezar (libre o bloqueada)", () => {
     const p = project({ folders: ["gersom"], ...IDLE });
     const before = snapshot(p.root);
     for (const n of ["18", "17"]) {
-      const { code, err } = await exec(["close", n, "--done", "--resumen", "x", "--apply"], p);
+      const { code, err } = await exec(["close", n, "--done", "--summary", "x", "--apply"], p);
       expect(code).toBe(1);
       expect(err).toContain("una tarea sin empezar no se puede dar por hecha");
       expect(err).toContain(`start ${n}`);
@@ -374,12 +374,12 @@ describe("descartar una tarea sin empezar (libre o bloqueada)", () => {
     expect(snapshot(p.root)).toEqual(before);
   });
 
-  test("falta --motivo: error de uso", async () => {
+  test("falta --reason: error de uso", async () => {
     const p = project({ folders: ["gersom"], ...IDLE });
     const before = snapshot(p.root);
     const { code, err } = await exec(["close", "18", "--discarded", "--apply"], p);
     expect(code).toBe(2);
-    expect(err).toContain("Falta --motivo");
+    expect(err).toContain("Falta --reason");
     expect(snapshot(p.root)).toEqual(before);
   });
 
@@ -395,12 +395,12 @@ describe("errores: no se escribe nada", () => {
   test("hay que indicar exactamente uno de --done y --discarded, con su texto", async () => {
     const p = await started();
     const before = snapshot(p.root);
-    expect((await exec(["close", "--resumen", "x", "--apply"], p)).code).toBe(2);
-    expect((await exec(["close", "--done", "--discarded", "--resumen", "x", "--apply"], p)).code).toBe(2);
-    expect((await exec(["close", "--done", "--apply"], p)).err).toContain("Falta --resumen");
-    expect((await exec(["close", "--discarded", "--apply"], p)).err).toContain("Falta --motivo");
-    expect((await exec(["close", "--done", "--resumen", "x", "--motivo", "y", "--apply"], p)).err).toContain("--motivo es de --discarded");
-    expect((await exec(["close", "--discarded", "--motivo", "x", "--resumen", "y", "--apply"], p)).err).toContain("--resumen es de --done");
+    expect((await exec(["close", "--summary", "x", "--apply"], p)).code).toBe(2);
+    expect((await exec(["close", "--done", "--discarded", "--summary", "x", "--apply"], p)).code).toBe(2);
+    expect((await exec(["close", "--done", "--apply"], p)).err).toContain("Falta --summary");
+    expect((await exec(["close", "--discarded", "--apply"], p)).err).toContain("Falta --reason");
+    expect((await exec(["close", "--done", "--summary", "x", "--reason", "y", "--apply"], p)).err).toContain("--reason es de --discarded");
+    expect((await exec(["close", "--discarded", "--reason", "x", "--summary", "y", "--apply"], p)).err).toContain("--summary es de --done");
     expect((await exec([...DONE, "1", "2", "--apply"], p)).code).toBe(2);
     expect((await exec([...DONE, "Un título", "--apply"], p)).code).toBe(2);
     expect(snapshot(p.root)).toEqual(before);
@@ -431,10 +431,10 @@ describe("errores: no se escribe nada", () => {
   test("`close <N>` de una tarea que no se empezó (con --done), cerrada, o inexistente", async () => {
     const p = await started();
     const before = snapshot(p.root);
-    expect((await exec(["close", "18", "--done", "--resumen", "x", "--apply"], p)).err).toContain("una tarea sin empezar no se puede dar por hecha");
-    expect((await exec(["close", "11", "--done", "--resumen", "x", "--apply"], p)).err).toContain("ya figura cerrada");
-    expect((await exec(["close", "99", "--done", "--resumen", "x", "--apply"], p)).err).toContain("No existe la Tarea 99");
-    expect((await exec(["close", "1@ana", "--done", "--resumen", "x", "--apply"], p)).err).toContain("de otro operador");
+    expect((await exec(["close", "18", "--done", "--summary", "x", "--apply"], p)).err).toContain("una tarea sin empezar no se puede dar por hecha");
+    expect((await exec(["close", "11", "--done", "--summary", "x", "--apply"], p)).err).toContain("ya figura cerrada");
+    expect((await exec(["close", "99", "--done", "--summary", "x", "--apply"], p)).err).toContain("No existe la Tarea 99");
+    expect((await exec(["close", "1@ana", "--done", "--summary", "x", "--apply"], p)).err).toContain("de otro operador");
     expect(snapshot(p.root)).toEqual(before);
   });
 
@@ -489,7 +489,7 @@ describe("la tarea cerrada sigue en backlog.md", () => {
   test("y hay que agregar tareas a «libres» en la misma operación: error claro, sin escribir", async () => {
     const p = await leftover(BACKLOG_ONE);
     const before = snapshot(p.root);
-    const { code, err } = await exec([...DONE, "--nueva", "Otra", "--apply"], p);
+    const { code, err } = await exec([...DONE, "--new", "Otra", "--apply"], p);
     expect(code).toBe(1);
     expect(err).toContain("sigue en «Tareas libres» de backlog.md");
     expect(snapshot(p.root)).toEqual(before);
@@ -533,9 +533,9 @@ describe("la tarea cerrada sigue en backlog.md", () => {
 describe("--json", () => {
   test("sin --apply: lo pendiente; con --apply: el reporte estructurado", async () => {
     const p = await started("3");
-    const pending = JSON.parse((await exec([...DONE, "--nueva", "Algo", "--json"], p)).out);
+    const pending = JSON.parse((await exec([...DONE, "--new", "Algo", "--json"], p)).out);
     expect(pending).toMatchObject({ command: "close", applied: false, pending: true, task: { number: 3, outcome: "done", from: "current" } });
-    const applied = JSON.parse((await exec([...DONE, "--nueva", "Algo", "--json", "--apply"], p)).out);
+    const applied = JSON.parse((await exec([...DONE, "--new", "Algo", "--json", "--apply"], p)).out);
     expect(applied).toMatchObject({
       applied: true,
       task: { number: 3, title: "Exportar como skill", outcome: "done", date: "2026-10-07", origin: null },
@@ -558,7 +558,7 @@ describe("--json", () => {
 
   test("descartada: el motivo breve va en el reporte", async () => {
     const p = await started();
-    const out = JSON.parse((await exec(["close", "--discarded", "--motivo", "No hace falta.", "--json", "--apply"], p)).out);
+    const out = JSON.parse((await exec(["close", "--discarded", "--reason", "No hace falta.", "--json", "--apply"], p)).out);
     expect(out.report.discarded).toEqual([{ number: 1, title: "Probar el flujo completo", reason: "No hace falta." }]);
     expect(out.report.resolved).toEqual([]);
   });
@@ -569,7 +569,7 @@ describe("proyecto en inglés y CRLF", () => {
     const crlf = (text: string) => text.replace(/\n/g, "\r\n");
     const p = project({ folders: ["gersom"], contents: { "handoff.md": crlf(HANDOFF_IDLE_EN), "backlog.md": crlf(BACKLOG_EN), "history.md": crlf(HISTORY_EN) } });
     await exec(["start", "4", "--apply"], p);
-    const { code, out } = await exec(["close", "--done", "--resumen", "Translated.", "--nueva", "Review it", "--apply"], p);
+    const { code, out } = await exec(["close", "--done", "--summary", "Translated.", "--new", "Review it", "--apply"], p);
     expect(code).toBe(0);
     expect(out).toContain("**Resolved tasks:**\n- Task 4 — Translate the glossary");
     expect(out).toContain("**New tasks:**\n- Task 6 — Review it");
@@ -578,5 +578,22 @@ describe("proyecto en inglés y CRLF", () => {
     expect(text).toContain("## 2026-10-07 — ✅ Task 4 — Translate the glossary\r\n\r\n- Translated.\r\n\r\n## 2026-10-02 — ✅ Task 5");
     expect(backlog(p)).toContain("### Task 6 — Review it\r\n\r\n- **Description:** Raised when closing Task 4; still to be detailed.\r\n");
     expect(handoff(p)).toContain("No task in progress");
+  });
+});
+
+describe("flags en español", () => {
+  test("--resumen, --motivo y --nueva son desconocidos: código 2 y no se escribe nada", async () => {
+    const p = project({ folders: ["gersom"], ...IDLE });
+    const before = snapshot(p.root);
+    for (const argv of [
+      ["close", "--done", "--resumen", "x"],
+      ["close", "--discarded", "--motivo", "x"],
+      ["close", "--done", "--summary", "x", "--nueva", "Otra"],
+    ]) {
+      const { code, err } = await exec([...argv, "--apply"], p);
+      expect(code).toBe(2);
+      expect(err).toMatch(/Flag desconocido: --(resumen|motivo|nueva)\./);
+    }
+    expect(snapshot(p.root)).toEqual(before);
   });
 });

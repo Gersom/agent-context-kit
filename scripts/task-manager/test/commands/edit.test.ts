@@ -249,6 +249,30 @@ describe("edit — backlog propio", () => {
       expect(snapshot(p.root)).toEqual(before);
     });
 
+    test("los mensajes de --blocker citan los tags del idioma del archivo", async () => {
+      const es = project({ folders: ["gersom"], ...RICH });
+      expect((await exec(["edit", "1", "--blocker=[algo] x", "--apply"], es)).err).toContain("solo valen `[dependencia]`/`[postergada]`");
+      expect((await exec(["edit", "6", "--blocker=[algo] x", "--apply"], es)).err).toContain("solo valen `[dependencia]`/`[postergada]`");
+      const en = project({ folders: ["gersom"], contents: { "handoff.md": HANDOFF_IDLE_EN, "backlog.md": BACKLOG_EN, "history.md": HISTORY_EN } });
+      expect((await exec(["edit", "4", "--blocker=[something] x", "--apply"], en)).err).toContain("solo valen `[dependency]`/`[postponed]`");
+    });
+
+    test("los mensajes de una bloqueada («no es … ni …», «o …») citan los tags del idioma del archivo", async () => {
+      const blockedEn = BACKLOG_EN.replace(
+        "## Blocked / postponed tasks\n\nNone.\n",
+        "## Blocked / postponed tasks\n\n### Task 1 — Wait for the API\n\n- **Description:** needs the API.\n- **Blockers:** `[dependency]` needs Task 9.\n- **Trigger:** when the API ships.\n- **Added:** 2026-10-01.\n\n### Task 2 — Already resolved\n\n- **Description:** was blocked.\n- **Blockers:** `[Resolved on 2026-10-01]` — was `[dependency]` Task 9.\n- **Trigger:** any time.\n- **Added:** 2026-10-01.\n",
+      );
+      const en = project({ folders: ["gersom"], contents: { "handoff.md": HANDOFF_IDLE_EN, "backlog.md": blockedEn, "history.md": HISTORY_EN } });
+      const before = snapshot(en.root);
+      const unblocking = await exec(["edit", "1", "--blocker", "`[Resolved on 2026-10-02]` done", "--apply"], en);
+      expect(unblocking.code).toBe(1);
+      expect(unblocking.err).toContain("empieza con un tag que no es `[dependency]` ni `[postponed]`");
+      const noTag = await exec(["edit", "2", "--blocker", "a reason without tag", "--apply"], en);
+      expect(noTag.code).toBe(1);
+      expect(noTag.err).toContain("escribe el valor con `[dependency]` o `[postponed]` al inicio");
+      expect(snapshot(en.root)).toEqual(before);
+    });
+
     test("un corchete inicial que no es tag de bloqueo se rechaza (se leería como tag de la tarea)", async () => {
       const p = project({ folders: ["gersom"], ...RICH });
       const before = snapshot(p.root);

@@ -27,12 +27,12 @@ afterAll(() => projects.forEach((p) => p.cleanup()));
 
 const IDLE = { contents: { "handoff.md": HANDOFF_IDLE, "backlog.md": BACKLOG_RICH, "history.md": HISTORY_RICH }, teamBacklogText: TEAM_RICH };
 const handoff = (p: Project) => readIn(p, "gersom", "handoff.md");
-const PAUSE = ["pause", "--motivo", "Prioridad más alta.", "--espera", "Que termine la Tarea 2."];
+const PAUSE = ["pause", "--reason", "Prioridad más alta.", "--waiting-for", "Que termine la Tarea 2."];
 
 /** Proyecto con la Tarea 1 en curso, con plan y el paso 1 hecho. */
 async function started(extra: string[] = []): Promise<Project> {
   const p = project({ folders: ["gersom"], ...IDLE });
-  await exec(["start", "1", "--plan", "-", "--modo", "uno a la vez", ...extra, "--apply"], p, { stdin: "Paso 1 — Escribir\nPaso 2 — Probar" });
+  await exec(["start", "1", "--plan", "-", "--mode", "uno a la vez", ...extra, "--apply"], p, { stdin: "Paso 1 — Escribir\nPaso 2 — Probar" });
   await exec(["step", "1", "--apply"], p);
   return p;
 }
@@ -90,9 +90,9 @@ describe("pause", () => {
     expect(readIn(p, "gersom", "backlog.md")).toBe(BACKLOG_RICH.replace(/### Tarea 1 — [^]*?\n\n(?=### Grupo)/, ""));
   });
 
-  test("--falta, --decisiones y --proximo reemplazan lo que se guarda en el bloque", async () => {
+  test("--missing, --decisions y --next reemplazan lo que se guarda en el bloque", async () => {
     const p = await started();
-    await exec([...PAUSE, "--falta", "Casi todo.", "--decisiones", "Usar A.", "--proximo", "Llamar a Ana.", "--apply"], p);
+    await exec([...PAUSE, "--missing", "Casi todo.", "--decisions", "Usar A.", "--next", "Llamar a Ana.", "--apply"], p);
     const text = handoff(p);
     expect(text).toContain("- **Qué falta:** Casi todo.\n- **Decisiones a medio camino:** Usar A.\n- **Próximo paso concreto:** Llamar a Ana.\n- **Por qué se pausó:**");
   });
@@ -125,11 +125,11 @@ describe("pause", () => {
   });
 
   describe("errores: no se escribe nada", () => {
-    test("faltan --motivo o --espera, o se pasan argumentos", async () => {
+    test("faltan --reason o --waiting-for, o se pasan argumentos", async () => {
       const p = await started();
       const before = snapshot(p.root);
-      expect((await exec(["pause", "--espera", "x", "--apply"], p)).code).toBe(2);
-      expect((await exec(["pause", "--motivo", "x", "--apply"], p)).code).toBe(2);
+      expect((await exec(["pause", "--waiting-for", "x", "--apply"], p)).code).toBe(2);
+      expect((await exec(["pause", "--reason", "x", "--apply"], p)).code).toBe(2);
       expect((await exec([...PAUSE, "1", "--apply"], p)).code).toBe(2);
       expect(snapshot(p.root)).toEqual(before);
     });
@@ -188,7 +188,7 @@ describe("resume", () => {
   test("la evidencia al final de la línea de un paso (checks y commit) sobrevive a pause, resume y step", async () => {
     const p = project({ folders: ["gersom"], ...IDLE });
     const evidence = "Paso 1 — Escribir · bun test 779 pass · commit abc1234";
-    await exec(["start", "1", "--plan", "-", "--modo", "uno a la vez", "--apply"], p, { stdin: `${evidence}\nPaso 2 — Probar` });
+    await exec(["start", "1", "--plan", "-", "--mode", "uno a la vez", "--apply"], p, { stdin: `${evidence}\nPaso 2 — Probar` });
     await exec(["step", "escribir", "--apply"], p);
     expect(handoff(p)).toContain(`- [x] ${evidence}`);
     const before = handoff(p);
@@ -278,7 +278,7 @@ describe("resume", () => {
     const p = project({ folders: ["gersom"], contents: { "handoff.md": HANDOFF_IDLE_EN, "backlog.md": BACKLOG_EN, "history.md": HISTORY_EN } });
     await exec(["start", "4", "--plan", "-", "--apply"], p, { stdin: "Step 1 — write" });
     const before = handoff(p);
-    await exec(["pause", "--motivo", "Blocked by review.", "--espera", "The review.", "--apply"], p);
+    await exec(["pause", "--reason", "Blocked by review.", "--waiting-for", "The review.", "--apply"], p);
     expect(handoff(p)).toContain("- **Why it was paused:** Blocked by review.\n- **What it is waiting for:** The review.");
     expect(handoff(p)).toContain("## Paused tasks\n\n### Task 4 — Translate the glossary");
     expect((await exec(["resume", "4", "--apply"], p)).code).toBe(0);
@@ -294,5 +294,19 @@ describe("resume", () => {
     expect(handoff(p).replace(/\r\n/g, "")).not.toContain("\n");
     expect((await exec(["resume", "1", "--apply"], p)).code).toBe(0);
     expect(handoff(p)).toBe(before);
+  });
+});
+
+describe("flags en español", () => {
+  test("--motivo, --espera, --falta, --decisiones y --proximo son desconocidos: código 2 y no se escribe nada", async () => {
+    const p = await started();
+    const before = snapshot(p.root);
+    for (const old of ["--motivo", "--espera", "--falta", "--decisiones", "--proximo"]) {
+      const { code, err } = await exec([...PAUSE, old, "x", "--apply"], p);
+      expect(code).toBe(2);
+      expect(err).toContain(`Flag desconocido: ${old}.`);
+    }
+    expect((await exec(["pause", "--motivo", "x", "--espera", "y", "--apply"], p)).code).toBe(2);
+    expect(snapshot(p.root)).toEqual(before);
   });
 });

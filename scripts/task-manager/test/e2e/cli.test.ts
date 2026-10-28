@@ -89,13 +89,13 @@ describe("index.ts", () => {
     if (!hasGit) return;
     const backlog = join(project.agents, "ana", "backlog.md");
     const before = readFileSync(backlog, "utf8");
-    const preview = await runCli(["add", "--titulo", "Probar el e2e", "--descripcion", "Desde el proceso"]);
+    const preview = await runCli(["add", "--title", "Probar el e2e", "--description", "Desde el proceso"]);
     expect(preview.code).toBe(0);
     expect(preview.stdout).toContain("+### Tarea 20 — Probar el e2e");
     expect(preview.stdout).toContain("No se escribió nada; repite con --apply");
     expect(readFileSync(backlog, "utf8")).toBe(before);
 
-    const applied = await runCli(["add", "--titulo", "Probar el e2e", "--descripcion", "Desde el proceso", "--apply"]);
+    const applied = await runCli(["add", "--title", "Probar el e2e", "--description", "Desde el proceso", "--apply"]);
     expect(applied.code).toBe(0);
     expect(applied.stdout).toContain("Tarea 20 agregada");
     const after = readFileSync(backlog, "utf8");
@@ -103,7 +103,7 @@ describe("index.ts", () => {
     expect(after).toContain("**Próximo número de tarea:** 21");
 
     // la carpeta de otro operador es de solo lectura
-    const other = await runCli(["add", "--titulo", "X", "--descripcion", "Y", "--operator", "gersom", "--apply"]);
+    const other = await runCli(["add", "--title", "X", "--description", "Y", "--operator", "gersom", "--apply"]);
     expect(other.code).toBe(1);
     expect(other.stderr).toContain("«gersom» no es la tuya");
   });

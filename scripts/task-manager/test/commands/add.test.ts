@@ -67,7 +67,7 @@ describe("add — backlog propio", () => {
   test("sin --apply muestra el diff y no escribe nada", async () => {
     const p = project({ folders: ["gersom"], ...RICH });
     const before = snapshot(p.root);
-    const { code, out } = await exec(["add", "--titulo", "Nueva", "--descripcion", "Algo"], p);
+    const { code, out } = await exec(["add", "--title", "Nueva", "--description", "Algo"], p);
     expect(code).toBe(0);
     expect(out).toContain("+### Tarea 20 — Nueva");
     expect(out).toContain("-**Próximo número de tarea:** 20");
@@ -79,14 +79,14 @@ describe("add — backlog propio", () => {
   test("--dry-run + --apply tampoco escribe", async () => {
     const p = project({ folders: ["gersom"], ...RICH });
     const before = snapshot(p.root);
-    const { out } = await exec(["add", "--titulo", "Nueva", "--descripcion", "Algo", "--apply", "--dry-run"], p);
+    const { out } = await exec(["add", "--title", "Nueva", "--description", "Algo", "--apply", "--dry-run"], p);
     expect(out).toContain("--dry-run: no se escribió nada.");
     expect(snapshot(p.root)).toEqual(before);
   });
 
   test("libre: al final de «libres» con el espaciado del archivo, con los defaults de la plantilla y la fecha de hoy", async () => {
     const p = project({ folders: ["gersom"], ...RICH });
-    const { code, out } = await exec(["add", "--titulo", "Nueva tarea", "--descripcion", "Una descripción", "--apply"], p);
+    const { code, out } = await exec(["add", "--title", "Nueva tarea", "--description", "Una descripción", "--apply"], p);
     expect(code).toBe(0);
     expect(out).toBe("Tarea 20 agregada a «Tareas libres» de docs/agents/gersom/backlog.md (próximo número: 21).");
     const expected = BACKLOG_RICH.replace("**Próximo número de tarea:** 20", "**Próximo número de tarea:** 21").replace(
@@ -114,7 +114,7 @@ describe("add — backlog propio", () => {
   test("usa las etiquetas de las tareas que ya tiene el archivo y todos los campos opcionales", async () => {
     const p = project({ folders: ["gersom"], ...RICH });
     await exec(
-      ["add", "--titulo", "Completa", "--descripcion", "D", "--decisiones", "¿A o B?", "--disparador", "cuando haya tiempo", "--detalles", "Más contexto", "--apply"],
+      ["add", "--title", "Completa", "--description", "D", "--decisions", "¿A o B?", "--trigger", "cuando haya tiempo", "--details", "Más contexto", "--apply"],
       p,
     );
     const text = read(p, "gersom", "backlog.md");
@@ -125,7 +125,7 @@ describe("add — backlog propio", () => {
 
   test("con bloqueo `[dependencia]`/`[postergada]` va al final de «bloqueadas»", async () => {
     const p = project({ folders: ["gersom"], ...RICH });
-    const { out } = await exec(["add", "--titulo", "Bloqueada", "--descripcion", "D", "--bloqueo", "`[dependencia]` espera la Tarea 3", "--apply"], p);
+    const { out } = await exec(["add", "--title", "Bloqueada", "--description", "D", "--blocker", "`[dependencia]` espera la Tarea 3", "--apply"], p);
     expect(out).toContain("«Tareas bloqueadas / pospuestas»");
     const text = read(p, "gersom", "backlog.md");
     const blocked = text.slice(text.indexOf("section=blocked"), text.indexOf("section=grouped"));
@@ -137,8 +137,8 @@ describe("add — backlog propio", () => {
 
   test("un bloqueo sin tag conocido va a libres y avisa", async () => {
     const p = project({ folders: ["gersom"], ...RICH });
-    const { out } = await exec(["add", "--titulo", "T", "--descripcion", "D", "--bloqueo", "esperar al cliente", "--apply"], p);
-    expect(out).toContain("Aviso: --bloqueo no empieza con `[dependencia]` ni `[postergada]`");
+    const { out } = await exec(["add", "--title", "T", "--description", "D", "--blocker", "esperar al cliente", "--apply"], p);
+    expect(out).toContain("Aviso: --blocker no empieza con `[dependencia]` ni `[postergada]`");
     const text = read(p, "gersom", "backlog.md");
     expect(text.indexOf("### Tarea 20 — T")).toBeLessThan(text.indexOf("section=blocked"));
     expect(text).toContain("- **Bloqueos:** esperar al cliente");
@@ -146,14 +146,14 @@ describe("add — backlog propio", () => {
 
   test("sección vacía con «Ninguna.»: la tarea la reemplaza; el contador, N+1", async () => {
     const p = project(own(BACKLOG_EMPTY));
-    await exec(["add", "--titulo", "Primera", "--descripcion", "D", "--apply"], p);
+    await exec(["add", "--title", "Primera", "--description", "D", "--apply"], p);
     const text = read(p, "gersom", "backlog.md");
     expect(text).toContain("## Tareas libres\n\n### Tarea 5 — Primera\n\n- **Descripción:** D");
     expect(text).toContain("- **Agregada:** 2026-10-07.\n\n<!-- agent-context-skill:section=blocked -->\n## Tareas bloqueadas / pospuestas\n\nNinguna.\n");
     expect(text).toContain("**Próximo número de tarea:** 6");
     expect(text).not.toContain("Ninguna.\n\n<!-- agent-context-skill:section=blocked -->");
     // una bloqueada en la sección vacía de bloqueadas: reemplaza el «Ninguna.» de esa sección
-    await exec(["add", "--titulo", "Esperando", "--descripcion", "D", "--bloqueo", "`[postergada]` luego", "--apply"], p);
+    await exec(["add", "--title", "Esperando", "--description", "D", "--blocker", "`[postergada]` luego", "--apply"], p);
     const after = read(p, "gersom", "backlog.md");
     expect(after).toContain("## Tareas bloqueadas / pospuestas\n\n### Tarea 6 — Esperando");
     expect(after).toContain("<!-- agent-context-skill:section=grouped -->\n## Tareas agrupadas\n\nNo aplica todavía");
@@ -162,8 +162,8 @@ describe("add — backlog propio", () => {
 
   test("sección con el placeholder de la plantilla: la tarea lo reemplaza", async () => {
     const p = project(own(BACKLOG_TEMPLATE));
-    await exec(["add", "--titulo", "Primera", "--descripcion", "D", "--apply"], p);
-    await exec(["add", "--titulo", "Segunda", "--descripcion", "D", "--bloqueo", "`[dependencia]` x", "--apply"], p);
+    await exec(["add", "--title", "Primera", "--description", "D", "--apply"], p);
+    await exec(["add", "--title", "Segunda", "--description", "D", "--blocker", "`[dependencia]` x", "--apply"], p);
     const text = read(p, "gersom", "backlog.md");
     expect(text).not.toContain("Placeholder");
     expect(text).toContain("## Tareas libres\n\n### Tarea 1 — Primera\n\n");
@@ -177,30 +177,30 @@ describe("add — backlog propio", () => {
       "\n### Tarea 6 — Otra",
     );
     const p = project(own(backlog));
-    await exec(["add", "--titulo", "N", "--descripcion", "D", "--apply"], p);
+    await exec(["add", "--title", "N", "--description", "D", "--apply"], p);
     // entre «Tarea 7» y «Tarea 6» hay dos líneas en blanco: la nueva se separa igual
     expect(read(p, "gersom", "backlog.md")).toContain("- **Descripción:** x\n\n\n### Tarea 8 — N\n");
   });
 
   test("las tareas agrupadas no se tocan: el grupo no recibe tareas nuevas", async () => {
     const p = project({ folders: ["gersom"], ...RICH });
-    await exec(["add", "--titulo", "N", "--descripcion", "D", "--apply"], p);
+    await exec(["add", "--title", "N", "--description", "D", "--apply"], p);
     const text = read(p, "gersom", "backlog.md");
     expect(text.slice(text.indexOf("section=grouped"))).toBe(BACKLOG_RICH.slice(BACKLOG_RICH.indexOf("section=grouped")));
   });
 
   test("texto largo por stdin (solo un flag)", async () => {
     const p = project({ folders: ["gersom"], ...RICH });
-    await exec(["add", "--titulo", "T", "--descripcion", "-", "--apply"], p, { stdin: "Primera línea\n- sublista\nTercera" });
+    await exec(["add", "--title", "T", "--description", "-", "--apply"], p, { stdin: "Primera línea\n- sublista\nTercera" });
     expect(read(p, "gersom", "backlog.md")).toContain("- **Descripción:** Primera línea\n  - sublista\n  Tercera\n- **Decisiones");
-    const two = await exec(["add", "--titulo", "-", "--descripcion", "-"], p, { stdin: "x" });
+    const two = await exec(["add", "--title", "-", "--description", "-"], p, { stdin: "x" });
     expect(two.code).toBe(2);
     expect(two.err).toContain("Solo un flag puede leer la entrada estándar");
   });
 
   test("la tarea que escribe la lee el parser con el número, los campos y la lista de libres", async () => {
     const p = project({ folders: ["gersom"], ...RICH });
-    await exec(["add", "--titulo", "Visible", "--descripcion", "D", "--apply"], p);
+    await exec(["add", "--title", "Visible", "--description", "D", "--apply"], p);
     const status = await exec(["status", "--json"], p);
     const state = JSON.parse(status.out);
     expect(state.free.map((t: { number: number }) => t.number)).toContain(20);
@@ -208,17 +208,41 @@ describe("add — backlog propio", () => {
     expect(state.warnings.filter((w: string) => w.includes("Tarea 20"))).toEqual([]);
   });
 
+  test("los flags en español son desconocidos: código 2 y no se escribe nada", async () => {
+    const p = project({ folders: ["gersom"], ...RICH });
+    const before = snapshot(p.root);
+    const base = ["add", "--title", "T", "--description", "D"];
+    for (const [old, value] of [["--titulo", "T"], ["--descripcion", "D"], ["--decisiones", "x"], ["--bloqueo", "x"], ["--disparador", "x"], ["--detalles", "x"]]) {
+      const { code, err } = await exec([...base, old, value, "--apply"], p);
+      expect(code).toBe(2);
+      expect(err).toContain(`Flag desconocido: ${old}.`);
+    }
+    expect((await exec(["add", "--titulo", "T", "--descripcion", "D", "--apply"], p)).code).toBe(2);
+    expect(snapshot(p.root)).toEqual(before);
+  });
+
+  test("el aviso de --blocker cita los tags del idioma del archivo, y ambos si no se conoce", async () => {
+    const es = project({ folders: ["gersom"], ...RICH });
+    expect((await exec(["add", "--title", "T", "--description", "D", "--blocker", "esperar", "--apply"], es)).out).toContain("--blocker no empieza con `[dependencia]` ni `[postergada]`:");
+    const en = project({ folders: ["gersom"], contents: { "handoff.md": HANDOFF_IDLE_EN, "backlog.md": BACKLOG_EN, "history.md": HISTORY_EN } });
+    expect((await exec(["add", "--title", "T", "--description", "D", "--blocker", "wait", "--apply"], en)).out).toContain("--blocker no empieza con `[dependency]` ni `[postponed]`:");
+    const unknown = project(own(BACKLOG_EMPTY));
+    expect((await exec(["add", "--title", "T", "--description", "D", "--blocker", "esperar", "--apply"], unknown)).out).toContain(
+      "--blocker no empieza con `[dependencia]`/`[dependency]` ni `[postergada]`/`[postponed]`:",
+    );
+  });
+
   describe("errores: no se escribe nada", () => {
-    test("faltan --titulo o --descripcion", async () => {
+    test("faltan --title o --description", async () => {
       const p = project({ folders: ["gersom"], ...RICH });
       const before = snapshot(p.root);
-      const noTitle = await exec(["add", "--descripcion", "D", "--apply"], p);
+      const noTitle = await exec(["add", "--description", "D", "--apply"], p);
       expect(noTitle.code).toBe(2);
-      expect(noTitle.err).toContain("Falta --titulo");
-      const noDescription = await exec(["add", "--titulo", "T", "--apply"], p);
-      expect(noDescription.err).toContain("Falta --descripcion");
-      expect((await exec(["add", "--titulo", "  ", "--descripcion", "D", "--apply"], p)).err).toContain("Falta --titulo");
-      expect((await exec(["add", "--titulo", "-", "--descripcion", "D"], p, { stdin: "uno\ndos" })).err).toContain("una sola línea");
+      expect(noTitle.err).toContain("Falta --title");
+      const noDescription = await exec(["add", "--title", "T", "--apply"], p);
+      expect(noDescription.err).toContain("Falta --description");
+      expect((await exec(["add", "--title", "  ", "--description", "D", "--apply"], p)).err).toContain("Falta --title");
+      expect((await exec(["add", "--title", "-", "--description", "D"], p, { stdin: "uno\ndos" })).err).toContain("una sola línea");
       expect(snapshot(p.root)).toEqual(before);
     });
 
@@ -226,7 +250,7 @@ describe("add — backlog propio", () => {
       const low = BACKLOG_RICH.replace("**Próximo número de tarea:** 20", "**Próximo número de tarea:** 11");
       const p = project({ folders: ["gersom"], ...RICH, contents: { ...RICH.contents, "backlog.md": low } });
       const before = snapshot(p.root);
-      const { code, err } = await exec(["add", "--titulo", "T", "--descripcion", "D", "--apply"], p);
+      const { code, err } = await exec(["add", "--title", "T", "--description", "D", "--apply"], p);
       expect(code).toBe(1);
       expect(err).toContain("no es mayor que la tarea más alta que ya existe (la 18)");
       expect(snapshot(p.root)).toEqual(before);
@@ -234,16 +258,16 @@ describe("add — backlog propio", () => {
 
     test("backlog sin la línea del contador, o sin la sección", async () => {
       const noCounter = project(own(BACKLOG_EMPTY.replace("**Próximo número de tarea:** 5\n", "")));
-      expect((await exec(["add", "--titulo", "T", "--descripcion", "D", "--apply"], noCounter)).err).toContain("Próximo número de tarea");
+      expect((await exec(["add", "--title", "T", "--description", "D", "--apply"], noCounter)).err).toContain("Próximo número de tarea");
       const noSection = project(own(BACKLOG_EMPTY.replace("<!-- agent-context-skill:section=blocked -->", "<!-- otro -->")));
-      const { code, err } = await exec(["add", "--titulo", "T", "--descripcion", "D", "--bloqueo", "`[dependencia]` x", "--apply"], noSection);
+      const { code, err } = await exec(["add", "--title", "T", "--description", "D", "--blocker", "`[dependencia]` x", "--apply"], noSection);
       expect(code).toBe(1);
       expect(err).toContain("no tiene la sección «blocked»");
     });
 
     test("backlog.md ausente", async () => {
       const p = project({ folders: ["gersom"], omit: ["backlog.md"] });
-      const { code, err } = await exec(["add", "--titulo", "T", "--descripcion", "D", "--apply"], p);
+      const { code, err } = await exec(["add", "--title", "T", "--description", "D", "--apply"], p);
       expect(code).toBe(1);
       expect(err).toContain("Falta backlog.md");
     });
@@ -252,12 +276,12 @@ describe("add — backlog propio", () => {
       const p = project({ folders: ["gersom", "ana"], ...RICH, folderContents: { ana: { "backlog.md": BACKLOG_RICH } } });
       const before = snapshot(p.root);
       for (const extra of [[], ["--apply"]]) {
-        const other = await exec(["add", "--titulo", "T", "--descripcion", "D", "--operator", "ana", ...extra], p);
+        const other = await exec(["add", "--title", "T", "--description", "D", "--operator", "ana", ...extra], p);
         expect(other.code).toBe(1);
         expect(other.err).toContain("«ana» no es la tuya");
         expect(other.out).toBe("");
       }
-      const unverified = await exec(["add", "--titulo", "T", "--descripcion", "D", "--operator", "gersom", "--apply"], p, { email: null });
+      const unverified = await exec(["add", "--title", "T", "--description", "D", "--operator", "gersom", "--apply"], p, { email: null });
       expect(unverified.err).toContain("No se pudo verificar");
       expect(snapshot(p.root)).toEqual(before);
     });
@@ -267,14 +291,14 @@ describe("add — backlog propio", () => {
     test("un archivo CRLF sigue siendo CRLF (y uno LF, LF)", async () => {
       const crlf = BACKLOG_RICH.replace(/\n/g, "\r\n");
       const p = project({ folders: ["gersom"], contents: { "handoff.md": HANDOFF_IDLE, "backlog.md": crlf, "history.md": HISTORY_RICH } });
-      await exec(["add", "--titulo", "T", "--descripcion", "Varias\nlíneas", "--apply"], p);
+      await exec(["add", "--title", "T", "--description", "Varias\nlíneas", "--apply"], p);
       const text = read(p, "gersom", "backlog.md");
       expect(text).toContain("### Tarea 20 — T\r\n\r\n- **Descripción:** Varias\r\n  líneas\r\n");
       expect(text.replace(/\r\n/g, "")).not.toContain("\n"); // ningún LF suelto
       expect(text.replace(/\r\n/g, "\n").replace("**Próximo número de tarea:** 21", "**Próximo número de tarea:** 20")).toContain("### Tarea 20 — T");
 
       const lf = project({ folders: ["gersom"], ...RICH });
-      await exec(["add", "--titulo", "T", "--descripcion", "D", "--apply"], lf);
+      await exec(["add", "--title", "T", "--description", "D", "--apply"], lf);
       expect(read(lf, "gersom", "backlog.md")).not.toContain("\r");
     });
 
@@ -283,7 +307,7 @@ describe("add — backlog propio", () => {
         folders: ["gersom"],
         contents: { "handoff.md": HANDOFF_IDLE_EN, "backlog.md": BACKLOG_EN, "history.md": HISTORY_EN },
       });
-      const { out } = await exec(["add", "--titulo", "Write docs", "--descripcion", "Docs for the script", "--apply"], p);
+      const { out } = await exec(["add", "--title", "Write docs", "--description", "Docs for the script", "--apply"], p);
       expect(out).not.toContain("Aviso");
       expect(read(p, "gersom", "backlog.md")).toContain(
         [
@@ -302,14 +326,14 @@ describe("add — backlog propio", () => {
     test("idioma que no reconoce: usa español, conserva su palabra de header y avisa", async () => {
       const backlog = BACKLOG_ONE.replace("### Tarea 7 — La única", "### Ticket 7 — La única");
       const p = project(own(backlog));
-      const { out } = await exec(["add", "--titulo", "T", "--descripcion", "D", "--apply"], p);
+      const { out } = await exec(["add", "--title", "T", "--description", "D", "--apply"], p);
       expect(out).toContain("Aviso: No reconozco el idioma de «Ticket»");
       expect(read(p, "gersom", "backlog.md")).toContain("### Ticket 8 — T\n");
     });
 
     test("sin ninguna pista de idioma: español y aviso", async () => {
       const p = project(own(BACKLOG_EMPTY));
-      const { out } = await exec(["add", "--titulo", "T", "--descripcion", "D", "--apply"], p);
+      const { out } = await exec(["add", "--title", "T", "--description", "D", "--apply"], p);
       expect(out).toContain("Aviso: No pude determinar el idioma");
       expect(read(p, "gersom", "backlog.md")).toContain("### Tarea 5 — T");
     });
@@ -317,10 +341,10 @@ describe("add — backlog propio", () => {
 
   test("repo plano: agrega a su backlog.md", async () => {
     const p = project({ flat: true, contents: { "backlog.md": BACKLOG_RICH, "handoff.md": HANDOFF_IDLE, "history.md": HISTORY_RICH } });
-    const { code } = await exec(["add", "--titulo", "T", "--descripcion", "D", "--apply"], p, { email: null });
+    const { code } = await exec(["add", "--title", "T", "--description", "D", "--apply"], p, { email: null });
     expect(code).toBe(0);
     expect(read(p, "backlog.md")).toContain("### Tarea 20 — T");
-    const team = await exec(["add", "--team", "--titulo", "T", "--descripcion", "D", "--apply"], p, { email: null });
+    const team = await exec(["add", "--team", "--title", "T", "--description", "D", "--apply"], p, { email: null });
     expect(team.code).toBe(1);
     expect(team.err).toContain("el repo es plano");
   });
@@ -330,7 +354,7 @@ describe("add --team", () => {
   test("agrega a «libres» del team-backlog.md, sin número ni contador, con `Agregada: <fecha> por <operador>`", async () => {
     const p = project({ folders: ["gersom"], ...RICH });
     const backlogBefore = read(p, "gersom", "backlog.md");
-    const { code, out } = await exec(["add", "--team", "--titulo", "Nueva del equipo", "--descripcion", "Algo para todos", "--apply"], p);
+    const { code, out } = await exec(["add", "--team", "--title", "Nueva del equipo", "--description", "Algo para todos", "--apply"], p);
     expect(code).toBe(0);
     expect(out).toBe("Tarea «Nueva del equipo» agregada a «Tareas libres» de docs/agents/team-backlog.md (por gersom).");
     expect(read(p, "team-backlog.md")).toBe(
@@ -355,7 +379,7 @@ describe("add --team", () => {
   test("sin --apply solo muestra el diff", async () => {
     const p = project({ folders: ["gersom"], ...RICH });
     const before = snapshot(p.root);
-    const { out } = await exec(["add", "--team", "--titulo", "X", "--descripcion", "D"], p);
+    const { out } = await exec(["add", "--team", "--title", "X", "--description", "D"], p);
     expect(out).toContain("+### X");
     expect(out).toContain(APPLY_NOTICE);
     expect(snapshot(p.root)).toEqual(before);
@@ -363,21 +387,21 @@ describe("add --team", () => {
 
   test("con bloqueo va a «bloqueadas»; usa las etiquetas del archivo y `Detalles` opcional", async () => {
     const p = project({ folders: ["gersom"], teamBacklogText: TEAM_TWO });
-    await exec(["add", "--team", "--titulo", "Esperando", "--descripcion", "D", "--bloqueo", "`[postergada]` luego", "--detalles", "ver el wiki", "--apply"], p);
+    await exec(["add", "--team", "--title", "Esperando", "--description", "D", "--blocker", "`[postergada]` luego", "--details", "ver el wiki", "--apply"], p);
     const text = read(p, "team-backlog.md");
     expect(text.endsWith("- **Agregada:** 2026-10-04 por ana\n\n### Esperando\n\n- **Descripción:** D\n- **Decisiones/temas a definir antes de empezar:** Ninguno.\n- **Bloqueos:** `[postergada]` luego\n- **Detalles:** ver el wiki\n- **Agregada:** 2026-10-07 por gersom\n")).toBe(true);
   });
 
   test("respeta el espaciado: dos líneas en blanco entre las tareas del archivo", async () => {
     const p = project({ folders: ["gersom"], teamBacklogText: TEAM_TWO });
-    await exec(["add", "--team", "--titulo", "N", "--descripcion", "D", "--apply"], p);
+    await exec(["add", "--team", "--title", "N", "--description", "D", "--apply"], p);
     expect(read(p, "team-backlog.md")).toContain("2026-10-03 por ana\n\n\n### N\n\n- **Descripción:** D");
   });
 
   test("team-backlog recién generado: reemplaza los placeholders de las dos secciones", async () => {
     const p = project({ folders: ["gersom"], teamBacklogText: TEAM_TEMPLATE });
-    await exec(["add", "--team", "--titulo", "Libre", "--descripcion", "D", "--apply"], p);
-    await exec(["add", "--team", "--titulo", "Bloqueada", "--descripcion", "D", "--bloqueo", "`[dependencia]` algo", "--apply"], p);
+    await exec(["add", "--team", "--title", "Libre", "--description", "D", "--apply"], p);
+    await exec(["add", "--team", "--title", "Bloqueada", "--description", "D", "--blocker", "`[dependencia]` algo", "--apply"], p);
     const text = read(p, "team-backlog.md");
     expect(text).not.toContain("Placeholder");
     expect(text).toContain("## Tareas libres\n\n### Libre\n\n- **Descripción:** D");
@@ -388,23 +412,23 @@ describe("add --team", () => {
     const p = project({ folders: ["gersom"], teamBacklogText: TEAM_TWO });
     const before = snapshot(p.root);
     for (const title of ["migrar el ci", "Revisar el COPY del onboarding", "cambiar de PROVEEDOR"]) {
-      const { code, err } = await exec(["add", "--team", "--titulo", title, "--descripcion", "D", "--apply"], p);
+      const { code, err } = await exec(["add", "--team", "--title", title, "--description", "D", "--apply"], p);
       expect(code).toBe(1);
       expect(err).toContain("debe ser único");
     }
     expect(snapshot(p.root)).toEqual(before);
   });
 
-  test("--disparador no aplica con --team", async () => {
+  test("--trigger no aplica con --team", async () => {
     const p = project({ folders: ["gersom"], ...RICH });
-    const { code, err } = await exec(["add", "--team", "--titulo", "X", "--descripcion", "D", "--disparador", "ya", "--apply"], p);
+    const { code, err } = await exec(["add", "--team", "--title", "X", "--description", "D", "--trigger", "ya", "--apply"], p);
     expect(code).toBe(2);
-    expect(err).toContain("--disparador no aplica con --team");
+    expect(err).toContain("--trigger no aplica con --team");
   });
 
   test("el operador «solo team-backlog» (sin carpeta) puede agregar", async () => {
     const p = project({ folders: ["gersom"], ...RICH });
-    const { code } = await exec(["add", "--team", "--titulo", "Del cliente", "--descripcion", "Pidió esto", "--apply"], p, { email: "luis@mail.com" });
+    const { code } = await exec(["add", "--team", "--title", "Del cliente", "--description", "Pidió esto", "--apply"], p, { email: "luis@mail.com" });
     expect(code).toBe(0);
     expect(read(p, "team-backlog.md")).toContain("- **Agregada:** 2026-10-07 por luis\n");
   });
@@ -412,7 +436,7 @@ describe("add --team", () => {
   test("el operador sin carpeta no puede agregar a un backlog propio que no tiene", async () => {
     const p = project({ folders: ["gersom"], ...RICH });
     const before = snapshot(p.root);
-    const { code, err } = await exec(["add", "--titulo", "X", "--descripcion", "D", "--apply"], p, { email: "luis@mail.com" });
+    const { code, err } = await exec(["add", "--title", "X", "--description", "D", "--apply"], p, { email: "luis@mail.com" });
     expect(code).toBe(1);
     expect(err).toContain("solo team-backlog");
     expect(err).toContain("Operadores con carpeta: gersom");
@@ -422,24 +446,24 @@ describe("add --team", () => {
   test("sin saber quién es (sin correo de git y sin --operator): pide --operator", async () => {
     const p = project({ folders: ["gersom"], ...RICH });
     const before = snapshot(p.root);
-    const { code, err } = await exec(["add", "--team", "--titulo", "X", "--descripcion", "D", "--apply"], p, { email: null });
+    const { code, err } = await exec(["add", "--team", "--title", "X", "--description", "D", "--apply"], p, { email: null });
     expect(code).toBe(1);
     expect(err).toContain("indica uno con --operator");
-    expect((await exec(["add", "--team", "--titulo", "X", "--descripcion", "D", "--apply", "--operator", "luis"], p, { email: null })).code).toBe(0);
+    expect((await exec(["add", "--team", "--title", "X", "--description", "D", "--apply", "--operator", "luis"], p, { email: null })).code).toBe(0);
     expect(snapshot(p.root)).not.toEqual(before);
     expect(read(p, "team-backlog.md")).toContain("por luis");
   });
 
   test("agregar al team-backlog.md no exige que la carpeta resuelta sea la propia", async () => {
     const p = project({ folders: ["gersom", "ana"], ...RICH });
-    const { code } = await exec(["add", "--team", "--titulo", "X", "--descripcion", "D", "--operator", "ana", "--apply"], p);
+    const { code } = await exec(["add", "--team", "--title", "X", "--description", "D", "--operator", "ana", "--apply"], p);
     expect(code).toBe(0);
     expect(read(p, "team-backlog.md")).toContain("por ana");
   });
 
   test("team-backlog.md ausente: error (el script no lo crea)", async () => {
     const p = project({ folders: ["gersom"], ...RICH, teamBacklogText: undefined });
-    const { code, err } = await exec(["add", "--team", "--titulo", "X", "--descripcion", "D", "--apply"], p);
+    const { code, err } = await exec(["add", "--team", "--title", "X", "--description", "D", "--apply"], p);
     expect(code).toBe(1);
     expect(err).toContain("Falta team-backlog.md");
   });
@@ -451,14 +475,27 @@ describe("add --team", () => {
       .replace(/Detalles/g, "Details")
       .replace("Decisiones/temas a definir antes de empezar", "Decisions/topics to settle before starting");
     const p = project({ folders: ["gersom"], teamBacklogText: english });
-    await exec(["add", "--team", "--titulo", "N", "--descripcion", "D", "--apply"], p);
+    await exec(["add", "--team", "--title", "N", "--description", "D", "--apply"], p);
     expect(read(p, "team-backlog.md")).toContain("### N\n\n- **Description:** D\n- **Decisions/topics to settle before starting:** None.\n- **Blockers:** None.\n- **Added:** 2026-10-07 by gersom\n");
+  });
+
+  test("con --team, el aviso de --blocker cita los tags del idioma del team-backlog.md", async () => {
+    const warn = (p: Project) => exec(["add", "--team", "--title", "T", "--description", "D", "--blocker", "esperar", "--apply"], p);
+    const es = project({ folders: ["gersom"], teamBacklogText: TEAM_TWO });
+    expect((await warn(es)).out).toContain("--blocker no empieza con `[dependencia]` ni `[postergada]`:");
+    const english = TEAM_TWO.replace(/Descripción/g, "Description")
+      .replace(/Bloqueos/g, "Blockers")
+      .replace(/Agregada/g, "Added")
+      .replace(/Detalles/g, "Details")
+      .replace("Decisiones/temas a definir antes de empezar", "Decisions/topics to settle before starting");
+    const en = project({ folders: ["gersom"], teamBacklogText: english });
+    expect((await warn(en)).out).toContain("--blocker no empieza con `[dependency]` ni `[postponed]`:");
   });
 
   test("team-backlog con CRLF", async () => {
     const p = project({ folders: ["gersom"], ...RICH });
     writeFileSync(join(p.agents, "team-backlog.md"), TEAM_RICH.replace(/\n/g, "\r\n"));
-    await exec(["add", "--team", "--titulo", "X", "--descripcion", "D", "--apply"], p);
+    await exec(["add", "--team", "--title", "X", "--description", "D", "--apply"], p);
     const text = read(p, "team-backlog.md");
     expect(text).toContain("### X\r\n\r\n- **Descripción:** D\r\n");
     expect(text.replace(/\r\n/g, "")).not.toContain("\n");

@@ -15,10 +15,28 @@ import { fieldBody, renderField } from "./render.ts";
 /** Tags de bloqueo que mandan la tarea a «bloqueadas / pospuestas» (español e inglés). */
 export const BLOCKING_TAGS = /^(dependencia|postergada|dependency|postponed)$/i;
 
-/** El tag escrito por el operador (`dependencia`, `[dependencia]`, `` `[Dependencia]` ``) en su forma mínima, o `null` si no es uno de los dos. */
-export function parseTagFlag(value: string): string | null {
+/**
+ * Los dos tags de bloqueo para citarlos en un mensaje, unidos por `joiner` (`/`, `o`, `ni`): los del
+ * idioma del archivo si se conoce (`tags`) o, si no, los de ambos idiomas (`[dependencia]`/`[dependency]`).
+ */
+export function citeBlockingTags(tags: Strings["tags"] | undefined, joiner: "/" | "o" | "ni"): string {
+  const [first, second] = tags
+    ? [`\`[${tags.dependency}]\``, `\`[${tags.postponed}]\``]
+    : ["`[dependencia]`/`[dependency]`", "`[postergada]`/`[postponed]`"];
+  return joiner === "/" ? `${first}/${second}` : `${first} ${joiner} ${second}`;
+}
+
+/** Los valores del flag `--tag` de `block` (palabras clave en inglés; el tag que se escribe en el archivo sigue el idioma del proyecto, ver `Strings.tags`). */
+export type BlockTag = "dependency" | "postponed";
+
+/**
+ * El valor de `--tag` (`dependency`, `[dependency]`, `` `[Dependency]` ``) en su forma mínima, o `null` si no es
+ * uno de los dos. Solo acepta las palabras clave en inglés: es más estricto que `BLOCKING_TAGS`, que sirve para
+ * leer los tags ya escritos en los archivos (español e inglés).
+ */
+export function parseTagFlag(value: string): BlockTag | null {
   const tag = value.trim().replace(/^`?\[?|\]?`?$/g, "").toLowerCase();
-  return BLOCKING_TAGS.test(tag) ? tag : null;
+  return tag === "dependency" || tag === "postponed" ? tag : null;
 }
 
 /** El valor de `Bloqueos` de la tarea desbloqueada: `` `[Resuelto el <fecha>]` — era `[tag]` motivo `` (lo que seguía al tag se conserva, historial incluido). */

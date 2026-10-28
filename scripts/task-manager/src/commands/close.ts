@@ -1,4 +1,4 @@
-// `close`: cierra una tarea, hecha (`--done --resumen`) o descartada (`--discarded --motivo`), con las
+// `close`: cierra una tarea, hecha (`--done --summary`) o descartada (`--discarded --reason`), con las
 // Reglas 6 a 9 de rules.md en una sola operación sobre todos los archivos (o ninguno):
 // - `history.md`: la entrada `## <fecha> — ✅|❌ Tarea N — título` con el resumen o el motivo,
 //   arriba de las demás. Si la tarea traía `Origen: team-backlog`, la entrada lo conserva.
@@ -8,7 +8,7 @@
 //   backlog.md; las agrupadas no), `handoff.md` no se toca (la tarea en curso, si hay, sigue igual):
 //   solo se escribe la entrada ❌ y se saca su bloque del backlog. Una tarea sin empezar no se da por
 //   hecha: con `--done` es un error que manda a `start N`.
-// - `backlog.md`: si la tarea aún figura ahí (siempre, si es una tarea sin empezar), se saca; `--nueva "<título>"` (repetible) agrega tareas
+// - `backlog.md`: si la tarea aún figura ahí (siempre, si es una tarea sin empezar), se saca; `--new "<título>"` (repetible) agrega tareas
 //   nuevas con los números de «Próximo número de tarea»; y se revisan las bloqueadas (Regla 8): las
 //   que dependían de tareas ya cerradas (contando esta) pasan a «Tareas libres» con `Bloqueos` →
 //   `[Resuelto el <fecha>] — <motivo original>`; las de texto libre se listan para revisar a mano.
@@ -64,24 +64,24 @@ export const close: Command = {
   name: "close",
   summary: "Cierra la tarea en curso, una pausada o (solo --discarded) una sin empezar del backlog: entrada en history.md, «Sin tarea en curso», bloqueadas y reporte de cierre; escribe con --apply",
   usage:
-    "close [<N | T-N>] --done --resumen <texto>   |   close [<N | T-N>] --discarded --motivo <texto>   (N puede ser una tarea libre o bloqueada, sin empezarla)   [--nueva <título>]... [--json] [--apply]",
+    "close [<N | T-N>] --done --summary <texto>   |   close [<N | T-N>] --discarded --reason <texto>   (N puede ser una tarea libre o bloqueada, sin empezarla)   [--new <título>]... [--json] [--apply]",
   writes: true,
   flags: {
     done: { type: "boolean", description: "La tarea se hizo (entrada ✅ Hecha). Exactamente uno de --done y --discarded." },
     discarded: { type: "boolean", description: "La tarea se descarta (entrada ❌ Descartada)." },
-    resumen: {
+    summary: {
       type: "string",
       valueName: "texto",
       stdin: true,
       description: "Con --done, obligatorio: qué se hizo y por qué. Cada línea pasa a ser una viñeta de la entrada (las que ya empiezan con `- ` se conservan).",
     },
-    motivo: {
+    reason: {
       type: "string",
       valueName: "texto",
       stdin: true,
       description: "Con --discarded, obligatorio: por qué se descarta (queda para que no se vuelva a proponer sin verlo).",
     },
-    nueva: {
+    new: {
       type: "string",
       valueName: "título",
       multiple: true,
@@ -96,12 +96,12 @@ export const close: Command = {
     const discarded = flags.discarded === true;
     if (done === discarded) throw new UsageError("Indica cómo se cierra: `--done` (hecha) o `--discarded` (descartada), exactamente uno.");
     const outcome: Outcome = done ? "done" : "discarded";
-    if (done && textFlag(flags, "motivo")) throw new UsageError("--motivo es de --discarded; con --done el texto va en --resumen.");
-    if (discarded && textFlag(flags, "resumen")) throw new UsageError("--resumen es de --done; con --discarded el texto va en --motivo.");
-    const text = requiredFlag(flags, done ? "resumen" : "motivo");
-    const newTitles = (Array.isArray(flags.nueva) ? flags.nueva : []).map((title) => {
-      const clean = singleLine("nueva", title.trim());
-      if (!clean) throw new UsageError("--nueva necesita un título.");
+    if (done && textFlag(flags, "reason")) throw new UsageError("--reason es de --discarded; con --done el texto va en --summary.");
+    if (discarded && textFlag(flags, "summary")) throw new UsageError("--summary es de --done; con --discarded el texto va en --reason.");
+    const text = requiredFlag(flags, done ? "summary" : "reason");
+    const newTitles = (Array.isArray(flags.new) ? flags.new : []).map((title) => {
+      const clean = singleLine("new", title.trim());
+      if (!clean) throw new UsageError("--new necesita un título.");
       return clean;
     });
     const wanted = ctx.args.length ? parseTarget(ctx.args[0]) : null;
@@ -306,7 +306,7 @@ function notClosable(docs: Docs, number: number, found: TaskLocation[] = findTas
 /** `--done` sobre una tarea que ni se empezó: solo se puede descartar. */
 function notDoneable(number: number, source: TaskLocation): string {
   const section = source.place === "free" ? "Tareas libres" : "Tareas bloqueadas / pospuestas";
-  return `La Tarea ${number} está en «${section}» de backlog.md y nunca se empezó: una tarea sin empezar no se puede dar por hecha; empiézala con \`start ${number}\` y ciérrala después. Para descartarla sin empezarla: \`close ${number} --discarded --motivo <texto>\`. No se escribió nada.`;
+  return `La Tarea ${number} está en «${section}» de backlog.md y nunca se empezó: una tarea sin empezar no se puede dar por hecha; empiézala con \`start ${number}\` y ciérrala después. Para descartarla sin empezarla: \`close ${number} --discarded --reason <texto>\`. No se escribió nada.`;
 }
 
 /** Una tarea sin empezar de «libres» o «bloqueadas»: no toca handoff.md ni trae `Origen` (el campo es de la tarea en curso). */

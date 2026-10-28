@@ -80,7 +80,7 @@ export const edit: Command = {
     description: textFlagDef("Nueva descripción (en una tarea en curso, el texto bajo la línea `Tarea N — título`)."),
     decisions: textFlagDef("Nuevas decisiones/temas a definir (en handoff.md, «Decisiones a medio camino»)."),
     blocker: textFlagDef(
-      "Nuevo valor de Bloqueos sin cambiar el estado: en una libre no puede bloquearla (usa `block`); en una bloqueada, con tag `[dependencia]`/`[postergada]` se respeta y sin tag solo cambia el motivo. No aplica en handoff.md.",
+      "Nuevo valor de Bloqueos sin cambiar el estado: en una libre no puede bloquearla (usa `block`); en una bloqueada, con tag `[dependencia]`/`[postergada]` (`[dependency]`/`[postponed]` en inglés) se respeta y sin tag solo cambia el motivo. El tag se guarda tal cual se escribe: usa el del idioma de la documentación. No aplica en handoff.md.",
     ),
     trigger: textFlagDef("Nuevo Disparador. No aplica en el team-backlog.md ni en handoff.md."),
     details: textFlagDef("Nuevo contexto extendido (Detalles); si la tarea no tiene el campo, se agrega."),
@@ -176,7 +176,10 @@ function backlogValues(
     if (place === "grouped" && (blocking || WHERE_BLOCKER(task))) {
       throw new CliError("--blocker: cambiar el bloqueo de una tarea agrupada todavía no está soportado (no sé a qué sección pertenece su estado). Hazlo a mano. No se escribió nada.");
     }
+    // Los tags que citan los mensajes: los del idioma de los campos de la tarea, si se reconoce.
+    const language = detectLanguage(task.fields.map((field) => field.label));
     values.blockers = resolveBlocker({
+      tags: language.notice ? undefined : STRINGS[language.lang].tags,
       state: place === "blocked" || place === "team-blocked" ? "blocked" : "free",
       current: currentFieldBody(text, task.fields, "blockers"),
       value: given.blocker,

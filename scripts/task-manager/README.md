@@ -24,16 +24,16 @@ bun run task status                   # foto compacta: en curso, pausadas, libre
 bun run task next                     # qué hacer ahora
 bun run task show 24                  # el bloque completo de la Tarea 24, viva donde esté
 bun run task status --json            # lo mismo, estructurado, para otros scripts
-bun run task add --titulo "..." --descripcion "..."          # muestra el diff; NO escribe
-bun run task add --titulo "..." --descripcion "..." --apply  # ahora sí escribe
+bun run task add --title "..." --description "..."          # muestra el diff; NO escribe
+bun run task add --title "..." --description "..." --apply  # ahora sí escribe
 bun run task start 24 --plan - --apply < pasos.txt           # empieza la Tarea 24
 bun run task step 2 --apply                                  # marca el paso 2 y actualiza «Qué falta» / «Próximo paso»
-bun run task pause --motivo "..." --espera "..." --apply     # pausa la tarea en curso
+bun run task pause --reason "..." --waiting-for "..." --apply     # pausa la tarea en curso
 bun run task resume 24 --apply                               # la retoma
-bun run task block 7 --tag dependencia --motivo "depende de la Tarea 3" --apply
+bun run task block 7 --tag dependency --reason "depende de la Tarea 3" --apply
 bun run task unblock --apply                                 # desbloquea las que dependían de tareas ya cerradas
-bun run task close --done --resumen "Qué se hizo y por qué" --apply   # cierra la tarea en curso
-bun run task close --discarded --motivo "Por qué se descarta" --apply
+bun run task close --done --summary "Qué se hizo y por qué" --apply   # cierra la tarea en curso
+bun run task close --discarded --reason "Por qué se descarta" --apply
 bun run task <comando> --dry-run      # muestra el diff sin escribir nada (también con --apply)
 bun run task <comando> --agents D:/proyectos/mi-app --operator ana
 ```
@@ -67,13 +67,13 @@ bun run task <comando> --agents D:/proyectos/mi-app --operator ana
 **Texto largo por stdin:** un flag de texto que lo admita acepta `-` como valor y lee su contenido de la entrada estándar (se normaliza a LF y se quita el salto de línea final):
 
 ```sh
-bun run task <comando> --detalles - <<'EOF'
+bun run task <comando> --details - <<'EOF'
 Varias líneas
 de texto.
 EOF
 ```
 
-**Flags repetibles:** algunos flags de texto se pueden repetir (`close --nueva "A" --nueva "B"`); la ayuda del comando los marca «(repetible)». Esos no leen stdin.
+**Flags repetibles:** algunos flags de texto se pueden repetir (`close --new "A" --new "B"`); la ayuda del comando los marca «(repetible)». Esos no leen stdin.
 
 **Códigos de salida:** `0` bien; `1` error (operador o archivo que no se pudo resolver, edición inválida, ...), con el mensaje en español en la salida de error; `2` mal uso de la línea de comandos (comando o flag desconocido, falta un valor).
 
@@ -178,28 +178,28 @@ Reglas de seguridad que aplica el **núcleo** (no cada comando) a todo comando q
 ### `add`
 
 ```sh
-bun run task add --titulo "Mi tarea" --descripcion "De qué trata" [--decisiones ...] [--bloqueo ...] [--disparador ...] [--detalles ...] [--team] [--apply]
+bun run task add --title "Mi tarea" --description "De qué trata" [--decisions ...] [--blocker ...] [--trigger ...] [--details ...] [--team] [--apply]
 ```
 
 Agrega una tarea al final de «Tareas libres» (o de «bloqueadas / pospuestas») de tu `backlog.md`:
 
-- `--titulo` y `--descripcion` son obligatorios. `--decisiones` y `--bloqueo` valen «Ninguno.» por defecto; `--disparador`, «cuando el operador pregunte por tareas pendientes.»; `--detalles` es opcional y, si no se pasa, el campo se omite. Todos admiten `-` para leer de la entrada estándar (un solo flag por ejecución).
-- Si `--bloqueo` empieza con `[dependencia]` o `[postergada]` (con o sin acentos graves), la tarea va a «bloqueadas»; si no, a «libres» (con un aviso si dice algo sin ninguno de los dos tags).
+- `--title` y `--description` son obligatorios. `--decisions` y `--blocker` valen «Ninguno.» por defecto; `--trigger`, «cuando el operador pregunte por tareas pendientes.»; `--details` es opcional y, si no se pasa, el campo se omite. Todos admiten `-` para leer de la entrada estándar (un solo flag por ejecución).
+- Si `--blocker` empieza con `[dependencia]` o `[postergada]` (`[dependency]`/`[postponed]` en un proyecto en inglés; con o sin acentos graves), la tarea va a «bloqueadas»; si no, a «libres» (con un aviso si dice algo sin ninguno de los dos tags).
 - Recibe el número de «Próximo número de tarea», que pasa a N+1 **en la misma edición**. `Agregada`: la fecha de hoy (`YYYY-MM-DD.`, hora local).
-- Con `--team`: va al `team-backlog.md`, sin número ni contador, con `### <título único>` (error si el título ya existe, sin distinguir mayúsculas ni acentos) y `Agregada: <fecha> por <operador>`. No lleva `Disparador` (`--disparador` es un error). Para el operador, necesita saber quién eres: el de `git config user.email` o `--operator`; el **operador «solo team-backlog»** (sin carpeta) puede usarlo.
+- Con `--team`: va al `team-backlog.md`, sin número ni contador, con `### <título único>` (error si el título ya existe, sin distinguir mayúsculas ni acentos) y `Agregada: <fecha> por <operador>`. No lleva `Disparador` (`--trigger` es un error). Para el operador, necesita saber quién eres: el de `git config user.email` o `--operator`; el **operador «solo team-backlog»** (sin carpeta) puede usarlo.
 
 ### `start`
 
 ```sh
-bun run task start 24 [--plan -] [--modo "uno a la vez"] [--force] [--apply]
-bun run task start --team "Migrar el CI" [--plan -] [--modo ...] [--force] [--apply]
+bun run task start 24 [--plan -] [--mode "uno a la vez"] [--force] [--apply]
+bun run task start --team "Migrar el CI" [--plan -] [--mode ...] [--force] [--apply]
 ```
 
 Empieza una tarea, **en una sola operación** sobre todos los archivos (o ninguno):
 
 - Exige que **no haya otra tarea en curso** (si la hay, error que sugiere pausarla con `pause`) y que la elegida esté en «libres». Una **bloqueada** da error salvo con `--force` (queda constancia en la salida); una **pausada** (se retoma con `resume`) o **cerrada**, error claro; una **agrupada**, error (sacarla de «Tareas agrupadas» todavía no está soportado). Repetir el mismo `start --apply` falla limpio: ya hay una tarea en curso.
 - Saca su bloque de `backlog.md` sin dejar huecos ni líneas en blanco dobles; si era la última, la sección queda con «Ninguna.» (`None.` en inglés).
-- Reescribe el cuerpo de «Tarea en progreso» de `handoff.md` según su plantilla, sin tocar el resto del archivo ni las anclas: la línea `Tarea N — título` antes de la primera subsección `###`, un párrafo con la descripción, **Plan** (solo con `--plan`: una línea por paso; se agrega siempre el último paso «Documentar cierre de tarea»; con `--modo`, la línea «Modo de ejecución acordado»), **Qué falta**, **Decisiones a medio camino** (con lo que la tarea traía en «decisiones», si no era «Ninguno») y **Próximo paso concreto** (el primer paso del plan, o «Empezar la tarea.»), en ese orden. Los campos de la tarea que el handoff no tiene dónde poner (`Detalles`, `Desbloquea`...) se copian tal cual, en líneas `- **Campo:** valor` tras la descripción, para que no se pierdan al sacarla del backlog.
+- Reescribe el cuerpo de «Tarea en progreso» de `handoff.md` según su plantilla, sin tocar el resto del archivo ni las anclas: la línea `Tarea N — título` antes de la primera subsección `###`, un párrafo con la descripción, **Plan** (solo con `--plan`: una línea por paso; se agrega siempre el último paso «Documentar cierre de tarea»; con `--mode`, la línea «Modo de ejecución acordado»), **Qué falta**, **Decisiones a medio camino** (con lo que la tarea traía en «decisiones», si no era «Ninguno») y **Próximo paso concreto** (el primer paso del plan, o «Empezar la tarea.»), en ese orden. Los campos de la tarea que el handoff no tiene dónde poner (`Detalles`, `Desbloquea`...) se copian tal cual, en líneas `- **Campo:** valor` tras la descripción, para que no se pierdan al sacarla del backlog.
 - Con `--team`: la tarea sale de `team-backlog.md` (por título, o una parte única), recibe el siguiente número de tu secuencia (el contador pasa a N+1) y el handoff lleva la línea `- **Origen:** team-backlog`. Los tres archivos cambian juntos.
 - La rama y el commit no son asunto del script.
 
@@ -219,12 +219,12 @@ Marca pasos del «Plan» de la tarea en curso (Regla 7 de `rules.md`: el handoff
 ### `pause`
 
 ```sh
-bun run task pause --motivo <texto> --espera <texto> [--falta <texto>] [--decisiones <texto>] [--proximo <texto>] [--json] [--apply]
+bun run task pause --reason <texto> --waiting-for <texto> [--missing <texto>] [--decisions <texto>] [--next <texto>] [--json] [--apply]
 ```
 
 Pasa la tarea en curso al final de «Tareas pausadas» como un bloque `### Tarea N — título` y deja «Tarea en progreso» en `Sin tarea en curso` (los comentarios y las anclas no se mueven):
 
-- Campos del bloque, en este orden: `Descripción`, los extras que la tarea traía (`Origen`, `Detalles`...), `Plan` (los checkboxes tal cual, con lo ya marcado), `Modo de ejecución acordado`, `Qué falta`, `Decisiones a medio camino`, `Próximo paso concreto`, `Por qué se pausó` (`--motivo`, obligatorio) y `Qué espera para retomarse` (`--espera`, obligatorio). `Descripción`, los extras y el modo no figuran en el formato de la plantilla: se agregan para que `resume` pueda devolver la tarea tal cual estaba. `--falta`, `--decisiones` y `--proximo` reemplazan lo que se guarda.
+- Campos del bloque, en este orden: `Descripción`, los extras que la tarea traía (`Origen`, `Detalles`...), `Plan` (los checkboxes tal cual, con lo ya marcado), `Modo de ejecución acordado`, `Qué falta`, `Decisiones a medio camino`, `Próximo paso concreto`, `Por qué se pausó` (`--reason`, obligatorio) y `Qué espera para retomarse` (`--waiting-for`, obligatorio). `Descripción`, los extras y el modo no figuran en el formato de la plantilla: se agregan para que `resume` pueda devolver la tarea tal cual estaba. `--missing`, `--decisions` y `--next` reemplazan lo que se guarda.
 - **Contenido ajeno:** si «Tarea en progreso» tiene algo que no reconoce —una subsección con otro título, texto suelto dentro del plan que no sea un paso ni el modo, checkboxes fuera del plan, texto antes de la línea de la tarea— se niega con un error que lo dice y no escribe nada: hay que pausar a mano. No pierde información sin avisar.
 
 ### `resume`
@@ -238,10 +238,10 @@ El inverso de `pause`: saca la tarea de «Tareas pausadas» y rearma «Tarea en 
 ### `block`
 
 ```sh
-bun run task block <N> --tag <dependencia|postergada> --motivo <texto> [--json] [--apply]
+bun run task block <N> --tag <dependency|postponed> --reason <texto> [--json] [--apply]
 ```
 
-Bloquea una tarea **libre** de tu `backlog.md`: pone `Bloqueos` en `` `[tag]` motivo `` (si ya traía un `[Resuelto ...]` de un bloqueo anterior, queda después: el vigente va primero) y mueve su bloque al final de «Tareas bloqueadas / pospuestas». Sin formato nuevo: nombrar `Tarea N` en el motivo es lo que permite que `unblock` la desbloquee sola. Errores: la tarea ya está bloqueada (editar `Bloqueos` a mano), agrupada (sacarla de «Tareas agrupadas» no está soportado), pausada, en curso o cerrada. Solo opera sobre tu `backlog.md` (no sobre el `team-backlog.md`).
+Bloquea una tarea **libre** de tu `backlog.md`: pone `Bloqueos` en `` `[tag]` motivo `` (si ya traía un `[Resuelto ...]` de un bloqueo anterior, queda después: el vigente va primero) y mueve su bloque al final de «Tareas bloqueadas / pospuestas». `--tag` es siempre `dependency` o `postponed` (palabras clave en inglés; `--tag dependencia` es un error de uso), y el tag que se escribe sigue el idioma del proyecto: `[dependencia]`/`[postergada]` en uno en español, `[dependency]`/`[postponed]` en uno en inglés. Sin formato nuevo: nombrar `Tarea N` en el motivo es lo que permite que `unblock` la desbloquee sola. Errores: la tarea ya está bloqueada (editar `Bloqueos` a mano), agrupada (sacarla de «Tareas agrupadas» no está soportado), pausada, en curso o cerrada. Solo opera sobre tu `backlog.md` (no sobre el `team-backlog.md`).
 
 ### `unblock`
 
@@ -280,19 +280,19 @@ Modifica el **contenido** de una tarea y nunca su estado ni su lugar: una libre 
 ### `close`
 
 ```sh
-bun run task close [<N | T-N>] --done --resumen <texto> [--nueva "<título>"]... [--json] [--apply]
-bun run task close [<N | T-N>] --discarded --motivo <texto> [--nueva "<título>"]... [--json] [--apply]
+bun run task close [<N | T-N>] --done --summary <texto> [--new "<título>"]... [--json] [--apply]
+bun run task close [<N | T-N>] --discarded --reason <texto> [--new "<título>"]... [--json] [--apply]
 ```
 
-Cierra una tarea con las Reglas 6 a 9 de `rules.md`, **en una sola operación** sobre `handoff.md`, `history.md` y `backlog.md` (todos o ninguno). Exactamente uno de `--done` (hecha) y `--discarded` (descartada); cada uno exige su texto (`--resumen` o `--motivo`, que admiten `-` para stdin).
+Cierra una tarea con las Reglas 6 a 9 de `rules.md`, **en una sola operación** sobre `handoff.md`, `history.md` y `backlog.md` (todos o ninguno). Exactamente uno de `--done` (hecha) y `--discarded` (descartada); cada uno exige su texto (`--summary` o `--reason`, que admiten `-` para stdin).
 
-- **Qué tarea:** sin número, la tarea en curso. Con `close <N>`, la tarea en curso si es la `N` o **una pausada** (su bloque sale de «Tareas pausadas»; «Tarea en progreso» no se toca). **Una tarea que nunca se empezó** (libre o bloqueada, no agrupada) solo se puede **descartar**: `close <N> --discarded --motivo ...` escribe la entrada ❌ en `history.md` y saca su bloque de `backlog.md`, sin tocar `handoff.md` (la tarea en curso, si hay, queda como estaba). Con `--done` es un error: una tarea sin empezar no se da por hecha, se empieza antes con `start`. Una tarea agrupada es un error (sácala del grupo a mano). Sin tarea en curso (por ejemplo, al repetir el mismo cierre) es un error claro que no escribe nada.
-- **`history.md` (Regla 6):** la entrada `## <fecha> — ✅|❌ Tarea N — título` va **arriba de todas** (las más nuevas primero), con la fecha de hoy. Debajo, el texto como viñetas: cada línea de `--resumen` / `--motivo` pasa a ser una viñeta, y las que ya empiezan con `- ` o están sangradas se conservan tal cual. Va solo lo que la plantilla de `history.md` pide (qué se hizo y por qué, o el motivo del descarte); la descripción, el plan y los demás campos de la tarea no se copian. Si `history.md` no tiene entradas, la de ejemplo de la plantilla (`[Placeholder ...]`) se reemplaza; si tampoco hay, la entrada va al final del archivo. Si la tarea ya figura en `history.md`, se niega (no duplica entradas).
+- **Qué tarea:** sin número, la tarea en curso. Con `close <N>`, la tarea en curso si es la `N` o **una pausada** (su bloque sale de «Tareas pausadas»; «Tarea en progreso» no se toca). **Una tarea que nunca se empezó** (libre o bloqueada, no agrupada) solo se puede **descartar**: `close <N> --discarded --reason ...` escribe la entrada ❌ en `history.md` y saca su bloque de `backlog.md`, sin tocar `handoff.md` (la tarea en curso, si hay, queda como estaba). Con `--done` es un error: una tarea sin empezar no se da por hecha, se empieza antes con `start`. Una tarea agrupada es un error (sácala del grupo a mano). Sin tarea en curso (por ejemplo, al repetir el mismo cierre) es un error claro que no escribe nada.
+- **`history.md` (Regla 6):** la entrada `## <fecha> — ✅|❌ Tarea N — título` va **arriba de todas** (las más nuevas primero), con la fecha de hoy. Debajo, el texto como viñetas: cada línea de `--summary` / `--reason` pasa a ser una viñeta, y las que ya empiezan con `- ` o están sangradas se conservan tal cual. Va solo lo que la plantilla de `history.md` pide (qué se hizo y por qué, o el motivo del descarte); la descripción, el plan y los demás campos de la tarea no se copian. Si `history.md` no tiene entradas, la de ejemplo de la plantilla (`[Placeholder ...]`) se reemplaza; si tampoco hay, la entrada va al final del archivo. Si la tarea ya figura en `history.md`, se niega (no duplica entradas).
 - **`Origen: team-backlog`:** si la tarea traía el campo (la tomó `start --team`), la entrada de `history.md` lo conserva como primera viñeta: `- **Origen:** team-backlog`. El `team-backlog.md` no se toca: la tarea ya salió de ahí al empezarla.
 - **`handoff.md`:** «Tarea en progreso» queda en «Sin tarea en curso» (`STRINGS.noTask`; el comentario ancla no se mueve). Se niega, sin escribir, si «Tarea en progreso» tiene algo que no reconoce (como `pause`). Si el plan tenía pasos sin marcar (sin contar «Documentar cierre de tarea»), lo avisa.
 - **`backlog.md`:**
-  - Si la tarea todavía figura ahí (en «libres» o «bloqueadas»), se saca. Si además hay que agregar tareas a «libres» en la misma operación (desbloqueadas o `--nueva`): con una tarea sin empezar (`close <N> --discarded`) las ediciones se calculan sin pisarse (si era el último bloque de «libres», las nuevas ocupan su lugar; si no, se borra y se agrega al final); con la tarea en curso o pausada que quedó en «libres» por un descuido, se niega y pide sacarla a mano. Una tarea que figura en «Tareas agrupadas» es un error.
-  - `--nueva "<título>"` (repetible): agrega tareas nuevas al final de «Tareas libres» con los números de «Próximo número de tarea» (que pasa a N+k en la misma edición). Llevan solo el título y una descripción mínima («Surgió al cerrar la Tarea N; falta detallarla.»): para una tarea con todos sus campos, `add`.
+  - Si la tarea todavía figura ahí (en «libres» o «bloqueadas»), se saca. Si además hay que agregar tareas a «libres» en la misma operación (desbloqueadas o `--new`): con una tarea sin empezar (`close <N> --discarded`) las ediciones se calculan sin pisarse (si era el último bloque de «libres», las nuevas ocupan su lugar; si no, se borra y se agrega al final); con la tarea en curso o pausada que quedó en «libres» por un descuido, se niega y pide sacarla a mano. Una tarea que figura en «Tareas agrupadas» es un error.
+  - `--new "<título>"` (repetible): agrega tareas nuevas al final de «Tareas libres» con los números de «Próximo número de tarea» (que pasa a N+k en la misma edición). Llevan solo el título y una descripción mínima («Surgió al cerrar la Tarea N; falta detallarla.»): para una tarea con todos sus campos, `add`.
   - **Regla 8:** revisa las bloqueadas con la misma lógica que `unblock` (módulo compartido `src/write/unblocking.ts`), contando esta tarea como cerrada: las que dependían solo de tareas cerradas pasan a «Tareas libres» con `Bloqueos` → `` `[Resuelto el <fecha>]` — era `[tag]` motivo `` (se conservan el motivo y el historial). Las de **texto libre** (o que nombran una tarea de otro operador) se listan como «Para revisar a mano» y no se tocan. Avisa si «Tareas libres» queda con más de 15 tareas (Agrupamiento en `backlog.md`); **no agrupa** automáticamente.
 - **Reporte de cierre (Regla 9):** al escribir, imprime con el formato de `rules.md` las secciones que tengan contenido: `**Tareas resueltas:**`, `**Tareas descartadas:**` (con el motivo breve: la primera línea del motivo, recortada), `**Tareas desbloqueadas:**` y `**Tareas nuevas:**`. En inglés, los títulos salen en inglés. Una tarea descartada también cuenta como cerrada para la Regla 8. Las secciones «Checks pendientes» y «Próximo paso» del reporte no las genera el script: las añade el agente si hay checks fallidos, omitidos o pendientes.
 - **`--json`:** `{ ..., task: { number, title, outcome, date, from (`current`, `paused` o `backlog`), origin }, report: { resolved, discarded, unblocked, created }, unblocked, manualReview, stillBlocked, freeTasks, warnings }`: `report` es el mismo contenido del reporte de cierre; `unblocked`, `manualReview` y `stillBlocked` traen tag, motivo y tareas mencionadas (como `unblock --json`).

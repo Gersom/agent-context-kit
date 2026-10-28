@@ -23,7 +23,7 @@ export interface FlagSpec {
   short?: string;
   /** Solo `string`: el valor `-` lee el texto de la entrada estándar (para textos largos). */
   stdin?: boolean;
-  /** Solo `string`: el flag se puede repetir (`--nueva a --nueva b`) y su valor es la lista de textos. No admite `stdin`. */
+  /** Solo `string`: el flag se puede repetir (`--new a --new b`) y su valor es la lista de textos. No admite `stdin`. */
   multiple?: boolean;
 }
 

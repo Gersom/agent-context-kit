@@ -10,9 +10,9 @@ import type { Field } from "../../../_shared/types.ts";
 import { CliError } from "../cli/errors.ts";
 import { type Edit, insertAt, replaceRange } from "../edit/edits.ts";
 import { trimRange } from "../query/lines.ts";
-import { BLOCKING_TAGS, blockedValue } from "./blocking.ts";
+import { BLOCKING_TAGS, blockedValue, citeBlockingTags } from "./blocking.ts";
 import { partOf } from "./handoff.ts";
-import { findFieldOfKind, isFieldKind, NONE_RE, type FieldKind } from "./language.ts";
+import { findFieldOfKind, isFieldKind, NONE_RE, type FieldKind, type Strings } from "./language.ts";
 import { fieldBody, renderField } from "./render.ts";
 
 /** Un tramo `[start, end)` del texto LF. */
@@ -184,13 +184,13 @@ function keptHistory(current: string | null): string | null {
  * `blockInfo` lo leería como el tag de la tarea y el estado quedaría incoherente con su sección.
  * @throws CliError el valor empieza con un tag que no es de bloqueo ni de historial
  */
-function rejectUnknownLeadingTag(value: string): void {
+function rejectUnknownLeadingTag(value: string, tags?: Strings["tags"]): void {
   const lead = value.match(LEADING_TAG_RE);
   if (!lead) return;
   const tag = lead[2].trim();
   if (BLOCKING_TAGS.test(tag) || RESOLVED_LEAD_RE.test(tag)) return;
   throw new CliError(
-    `--blocker: un valor que empieza con un tag entre corchetes («${value.trim().slice(0, 40)}») se leería como tag de la tarea y dejaría su estado incoherente; solo valen \`[dependencia]\`/\`[postergada]\` (en una bloqueada) o \`[Resuelto ...]\`. Quita los corchetes iniciales. No se escribió nada.`,
+    `--blocker: un valor que empieza con un tag entre corchetes («${value.trim().slice(0, 40)}») se leería como tag de la tarea y dejaría su estado incoherente; solo valen ${citeBlockingTags(tags, "/")} (en una bloqueada) o \`[Resuelto ...]\`. Quita los corchetes iniciales. No se escribió nada.`,
   );
 }
 
@@ -209,6 +209,8 @@ export interface BlockerInput {
   value: string;
   /** ¿El valor pedido bloquea (empieza con un tag `[dependencia]` / `[postergada]`)? */
   blocking: boolean;
+  /** Los tags de bloqueo del idioma del archivo, si se conoce; sin ellos los mensajes citan los de ambos idiomas. */
+  tags?: Strings["tags"];
   /** La tarea es del team-backlog.md (no hay `block` ni `unblock` para ella). */
   team: boolean;
 }
@@ -227,13 +229,13 @@ export interface BlockerInput {
  * @throws CliError el valor cambiaría el estado de la tarea (el mensaje dice con qué comando)
  */
 export function resolveBlocker(input: BlockerInput): string {
-  const { state, current, value, blocking, team } = input;
+  const { state, current, value, blocking, team, tags } = input;
   const move = (command: string, what: string) =>
     team ? `${what}: cambia su sección, y para el team-backlog.md no hay comando; hazlo a mano` : `${what}: usa \`${command}\``;
 
   if (state === "free") {
-    if (blocking) throw new CliError(`Ese valor de Bloqueos bloquearía la tarea y edit no cambia su estado (${move("block <N> --tag <dependencia|postergada> --motivo <texto>", "para bloquearla")}). No se escribió nada.`);
-    rejectUnknownLeadingTag(value);
+    if (blocking) throw new CliError(`Ese valor de Bloqueos bloquearía la tarea y edit no cambia su estado (${move("block <N> --tag <dependency|postponed> --reason <texto>", "para bloquearla")}). No se escribió nada.`);
+    rejectUnknownLeadingTag(value, tags);
     return withHistory(value, keptHistory(current));
   }
 
@@ -242,15 +244,15 @@ export function resolveBlocker(input: BlockerInput): string {
   }
   if (LEADING_TAG_RE.test(value)) {
     if (blocking) return withHistory(value, keptHistory(current));
-    rejectUnknownLeadingTag(value);
+    rejectUnknownLeadingTag(value, tags);
     throw new CliError(
-      `El valor de Bloqueos empieza con un tag que no es \`[dependencia]\` ni \`[postergada]\`: la tarea dejaría de estar bloqueada y edit no cambia su estado (${move("unblock <N>", "para desbloquearla")}). No se escribió nada.`,
+      `El valor de Bloqueos empieza con un tag que no es ${citeBlockingTags(tags, "ni")}: la tarea dejaría de estar bloqueada y edit no cambia su estado (${move("unblock <N>", "para desbloquearla")}). No se escribió nada.`,
     );
   }
   const tag = current ? blockInfo({ fields: [{ label: "Bloqueos", value: current }] }).tag : null;
   if (!tag || !BLOCKING_TAGS.test(tag)) {
     throw new CliError(
-      "La tarea está en «bloqueadas / pospuestas» pero su campo Bloqueos no tiene un tag vigente que conservar: escribe el valor con `[dependencia]` o `[postergada]` al inicio. No se escribió nada.",
+      `La tarea está en «bloqueadas / pospuestas» pero su campo Bloqueos no tiene un tag vigente que conservar: escribe el valor con ${citeBlockingTags(tags, "o")} al inicio. No se escribió nada.`,
     );
   }
   return blockedValue(tag, value, current ? resolvedHistory(current) : null);

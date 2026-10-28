@@ -1,6 +1,6 @@
 // Línea de comandos: el comando es el primer argumento que no es un flag, los flags (globales y del
 // comando) se interpretan con `node:util` `parseArgs` en modo estricto y un flag de texto con valor
-// `-` lee su contenido de la entrada estándar (para textos largos: `--detalles -`).
+// `-` lee su contenido de la entrada estándar (para textos largos: `--details -`).
 
 import { parseArgs } from "node:util";
 import { UsageError } from "./errors.ts";

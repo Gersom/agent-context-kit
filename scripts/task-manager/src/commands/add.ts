@@ -12,22 +12,25 @@ import { normalizeTitle } from "../query/find.ts";
 import { relFile } from "../query/format.ts";
 import { requireDoc } from "../workspace/docs.ts";
 import { requireOwnFolder } from "../workspace/ownership.ts";
-import { BLOCKING_TAGS } from "../write/blocking.ts";
+import { BLOCKING_TAGS, citeBlockingTags } from "../write/blocking.ts";
 import { requiredFlag, singleLine, textFlag } from "../write/flags.ts";
-import { detectLanguage, NONE_RE, STRINGS } from "../write/language.ts";
+import { detectLanguage, NONE_RE, STRINGS, type Strings } from "../write/language.ts";
 import { renderBacklogTask } from "../write/new-task.ts";
 import { reserveNextNumber } from "../write/numbering.ts";
 import { formatLocalDate, renderTaskBlock } from "../write/render.ts";
 import { headerLabels, labelResolver } from "../write/samples.ts";
 
-/** ¿El texto de `--bloqueo` bloquea la tarea? Si dice algo pero sin el tag esperado, avisa en vez de adivinar. */
-export function classifyBlocker(value: string): { blocked: boolean; warning: string | null } {
+/**
+ * ¿El texto de `--blocker` bloquea la tarea? Si dice algo pero sin el tag esperado, avisa en vez de adivinar.
+ * @param tags tags del idioma del archivo, si se conoce; sin ellos el aviso cita los dos idiomas
+ */
+export function classifyBlocker(value: string, tags?: Strings["tags"]): { blocked: boolean; warning: string | null } {
   if (!value.trim() || NONE_RE.test(value.trim())) return { blocked: false, warning: null };
   const { tag } = blockInfo({ fields: [{ label: "Bloqueos", value }] });
   if (tag && BLOCKING_TAGS.test(tag)) return { blocked: true, warning: null };
   return {
     blocked: false,
-    warning: "--bloqueo no empieza con `[dependencia]` ni `[postergada]`: la tarea va a «libres» (si debe quedar bloqueada, empieza el texto con uno de los dos tags).",
+    warning: `--blocker no empieza con ${citeBlockingTags(tags, "ni")}: la tarea va a «libres» (si debe quedar bloqueada, empieza el texto con uno de los dos tags).`,
   };
 }
 
@@ -35,30 +38,30 @@ export const add: Command = {
   name: "add",
   summary: "Agrega una tarea a tu backlog.md (o al team-backlog.md con --team); escribe con --apply",
   usage:
-    "add --titulo <título> --descripcion <texto> [--decisiones <texto>] [--bloqueo <texto>] [--disparador <texto>] [--detalles <texto>] [--team] [--apply]",
+    "add --title <título> --description <texto> [--decisions <texto>] [--blocker <texto>] [--trigger <texto>] [--details <texto>] [--team] [--apply]",
   writes: true,
   flags: {
-    titulo: { type: "string", valueName: "título", stdin: true, description: "Título de la tarea (una línea). Obligatorio." },
-    descripcion: { type: "string", valueName: "texto", stdin: true, description: "De qué trata (1–3 líneas). Obligatorio." },
-    decisiones: {
+    title: { type: "string", valueName: "título", stdin: true, description: "Título de la tarea (una línea). Obligatorio." },
+    description: { type: "string", valueName: "texto", stdin: true, description: "De qué trata (1–3 líneas). Obligatorio." },
+    decisions: {
       type: "string",
       valueName: "texto",
       stdin: true,
       description: "Decisiones/temas a definir antes de empezar. Por defecto «Ninguno.».",
     },
-    bloqueo: {
+    blocker: {
       type: "string",
       valueName: "texto",
       stdin: true,
-      description: "Bloqueo: «Ninguno.» (por defecto) o un texto que empiece con `[dependencia]` o `[postergada]` (va a «bloqueadas»).",
+      description: "Bloqueo: «Ninguno.» (por defecto) o un texto que empiece con `[dependencia]` o `[postergada]` (`[dependency]`/`[postponed]` en un proyecto en inglés; va a «bloqueadas»). El tag se guarda tal cual se escribe: usa el del idioma de la documentación.",
     },
-    disparador: {
+    trigger: {
       type: "string",
       valueName: "texto",
       stdin: true,
       description: "Cuándo corresponde tomarla. Por defecto, el genérico de la plantilla. No aplica con --team.",
     },
-    detalles: { type: "string", valueName: "texto", stdin: true, description: "Contexto extendido. Opcional: si no se pasa, el campo se omite." },
+    details: { type: "string", valueName: "texto", stdin: true, description: "Contexto extendido. Opcional: si no se pasa, el campo se omite." },
     team: {
       type: "boolean",
       description: "Agregarla al team-backlog.md compartido (sin número; título único) en vez de a tu backlog.md. Sirve también al operador «solo team-backlog».",
@@ -66,14 +69,14 @@ export const add: Command = {
   },
   run(ctx) {
     const { flags } = ctx;
-    const title = singleLine("titulo", requiredFlag(flags, "titulo"));
+    const title = singleLine("title", requiredFlag(flags, "title"));
     const input = {
       title,
-      description: requiredFlag(flags, "descripcion"),
-      decisions: textFlag(flags, "decisiones"),
-      blocker: textFlag(flags, "bloqueo"),
-      trigger: textFlag(flags, "disparador"),
-      details: textFlag(flags, "detalles"),
+      description: requiredFlag(flags, "description"),
+      decisions: textFlag(flags, "decisions"),
+      blocker: textFlag(flags, "blocker"),
+      trigger: textFlag(flags, "trigger"),
+      details: textFlag(flags, "details"),
     };
     return flags.team === true ? addToTeam(ctx, input) : addToBacklog(ctx, input);
   },
@@ -96,16 +99,16 @@ function addToBacklog(ctx: CommandContext, input: AddInput): void {
   const backlog = requireDoc(docs.backlog, "backlog.md");
   const reserved = reserveNextNumber(docs);
 
-  const kind = classifyBlocker(input.blocker ?? "");
+  // Idioma y etiquetas: las de las tareas que el archivo ya tiene; si no hay, la tabla mínima.
+  const { lang, notice } = detectLanguage(headerLabels(docs));
+  const S = STRINGS[lang];
+  const kind = classifyBlocker(input.blocker ?? "", notice ? undefined : S.tags);
   const sectionId = kind.blocked ? "blocked" : "free";
   const section = backlog.parsed.sections[sectionId];
   if (!section) {
     throw new CliError(`backlog.md no tiene la sección «${sectionId}» (${kind.blocked ? "tareas bloqueadas / pospuestas" : "tareas libres"}): no sé dónde agregar la tarea. No se escribió nada.`);
   }
 
-  // Idioma y etiquetas: las de las tareas que el archivo ya tiene; si no hay, la tabla mínima.
-  const { lang, notice } = detectLanguage(headerLabels(docs));
-  const S = STRINGS[lang];
   const block = renderBacklogTask(docs, S, kind.blocked ? backlog.parsed.blocked : backlog.parsed.free.tasks, {
     number: reserved.number,
     title: input.title,
@@ -133,7 +136,7 @@ function addToBacklog(ctx: CommandContext, input: AddInput): void {
 function addToTeam(ctx: CommandContext, input: AddInput): void {
   const { io } = ctx;
   if (input.trigger) {
-    throw new UsageError("--disparador no aplica con --team: las tareas del team-backlog.md no llevan Disparador (lo completa quien la toma).");
+    throw new UsageError("--trigger no aplica con --team: las tareas del team-backlog.md no llevan Disparador (lo completa quien la toma).");
   }
   // El operador «solo team-backlog» no tiene carpeta, pero sí puede agregar acá.
   const ws = ctx.workspace({ allowFolderless: true });
@@ -151,19 +154,18 @@ function addToTeam(ctx: CommandContext, input: AddInput): void {
     throw new CliError(`Ya hay una tarea con el título «${repeated.title}» en team-backlog.md: el título identifica la tarea y debe ser único. No se escribió nada.`);
   }
 
-  const kind = classifyBlocker(input.blocker ?? "");
-  const sectionId = kind.blocked ? "blocked" : "free";
-  const section = team.parsed.sections[sectionId];
-  if (!section) {
-    throw new CliError(`team-backlog.md no tiene la sección «${sectionId}» (${kind.blocked ? "tareas bloqueadas / pospuestas" : "tareas libres"}): no sé dónde agregar la tarea. No se escribió nada.`);
-  }
-
   const fieldLists = [...team.parsed.free, ...team.parsed.blocked].map((task) => task.fields);
   const detected = detectLanguage([
     ...fieldLists.flat().map((field) => field.label),
     ...headerLabels(docs),
   ]);
   const S = STRINGS[detected.lang];
+  const kind = classifyBlocker(input.blocker ?? "", detected.notice ? undefined : S.tags);
+  const sectionId = kind.blocked ? "blocked" : "free";
+  const section = team.parsed.sections[sectionId];
+  if (!section) {
+    throw new CliError(`team-backlog.md no tiene la sección «${sectionId}» (${kind.blocked ? "tareas bloqueadas / pospuestas" : "tareas libres"}): no sé dónde agregar la tarea. No se escribió nada.`);
+  }
   const label = labelResolver(fieldLists, S);
 
   const fields: Array<[string, string]> = [

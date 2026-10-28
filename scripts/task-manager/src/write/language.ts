@@ -80,6 +80,8 @@ export interface Strings {
   raisedWhenClosing(task: string, number: number): string;
   /** Títulos del reporte de cierre (Regla 9 de rules.md). */
   report: { done: string; discarded: string; unblocked: string; created: string };
+  /** Tags de bloqueo que `block` escribe en `Bloqueos` (`` `[dependencia]` motivo ``). */
+  tags: { dependency: string; postponed: string };
 }
 
 export const STRINGS: Record<Lang, Strings> = {
@@ -118,6 +120,7 @@ export const STRINGS: Record<Lang, Strings> = {
     was: "era",
     raisedWhenClosing: (task, number) => `Surgió al cerrar la ${task} ${number}; falta detallarla.`,
     report: { done: "Tareas resueltas", discarded: "Tareas descartadas", unblocked: "Tareas desbloqueadas", created: "Tareas nuevas" },
+    tags: { dependency: "dependencia", postponed: "postergada" },
   },
   en: {
     task: "Task",
@@ -154,6 +157,7 @@ export const STRINGS: Record<Lang, Strings> = {
     was: "was",
     raisedWhenClosing: (task, number) => `Raised when closing ${task} ${number}; still to be detailed.`,
     report: { done: "Resolved tasks", discarded: "Discarded tasks", unblocked: "Unblocked tasks", created: "New tasks" },
+    tags: { dependency: "dependency", postponed: "postponed" },
   },
 };
 

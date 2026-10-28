@@ -15,10 +15,10 @@ function probe(seen: CommandContext[], extra: Partial<Command> = {}): Command {
   return {
     name: "probe",
     summary: "Comando de prueba",
-    usage: "probe <x> [--titulo <t>]",
+    usage: "probe <x> [--title <t>]",
     flags: {
-      titulo: { type: "string", description: "Un título" },
-      detalles: { type: "string", description: "Texto largo", stdin: true, valueName: "texto" },
+      title: { type: "string", description: "Un título" },
+      details: { type: "string", description: "Texto largo", stdin: true, valueName: "texto" },
       fuerza: { type: "boolean", description: "Fuerza" },
     },
     run(ctx) {
@@ -50,8 +50,8 @@ describe("ayuda", () => {
     for (const argv of [["probe", "--help"], ["help", "probe"]]) {
       const { code, out } = await exec(argv, [probe([])]);
       expect(code).toBe(0);
-      expect(out).toContain("Uso: acsuite task probe <x> [--titulo <t>]");
-      expect(out).toContain("--detalles <texto|->");
+      expect(out).toContain("Uso: acsuite task probe <x> [--title <t>]");
+      expect(out).toContain("--details <texto|->");
       expect(out).toContain("--fuerza");
     }
   });
@@ -86,9 +86,9 @@ describe("errores y códigos de salida", () => {
 
   test("flag desconocido o sin valor: código 2", async () => {
     expect((await exec(["probe", "--nada"], [probe([])])).code).toBe(2);
-    const { code, err } = await exec(["probe", "--titulo"], [probe([])]);
+    const { code, err } = await exec(["probe", "--title"], [probe([])]);
     expect(code).toBe(2);
-    expect(err).toContain("Falta el valor de --titulo.");
+    expect(err).toContain("Falta el valor de --title.");
   });
 
   test("CliError del comando: código 1 y mensaje sin stack", async () => {
@@ -123,9 +123,9 @@ describe("errores y códigos de salida", () => {
 describe("contexto de un comando", () => {
   test("posicionales y flags propios (sin los globales); globales aparte", async () => {
     const seen: CommandContext[] = [];
-    await exec(["probe", "a", "--titulo", "T", "b", "--fuerza", "--dry-run", "--operator", "gersom"], [probe(seen)]);
+    await exec(["probe", "a", "--title", "T", "b", "--fuerza", "--dry-run", "--operator", "gersom"], [probe(seen)]);
     expect(seen[0].args).toEqual(["a", "b"]);
-    expect(seen[0].flags).toEqual({ titulo: "T", fuerza: true });
+    expect(seen[0].flags).toEqual({ title: "T", fuerza: true });
     expect(seen[0].global).toEqual({ dryRun: true, apply: false });
   });
 
@@ -138,8 +138,8 @@ describe("contexto de un comando", () => {
 
   test("valor `-` lee la entrada estándar", async () => {
     const seen: CommandContext[] = [];
-    await exec(["probe", "--detalles", "-"], [probe(seen)], { readStdin: async () => "Texto\nlargo\n" });
-    expect(seen[0].flags.detalles).toBe("Texto\nlargo");
+    await exec(["probe", "--details", "-"], [probe(seen)], { readStdin: async () => "Texto\nlargo\n" });
+    expect(seen[0].flags.details).toBe("Texto\nlargo");
   });
 
   test("dos flags con `-`: error de uso", async () => {
