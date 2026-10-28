@@ -7,7 +7,7 @@ Mod de Claude Code para la suite [agent-context-suite](https://github.com/Gersom
 Guarda la raíz del proyecto de la sesión (donde arrancó, no la carpeta a la que un `cd` la haya movido) y la hora en `active-project.json`, dentro de la carpeta de config de la suite (`ACSUITE_HOME` si está definida, si no `~/.acsuite`):
 
 ```json
-{ "path": "D:\personal\mi-proyecto", "at": "2026-10-28T01:07:20.960Z" }
+{ "path": "D:\\personal\\mi-proyecto", "at": "2026-10-28T01:07:20.960Z" }
 ```
 
 Se usa de dos formas, con el mismo resultado:

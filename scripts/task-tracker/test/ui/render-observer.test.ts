@@ -6,7 +6,7 @@ import { buildModel } from "../../src/model/model.ts";
 import { fixture } from "../../../_shared/test/helpers.ts";
 
 const SKILL_NOTICE = `Este repo no tiene la skill iniciada: /repos/nuevo. Instálala desde ${SKILL_URL}`;
-const STATUS = "Observando: el board cambia solo de proyecto cuando pulsas el botón «Marcar este proyecto» del mod de Claude o escribes /board.";
+const STATUS = "Observando: el board cambia solo de proyecto cuando pulsas el botón «Mark» del mod de Claude o escribes /board.";
 
 const projectsMeta: ProjectsRenderMeta = {
   updatedAt: new Date(2026, 9, 6, 12, 0, 0),
@@ -176,7 +176,7 @@ describe("modo observador: línea de estado", () => {
 });
 
 describe("modo observador: vista de espera", () => {
-  const WAITING = "Esperando: el board cambiará solo de proyecto cuando pulses el botón «Marcar este proyecto» del mod de Claude o escribas /board.";
+  const WAITING = "Esperando: el board cambiará solo de proyecto cuando pulses el botón «Mark» del mod de Claude o escribas /board.";
   const waitingMeta = { updatedAt: projectsMeta.updatedAt, trigger: projectsMeta.trigger, color: false, width: 160, controls: "keys" as const, observer: { notice: null } };
 
   /** El texto de las líneas desde `start` hasta la próxima línea en blanco, unido con espacios. */

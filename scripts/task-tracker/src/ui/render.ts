@@ -143,10 +143,10 @@ function finishCanvas(
 }
 
 /** Línea de estado del modo observador (ver `RenderMeta.observer`). */
-const OBSERVER_STATUS = "Observando: el board cambia solo de proyecto cuando pulsas el botón «Marcar este proyecto» del mod de Claude o escribes /board.";
+const OBSERVER_STATUS = "Observando: el board cambia solo de proyecto cuando pulsas el botón «Mark» del mod de Claude o escribes /board.";
 
 /** Lo que dice la vista de espera del modo observador (ver `renderObserver`). */
-const OBSERVER_WAITING = "Esperando: el board cambiará solo de proyecto cuando pulses el botón «Marcar este proyecto» del mod de Claude o escribas /board.";
+const OBSERVER_WAITING = "Esperando: el board cambiará solo de proyecto cuando pulses el botón «Mark» del mod de Claude o escribas /board.";
 
 /**
  * Parte `text` en líneas de a lo sumo `width` caracteres, cortando en los espacios. Una palabra más
