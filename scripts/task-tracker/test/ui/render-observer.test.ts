@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import type { ProjectRow, ProjectsRenderMeta } from "../../src/shared/types.ts";
-import { render, renderProjects, renderTeam } from "../../src/ui/render.ts";
+import { render, renderObserver, renderProjects, renderTeam } from "../../src/ui/render.ts";
 import { buildModel } from "../../src/model/model.ts";
 import { fixture } from "../../../_shared/test/helpers.ts";
 
@@ -118,5 +118,72 @@ describe("modo observador: línea de estado", () => {
   test("el aviso largo se recorta al ancho como los demás avisos", () => {
     const notice = `No se pudo abrir ${"/carpeta".repeat(30)}`;
     for (const line of render(model, { ...repoMeta, width: 80, observer: { notice } }).split("\n")) expect([...line].length).toBeLessThanOrEqual(80);
+  });
+});
+
+describe("modo observador: vista de espera", () => {
+  const WAITING = "Esperando que marques un proyecto con el mod de Claude (botón «Marcar este proyecto» o /board).";
+  const waitingMeta = { updatedAt: projectsMeta.updatedAt, trigger: projectsMeta.trigger, color: false, width: 160, controls: "keys" as const, observer: { notice: null } };
+
+  /** El texto de las líneas desde `start` hasta la próxima línea en blanco, unido con espacios. */
+  const paragraph = (lines: string[], start: number): string => {
+    const text = [];
+    for (let i = start; lines[i] !== ""; i++) text.push(lines[i]);
+    return text.join(" ");
+  };
+
+  test("título, texto de espera y pie, sin recuadros de tareas ni la línea de estado", () => {
+    const out = renderObserver(waitingMeta);
+    const lines = out.split("\n");
+    expect(lines[0]).toBe("▣ Modo observador");
+    expect(out).toContain(WAITING);
+    expect(out).toContain("[o] salir del modo observador - [Ctrl+C o q] salir");
+    expect(out).not.toContain("[o] observar");
+    expect(out).not.toContain("Observando");
+    expect(out).not.toContain("! ");
+    expect(out).not.toMatch(/[╭╰]/);
+    for (const word of ["EN PROGRESO", "LIBRES", "PROYECTOS", "[p] proyectos", "[c] "]) expect(out).not.toContain(word);
+  });
+
+  test("el pie va después del texto, separado por una línea en blanco", () => {
+    const lines = renderObserver(waitingMeta).split("\n");
+    const text = lines.findIndex((l) => l.startsWith("Esperando"));
+    expect(lines[text - 1]).toBe("");
+    expect(lines[text + 1]).toBe("");
+    expect(lines[text + 2]).toBe("[o] salir del modo observador - [Ctrl+C o q] salir");
+  });
+
+  test("con aviso: una línea `! …` entre el texto y el pie", () => {
+    const notice = "No se pudo abrir /repos/roto: No existe la carpeta.";
+    const lines = renderObserver({ ...waitingMeta, observer: { notice } }).split("\n");
+    const text = lines.findIndex((l) => l.startsWith("Esperando"));
+    expect(lines[text + 1]).toBe("");
+    expect(lines[text + 2]).toBe(`! ${notice}`);
+    expect(lines[text + 3]).toBe("");
+    expect(lines[text + 4]).toContain("[o] salir del modo observador");
+  });
+
+  test("sin el campo observer tampoco hay aviso", () => {
+    expect(renderObserver({ ...waitingMeta, observer: undefined })).not.toContain("! ");
+  });
+
+  test("en un ancho estrecho el texto y el pie se parten en palabras y no se pierde el final", () => {
+    for (const width of [100, 60, 40]) {
+      const lines = renderObserver({ ...waitingMeta, width }).split("\n");
+      for (const line of lines) expect([...line].length).toBeLessThanOrEqual(width);
+      expect(paragraph(lines, lines.findIndex((l) => l.startsWith("Esperando")))).toBe(WAITING);
+      const footer = lines.findIndex((l) => l.startsWith("[o]"));
+      expect(paragraph(lines, footer).replace(/ - /g, " ").replace(/\s+/g, " ")).toContain("[o] salir del modo observador");
+    }
+  });
+
+  test("el aviso largo se recorta al ancho como los demás avisos", () => {
+    const notice = `No se pudo abrir ${"/carpeta".repeat(30)}`;
+    for (const line of renderObserver({ ...waitingMeta, width: 80, observer: { notice } }).split("\n")) expect([...line].length).toBeLessThanOrEqual(80);
+  });
+
+  test("sin teclas activas el pie es el de siempre", () => {
+    expect(renderObserver({ ...waitingMeta, controls: "ctrl-c" })).toContain("[Ctrl+C] salir");
+    expect(renderObserver({ ...waitingMeta, controls: "none" })).not.toContain("[o]");
   });
 });

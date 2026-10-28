@@ -12,6 +12,7 @@ import type {
   BlockedTask,
   DrawTrigger,
   Model,
+  ObserverRenderMeta,
   Plan,
   ProjectRow,
   ProjectsRenderMeta,
@@ -105,6 +106,9 @@ function finishCanvas({ out, line, blank, secondary, pc, width }: Canvas, meta: 
 
 /** Línea de estado del modo observador (ver `RenderMeta.observer`). */
 const OBSERVER_STATUS = "Observando: esperando que marques un proyecto con el mod de Claude (botón «Marcar este proyecto» o /board)";
+
+/** Lo que dice la vista de espera del modo observador (ver `renderObserver`). */
+const OBSERVER_WAITING = "Esperando que marques un proyecto con el mod de Claude (botón «Marcar este proyecto» o /board).";
 
 /** Parte `text` en líneas de a lo sumo `width` caracteres, cortando en los espacios. */
 function wrapWords(text: string, width: number): string[] {
@@ -304,6 +308,20 @@ export function renderTeam(team: TeamModel, meta: TeamRenderMeta): string {
   return finishCanvas(canvas, meta, { warnings: team.warnings });
 }
 
+/**
+ * Vista de espera del modo observador: mientras ninguna marca abre un repo, la pantalla es solo
+ * esta (sin tareas): qué se espera, el aviso del observador si hay (`observer.notice`) y el pie.
+ */
+export function renderObserver(meta: ObserverRenderMeta): string {
+  const canvas = createCanvas(meta, "Modo observador");
+  const { pc, width, line } = canvas;
+  // El texto se parte en palabras si no entra, para no perder el final («o /board»).
+  for (const text of wrapWords(OBSERVER_WAITING, width)) line(0, text, pc.cyan);
+  // Sin la línea de estado de `finishCanvas` (que ya dice lo mismo): el aviso va como los demás avisos.
+  const notice = meta.observer?.notice;
+  return finishCanvas(canvas, { ...meta, observer: undefined, multiView: "observer" }, { warnings: notice ? [notice] : [] });
+}
+
 /** Segunda línea de la fila de un operador: conteos y su última tarea completada. */
 function summaryLine(op: TeamRow): string {
   const parts = [`libres ${op.counts.free}`, `bloqueadas ${op.counts.blocked}`];
@@ -459,7 +477,10 @@ function footerLines(meta: CanvasMeta, width: number): string[] {
   if (controls !== "keys") return [];
   const parts: string[] = [];
   const observe = meta.observer ? "[o] salir del modo observador" : "[o] observar";
-  if (meta.multiView === "projects") {
+  if (meta.multiView === "observer") {
+    // La vista de espera del observador no tiene más teclas: `r` redibuja pero no se ofrece.
+    parts.push("[o] salir del modo observador", "[Ctrl+C o q] salir");
+  } else if (meta.multiView === "projects") {
     // La lista de proyectos no se compacta ni tiene flechas de flujo, y `r` la vuelve a leer.
     // Agregando o confirmando una salida de la lista, solo valen las teclas de ese paso.
     if (meta.input != null) parts.push("[Enter] agregar", "[Esc] cancelar", "[Ctrl+C] salir");

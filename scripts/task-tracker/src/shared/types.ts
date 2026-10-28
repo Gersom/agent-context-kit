@@ -118,7 +118,7 @@ export interface RenderMeta {
   /** Tareas sin dueño (modo multi-operador): se pintan en el recuadro "SIN DUEÑO" debajo de las bloqueadas. */
   teamBacklog?: TeamBacklogModel;
   /** Qué vista es, si no es el panel de un repo plano (cambia las teclas que indica el pie). */
-  multiView?: "team" | "operator" | "projects";
+  multiView?: "team" | "operator" | "projects" | "observer";
   /** Lista de proyectos: texto de la ruta que se escribe para agregar un repo; `null` si no se agrega. */
   input?: string | null;
   /** Lista de proyectos: nombre y ruta del proyecto cuya salida de la lista se pide confirmar; `null` si no se confirma nada. */
@@ -221,6 +221,12 @@ export interface ProjectsRenderMeta extends Omit<RenderMeta, "projectName" | "pr
   /** Ruta del proyecto elegido en la lista. */
   selected: string | null;
 }
+
+/**
+ * Metadatos de la vista de espera del modo observador: sin repo en el encabezado. El aviso sale de
+ * `observer.notice`; `renderObserver` pone la vista (`multiView`) por su cuenta.
+ */
+export type ObserverRenderMeta = Omit<RenderMeta, "projectName" | "projectDir" | "multiView">;
 
 /** Metadatos de la vista de equipo: los de siempre más qué fila está elegida y cuál es "tú". */
 export interface TeamRenderMeta extends RenderMeta {

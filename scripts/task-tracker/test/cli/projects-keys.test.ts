@@ -82,10 +82,14 @@ describe("projectsKeysReduce: observar con o", () => {
     expect(projectsKeysReduce(list(null), "o", { paths: [] })).toEqual({ state: list(null), actions: [{ kind: "observe" }], resume: null });
   });
 
-  test("el bloque sigue después de o: las demás teclas se atienden en orden", () => {
-    const result = projectsKeysReduce(list(), "o\u001b[Bq", CTX);
-    expect(result.actions).toEqual([{ kind: "observe" }, { kind: "redraw" }, { kind: "quit" }]);
-    expect(result.state.nav.selected).toBe("/repos/gersom");
+  test("o se detiene ahí: lo que sigue en el bloque se atiende desde resume, ya con la vista nueva", () => {
+    const first = projectsKeysReduce(list(), "o\u001b[Bq", CTX);
+    expect(first.actions).toEqual([{ kind: "observe" }]);
+    expect(first.resume).toBe(1);
+    expect(first.state).toEqual(list());
+    const rest = projectsKeysReduce(first.state, "o\u001b[Bq", CTX, first.resume ?? 0);
+    expect(rest.actions).toEqual([{ kind: "redraw" }, { kind: "quit" }]);
+    expect(rest.state.nav.selected).toBe("/repos/gersom");
   });
 
   test("escribiendo una ruta, la o es texto", () => {

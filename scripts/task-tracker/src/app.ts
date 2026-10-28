@@ -23,7 +23,7 @@ import { buildModel } from "./model/model.ts";
 import { buildTeamModel } from "./model/team.ts";
 import type { Controls, DrawTrigger, MultiInfo, ProjectRow, RenderMeta, ResolveOk } from "./shared/types.ts";
 import { displayProjectName } from "./ui/format.ts";
-import { render, renderProjects, renderTeam } from "./ui/render.ts";
+import { render, renderObserver, renderProjects, renderTeam } from "./ui/render.ts";
 
 /** El repo que se vigila: lo que resuelve `resolveAgentsDir`. */
 type Target = Omit<ResolveOk, "ok">;
@@ -34,8 +34,8 @@ type Target = Omit<ResolveOk, "ok">;
  * `operators.md`); `null` abre la lista de proyectos.
  * `listProjects`: de dónde sale la lista de proyectos (se lee al abrir la vista y con `r`).
  * `once`: pinta una sola vez y no vigila (sin atajos de teclado).
- * `follow`: arranca con el modo observador activo (solo en una sesión interactiva; con `once` o sin
- * terminal se ignora). La tecla `o` lo alterna.
+ * `follow`: arranca con el modo observador activo, en su vista de espera aunque haya un `target` (solo
+ * en una sesión interactiva; con `once` o sin terminal se ignora). La tecla `o` lo alterna.
  */
 export function startApp({
   target: initialTarget,
@@ -81,6 +81,9 @@ export function startApp({
   let stopObserver: (() => void) | null = null;
   // Último aviso del observador (ej. el proyecto marcado no se pudo abrir); `null` si no hay.
   let observerNotice: string | null = null;
+  // `true` desde que se activa el observador hasta que una marca abre un repo: la pantalla es solo la
+  // de espera (`renderObserver`), sin repo ni lista de proyectos (`target` es `null`).
+  let observerWaiting = false;
   // Atajos solo con una terminal interactiva de verdad (no con salida o entrada redirigida).
   const interactive = !once && Boolean(process.stdin.isTTY) && Boolean(process.stdout.isTTY);
   const controls: Controls = once ? "none" : interactive ? "keys" : "ctrl-c";
@@ -95,7 +98,8 @@ export function startApp({
     teamReader = next?.multi ? createTeamReader(next.agentsDir) : null;
     nav = null;
     navRows = [];
-    if (!next) loadProjects();
+    // Esperando una marca la lista no se ve: se lee al salir del observador.
+    if (!next && !observerWaiting) loadProjects();
     if (process.stdout.isTTY && !next?.multi) setTitle();
   }
 
@@ -172,6 +176,8 @@ export function startApp({
     };
     let screen: string;
 
+    if (observerWaiting) return write(renderObserver(common));
+
     if (!target) {
       // La lista no se relee al redibujar (cambio de tamaño): solo con `r` o al abrir la vista.
       projectsNav = reconcileProjects(projectsNav, projectRows.map((row) => row.path));
@@ -239,7 +245,7 @@ export function startApp({
   }
 
   function setTitle(suffix?: string): void {
-    const name = target ? displayProjectName(target.projectName) : "proyectos";
+    const name = observerWaiting ? "observador" : target ? displayProjectName(target.projectName) : "proyectos";
     process.stdout.write(`\x1b]0;tareas · ${name}${suffix ? ` · ${suffix}` : ""}\x07`);
   }
 
@@ -272,7 +278,8 @@ export function startApp({
 
   /**
    * Activa el modo observador: borra el `active-project.json` que haya (lo marcado antes no cuenta) y
-   * vigila la carpeta de config hasta que el mod de Claude escriba uno nuevo.
+   * vigila la carpeta de config hasta que el mod de Claude escriba uno nuevo. Mientras tanto la
+   * pantalla es la de espera: se cierra el repo abierto (sin lectores ni vigilantes) y no hay tareas.
    */
   function enterObserver(): void {
     stopObserver?.();
@@ -291,15 +298,28 @@ export function startApp({
       draw({ kind: "redraw" });
     };
     stopObserver = watchDir(configDir(), onActiveChange, onObserverError, undefined, [ACTIVE_PROJECT_FILE]);
+    // No queda una ruta a medio escribir ni una confirmación pendiente de la lista.
+    adding = null;
+    confirmRemove = null;
+    observerWaiting = true;
+    open(null);
     draw({ kind: "redraw" });
   }
 
-  /** Desactiva el modo observador. */
+  /**
+   * Desactiva el modo observador. Si todavía esperaba la primera marca, no hay repo al que volver:
+   * queda la lista de proyectos (se vuelve a leer).
+   */
   function exitObserver(): void {
     stopObserver?.();
     stopObserver = null;
     observer = null;
     observerNotice = null;
+    if (observerWaiting) {
+      observerWaiting = false;
+      fromList = false;
+      open(null);
+    }
     draw({ kind: "redraw" });
   }
 
@@ -312,8 +332,9 @@ export function startApp({
   }
 
   /**
-   * Abre el proyecto marcado `path` (agregándolo a la lista si no estaba). Si no se puede, lo avisa
-   * en la pantalla actual y se sigue observando.
+   * Abre el proyecto marcado `path` (agregándolo a la lista si no estaba) y termina la espera. Si no
+   * se puede, lo avisa en la pantalla actual (la de espera, si todavía no se abrió ninguno) y se
+   * sigue observando.
    */
   function followProject(path: string): void {
     const result = projectList.add(path);
@@ -333,6 +354,7 @@ export function startApp({
     adding = null;
     confirmRemove = null;
     fromList = true;
+    observerWaiting = false;
     open(resolved);
     draw({ kind: "start" });
     syncWatchers();
@@ -346,11 +368,15 @@ export function startApp({
     const failure = saveProject(root);
     if (failure) watcherErrors.push(failureMessage("guardar", basename(root), failure));
   }
-  draw({ kind: "start" });
-  if (once) return;
-  syncWatchers();
-  // `--follow` solo vale en una sesión interactiva (con `once` ya se salió arriba).
-  if (follow && interactive) enterObserver();
+  if (follow && interactive) {
+    // `--follow` solo vale en una sesión interactiva. La primera pantalla es la de espera, aunque
+    // haya un repo inicial: ese repo se cierra sin pintarse.
+    enterObserver();
+  } else {
+    draw({ kind: "start" });
+    if (once) return;
+    syncWatchers();
+  }
 
   const quit = () => {
     for (const stop of stops.values()) stop();
@@ -398,6 +424,16 @@ export function startApp({
       const keys = parseKeys(chunk);
       let at = 0;
       while (true) {
+        if (observerWaiting) {
+          // Esperando la primera marca solo valen salir, `r` y `o` (que deja la lista de proyectos: lo que
+          // siga en el bloque va a ella); lo demás se ignora.
+          if (at >= keys.length) return;
+          const key = keys[at++];
+          if (key === "quit") return quit();
+          if (key === "observe") exitObserver();
+          else if (key === "redraw") draw({ kind: "redraw" });
+          continue;
+        }
         if (!target) {
           const resume = projectsKeys(chunk, at);
           if (resume == null) return;

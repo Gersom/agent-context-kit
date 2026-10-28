@@ -48,8 +48,9 @@ export interface ProjectsKeysResult {
   actions: ProjectsAction[];
   /**
    * Índice (en `parseKeys(chunk)`) de la primera tecla del bloque que falta atender, o `null` si no
-   * queda ninguna. Tras `reload` y `open` el reductor se detiene: lo que sigue depende de lo que
-   * cambie al ejecutarlos (otras filas, o un repo abierto en vez de la lista).
+   * queda ninguna. Tras `reload`, `open` y `observe` el reductor se detiene: lo que sigue depende de
+   * lo que cambie al ejecutarlos (otras filas, un repo abierto o la vista de espera del observador
+   * en vez de la lista).
    */
   resume: number | null;
 }
@@ -94,11 +95,8 @@ export function projectsKeysReduce(state: ProjectsKeysState, chunk: string, ctx:
     const next = i + 1 < keys.length ? i + 1 : null;
     if (key === "quit") return result({}, [{ kind: "quit" }]);
     if (key === "redraw") return result({}, [{ kind: "reload" }, { kind: "redraw" }], next);
-    if (key === "observe") {
-      // No cambia las filas ni la vista: el bloque sigue con la tecla siguiente.
-      actions.push({ kind: "observe" });
-      continue;
-    }
+    // Activar el observador cambia la vista (pasa a la de espera): lo que sigue en el bloque lo atiende app.ts según lo que quede en pantalla.
+    if (key === "observe") return result({}, [{ kind: "observe" }], next);
     if (key === "add") {
       // Lo que siga en este mismo bloque ya es la ruta, no teclas de navegación.
       const rest = chunk.slice(chunk.search(/[aA]/) + 1);
