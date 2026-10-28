@@ -50,6 +50,7 @@ Varias personas trabajan a la vez, cada una con su agente. Estas reglas se suman
 - No hay linter/formatter. `scripts/` (TypeScript con Bun, ej. `scripts/task-tracker/`) son herramientas propias de la suite que **no forman parte de la skill distribuida** ni se copian a los repos destino.
 - Dependencias de `scripts/`: en el `package.json` raíz (no uno por script); `bun install` en la raíz; `node_modules/` no se commitea y `bun.lock` sí. Tests con `bun test` desde la raíz.
 - Los scripts nuevos se escriben en **TypeScript** (decisión del operador, 2026-10-05), con el `tsconfig.json` raíz (`strict`). Bun no revisa tipos: `bun run typecheck` (`tsc --noEmit`) tiene que pasar junto con `bun test`.
+- **Comandos y flags de las herramientas, siempre en inglés.** Los nombres de comandos, flags y palabras clave de las herramientas (ej. `acsuite task add --title`, `--tag dependency`) van siempre en inglés, sea cual sea el idioma del usuario o de la documentación. El contenido libre que escribe la persona (título, descripción, motivo, detalles) va en su idioma y no se traduce.
 - **Decisión no negociable —** versionado SemVer, un tag de git anotado `vX.Y.Z` por cada cambio de versión (se sube con `git push --follow-tags`) y releases manuales en GitHub, no por CI. Cada repo se versiona por separado: la suite con `package.json`; la skill, en su propio repo. Cuándo subir patch, minor o major y dónde vive cada versión: [`../releasing.md`](../releasing.md).
 
 ### Si usas el script de tareas
