@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-28 — ✅ Tarea 114 — Pasar los flags y tags de los comandos del task-manager a inglés y fijar la regla
+
+- Los flags de `add`, `block`, `close`, `start` y `pause` pasaron a inglés, sin alias (`--title`, `--description`, `--decisions`, `--blocker`, `--trigger`, `--details`, `--reason`, `--summary`, `--new`, `--mode`, `--waiting-for`, `--missing`, `--next`). `block --tag` acepta solo `dependency|postponed`; el tag que se escribe en el archivo sigue el idioma de la documentación y la lectura acepta ambos idiomas.
+- Regla nueva en rules.md: comandos, flags y palabras clave en inglés; el contenido libre va en el idioma de la persona. Revisado con un revisor aparte; 1451 tests, typecheck y check pasan.
+- Commits en la suite: 2415ec7 y caf146e. Quedan fuera el mensaje de docs-check que cita solo tags en español y `dist/cli.js`, que se regenera con `bun run build`.
+
 ## 2026-10-28 — ✅ Tarea 115 — Quitar de step los flags de edición de texto (ahora en edit)
 
 - `step` quedó con una sola función: marcar o desmarcar (`--undo`) pasos del plan y mantener al día «Qué falta» y «Próximo paso concreto» cuando siguen con el texto automático. Se quitaron sus flags `--falta`, `--decisiones` y `--proximo`, de golpe y sin período de aviso: el texto se cambia con `edit`.
