@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 103 — Prueba mínima del mod de proyecto activo
+
+- Mod de prueba mods/active-project-probe/: comando /board y banda con botón que guardan {path, at} en ~/.acsuite/active-project.json (ACSUITE_HOME).
+- Verificado en la app de escritorio: el mod escribe fuera de su carpeta, la banda se dibuja y cada sesión guarda su propio proyecto; se instala vía CLAUDE_CODE_PLUGIN_DIRS porque un mod de dev-mods solo carga en la sesión que lo creó. Veredicto: viable.
+- Commit: fdacf49 (suite).
+
 ## 2026-10-27 — ❌ Tarea 102 — Board: menores descartados y pegados en la lista de proyectos
 
 - El operador descartó estos menores de la lista de proyectos (carrera de dos escrituras, x con archivo corrupto, aviso truncado, casos raros de pegado y tests del flujo de app.ts): son improbables en uso normal y no justifican el trabajo.
