@@ -249,6 +249,20 @@ describe("edit — backlog propio", () => {
       expect(snapshot(p.root)).toEqual(before);
     });
 
+    test("un corchete inicial que no es tag de bloqueo se rechaza (se leería como tag de la tarea)", async () => {
+      const p = project({ folders: ["gersom"], ...RICH });
+      const before = snapshot(p.root);
+      for (const n of ["1", "6", "14"]) {
+        const { code, err } = await exec(["edit", n, "--blocker=[algo] x", "--apply"], p);
+        expect(code).toBe(1);
+        expect(err).toContain("se leería como tag de la tarea");
+      }
+      expect(snapshot(p.root)).toEqual(before);
+      // Con el corchete en medio del texto no hay problema.
+      expect((await exec(["edit", "1", "--blocker", "esperar [algo] más", "--apply"], p)).code).toBe(0);
+      expect(numbers((await state(p)).free)).toContain(1);
+    });
+
     test("agrupada: un bloqueo que no la bloquea se edita; uno bloqueante no está soportado", async () => {
       const p = project({ folders: ["gersom"], ...RICH });
       await exec(["edit", "14", "--blocker", "Ninguno.", "--apply"], p);
@@ -409,6 +423,26 @@ describe("edit — handoff.md", () => {
     expect(snapshot(p.root)).toEqual(before);
   });
 
+  test("pausada: una línea con `#` o con checkbox se rechaza en cualquier campo de texto", async () => {
+    const p = project({ folders: ["gersom"], ...FULL });
+    const before = snapshot(p.root);
+    const run = (flag: string, value: string) => exec(["edit", "8", `${flag}=${value}`, "--apply"], p);
+    for (const [flag, value] of [
+      ["--description", "Texto\n## Otra sección"],
+      ["--details", "- [ ] Paso nuevo"],
+      ["--missing", "  - [x] hecho"],
+      ["--decisions", "uno\n# Título"],
+      ["--next", "* [ ] algo"],
+    ]) {
+      const { code, err } = await run(flag, value);
+      expect(code).toBe(1);
+      expect(err).toContain("crearía una subsección o un paso del plan");
+    }
+    expect(snapshot(p.root)).toEqual(before);
+    // Una viñeta común o un `#` en medio de la línea son texto normal.
+    expect((await run("--missing", "- uno\n- dos con #3")).code).toBe(0);
+  });
+
   test("un handoff con CRLF sigue con CRLF", async () => {
     const p = project({ folders: ["gersom"], contents: { ...FULL.contents, "handoff.md": crlf(HANDOFF_FULL) } });
     await exec(["edit", "12", "--description", "Otra\nde dos líneas", "--next", "Paso 3", "--apply"], p);
@@ -454,6 +488,10 @@ describe("edit — team-backlog.md", () => {
     const trigger = await exec(["edit", "Migrar el CI", "--trigger", "x", "--apply"], p);
     expect(trigger.err).toContain("no llevan Disparador");
     expect((await exec(["edit", "Migrar el CI", "--missing", "x", "--apply"], p)).code).toBe(1);
+    // Un corchete inicial que no es de bloqueo se leería como tag de la tarea, esté libre o bloqueada.
+    for (const title of ["Migrar el CI", "Cambiar de host"]) {
+      expect((await exec(["edit", title, "--blocker=[algo] x", "--apply"], p)).err).toContain("se leería como tag de la tarea");
+    }
     expect(snapshot(p.root)).toEqual(before);
   });
 

@@ -147,6 +147,21 @@ describe("resolveBlocker", () => {
     expect(() => resolveBlocker({ ...base, state: "blocked", current, value: "`[Resuelto el 2026-10-01]` — era `[dependencia]` x" })).toThrow("unblock <N>");
   });
 
+  test("un corchete inicial que no es de bloqueo ni `[Resuelto ...]` se rechaza, en libre y en bloqueada", () => {
+    for (const state of ["free", "blocked"] as const) {
+      for (const team of [false, true]) {
+        const input = { ...base, state, team, current: "`[dependencia]` x" } as const;
+        expect(() => resolveBlocker({ ...input, value: "[algo] x" })).toThrow("se leería como tag de la tarea");
+        expect(() => resolveBlocker({ ...input, value: "  `[otra cosa]` x" })).toThrow("--blocker");
+      }
+    }
+    // Sin corchete inicial, con corchetes en medio o con un link, sigue como antes.
+    expect(resolveBlocker({ ...base, state: "free", value: "esperar [algo] más" })).toBe("esperar [algo] más");
+    expect(resolveBlocker({ ...base, state: "free", value: "[plan](a.md) revisado" })).toBe("[plan](a.md) revisado");
+    expect(resolveBlocker({ ...base, state: "free", value: "[Resuelto el 2026-10-01] — era x" })).toBe("[Resuelto el 2026-10-01] — era x");
+    expect(resolveBlocker({ ...base, state: "blocked", current: "`[dependencia]` x", value: "[postergada] y", blocking: true })).toBe("[postergada] y");
+  });
+
   test("bloqueada sin tag vigente que conservar: pide un tag", () => {
     expect(() => resolveBlocker({ ...base, state: "blocked", current: "`[Resuelto el 2026-10-01]` — era `[dependencia]` x", value: "algo" })).toThrow("no tiene un tag vigente");
     expect(() => resolveBlocker({ ...base, state: "blocked", current: null, value: "algo" })).toThrow("no tiene un tag vigente");

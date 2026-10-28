@@ -269,6 +269,11 @@ function planHandoff(ctx: CommandContext, location: TaskLocation, given: Given):
     const newline = text.indexOf("\n", block.start);
     const headerEnd = newline === -1 || newline > block.end ? block.end : newline;
     if (given.title !== undefined) edits.push(titleEdit(text, block, "numbered", task.title, given.title));
+    // Igual que en curso: estos textos se escriben tal cual y una línea con `#` o checkbox cambiaría la estructura.
+    for (const name of ["description", "details", "missing", "decisions", "next"] as const) {
+      const value = given[name];
+      if (value !== undefined) rejectStructuralLines(name, value);
+    }
 
     const values: FieldValues = {};
     if (given.description !== undefined) values.description = given.description;

@@ -140,15 +140,15 @@ export function rejectLeadingTag(flag: string, value: string): void {
 const STRUCTURAL_LINE_RE = /^\s*(?:#|[-*]\s+\[[ xX]\])/;
 
 /**
- * Falla si alguna línea del valor, que se escribe tal cual bajo «Tarea en progreso», crearía una
- * subsección (`#`) o un paso de plan (`- [ ]`, `- [x]`, `* [ ]`).
+ * Falla si alguna línea del valor, que se escribe tal cual bajo «Tarea en progreso» o en un campo
+ * de una tarea pausada, crearía una subsección (`#`) o un paso de plan (`- [ ]`, `- [x]`, `* [ ]`).
  * @throws CliError una línea empieza con `#` o con un checkbox
  */
 export function rejectStructuralLines(flag: string, value: string): void {
   const line = value.split(/\r\n?|\n/).find((candidate) => STRUCTURAL_LINE_RE.test(candidate));
   if (line === undefined) return;
   throw new CliError(
-    `--${flag}: la línea «${line.trim().slice(0, 40)}» empieza con \`#\` o con un checkbox y, en «Tarea en progreso», crearía una subsección o un paso del plan (los pasos son de \`step\`); reescríbela sin ese inicio. No se escribió nada.`,
+    `--${flag}: la línea «${line.trim().slice(0, 40)}» empieza con \`#\` o con un checkbox y, en «Tarea en progreso» o en una tarea pausada, crearía una subsección o un paso del plan (los pasos son de \`step\`); reescríbela sin ese inicio. No se escribió nada.`,
   );
 }
 
@@ -169,12 +169,29 @@ function resolvedHistory(body: string): string | null {
   return rest.slice(found.index - (label?.[0].length ?? 0));
 }
 
+const RESOLVED_LEAD_RE = /^(resuelto|resolved)\b/i;
+
 /** El historial resuelto que conserva `Bloqueos`: el campo entero si empieza con `[Resuelto ...]` (tarea ya desbloqueada) o lo que sigue al bloqueo vigente; `null` si no hay. */
 function keptHistory(current: string | null): string | null {
   if (!current) return null;
   const lead = current.match(LEADING_TAG_RE);
-  if (lead && /^(resuelto|resolved)\b/i.test(lead[2].trim())) return current.trim();
+  if (lead && RESOLVED_LEAD_RE.test(lead[2].trim())) return current.trim();
   return resolvedHistory(current);
+}
+
+/**
+ * Falla si el valor empieza con un tag entre corchetes que no es de bloqueo ni `[Resuelto ...]`:
+ * `blockInfo` lo leería como el tag de la tarea y el estado quedaría incoherente con su sección.
+ * @throws CliError el valor empieza con un tag que no es de bloqueo ni de historial
+ */
+function rejectUnknownLeadingTag(value: string): void {
+  const lead = value.match(LEADING_TAG_RE);
+  if (!lead) return;
+  const tag = lead[2].trim();
+  if (BLOCKING_TAGS.test(tag) || RESOLVED_LEAD_RE.test(tag)) return;
+  throw new CliError(
+    `--blocker: un valor que empieza con un tag entre corchetes («${value.trim().slice(0, 40)}») se leería como tag de la tarea y dejaría su estado incoherente; solo valen \`[dependencia]\`/\`[postergada]\` (en una bloqueada) o \`[Resuelto ...]\`. Quita los corchetes iniciales. No se escribió nada.`,
+  );
 }
 
 /** El valor nuevo primero y el historial después (mismo formato que `blockedValue`); si el valor ya trae su propio `[Resuelto ...]`, no se duplica. */
@@ -202,7 +219,9 @@ export interface BlockerInput {
  * - libre: el valor no puede bloquearla;
  * - bloqueada: un valor con tag bloqueante se respeta (puede pasar de `[dependencia]` a `[postergada]`);
  *   uno sin tag conserva el tag actual y reemplaza solo el motivo; uno que la desbloquea
- *   («Ninguno.», `[Resuelto ...]`) se rechaza.
+ *   («Ninguno.», `[Resuelto ...]`) se rechaza;
+ * - en ambas, un corchete inicial que no es tag de bloqueo ni `[Resuelto ...]` se rechaza (se leería
+ *   como tag de la tarea).
  * En todos los casos el historial `[Resuelto ...]` que ya hubiera se conserva tras el valor nuevo
  * (Regla 8: no se borra), salvo que el valor pedido traiga el suyo.
  * @throws CliError el valor cambiaría el estado de la tarea (el mensaje dice con qué comando)
@@ -214,6 +233,7 @@ export function resolveBlocker(input: BlockerInput): string {
 
   if (state === "free") {
     if (blocking) throw new CliError(`Ese valor de Bloqueos bloquearía la tarea y edit no cambia su estado (${move("block <N> --tag <dependencia|postergada> --motivo <texto>", "para bloquearla")}). No se escribió nada.`);
+    rejectUnknownLeadingTag(value);
     return withHistory(value, keptHistory(current));
   }
 
@@ -222,6 +242,7 @@ export function resolveBlocker(input: BlockerInput): string {
   }
   if (LEADING_TAG_RE.test(value)) {
     if (blocking) return withHistory(value, keptHistory(current));
+    rejectUnknownLeadingTag(value);
     throw new CliError(
       `El valor de Bloqueos empieza con un tag que no es \`[dependencia]\` ni \`[postergada]\`: la tarea dejaría de estar bloqueada y edit no cambia su estado (${move("unblock <N>", "para desbloquearla")}). No se escribió nada.`,
     );
