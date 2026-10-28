@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 112
+**Próximo número de tarea:** 113
 
 ---
 
@@ -47,6 +47,15 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador quiera hacer pública la skill, o priorice esta tarea explícitamente.
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
+
+### Tarea 112 — Mejorar la UX de la tabla de listado de proyectos del board con poco ancho
+
+- **Descripción:** La tabla de la lista de proyectos del board (scripts/task-tracker) se corta cuando la terminal tiene poco ancho. Hacer que se adapte: truncar o abreviar columnas con criterio, priorizar las importantes y que nada quede cortado a media palabra o desalineado.
+- **Decisiones/temas a definir antes de empezar:** Qué columnas tienen prioridad cuando falta ancho; si se truncan con elipsis, se ocultan o se pasa a un formato de una línea por proyecto; ancho mínimo soportado.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Pedida por el operador al ver que la tabla se corta con poco ancho. Revisar también cómo se comporta al redimensionar la terminal.
+- **Agregada:** 2026-10-28.
 
 <!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
