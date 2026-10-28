@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 103
+**Próximo número de tarea:** 108
 
 ---
 
@@ -48,6 +48,15 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
+### Tarea 103 — Prueba mínima del mod de proyecto activo
+
+- **Descripción:** Hacer un mod de Claude mínimo (comando /board y banda con botón sobre el prompt) que escriba el cwd de la sesión y la hora en la config de la suite, para comprobar que la idea es viable antes de construirla.
+- **Decisiones/temas a definir antes de empezar:** Ninguno. Se decidió no depender de un evento de pestaña activa: no existe en la API de mods (verificado en los tipos de la versión 2.1.309).
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Comprobar: (1) que un mod puede escribir en ~/.acsuite (o ACSUITE_HOME), fuera de su carpeta; (2) que la app de escritorio dibuja el botón (banda AbovePrompt); (3) que el mod se carga en cada sesión de escritorio; (4) escritura atómica (archivo temporal y renombrar). Resultado esperado: un veredicto de viabilidad y el formato del archivo de estado (nombre, JSON, ubicación). Mods en ~/.claude/dev-mods/; la activación pide confirmación al usuario.
+- **Agregada:** 2026-10-27.
+
 <!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
 
@@ -67,6 +76,40 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Bloqueos:** [postergada] Hay que debatirla al llegar a esta tarea, tras publicar la primera versión.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Agregada:** 2026-10-26.
+
+### Tarea 104 — Mod de Claude: botón y /board que guardan el proyecto activo
+
+- **Descripción:** Convertir la prueba mínima en el mod definitivo: un botón y el comando /board que, al usarse en una sesión, guardan el repo de esa sesión como proyecto activo en la config de la suite.
+- **Decisiones/temas a definir antes de empezar:** Dónde vive el mod (este repo o aparte) y cómo se distribuye; si se guarda la raíz del repo (git toplevel) o el cwd tal cual.
+- **Bloqueos:** [dependencia] Depende de la Tarea 103 (la prueba mínima confirma que el mod puede escribir y que el botón se dibuja).
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Botón y comando comparten la misma lógica. Escritura atómica (temporal y renombrar) para que el board nunca lea un JSON a medias. El botón es el camino cómodo; el comando es la alternativa que no depende de cómo la app dibuje la interfaz.
+- **Agregada:** 2026-10-27.
+
+### Tarea 105 — Board: modo observador del proyecto activo
+
+- **Descripción:** Agregar al board un modo observador (tecla o flag): al entrar borra lo guardado en la config, muestra que espera un clic en el mod de Claude y, cuando aparece una ruta nueva, abre ese repo, agregándolo a la lista de proyectos si no está.
+- **Decisiones/temas a definir antes de empezar:** Qué tecla y qué flag lo activan; qué tecla sale del modo; cómo se ve la pantalla de espera.
+- **Bloqueos:** [dependencia] Depende de la Tarea 103 (define el formato y la ubicación del archivo de estado).
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Reglas acordadas: (1) al entrar se borra lo guardado, así nunca abre un repo que no se pidió; (2) sigue observando tras el primer clic, y cada clic en otra sesión cambia el repo; (3) una tecla en la terminal del board sale del modo; (4) usar open() de app.ts, projectList.add() y un watcher del archivo (watch.ts); (5) leer el archivo con tolerancia a escritura a medias.
+- **Agregada:** 2026-10-27.
+
+### Tarea 106 — Board: aviso cuando el repo no tiene la skill iniciada
+
+- **Descripción:** En el modo observador, si el repo elegido no tiene la skill iniciada (no se puede agregar), mostrar «este repo no tiene la skill iniciada» y el enlace de la skill en GitHub, en vez de fallar en silencio.
+- **Decisiones/temas a definir antes de empezar:** Confirmar la URL del enlace (Gersom/agent-context-skill) y dónde se muestra el aviso.
+- **Bloqueos:** [dependencia] Depende de la Tarea 105 (el modo observador).
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-27.
+
+### Tarea 107 — Documentar y versionar el modo observador
+
+- **Descripción:** Documentar el mod y el modo observador (README del board, architecture.md) y subir la versión de la suite según docs/releasing.md.
+- **Decisiones/temas a definir antes de empezar:** Si el cambio es minor; si el mod se documenta aquí o en su propio README.
+- **Bloqueos:** [dependencia] Depende de las Tareas 104, 105 y 106.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-27.
 
 <!-- agent-context-skill:section=grouped -->
 ## Tareas agrupadas
