@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 115
+**Próximo número de tarea:** 116
 
 ---
 
@@ -103,6 +103,15 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador quiera distribuir el mod por separado.
 - **Detalles:** Surgida al planear la Tarea 104. Pasos probables: crear el repo, mover la carpeta con su historial si conviene, mover el marketplace.json, ajustar el README y la ruta en ~/.claude/settings.json.
 - **Agregada:** 2026-10-27.
+
+### Tarea 115 — Quitar de step los flags de edición de texto (ahora en edit)
+
+- **Descripción:** Con el comando edit (T113) cubriendo todo cambio de texto, dejar step con una sola función: marcar un paso hecho o retroceder (--undo) y mantener al día «Qué falta» y «Próximo paso concreto» cuando siguen con el texto automático. Quitar de step los flags --falta, --decisiones y --proximo, y actualizar la Regla 7 de rules.md, los avisos de step, sus tests y el README.
+- **Decisiones/temas a definir antes de empezar:** Si los flags se quitan de golpe o pasan antes por un período de aviso (deprecación); qué dice el aviso de step cuando «Qué falta» o «Próximo paso» tienen texto propio (hoy manda a --falta/--proximo y debería mandar a edit); coordinar con la T114 (flags en inglés) y la T34 (reevaluar comandos).
+- **Bloqueos:** [dependencia] depende de que la Tarea 113 (comando edit) esté resuelta.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Acordada con el operador al diseñar la T113: edit absorbe la edición de texto del handoff y step se queda solo con marcar o retroceder pasos. Se hace aparte porque quitar flags rompe a quien ya los usa (Regla 7, avisos, tests y README los mencionan).
+- **Agregada:** 2026-10-28.
 
 <!-- agent-context-skill:section=grouped -->
 ## Tareas agrupadas
