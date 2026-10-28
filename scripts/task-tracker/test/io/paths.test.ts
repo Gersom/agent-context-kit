@@ -2,7 +2,17 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } fr
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
-import { cleanPathInput, expandHome, invocationDir, projectDirFor, projectNameFor, resolveAgentsDir } from "../../src/io/paths.ts";
+import {
+  cleanPathInput,
+  expandHome,
+  invocationDir,
+  isSkillMissing,
+  OTHER_USER_NOTE,
+  projectDirFor,
+  projectNameFor,
+  resolveAgentsDir,
+  SKILL_MISSING_ERROR,
+} from "../../src/io/paths.ts";
 import type { ResolveError, ResolveOk, ResolveResult } from "../../src/shared/types.ts";
 
 /** Afirma que la ruta se resolvió bien y lo deja tipado como tal. */
@@ -112,6 +122,27 @@ describe("resolveAgentsDir en modo multi-operador", () => {
     const result = expectError(resolveAgentsDir(join(root, "rota")));
     expect(result.error).toContain("falta operators.md");
     expect(result.error).toContain("ana");
+  });
+});
+
+describe("isSkillMissing", () => {
+  test("reconoce el error de un repo sin handoff.md, con y sin el «:» final", () => {
+    const error = expectError(resolveAgentsDir(join(root, "vacia"))).error;
+    expect(error.endsWith(":")).toBe(true);
+    expect(isSkillMissing(error)).toBe(true);
+    expect(isSkillMissing(error.replace(/:$/, ""))).toBe(true);
+    expect(isSkillMissing(`${SKILL_MISSING_ERROR}. La carpeta se movió.`)).toBe(true);
+  });
+
+  test("no lo confunde con otros errores", () => {
+    expect(isSkillMissing(expectError(resolveAgentsDir(join(root, "no-existe"))).error)).toBe(false);
+    expect(isSkillMissing(expectError(resolveAgentsDir(join(root, "rota"))).error)).toBe(false);
+    expect(isSkillMissing(expectError(resolveAgentsDir("")).error)).toBe(false);
+    expect(isSkillMissing("")).toBe(false);
+  });
+
+  test("con la nota de otro usuario no es «sin skill»", () => {
+    expect(isSkillMissing(`${SKILL_MISSING_ERROR}. ${OTHER_USER_NOTE} y git no puede leerla.`)).toBe(false);
   });
 });
 

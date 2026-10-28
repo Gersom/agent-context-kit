@@ -9,7 +9,7 @@ import { basename, join, resolve } from "node:path";
 import { gitToplevel } from "../../../_shared/git.ts";
 import { buildModel } from "../model/model.ts";
 import type { ProjectRow } from "../shared/types.ts";
-import { cleanPathInput, expandHome, invocationDir, resolveAgentsDir } from "./paths.ts";
+import { cleanPathInput, expandHome, invocationDir, OTHER_USER_NOTE, resolveAgentsDir } from "./paths.ts";
 import { createSnapshotReader } from "./snapshot.ts";
 import { type ConfigError, failureMessage, loadSavedProjects, samePath } from "./user-config.ts";
 
@@ -38,7 +38,7 @@ function kindOf(path: string): "dir" | "file" | null {
 }
 
 /** Nota que se suma al error de `add` cuando git no deja leer la carpeta por ser de otro usuario. */
-const DUBIOUS_OWNERSHIP_NOTE = ". La carpeta es de otro usuario y git no puede leerla.";
+const DUBIOUS_OWNERSHIP_NOTE = `. ${OTHER_USER_NOTE} y git no puede leerla.`;
 
 /** `true` si la salida de git dice «dubious ownership» (sin importar mayúsculas ni cuántos espacios hay entre las palabras). */
 export function isDubiousOwnership(gitOutput: string): boolean {

@@ -1,9 +1,11 @@
 import { describe, expect, test } from "bun:test";
+import { SKILL_URL } from "../../src/io/paths.ts";
 import type { ProjectRow, ProjectsRenderMeta } from "../../src/shared/types.ts";
 import { render, renderObserver, renderProjects, renderTeam } from "../../src/ui/render.ts";
 import { buildModel } from "../../src/model/model.ts";
 import { fixture } from "../../../_shared/test/helpers.ts";
 
+const SKILL_NOTICE = `Este repo no tiene la skill iniciada: /repos/nuevo. Instálala desde ${SKILL_URL}`;
 const STATUS = "Observando: el board cambia solo de proyecto cuando pulsas el botón «Marcar este proyecto» del mod de Claude o escribes /board.";
 
 const projectsMeta: ProjectsRenderMeta = {
@@ -87,6 +89,20 @@ describe("modo observador: pie", () => {
   });
 });
 
+/** Las líneas del aviso: la que empieza con `! ` y las de continuación, con 2 espacios de sangría como la de estado. */
+function noticeBlock(lines: string[]): string[] {
+  const start = lines.findIndex((l) => l.startsWith("! "));
+  expect(start).toBeGreaterThan(-1);
+  let end = start + 1;
+  while (lines[end].startsWith("  ")) end++;
+  return lines.slice(start, end);
+}
+
+/** El texto del aviso sin el prefijo ni los espacios, para compararlo aunque se haya partido en palabras o dentro de una URL. */
+function noticeText(block: string[]): string {
+  return block.map((l) => l.slice(2)).join("").replace(/ /g, "");
+}
+
 describe("modo observador: línea de estado", () => {
   test("apagado no cambia nada: ni la línea ni el aviso", () => {
     expect(renderProjects(rows, projectsMeta)).not.toContain("Observando");
@@ -137,9 +153,25 @@ describe("modo observador: línea de estado", () => {
     }
   });
 
-  test("el aviso largo se recorta al ancho como los demás avisos", () => {
+  test("el aviso largo se parte al ancho, sin perder el final", () => {
     const notice = `No se pudo abrir ${"/carpeta".repeat(30)}`;
-    for (const line of render(model, { ...repoMeta, width: 80, observer: { notice } }).split("\n")) expect([...line].length).toBeLessThanOrEqual(80);
+    const lines = render(model, { ...repoMeta, width: 80, observer: { notice } }).split("\n");
+    for (const line of lines) expect([...line].length).toBeLessThanOrEqual(80);
+    expect(noticeText(noticeBlock(lines))).toBe(notice.replace(/ /g, ""));
+  });
+
+  test("el aviso de un repo sin la skill muestra el enlace entero en cualquier ancho", () => {
+    for (const width of [100, 60, 40]) {
+      const lines = render(model, { ...repoMeta, width, observer: { notice: SKILL_NOTICE } }).split("\n");
+      for (const line of lines) expect([...line].length).toBeLessThanOrEqual(width);
+      const block = noticeBlock(lines);
+      expect(noticeText(block)).toBe(SKILL_NOTICE.replace(/ /g, ""));
+      expect(block.map((l) => l.slice(2)).join(" ")).toContain("Instálala desde");
+    }
+  });
+
+  test("con espacio suficiente el aviso queda en una sola línea, con el enlace", () => {
+    expect(render(model, { ...repoMeta, width: 160, observer: { notice: SKILL_NOTICE } })).toContain(`\n! ${SKILL_NOTICE}\n`);
   });
 });
 
@@ -201,9 +233,22 @@ describe("modo observador: vista de espera", () => {
     }
   });
 
-  test("el aviso largo se recorta al ancho como los demás avisos", () => {
+  test("el aviso largo se parte al ancho, sin perder el final", () => {
     const notice = `No se pudo abrir ${"/carpeta".repeat(30)}`;
-    for (const line of renderObserver({ ...waitingMeta, width: 80, observer: { notice } }).split("\n")) expect([...line].length).toBeLessThanOrEqual(80);
+    const lines = renderObserver({ ...waitingMeta, width: 80, observer: { notice } }).split("\n");
+    for (const line of lines) expect([...line].length).toBeLessThanOrEqual(80);
+    expect(noticeText(noticeBlock(lines))).toBe(notice.replace(/ /g, ""));
+  });
+
+  test("el aviso de un repo sin la skill muestra el enlace entero en cualquier ancho", () => {
+    for (const width of [100, 60, 40]) {
+      const lines = renderObserver({ ...waitingMeta, width, observer: { notice: SKILL_NOTICE } }).split("\n");
+      for (const line of lines) expect([...line].length).toBeLessThanOrEqual(width);
+      const block = noticeBlock(lines);
+      expect(noticeText(block)).toBe(SKILL_NOTICE.replace(/ /g, ""));
+      // Después del aviso, una línea en blanco y el pie.
+      expect(lines[lines.indexOf(block[block.length - 1]) + 1]).toBe("");
+    }
   });
 
   test("sin teclas activas el pie es el de siempre", () => {

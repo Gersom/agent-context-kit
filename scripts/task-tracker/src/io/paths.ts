@@ -10,6 +10,24 @@ import { isMultiDir, OPERATORS_FILE, operatorFolders, resolveOperator } from "./
 /** Subcarpetas donde la skill genera la documentación, relativas a la raíz del proyecto. */
 const AGENTS_SUBDIRS = [join("docs", "agents"), join("agent-context", "agents")];
 
+/** Dónde está la skill, para quien abre un repo que todavía no la tiene iniciada. */
+export const SKILL_URL = "https://github.com/Gersom/agent-context-skill";
+
+/** Lo que dice el error de un repo sin la skill iniciada (sin el «:» final, que lista las carpetas probadas). */
+export const SKILL_MISSING_ERROR = "No se encontró handoff.md en ninguna de estas carpetas";
+
+/** Parte de la nota que `createProjectList.add` suma al error cuando git no deja leer la carpeta por ser de otro usuario. */
+export const OTHER_USER_NOTE = "La carpeta es de otro usuario";
+
+/**
+ * `true` si `error` (el de `resolveAgentsDir`, con o sin el «:» final, o el de `add`) dice que el repo
+ * no tiene la skill iniciada. Con la nota de otro usuario no: ahí la raíz pudo no encontrarse porque
+ * git no deja leer la carpeta, no porque falte la skill.
+ */
+export function isSkillMissing(error: string): boolean {
+  return error.startsWith(SKILL_MISSING_ERROR) && !error.includes(OTHER_USER_NOTE);
+}
+
 /**
  * Carpeta desde la que el operador lanzó el comando, para resolver rutas relativas.
  *
@@ -100,7 +118,7 @@ export function resolveAgentsDir(
       };
     }
   }
-  return { ok: false, error: "No se encontró handoff.md en ninguna de estas carpetas:", tried: candidates };
+  return { ok: false, error: `${SKILL_MISSING_ERROR}:`, tried: candidates };
 }
 
 /**

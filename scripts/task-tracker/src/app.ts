@@ -9,7 +9,7 @@ import { basename } from "node:path";
 import { gitToplevel } from "../../_shared/git.ts";
 import { parseKeys } from "./cli/keys.ts";
 import { compactApplies, initialNav, type NavRow, navReduce, type NavState, reconcileNav } from "./cli/nav.ts";
-import { ignoredWithObserver, type ObserverState, observerStep, startObserver } from "./cli/observer.ts";
+import { ignoredWithObserver, type ObserverState, observerFailureNotice, observerStep, startObserver } from "./cli/observer.ts";
 import { projectsKeysReduce } from "./cli/projects-keys.ts";
 import { initialProjectsNav, neighborAfterRemove, type ProjectsNavState, reconcileProjects } from "./cli/projects-nav.ts";
 import { ACTIVE_PROJECT_FILE, clearActiveProject, readActiveProject } from "./io/active-project.ts";
@@ -339,13 +339,12 @@ export function startApp({
   function followProject(path: string): void {
     const result = projectList.add(path);
     if (!result.ok) {
-      observerNotice = `No se pudo abrir ${path}: ${result.error}.`;
+      observerNotice = observerFailureNotice(path, result.error);
       return draw({ kind: "redraw" });
     }
-    const warning = result.warning ? ` ${result.warning}` : "";
     let resolved = resolveAgentsDir(result.path);
     if (!resolved.ok) {
-      observerNotice = `No se pudo abrir ${path}: ${resolved.error.replace(/:$/, "")}.${warning}`;
+      observerNotice = observerFailureNotice(path, resolved.error, result.warning);
       return draw({ kind: "redraw" });
     }
     // Repo multi-operador: se abre de frente el tablero del operador actual (el del correo de git),

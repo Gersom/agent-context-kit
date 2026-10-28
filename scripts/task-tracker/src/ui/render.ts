@@ -116,15 +116,22 @@ function createCanvas(meta: CanvasMeta, header: Header) {
 type Canvas = ReturnType<typeof createCanvas>;
 
 /** Avisos, notas y pie con las teclas; cierra la pantalla y la devuelve como texto. */
-function finishCanvas({ out, line, blank, secondary, pc, width }: Canvas, meta: CanvasMeta, model: { notes?: string[]; warnings: string[] }): string {
+function finishCanvas(
+  { out, line, blank, secondary, pc, width }: Canvas,
+  meta: CanvasMeta,
+  model: { notes?: string[]; warnings: string[]; observerNotice?: string | null },
+): string {
   const notes = model.notes ?? [];
-  if (notes.length || meta.observer || model.warnings.length) blank();
+  const notice = model.observerNotice ?? meta.observer?.notice;
+  if (notes.length || meta.observer || notice || model.warnings.length) blank();
   for (const note of notes) line(0, `ℹ ${note}`, secondary);
   if (meta.observer) {
     // El estado fijo se parte en palabras si no entra, para no perder el final («o /board»).
     wrapWords(OBSERVER_STATUS, width - 2).forEach((text, i) => line(0, `${i === 0 ? "ℹ" : " "} ${text}`, pc.cyan));
-    if (meta.observer.notice) line(0, `! ${meta.observer.notice}`, pc.yellow);
   }
+  // El aviso del observador también se parte en palabras (con la sangría de continuación de 2 espacios):
+  // recortarlo con «…» perdería el final, donde va el enlace de la skill.
+  if (notice) wrapWords(plainText(notice), width - 2).forEach((text, i) => line(0, `${i === 0 ? "!" : " "} ${text}`, pc.yellow));
   for (const warning of model.warnings) line(0, `! ${warning}`, pc.yellow);
 
   const footer = footerLines(meta, width);
@@ -141,7 +148,11 @@ const OBSERVER_STATUS = "Observando: el board cambia solo de proyecto cuando pul
 /** Lo que dice la vista de espera del modo observador (ver `renderObserver`). */
 const OBSERVER_WAITING = "Esperando: el board cambiará solo de proyecto cuando pulses el botón «Marcar este proyecto» del mod de Claude o escribas /board.";
 
-/** Parte `text` en líneas de a lo sumo `width` caracteres, cortando en los espacios. */
+/**
+ * Parte `text` en líneas de a lo sumo `width` caracteres, cortando en los espacios. Una palabra más
+ * larga que `width` (una URL o una ruta) no tiene dónde cortarse: se parte en trozos de `width`, de
+ * modo que no se pierde ni su inicio ni su final.
+ */
 function wrapWords(text: string, width: number): string[] {
   const lines: string[] = [];
   let current = "";
@@ -152,6 +163,11 @@ function wrapWords(text: string, width: number): string[] {
       current = word;
     } else {
       current = joined;
+    }
+    while (visibleLength(current) > width) {
+      const chars = [...current];
+      lines.push(chars.slice(0, width).join(""));
+      current = chars.slice(width).join("");
     }
   }
   if (current) lines.push(current);
@@ -348,9 +364,8 @@ export function renderObserver(meta: ObserverRenderMeta): string {
   const { pc, width, line } = canvas;
   // El texto se parte en palabras si no entra, para no perder el final («o /board»).
   for (const text of wrapWords(OBSERVER_WAITING, width)) line(0, text, pc.cyan);
-  // Sin la línea de estado de `finishCanvas` (que ya dice lo mismo): el aviso va como los demás avisos.
-  const notice = meta.observer?.notice;
-  return finishCanvas(canvas, { ...meta, observer: undefined, multiView: "observer" }, { warnings: notice ? [notice] : [] });
+  // Sin la línea de estado de `finishCanvas` (que ya dice lo mismo): el aviso va como en las demás vistas.
+  return finishCanvas(canvas, { ...meta, observer: undefined, multiView: "observer" }, { warnings: [], observerNotice: meta.observer?.notice });
 }
 
 /** Segunda línea de la fila de un operador: conteos y su última tarea completada. */

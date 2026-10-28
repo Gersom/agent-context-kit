@@ -2,6 +2,7 @@
 // Puro y sin I/O: recibe lo leído de `active-project.json` y dice si hay algo nuevo que abrir.
 
 import type { ActiveProject } from "../io/active-project.ts";
+import { isSkillMissing, SKILL_URL } from "../io/paths.ts";
 import type { NavKey } from "./keys.ts";
 
 /** `since`: cuándo arrancó el observador; `lastAt`: la marca más reciente ya atendida (ms desde la época). */
@@ -17,6 +18,18 @@ export interface ObserverState {
  */
 export function ignoredWithObserver(key: NavKey): boolean {
   return key === "projects" || key === "back";
+}
+
+/**
+ * Aviso del observador cuando no se pudo abrir el repo marcado `path`. `error`: el de `add` o de
+ * `resolveAgentsDir` (con o sin el «:» final). Sin la skill iniciada lo dice claro y da el enlace
+ * (sin punto final, para que la URL se copie entera); los demás errores van como «No se pudo abrir».
+ * `warning`: aviso ya armado que se suma al final, si lo hay.
+ */
+export function observerFailureNotice(path: string, error: string, warning?: string | null): string {
+  const extra = warning ? ` ${warning}` : "";
+  if (isSkillMissing(error)) return `Este repo no tiene la skill iniciada: ${path}. Instálala desde ${SKILL_URL}${extra}`;
+  return `No se pudo abrir ${path}: ${error.replace(/:$/, "")}.${extra}`;
 }
 
 /** Estado inicial: lo marcado antes de `now` no cuenta, solo lo posterior. */

@@ -1,6 +1,33 @@
 import { describe, expect, test } from "bun:test";
 import type { NavKey } from "../../src/cli/keys.ts";
-import { ignoredWithObserver, observerStep, startObserver } from "../../src/cli/observer.ts";
+import { ignoredWithObserver, observerFailureNotice, observerStep, startObserver } from "../../src/cli/observer.ts";
+import { OTHER_USER_NOTE, SKILL_MISSING_ERROR, SKILL_URL } from "../../src/io/paths.ts";
+
+describe("observerFailureNotice", () => {
+  const SKILL_NOTICE = `Este repo no tiene la skill iniciada: /repos/nuevo. Instálala desde ${SKILL_URL}`;
+
+  test("sin la skill iniciada lo dice claro y da el enlace, con o sin el «:» final", () => {
+    expect(observerFailureNotice("/repos/nuevo", `${SKILL_MISSING_ERROR}:`)).toBe(SKILL_NOTICE);
+    expect(observerFailureNotice("/repos/nuevo", SKILL_MISSING_ERROR)).toBe(SKILL_NOTICE);
+    expect(SKILL_URL).toBe("https://github.com/Gersom/agent-context-skill");
+  });
+
+  test("el aviso de guardado se suma después del enlace", () => {
+    expect(observerFailureNotice("/repos/nuevo", SKILL_MISSING_ERROR, "No se pudo guardar.")).toBe(`${SKILL_NOTICE} No se pudo guardar.`);
+  });
+
+  test("los demás errores siguen como «No se pudo abrir»", () => {
+    expect(observerFailureNotice("/repos/roto", "No existe la carpeta: /repos/roto")).toBe("No se pudo abrir /repos/roto: No existe la carpeta: /repos/roto.");
+    expect(observerFailureNotice("/repos/roto", "Hay carpetas de operador (ana) pero falta operators.md en /x. Hay que restaurarlo", "Aviso.")).toBe(
+      "No se pudo abrir /repos/roto: Hay carpetas de operador (ana) pero falta operators.md en /x. Hay que restaurarlo. Aviso.",
+    );
+  });
+
+  test("con la nota de otro usuario no es «sin skill»", () => {
+    const error = `${SKILL_MISSING_ERROR}. ${OTHER_USER_NOTE} y git no puede leerla.`;
+    expect(observerFailureNotice("/repos/ajeno", error)).toBe(`No se pudo abrir /repos/ajeno: ${error}.`);
+  });
+});
 
 describe("ignoredWithObserver", () => {
   test("ir a proyectos y volver se ignoran", () => {
