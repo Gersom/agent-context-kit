@@ -108,6 +108,29 @@ describe("index.ts", () => {
     expect(other.stderr).toContain("«gersom» no es la tuya");
   });
 
+  test("edit: sin --apply solo muestra el diff; con --apply cambia el contenido sin mover la tarea", async () => {
+    if (!hasGit) return;
+    const backlog = join(project.agents, "ana", "backlog.md");
+    const before = readFileSync(backlog, "utf8");
+    const preview = await runCli(["edit", "4", "--blocker", "esperar a la Tarea 5", "--details", "Nuevo contexto"]);
+    expect(preview.code).toBe(0);
+    expect(preview.stdout).toContain("+- **Bloqueos:** `[dependencia]` esperar a la Tarea 5");
+    expect(preview.stdout).toContain("No se escribió nada; repite con --apply");
+    expect(readFileSync(backlog, "utf8")).toBe(before);
+
+    const applied = await runCli(["edit", "4", "--blocker", "esperar a la Tarea 5", "--details", "Nuevo contexto", "--apply"]);
+    expect(applied.code).toBe(0);
+    expect(applied.stdout).toContain("Tarea 4 editada (--blocker, --details)");
+    const after = readFileSync(backlog, "utf8");
+    expect(after).toContain("- **Bloqueos:** `[dependencia]` esperar a la Tarea 5\n- **Detalles:** Nuevo contexto");
+    const shown = JSON.parse((await runCli(["show", "4", "--json"])).stdout);
+    expect(shown.matches[0]).toMatchObject({ place: "blocked", number: 4 });
+
+    const blocked = await runCli(["edit", "1", "--blocker", "[dependencia] algo", "--apply"]);
+    expect(blocked.code).toBe(1);
+    expect(blocked.stderr).toContain("block <N>");
+  });
+
   test("la ayuda de un comando de escritura avisa de --apply", async () => {
     const { stdout, code } = await runCli(["start", "--help"]);
     expect(code).toBe(0);

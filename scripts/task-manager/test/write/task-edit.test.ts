@@ -1,0 +1,213 @@
+// Funciones puras de `edit`: título, campos (reemplazar o agregar), `Bloqueos` según el estado y el
+// preámbulo de «Tarea en progreso». Se prueban sobre texto parseado, sin leer archivos.
+
+import { describe, expect, test } from "bun:test";
+import { parseBacklog } from "../../../_shared/parse/backlog.ts";
+import { parseHandoff } from "../../../_shared/parse/handoff.ts";
+import { normalizeEol } from "../../../_shared/parse/positions.ts";
+import { parseTeamBacklog } from "../../../_shared/parse/team-backlog.ts";
+import { applyEdits, type Edit } from "../../src/edit/edits.ts";
+import { trimRange } from "../../src/query/lines.ts";
+import {
+  backlogPlacement,
+  fieldEdits,
+  parsePreamble,
+  pausedPlacement,
+  preambleEdits,
+  rejectLeadingTag,
+  rejectStructuralLines,
+  resolveBlocker,
+  setField,
+  titleEdit,
+} from "../../src/write/task-edit.ts";
+import { BACKLOG_ONE, BACKLOG_RICH, HANDOFF_CURRENT, TEAM_TWO } from "../fixtures.ts";
+
+const apply = (text: string, edits: Edit[]) => applyEdits(text, normalizeEol(text), edits);
+const label = (kind: string) => ({ details: "Detalles", description: "Descripción" })[kind] ?? kind;
+
+describe("titleEdit", () => {
+  test("backlog: cambia solo el texto del título y conserva nivel, palabra y número", () => {
+    const { free, grouped } = parseBacklog(BACKLOG_RICH);
+    const task = free.tasks.find((t) => t.number === 1)!;
+    expect(apply(BACKLOG_RICH, [titleEdit(BACKLOG_RICH, trimRange(BACKLOG_RICH, task.range!), "numbered", task.title, "Otro título")])).toBe(
+      BACKLOG_RICH.replace("### Tarea 1 — Probar el flujo completo", "### Tarea 1 — Otro título"),
+    );
+    const nested = grouped[0].tasks[0];
+    expect(apply(BACKLOG_RICH, [titleEdit(BACKLOG_RICH, trimRange(BACKLOG_RICH, nested.range!), "numbered", nested.title, "Costos")])).toContain("#### Tarea 14 — Costos\n");
+  });
+
+  test("team-backlog: el header no lleva número", () => {
+    const task = parseTeamBacklog(TEAM_TWO).free[1];
+    expect(apply(TEAM_TWO, [titleEdit(TEAM_TWO, trimRange(TEAM_TWO, task.range!), "team", task.title, "Migrar CI")])).toContain("### Migrar CI\n\n- **Descripción:** pasar a Actions");
+  });
+
+  test("la línea de la tarea en curso, con etiqueta en negrita y negritas en el título", () => {
+    const text = "## Tarea en progreso\n\n**Tarea:** Tarea 12 — Implementar el **parser** de anclas\n\n### Plan\n";
+    const line = text.indexOf("**Tarea:**");
+    const range = { start: line, end: text.indexOf("\n", line) };
+    expect(apply(text, [titleEdit(text, range, "current", "Implementar el parser de anclas", "Nuevo")])).toBe(text.replace("Implementar el **parser** de anclas", "Nuevo"));
+  });
+
+  test("si la línea no es la esperada, falla sin editar", () => {
+    const task = parseTeamBacklog(TEAM_TWO).free[0];
+    expect(() => titleEdit(TEAM_TWO, trimRange(TEAM_TWO, task.range!), "team", "Otro", "X")).toThrow("No reconozco la línea del título");
+  });
+});
+
+describe("setField / fieldEdits", () => {
+  test("reemplaza el campo existente con su propia etiqueta, también de varias líneas", () => {
+    const task = parseBacklog(BACKLOG_ONE).free.tasks[0];
+    const place = backlogPlacement(BACKLOG_ONE, trimRange(BACKLOG_ONE, task.range!), task.fields);
+    const out = apply(BACKLOG_ONE, [setField(BACKLOG_ONE, task.fields, "decisions", "x", "uno\ndos", place)]);
+    expect(out).toContain("- **Decisiones/temas a definir antes de empezar:** uno\n  dos\n- **Bloqueos:** Ninguno.");
+  });
+
+  test("agrega el campo que falta antes de `Agregada`", () => {
+    const task = parseBacklog(BACKLOG_ONE).free.tasks[0];
+    const place = backlogPlacement(BACKLOG_ONE, trimRange(BACKLOG_ONE, task.range!), task.fields);
+    const out = apply(BACKLOG_ONE, fieldEdits(BACKLOG_ONE, task.fields, { details: "más contexto" }, label, place));
+    expect(out).toContain("- **Disparador:** cuando el operador pregunte por tareas pendientes.\n- **Detalles:** más contexto\n- **Agregada:** 2026-10-01.\n");
+  });
+
+  test("sin `Agregada`, lo agrega tras el último campo; sin campos, al final del bloque", () => {
+    const withFields = parseBacklog(BACKLOG_RICH).free.tasks[0];
+    const out = apply(BACKLOG_RICH, fieldEdits(BACKLOG_RICH, withFields.fields, { details: "d" }, label, backlogPlacement(BACKLOG_RICH, trimRange(BACKLOG_RICH, withFields.range!), withFields.fields)));
+    expect(out).toContain("- **Disparador:** cuando el operador pregunte por tareas pendientes.\n- **Detalles:** d\n\n### Grupo");
+
+    const text = "## Tareas libres\n\n### Tarea 5 — Sola\n\n### Tarea 6 — Otra\n";
+    const bare = parseBacklog(text).free.tasks[0];
+    const range = trimRange(text, bare.range!);
+    expect(apply(text, fieldEdits(text, bare.fields, { details: "d" }, label, backlogPlacement(text, range, bare.fields)))).toBe(
+      "## Tareas libres\n\n### Tarea 5 — Sola\n\n- **Detalles:** d\n\n### Tarea 6 — Otra\n",
+    );
+  });
+
+  test("varios campos a la vez no se solapan y mantienen el orden de la plantilla", () => {
+    const task = parseBacklog(BACKLOG_ONE).free.tasks[0];
+    const place = backlogPlacement(BACKLOG_ONE, trimRange(BACKLOG_ONE, task.range!), task.fields);
+    const out = apply(BACKLOG_ONE, fieldEdits(BACKLOG_ONE, task.fields, { description: "D", trigger: "T", details: "X" }, label, place));
+    expect(out).toContain("- **Descripción:** D\n");
+    expect(out).toContain("- **Disparador:** T\n- **Detalles:** X\n- **Agregada:**");
+  });
+
+  test("tarea pausada: lo nuevo va tras la descripción y los campos previos al avance; sin ellos, tras el header", () => {
+    const handoff = parseHandoff(HANDOFF_CURRENT);
+    const nine = handoff.paused.find((t) => t.number === 9)!;
+    const headerEnd = HANDOFF_CURRENT.indexOf("\n", nine.range!.start);
+    expect(apply(HANDOFF_CURRENT, [setField(HANDOFF_CURRENT, nine.fields, "details", "Detalles", "d", pausedPlacement(HANDOFF_CURRENT, headerEnd, nine.fields))])).toContain(
+      "### Tarea 9 — Otra pausada\n\n- **Detalles:** d\n\n- **Qué falta:** nada.",
+    );
+  });
+});
+
+describe("resolveBlocker", () => {
+  const base = { current: null, blocking: false, team: false } as const;
+
+  test("libre: el valor no puede bloquearla", () => {
+    expect(resolveBlocker({ ...base, state: "free", value: "Ninguno." })).toBe("Ninguno.");
+    expect(resolveBlocker({ ...base, state: "free", value: "esperar" })).toBe("esperar");
+    expect(() => resolveBlocker({ ...base, state: "free", value: "`[dependencia]` x", blocking: true })).toThrow("block <N>");
+    expect(() => resolveBlocker({ ...base, state: "free", value: "[postergada] x", blocking: true, team: true })).toThrow("no hay comando");
+  });
+
+  test("bloqueada: con tag bloqueante se respeta; sin tag conserva el actual", () => {
+    const current = "`[dependencia]` la Tarea 3";
+    expect(resolveBlocker({ ...base, state: "blocked", current, value: "`[postergada]` mejor después", blocking: true })).toBe("`[postergada]` mejor después");
+    expect(resolveBlocker({ ...base, state: "blocked", current, value: "la Tarea 4" })).toBe("`[dependencia]` la Tarea 4");
+  });
+
+  test("bloqueada: conserva el historial `[Resuelto ...]` al cambiar solo el motivo", () => {
+    const current = "`[postergada]` esperar. `[Resuelto el 2026-09-01]` — era `[dependencia]` la Tarea 3.";
+    expect(resolveBlocker({ ...base, state: "blocked", current, value: "otro motivo" })).toBe("`[postergada]` otro motivo `[Resuelto el 2026-09-01]` — era `[dependencia]` la Tarea 3.");
+  });
+
+  test("bloqueada con tag explícito: conserva el historial `[Resuelto ...]` tras el valor nuevo", () => {
+    const current = "`[postergada]` esperar. `[Resuelto el 2026-09-01]` — era `[dependencia]` la Tarea 3.";
+    expect(resolveBlocker({ ...base, state: "blocked", current, value: "`[dependencia]` otra", blocking: true })).toBe(
+      "`[dependencia]` otra `[Resuelto el 2026-09-01]` — era `[dependencia]` la Tarea 3.",
+    );
+    // Sin historial, o con uno propio en el valor pedido, no se agrega ni se duplica nada.
+    expect(resolveBlocker({ ...base, state: "blocked", current: "`[postergada]` esperar", value: "`[dependencia]` otra", blocking: true })).toBe("`[dependencia]` otra");
+    const own = "`[dependencia]` otra `[Resuelto el 2026-10-01]` — era `[postergada]` x";
+    expect(resolveBlocker({ ...base, state: "blocked", current, value: own, blocking: true })).toBe(own);
+  });
+
+  test("libre: conserva el historial `[Resuelto ...]`, sea el campo entero o lo que sigue a un texto", () => {
+    const history = "`[Resuelto el 2026-09-24]` — era `[postergada]`.";
+    expect(resolveBlocker({ ...base, state: "free", current: history, value: "esperar" })).toBe(`esperar ${history}`);
+    expect(resolveBlocker({ ...base, state: "free", current: history, value: "Ninguno." })).toBe(`Ninguno. ${history}`);
+    expect(resolveBlocker({ ...base, state: "free", current: `Antes: ${history}`, value: "esperar" })).toBe(`esperar Antes: ${history}`);
+    expect(resolveBlocker({ ...base, state: "free", current: history, value: "uno\ndos" })).toBe(`uno\ndos\n${history}`);
+    expect(resolveBlocker({ ...base, state: "free", current: "Ninguno.", value: "esperar" })).toBe("esperar");
+  });
+
+  test("bloqueada: lo que la desbloquearía se rechaza y manda a unblock", () => {
+    const current = "`[dependencia]` x";
+    expect(() => resolveBlocker({ ...base, state: "blocked", current, value: "Ninguno." })).toThrow("unblock <N>");
+    expect(() => resolveBlocker({ ...base, state: "blocked", current, value: "`[Resuelto el 2026-10-01]` — era `[dependencia]` x" })).toThrow("unblock <N>");
+  });
+
+  test("bloqueada sin tag vigente que conservar: pide un tag", () => {
+    expect(() => resolveBlocker({ ...base, state: "blocked", current: "`[Resuelto el 2026-10-01]` — era `[dependencia]` x", value: "algo" })).toThrow("no tiene un tag vigente");
+    expect(() => resolveBlocker({ ...base, state: "blocked", current: null, value: "algo" })).toThrow("no tiene un tag vigente");
+  });
+});
+
+describe("rejectLeadingTag", () => {
+  test("rechaza un valor que empieza con un tag, con o sin backticks; el resto pasa", () => {
+    expect(() => rejectLeadingTag("description", "[dependencia] x")).toThrow("tag de bloqueo");
+    expect(() => rejectLeadingTag("details", "  `[postergada]` x")).toThrow("tag de bloqueo");
+    expect(() => rejectLeadingTag("trigger", "[Resuelto el 2026-10-01] x")).toThrow("--trigger");
+    expect(() => rejectLeadingTag("description", "texto [con] corchetes")).not.toThrow();
+    expect(() => rejectLeadingTag("description", "[plan](plans/a.md) y más")).not.toThrow();
+  });
+});
+
+describe("rejectStructuralLines", () => {
+  test("rechaza líneas que empiezan con `#` o con un checkbox, en cualquier parte del valor", () => {
+    for (const value of ["# Título", "uno\n## Dos", "- [ ] paso", "x\n  - [x] hecho", "* [ ] otro", "a\r\n- [X] b"]) {
+      expect(() => rejectStructuralLines("next", value)).toThrow("crearía una subsección o un paso del plan");
+    }
+  });
+
+  test("deja pasar viñetas comunes y `#` o corchetes dentro de la línea", () => {
+    for (const value of ["- uno\n- dos", "ver la Tarea #3", "texto [x] y [ ] sueltos", "- [link](a.md)"]) {
+      expect(() => rejectStructuralLines("next", value)).not.toThrow();
+    }
+  });
+});
+
+describe("parsePreamble / preambleEdits", () => {
+  const region = (text: string) => {
+    const handoff = parseHandoff(text);
+    const task = handoff.inProgress.task!;
+    return { task, region: { start: task.range!.end, end: handoff.inProgress.subsections[0].range!.start } };
+  };
+
+  test("separa la descripción de los campos con sus líneas de continuación", () => {
+    const text = "<!-- agent-context-skill:section=in-progress -->\n## Tarea en progreso\n\nTarea 3 — T\n\nUno.\n\nDos.\n\n- **Detalles:** a\n  b\n- **Origen:** c\n\n### Plan\n\n- [ ] x\n";
+    const { region: r } = region(text);
+    const pre = parsePreamble(text, r);
+    expect(text.slice(pre.description!.start, pre.description!.end)).toBe("Uno.\n\nDos.");
+    expect(pre.fields.map((f) => [f.label, text.slice(f.span.start, f.span.end)])).toEqual([
+      ["Detalles", "- **Detalles:** a\n  b"],
+      ["Origen", "- **Origen:** c"],
+    ]);
+  });
+
+  test("sin descripción ni campos; con descripción mezclada con un campo se niega", () => {
+    const bare = "<!-- agent-context-skill:section=in-progress -->\n## Tarea en progreso\n\nTarea 3 — T\n\n### Plan\n\n- [ ] x\n";
+    expect(parsePreamble(bare, region(bare).region)).toEqual({ description: null, fields: [] });
+    const mixed = "<!-- agent-context-skill:section=in-progress -->\n## Tarea en progreso\n\nTarea 3 — T\n\nUno.\n- **Detalles:** a\nDos.\n\n### Plan\n\n- [ ] x\n";
+    expect(() => parsePreamble(mixed, region(mixed).region)).toThrow("mezclada");
+    const commented = "<!-- agent-context-skill:section=in-progress -->\n## Tarea en progreso\n\nTarea 3 — T\n\nUno.\n<!-- nota -->\nDos.\n\n### Plan\n\n- [ ] x\n";
+    expect(() => parsePreamble(commented, region(commented).region)).toThrow("mezclada");
+  });
+
+  test("agrega descripción y Detalles donde corresponde", () => {
+    const text = "<!-- agent-context-skill:section=in-progress -->\n## Tarea en progreso\n\nTarea 3 — T\n\n### Plan\n\n- [ ] x\n";
+    const { task, region: r } = region(text);
+    const edits = preambleEdits(parsePreamble(text, r), task.range!.end, { description: "Desc", details: "Det" }, () => "Detalles");
+    expect(apply(text, edits)).toContain("Tarea 3 — T\n\nDesc\n\n- **Detalles:** Det\n\n### Plan");
+  });
+});
