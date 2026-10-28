@@ -1,0 +1,11 @@
+{
+  "name": "agent-context-suite",
+  "owner": { "name": "Gersom Alaja" },
+  "plugins": [
+    {
+      "name": "acsuite-active-project",
+      "source": "./mods/acsuite-active-project",
+      "description": "Marca el proyecto de esta sesión de Claude como el activo para el modo observador de acsuite board."
+    }
+  ]
+}
