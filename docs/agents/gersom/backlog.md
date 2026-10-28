@@ -48,15 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 109 — Normalizar el título y el modo de la vista del board
-
-- **Descripción:** Unificar el encabezado de cada vista del board: en modo observador arriba del todo debe decir «MODO OBSERVADOR» (además del mensaje de abajo); la lista dice «PROYECTOS» en mayúsculas; la vista de tareas dice «TAREAS» con el nombre del proyecto debajo y, en la misma línea, a su lado, la ruta; la vista de equipo dice «EQUIPO» con el mismo formato.
-- **Decisiones/temas a definir antes de empezar:** Cómo se ve la ruta larga en terminales angostas (recorte); si el título cambia también el de la ventana de la terminal; si el encabezado actual de cada vista se reemplaza o se conserva.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Surgida al probar el modo observador (Tarea 105). Vistas afectadas: observador (renderObserver), lista de proyectos (renderProjects), tareas por operador (render) y equipo (renderTeam), todas en scripts/task-tracker/src/ui/render.ts.
-- **Agregada:** 2026-10-27.
-
 ### Tarea 106 — Board: aviso cuando el repo no tiene la skill iniciada
 
 - **Descripción:** En el modo observador, si el repo elegido no tiene la skill iniciada (no se puede agregar), mostrar «este repo no tiene la skill iniciada» y el enlace de la skill en GitHub, en vez de fallar en silencio.

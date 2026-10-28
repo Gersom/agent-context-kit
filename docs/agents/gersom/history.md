@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 109 — Normalizar el título y el modo de la vista del board
+
+- Encabezado normalizado en las vistas del board: título en mayúsculas con ▣ (TAREAS, EQUIPO, PROYECTOS, MODO OBSERVADOR), segunda línea con el nombre del proyecto (· operador en tareas) y la ruta a su lado, recortada si no cabe; con el observador activo el título lleva el sufijo · MODO OBSERVADOR.
+- README del board actualizado y pruebas de render y e2e ajustadas; setTitle (título de la ventana) no cambia. Verificado por el operador.
+- Commits en la suite: aa642af y 883a838.
+
 ## 2026-10-27 — ✅ Tarea 105 — Board: modo observador del proyecto activo
 
 - Modo observador del board: tecla o y flag --follow. Al entrar borra active-project.json y muestra una vista de espera propia; cuando el mod acsuite-active-project marca un proyecto (botón o /board, con at posterior), abre ese repo agregándolo a la lista si no estaba, entra al tablero del operador del correo de git en repos multi-operador y sigue observando; con el observador activo se ignoran p y b/Esc (se sale con o).
