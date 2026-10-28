@@ -48,14 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 106 — Board: aviso cuando el repo no tiene la skill iniciada
-
-- **Descripción:** En el modo observador, si el repo elegido no tiene la skill iniciada (no se puede agregar), mostrar «este repo no tiene la skill iniciada» y el enlace de la skill en GitHub, en vez de fallar en silencio.
-- **Decisiones/temas a definir antes de empezar:** Confirmar la URL del enlace (Gersom/agent-context-skill) y dónde se muestra el aviso.
-- **Bloqueos:** `[Resuelto el 2026-10-27]` — era `[dependencia]` Depende de la Tarea 105 (el modo observador).
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Agregada:** 2026-10-27.
-
 ### Tarea 110 — Pruebas automáticas de startApp (teclas y observador con TTY simulada)
 
 - **Descripción:** Surgió al cerrar la Tarea 105; falta detallarla.

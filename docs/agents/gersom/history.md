@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-27 — ✅ Tarea 106 — Board: aviso cuando el repo no tiene la skill iniciada
+
+- Aviso del modo observador cuando el repo marcado no tiene la skill iniciada: «Este repo no tiene la skill iniciada: <ruta>. Instálala desde https://github.com/Gersom/agent-context-skill»; los demás errores siguen genéricos.
+- Nuevos en paths.ts: isSkillMissing, SKILL_URL, SKILL_MISSING_ERROR; en observer.ts: observerFailureNotice (pura). Los avisos del observador ahora se parten por palabras (wrapWords, que también parte palabras más largas que el ancho) para no perder el enlace.
+- Commit en la suite: 1b07abf.
+
 ## 2026-10-27 — ✅ Tarea 109 — Normalizar el título y el modo de la vista del board
 
 - Encabezado normalizado en las vistas del board: título en mayúsculas con ▣ (TAREAS, EQUIPO, PROYECTOS, MODO OBSERVADOR), segunda línea con el nombre del proyecto (· operador en tareas) y la ruta a su lado, recortada si no cabe; con el observador activo el título lleva el sufijo · MODO OBSERVADOR.
