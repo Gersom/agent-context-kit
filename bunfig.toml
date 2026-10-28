@@ -1,0 +1,3 @@
+[test]
+# Las pruebas de los mods las corre `claude plugin test`, no bun (importan claude-code/testing).
+pathIgnorePatterns = ["mods/**"]
