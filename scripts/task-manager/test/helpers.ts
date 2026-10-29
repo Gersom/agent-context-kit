@@ -130,10 +130,13 @@ export function snapshot(root: string): Record<string, string> {
   return result;
 }
 
-/** Ejecuta el script contra un proyecto temporal como `gersom` (fecha fija: 2026-10-07 15:30). */
+/** Ejecuta el script contra un proyecto temporal como `gersom` (fecha fija: 2026-10-07 15:30).
+ * Sin `--agents` en `argv` lo agrega: así no se lanza `git rev-parse` en cada llamada (en Windows suma
+ * ~75 ms por llamada). El descubrimiento por git se prueba en `workspace.test.ts` y en los e2e. */
 export async function exec(argv: string[], p: Project, options: { email?: string | null; stdin?: string } = {}) {
   const cap = captureIo();
-  const code = await run(argv, {
+  const withAgents = argv.some((a) => a === "--agents" || a.startsWith("--agents=")) ? argv : [...argv, "--agents", p.agents];
+  const code = await run(withAgents, {
     io: cap.io,
     email: options.email === undefined ? "gersom@mail.com" : options.email,
     baseDir: p.root,
