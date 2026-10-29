@@ -51,7 +51,7 @@ export function readRootFiles(projectDir: string, read: ReadFile): RootFileInfo[
   });
 }
 
-/** Cuántas líneas de `rules.md` se conservan: el marcador de versión va en las primeras. */
+/** Cuántas líneas de `rules.md` se conservan: los marcadores van en las primeras. */
 export const RULES_HEAD_LINES = 3;
 
 /** `rules.md` de la carpeta de agentes: su cabecera y su texto, o vacíos si no existe. */

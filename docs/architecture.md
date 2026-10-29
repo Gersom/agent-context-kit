@@ -24,7 +24,7 @@ agent-context-suite/
 │   │   ├── init.ts              # `acsuite init`: agrega a `rules.md` el bloque que enseña al agente a usar la suite, al inicio y tras el título (diff sin `--apply`)
 │   │   └── test/                # Tests del despachador y de `init`
 │   ├── _shared/               # Código compartido entre scripts (el `_` marca que no es un script: las carpetas sin `_` sí lo son)
-│   │   ├── markers.ts           # Prefijo `agent-context-skill:` de los marcadores de la skill y los prefijos anteriores que se siguen leyendo
+│   │   ├── markers.ts           # Prefijo `agent-context-skill:` de los marcadores de la skill, los prefijos anteriores que se siguen leyendo y el regex del marcador de versión
 │   │   ├── rules-block.ts       # El bloque de la suite en `rules.md` (marcas, texto, `hasSuiteBlock`, `upsertSuiteBlock`; se inserta tras el título, antes del primer `##`): código puro, sin E/S
 │   │   ├── types.ts             # Tipos del dominio: tarea, campo, sección, entrada de historial, handoff/backlog interpretados
 │   │   ├── parse/               # Markdown → datos: secciones por ancla, bloques, handoff, backlog, history, operators, team-backlog

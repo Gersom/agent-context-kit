@@ -45,7 +45,7 @@ export interface RootFileInfo {
   text: string;
 }
 
-/** `rules.md` de la carpeta de agentes compartida: su cabecera (donde va el marcador de versión) y el texto completo. */
+/** `rules.md` de la carpeta de agentes compartida: su cabecera (para buscar marcadores con prefijo anterior) y el texto completo. */
 export interface RulesInfo {
   /** Ruta relativa a la raíz del proyecto, con `/` (también si no existe: dónde debería estar). */
   file: string;
