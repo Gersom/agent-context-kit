@@ -1,7 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { checkLegacyMarkers } from "../../src/checks/legacy-marker.ts";
 import { checkRootFiles } from "../../src/checks/files.ts";
-import { checkSkillVersion } from "../../src/checks/skill-version.ts";
 import { BACKLOG, HANDOFF, OPERATORS, RULES, TEAM_BACKLOG } from "../fixtures.ts";
 import { brief, makeCtx, PATHS } from "../helpers.ts";
 
@@ -24,9 +23,8 @@ describe("legacy-marker", () => {
     expect(ctx.docs.backlog.parsed.missing).toEqual([]);
   });
 
-  test("marcador de versión con el prefijo anterior: aviso, y el check de versión lo acepta", () => {
+  test("marcador de versión con el prefijo anterior: aviso en la línea 1", () => {
     const ctx = makeCtx({ rules: old(RULES) });
-    expect(checkSkillVersion(ctx)).toEqual([]);
     expect(checkLegacyMarkers(ctx).map(brief)).toEqual([{ severity: "warning", code: "legacy-marker", file: `${PATHS.flat}/rules.md`, line: 1 }]);
   });
 

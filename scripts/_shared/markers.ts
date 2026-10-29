@@ -14,6 +14,9 @@ export const LEGACY_ROOT_PREFIX = "agent-docs-skill";
 /** Fragmento de regex para anclas, versión y firma: el prefijo vigente o el anterior. */
 export const ANCHOR_PREFIX_PATTERN = `(?:${MARKER_PREFIX}|${LEGACY_MARKER_PREFIX})`;
 
+/** Marcador de versión de la skill (también con el prefijo anterior a la 2.0.0); el grupo 1 es la versión. Mismo formato que en la plantilla de la skill. */
+export const VERSION_MARKER_RE = new RegExp(`<!-- ${ANCHOR_PREFIX_PATTERN}:version (\\d+\\.\\d+\\.\\d+)[^>]*-->`);
+
 /** Marcador de máquina con un prefijo anterior (`agent-context-kit:section=…`, `agent-docs-skill:start`…). */
 export const LEGACY_MARKER_RE = new RegExp(
   String.raw`<!--\s*(?:${LEGACY_MARKER_PREFIX}:(?:section|version|signature)|${LEGACY_ROOT_PREFIX}:(?:start|end))`,

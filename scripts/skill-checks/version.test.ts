@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
-import { VERSION_MARKER_RE } from "../docs-check/src/checks/skill-version.ts";
+import { VERSION_MARKER_RE } from "../_shared/markers.ts";
 import { hasSkill, readSkill, SKILL_DIR } from "./skill-dir.ts";
 
 // La versión de la skill vive en tres sitios que deben coincidir: .claude-plugin/plugin.json,
