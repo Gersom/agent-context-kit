@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-28 — ✅ Tarea 118 — Board: al abrir un proyecto con varios operadores, entrar directo a las tareas del operador activo
+
+- Al ejecutar board de frente o abrir un proyecto desde la lista, en un repo multi-operador se abre la vista de tareas del operador del correo de git; si no figura con carpeta, la vista de equipo.
+
 ## 2026-10-28 — ✅ Tarea 116 — Board: que la vista siga la selección cuando no cabe en el alto de la terminal
 
 - Las vistas de equipo y proyectos se recortan al alto de la terminal siguiendo la fila elegida, con indicadores de líneas ocultas; pie, entrada de ruta, confirmación y avisos siempre visibles.

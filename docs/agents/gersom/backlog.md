@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 120
+**Próximo número de tarea:** 121
 
 ---
 
@@ -48,15 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 118 — Board: al abrir un proyecto con varios operadores, entrar directo a las tareas del operador activo
-
-- **Descripción:** Hoy, en la lista de proyectos, abrir un proyecto con varios operadores muestra la vista de equipo. Debe abrir de frente la vista de tareas del operador activo (el del correo de git de ese repo). Solo si no se puede determinar el operador activo, abre la vista de equipo.
-- **Decisiones/temas a definir antes de empezar:** Qué cuenta como operador activo (el del correo de git de ese repo, igual que la columna operador de la lista) y qué hacer si el correo no está registrado o el repo es plano; cómo se llega al equipo desde las tareas (depende de la tarea de reemplazar «volver al equipo» por «equipo»); si la selección del equipo recuerda al operador elegido.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Pedida por el operador. Jerarquía de vistas: equipo, proyectos, tareas. De proyectos se pasa a tareas si hay operador activo y a equipo solo si no se encuentra. Relacionada con la tarea de pasar de «volver al equipo» a «equipo». Afecta la apertura de un repo desde la lista (src/app.ts, src/cli/projects-keys.ts) y la resolución del operador (src/io/operator.ts).
-- **Agregada:** 2026-10-28.
-
 ### Tarea 119 — Board: guardar preferencias (compacto, flechas, observador) en settings.json
 
 - **Descripción:** El board no recuerda las opciones de pantalla entre ejecuciones. Guardar compacto, flechas y modo observador en settings.json, en un objeto por script, y leerlas al arrancar.
@@ -64,6 +55,15 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Detalles:** Surgió al definir la T116: en la vista de tareas se deja el scroll normal y el operador compacta con c. Cada script lee y escribe solo su clave y respeta las demás.
+- **Agregada:** 2026-10-28.
+
+### Tarea 120 — Revisar la cantidad de tests de la suite
+
+- **Descripción:** La suite tiene 1501 tests en 92 archivos y parece excesivo. Revisar si hay tests redundantes, demasiado acoplados al texto o de poco valor, y qué conviene podar o consolidar.
+- **Decisiones/temas a definir antes de empezar:** Criterio para podar (duplicados, acoplados al texto de la pantalla, o ya cubiertos por otro nivel); qué paquetes revisar primero (task-tracker tiene la mayoría); si se acuerda un presupuesto de tiempo de ejecución (hoy unos 40 s).
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Pedida por el operador al cerrar la T118. Cada tarea suma tests; algunos solo verifican frases exactas de la pantalla.
 - **Agregada:** 2026-10-28.
 
 <!-- agent-context-skill:section=blocked -->
