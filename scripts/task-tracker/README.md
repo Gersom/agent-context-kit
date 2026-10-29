@@ -69,7 +69,7 @@ Solo con una terminal interactiva (sin `--once` ni salida redirigida). Las mayú
 
 Con el observador activo, `p` y `e` no hacen nada: hay que salir antes con `o`. En la espera solo valen `q`/`Ctrl+C`, `o` y `r`; lo demás se ignora.
 
-Si la lista de proyectos o la vista de equipo no caben en el alto de la terminal, se recortan: la ventana sigue a la fila elegida con `↑`/`↓`, el pie de teclas se conserva y las líneas ocultas se indican con `↑ N más` y `↓ N más`. El panel de tareas no se recorta (se desplaza con la propia terminal), ni tampoco con `--once` o salida redirigida.
+Si la lista de proyectos o la vista de equipo no caben en el alto de la terminal, se recortan: la ventana sigue a la fila elegida con `↑`/`↓`, el pie de teclas se conserva (en proyectos, también la ruta que se escribe, la confirmación de quitar y los avisos) y las líneas ocultas se indican con `↑ N más` y `↓ N más`; «N más» cuenta líneas de pantalla, no filas. El panel de tareas no se recorta (se desplaza con la propia terminal), ni tampoco con `--once` o salida redirigida.
 
 El pie de la pantalla lista las teclas que valen en la vista actual como `[tecla] acción` (por ejemplo, en un panel de operador: `[e] equipo - [p] proyectos - [c] compactar - [f] ocultar flechas - [r] redibujar - [o] observar - [Ctrl+C o q] salir`); `c` y `f` dicen lo que harán según el estado (`[c] expandir`, `[f] mostrar flechas`), `[o]` dice `observar` o `salir del modo observador`, y si el pie no entra en el ancho se parte en dos líneas para que "salir" nunca quede recortado.
 

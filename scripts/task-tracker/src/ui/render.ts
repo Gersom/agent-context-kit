@@ -119,13 +119,14 @@ type Canvas = ReturnType<typeof createCanvas>;
 
 /**
  * Avisos, notas y pie con las teclas; cierra la pantalla y la devuelve como texto. Con `view.rows`
- * (alto de la terminal) la recorta a ese alto, conservando el pie y la fila `view.selected`.
+ * (alto de la terminal) la recorta a ese alto, conservando el pie (y lo que siga a `view.pinFrom`)
+ * y la fila `view.selected`.
  */
 function finishCanvas(
   { out, line, blank, secondary, pc, width }: Canvas,
   meta: CanvasMeta,
   model: { notes?: string[]; warnings: string[]; observerNotice?: string | null },
-  view: { rows?: number; selected: LineRange | null } = { selected: null },
+  view: { rows?: number; selected: LineRange | null; pinFrom?: number } = { selected: null },
 ): string {
   const notes = model.notes ?? [];
   const notice = model.observerNotice ?? meta.observer?.notice;
@@ -146,9 +147,10 @@ function finishCanvas(
     blank();
     for (const text of footer) line(0, text, secondary);
   }
+  // `pinFrom`: desde esa línea todo queda fijo, como el pie (ej. la ruta que se escribe y los avisos).
+  const pinned = out.length - Math.min(footerStart, view.pinFrom ?? footerStart);
   // Una línea menos que el alto: el salto de línea final deja el cursor en la última fila sin desplazar la pantalla.
-  const lines =
-    view.rows === undefined ? out : fitToHeight(out, { rows: view.rows - 1, selected: view.selected, footer: out.length - footerStart, paint: secondary });
+  const lines = view.rows === undefined ? out : fitToHeight(out, { rows: view.rows - 1, selected: view.selected, footer: pinned, paint: secondary });
   return lines.join("\n") + "\n";
 }
 
@@ -406,6 +408,8 @@ export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, war
   const { pc, box, secondary, width, out } = canvas;
   // Líneas de la fila elegida, para que `rows` la mantenga a la vista.
   let selected = null as LineRange | null;
+  // Primera línea de la entrada de ruta o la confirmación: desde ahí todo queda fijo, siempre a la vista.
+  let pinFrom: number | undefined;
   // La ruta que se escribe se muestra por el final (donde está el cursor), no por el principio.
   const inputLine = (text: string): string => {
     const label = "Ruta del repo: ";
@@ -426,11 +430,15 @@ export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, war
     if (!rows.length) {
       row(0, { paint: secondary, text: "No hay proyectos para mostrar." });
       row(0, { paint: secondary, text: `Abre uno con: acsuite board <ruta>${meta.controls === "keys" ? ", o agrégalo con [a]" : ""}` });
-      if (meta.input != null) row(0, { text: inputLine(meta.input) });
+      if (meta.input != null) {
+        pinFrom = out.length;
+        row(0, { text: inputLine(meta.input) });
+      }
       return;
     }
     // Debajo de la tabla o de las tarjetas: la ruta que se escribe y la confirmación de quitar.
     const footer = () => {
+      if (meta.input != null || meta.confirmRemove != null) pinFrom = out.length;
       if (meta.input != null) row(0, { text: inputLine(meta.input) });
       if (meta.confirmRemove != null) row(0, { paint: pc.yellow, text: confirmLine(meta.confirmRemove) });
     };
@@ -475,7 +483,9 @@ export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, war
     footer();
   });
 
-  return finishCanvas(canvas, { ...meta, hasRows: rows.length > 0 }, { warnings }, { rows: meta.rows, selected });
+  // Los avisos de la vista también quedan fijos: sin entrada ni confirmación, desde el cierre del recuadro.
+  if (pinFrom === undefined && warnings.length) pinFrom = out.length;
+  return finishCanvas(canvas, { ...meta, hasRows: rows.length > 0 }, { warnings }, { rows: meta.rows, selected, pinFrom });
 }
 
 /**

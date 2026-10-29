@@ -173,7 +173,7 @@ export function startApp({
     };
     let screen: string;
     // Alto de la terminal para recortar la lista de proyectos y el equipo; con `--once` o salida redirigida no se recorta.
-    const rows = !once && process.stdout.isTTY ? process.stdout.rows || undefined : undefined;
+    const rows = interactive ? process.stdout.rows || undefined : undefined;
 
     if (observerWaiting) return write(renderObserver(common));
 

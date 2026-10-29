@@ -407,11 +407,30 @@ describe("renderProjects recortado al alto de la terminal", () => {
     });
   }
 
-  test("con entrada de ruta y confirmación al fondo, el pie de ese paso sigue a la vista", () => {
+  test("con entrada de ruta, el pie de ese paso sigue a la vista", () => {
     const out = at(11, { width: 140, rows: 14, input: "/repos/nuevo" });
     expect(out).toContain("[Enter] agregar - [Esc] cancelar - [Ctrl+C] salir");
     expect(out).toContain("› repo11");
   });
+
+  for (const width of [140, 60]) {
+    test(`con la fila elegida arriba, en medio o abajo, la entrada de ruta, la confirmación y el aviso siguen a la vista (ancho ${width})`, () => {
+      const rows = 14;
+      for (const i of [0, 6, 11]) {
+        const out = at(i, { width, rows, input: "/repos/nuevo", confirmRemove: { name: many[i].name, path: many[i].path } }).split("\n");
+        const text = out.join("\n");
+        expect(out.length - 1).toBeLessThanOrEqual(rows - 1);
+        expect(text).toContain("Ruta del repo: /repos/nuevo█");
+        expect(text).toContain(`¿Quitar ${many[i].name} (`);
+        expect(text).toContain("[Ctrl+C");
+        expect(text).toContain(`› ${many[i].name}`);
+        const notice = renderProjects(many, { ...keys, width, rows, selected: many[i].path }, ["no se pudo abrir /repos/roto"]);
+        expect(notice).toContain("! no se pudo abrir /repos/roto");
+        expect(notice).toContain(`› ${many[i].name}`);
+        expect(notice.split("\n").length - 1).toBeLessThanOrEqual(rows - 1);
+      }
+    });
+  }
 
   test("los indicadores van en el gris secundario", () => {
     expect(at(6, { width: 60, rows: 14, color: true })).toMatch(/\x1b\[38;5;250m↑ \d+ más\x1b\[39m/);
