@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-28 — ✅ Tarea 121 — Board: quitar los flags --operator, --compact, --arrows y --follow
+
+- Se quitaron del board los flags --operator, --compact, --arrows y --follow (con sus --no-); los flags quitados o desconocidos dan error de uso (código 2) con la alternativa; compacto, flechas y observador se cambian con c, f y o y se recuerdan en settings.json.
+
 ## 2026-10-28 — ✅ Tarea 120 — Revisar la cantidad de tests de la suite
 
 - Auditoría de la suite: el helper de los tests de task-manager pasa --agents y evita un git por llamada (suite de 40 s a 25 s); se consolidó watch.test.ts y se quitaron 4 e2e repetidos (1540 a 1536 tests).
