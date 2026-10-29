@@ -26,6 +26,7 @@ import type { HistoryEntry, TaskRef } from "../../../_shared/types.ts";
 import { BOX_PADDING, boxBottom, boxRow, boxTop, type Paint, type Segment } from "./box.ts";
 import { displayProjectName, plainText, progressBar, shortTaskName, truncate, visibleLength } from "./format.ts";
 import { currentText, OPERATOR_MAX_WIDTH, PROJECT_GAP, projectColumns, projectViewMode, truncateStart } from "./project-columns.ts";
+import { fitToHeight, type LineRange } from "./viewport.ts";
 
 /** Ancho mínimo de la pantalla, aunque la terminal sea más angosta. */
 const MIN_WIDTH = 40;
@@ -116,11 +117,15 @@ function createCanvas(meta: CanvasMeta, header: Header) {
 
 type Canvas = ReturnType<typeof createCanvas>;
 
-/** Avisos, notas y pie con las teclas; cierra la pantalla y la devuelve como texto. */
+/**
+ * Avisos, notas y pie con las teclas; cierra la pantalla y la devuelve como texto. Con `view.rows`
+ * (alto de la terminal) la recorta a ese alto, conservando el pie y la fila `view.selected`.
+ */
 function finishCanvas(
   { out, line, blank, secondary, pc, width }: Canvas,
   meta: CanvasMeta,
   model: { notes?: string[]; warnings: string[]; observerNotice?: string | null },
+  view: { rows?: number; selected: LineRange | null } = { selected: null },
 ): string {
   const notes = model.notes ?? [];
   const notice = model.observerNotice ?? meta.observer?.notice;
@@ -136,11 +141,15 @@ function finishCanvas(
   for (const warning of model.warnings) line(0, `! ${warning}`, pc.yellow);
 
   const footer = footerLines(meta, width);
+  const footerStart = out.length;
   if (footer.length) {
     blank();
     for (const text of footer) line(0, text, secondary);
   }
-  return out.join("\n") + "\n";
+  // Una línea menos que el alto: el salto de línea final deja el cursor en la última fila sin desplazar la pantalla.
+  const lines =
+    view.rows === undefined ? out : fitToHeight(out, { rows: view.rows - 1, selected: view.selected, footer: out.length - footerStart, paint: secondary });
+  return lines.join("\n") + "\n";
 }
 
 /** Línea de estado del modo observador (ver `RenderMeta.observer`). */
@@ -326,7 +335,9 @@ export function render(model: Model, meta: RenderMeta): string {
  */
 export function renderTeam(team: TeamModel, meta: TeamRenderMeta): string {
   const canvas = createCanvas(meta, { title: "EQUIPO", location: {} });
-  const { pc, box, secondary } = canvas;
+  const { pc, box, secondary, out } = canvas;
+  // Líneas de la fila elegida (la del operador y su resumen), para que `rows` la mantenga a la vista.
+  let selected = null as LineRange | null;
 
   box(`EQUIPO (${team.rows.length})`, "operators.md", pc.green, (row) => {
     if (!team.rows.length) row(0, { paint: secondary, text: "Ningún operador registrado en operators.md" });
@@ -335,6 +346,7 @@ export function renderTeam(team: TeamModel, meta: TeamRenderMeta): string {
     const nameWidth = Math.max(0, ...team.rows.map((op) => visibleLength(label(op))));
     for (const op of team.rows) {
       const chosen = op.folder === meta.selected && !op.folderless;
+      const start = out.length;
       const mark = chosen ? "› " : "  ";
       const padded = label(op) + " ".repeat(nameWidth - visibleLength(label(op)));
       const name = { paint: (s: string) => (chosen ? pc.bold(pc.green(s)) : pc.bold(s)), text: `${mark}${padded}` };
@@ -349,11 +361,12 @@ export function renderTeam(team: TeamModel, meta: TeamRenderMeta): string {
         row(0, name, { paint: secondary, text: "  Sin tarea en curso" });
       }
       if (!op.folderless && !op.missing) row(4, { paint: secondary, text: summaryLine(op) });
+      if (chosen) selected = { start, end: out.length - 1 };
     }
   });
 
   if (team.teamBacklog.present) teamBacklogBox(canvas, team.teamBacklog, meta.compact);
-  return finishCanvas(canvas, meta, { warnings: team.warnings });
+  return finishCanvas(canvas, meta, { warnings: team.warnings }, { rows: meta.rows, selected });
 }
 
 /**
@@ -390,7 +403,9 @@ function summaryLine(op: TeamRow): string {
  */
 export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, warnings: string[] = []): string {
   const canvas = createCanvas(meta, { title: "PROYECTOS" });
-  const { pc, box, secondary, width } = canvas;
+  const { pc, box, secondary, width, out } = canvas;
+  // Líneas de la fila elegida, para que `rows` la mantenga a la vista.
+  let selected = null as LineRange | null;
   // La ruta que se escribe se muestra por el final (donde está el cursor), no por el principio.
   const inputLine = (text: string): string => {
     const label = "Ruta del repo: ";
@@ -420,7 +435,7 @@ export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, war
       if (meta.confirmRemove != null) row(0, { paint: pc.yellow, text: confirmLine(meta.confirmRemove) });
     };
     if (projectViewMode(rows, width) === "cards") {
-      projectCards(rows, meta.selected, canvas, row);
+      selected = projectCards(rows, meta.selected, canvas, row);
       footer();
       return;
     }
@@ -439,6 +454,7 @@ export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, war
 
     for (const project of rows) {
       const chosen = project.path === meta.selected;
+      if (chosen) selected = { start: out.length, end: out.length };
       const name = { paint: (s: string) => (chosen ? pc.bold(pc.green(s)) : pc.bold(s)), text: `${chosen ? "› " : "  "}${fit(project.name, nameW)}${PROJECT_GAP}` };
       const path = { paint: secondary, text: fit(project.path, pathW) + PROJECT_GAP };
       if (project.warning != null) {
@@ -459,7 +475,7 @@ export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, war
     footer();
   });
 
-  return finishCanvas(canvas, { ...meta, hasRows: rows.length > 0 }, { warnings });
+  return finishCanvas(canvas, { ...meta, hasRows: rows.length > 0 }, { warnings }, { rows: meta.rows, selected });
 }
 
 /**
@@ -473,12 +489,16 @@ export function renderProjects(rows: ProjectRow[], meta: ProjectsRenderMeta, war
  * Si algo no entra, se recorta el nombre (conservando los conteos), la ruta por el principio y la
  * tercera línea por el final. Un repo que no se pudo leer lleva solo el nombre y, en la tercera
  * línea, su aviso.
+ *
+ * Devuelve las líneas (índices en la pantalla) de la tarjeta elegida, o `null` si no hay ninguna.
  */
-function projectCards(rows: ProjectRow[], selected: string | null, { pc, width, secondary }: Canvas, row: Row): void {
+function projectCards(rows: ProjectRow[], selected: string | null, { pc, width, secondary, out }: Canvas, row: Row): LineRange | null {
   const inner = Math.max(1, width - BOX_PADDING);
+  let range: LineRange | null = null;
   for (const [index, project] of rows.entries()) {
     if (index > 0) row(0, { text: "" });
     const chosen = project.path === selected;
+    if (chosen) range = { start: out.length, end: out.length + 2 };
     const marker = chosen ? "› " : "  ";
     const paintName = (s: string) => (chosen ? pc.bold(pc.green(s)) : pc.bold(s));
     const name = plainText(project.name);
@@ -511,6 +531,7 @@ function projectCards(rows: ProjectRow[], selected: string | null, { pc, width, 
       { paint: work?.current ? undefined : secondary, text: currentText(project) },
     );
   }
+  return range;
 }
 
 /**

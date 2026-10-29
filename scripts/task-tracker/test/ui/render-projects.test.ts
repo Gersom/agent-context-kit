@@ -352,6 +352,80 @@ describe("renderProjects como tarjetas", () => {
   });
 });
 
+describe("renderProjects recortado al alto de la terminal", () => {
+  const many: ProjectRow[] = Array.from({ length: 12 }, (_, i) => ({
+    name: `repo${String(i).padStart(2, "0")}`,
+    path: `/repos/repo${String(i).padStart(2, "0")}`,
+    operator: "ana",
+    work: { current: null, counts: { free: i, blocked: 0 } },
+    warning: null,
+  }));
+  const keys = { ...meta, controls: "keys" as const, multiView: "projects" as const };
+  const footer = "[↑/↓] elegir - [Enter] abrir - [a] agregar repo - [x] quitar - [r] releer - [o] observar - [Ctrl+C o q] salir";
+  const at = (i: number, extra: Partial<ProjectsRenderMeta> = {}) => renderProjects(many, { ...keys, selected: many[i].path, ...extra });
+
+  test("sin `rows` no cambia nada, y con `rows` de sobra tampoco", () => {
+    for (const width of [140, 60]) {
+      const full = at(5, { width });
+      expect(at(5, { width, rows: 500 })).toBe(full);
+      expect(full).not.toContain("más");
+    }
+  });
+
+  for (const [mode, width] of [["tabla", 140], ["tarjetas", 60]] as const) {
+    describe(`en ${mode}`, () => {
+      const rows = 14;
+
+      test("para cada fila elegida: a lo sumo rows - 1 líneas, la fila elegida entera a la vista y el pie", () => {
+        for (let i = 0; i < many.length; i++) {
+          const out = at(i, { width, rows });
+          const lines = out.split("\n");
+          expect(lines.length - 1).toBeLessThanOrEqual(rows - 1);
+          expect(out).toContain(`› ${many[i].name}`);
+          if (mode === "tarjetas") {
+            // Las tres líneas de la tarjeta: nombre, ruta y operador.
+            const idx = lines.findIndex((l) => l.includes(`› ${many[i].name}`));
+            expect(lines[idx + 1]).toContain(many[i].path);
+            expect(lines[idx + 2]).toContain("ana");
+          }
+          expect(out).toContain(width === 140 ? footer : "[Ctrl+C o q] salir");
+        }
+      });
+
+      test("indicadores: solo abajo con el primero, arriba y abajo en medio, solo arriba con el último", () => {
+        expect(at(0, { width, rows })).not.toMatch(/↑ \d+ más/);
+        expect(at(0, { width, rows })).toMatch(/↓ \d+ más/);
+        expect(at(6, { width, rows })).toMatch(/↑ \d+ más/);
+        expect(at(6, { width, rows })).toMatch(/↓ \d+ más/);
+        expect(at(11, { width, rows })).toMatch(/↑ \d+ más/);
+        expect(at(11, { width, rows })).not.toMatch(/↓ \d+ más/);
+      });
+
+      test("ninguna línea supera el ancho", () => {
+        for (const line of at(6, { width, rows }).split("\n")) expect(visibleLength(line)).toBeLessThanOrEqual(width);
+      });
+    });
+  }
+
+  test("con entrada de ruta y confirmación al fondo, el pie de ese paso sigue a la vista", () => {
+    const out = at(11, { width: 140, rows: 14, input: "/repos/nuevo" });
+    expect(out).toContain("[Enter] agregar - [Esc] cancelar - [Ctrl+C] salir");
+    expect(out).toContain("› repo11");
+  });
+
+  test("los indicadores van en el gris secundario", () => {
+    expect(at(6, { width: 60, rows: 14, color: true })).toMatch(/\x1b\[38;5;250m↑ \d+ más\x1b\[39m/);
+  });
+
+  test("lista vacía o sin selección con `rows`: no falla y arranca desde arriba", () => {
+    expect(renderProjects([], { ...keys, rows: 6 })).toContain("[Ctrl+C o q] salir");
+    const out = renderProjects(many, { ...keys, selected: null, rows: 14 });
+    expect(out).toContain("▣ PROYECTOS");
+    expect(out).toMatch(/↓ \d+ más/);
+    expect(out).not.toMatch(/↑ \d+ más/);
+  });
+});
+
 describe("truncateStart", () => {
   test("deja el final con «…» delante y respeta el ancho", () => {
     expect(truncateStart("/repos/abc/final", 10)).toBe("…abc/final");

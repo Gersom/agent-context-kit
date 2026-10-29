@@ -172,6 +172,8 @@ export function startApp({
       ...(observer ? { observer: { notice: observerNotice } } : {}),
     };
     let screen: string;
+    // Alto de la terminal para recortar la lista de proyectos y el equipo; con `--once` o salida redirigida no se recorta.
+    const rows = !once && process.stdout.isTTY ? process.stdout.rows || undefined : undefined;
 
     if (observerWaiting) return write(renderObserver(common));
 
@@ -179,7 +181,7 @@ export function startApp({
       // La lista no se relee al redibujar (cambio de tamaño): solo con `r` o al abrir la vista.
       projectsNav = reconcileProjects(projectsNav, projectRows.map((row) => row.path));
       const confirm = confirmRemove ? { name: projectRows.find((row) => row.path === confirmRemove)?.name ?? confirmRemove, path: confirmRemove } : null;
-      screen = renderProjects(projectRows, { ...common, selected: projectsNav.selected, multiView: "projects", input: adding, confirmRemove: confirm }, projectsNotices);
+      screen = renderProjects(projectRows, { ...common, selected: projectsNav.selected, multiView: "projects", input: adding, confirmRemove: confirm, rows }, projectsNotices);
       return write(screen);
     }
 
@@ -211,7 +213,7 @@ export function startApp({
       } else {
         screen = renderTeam(
           { ...team, warnings: [...team.warnings, ...lost] },
-          { ...meta, selected: nav.selected, preferred: multi.preferred, multiView: "team" },
+          { ...meta, selected: nav.selected, preferred: multi.preferred, multiView: "team", rows },
         );
       }
       if (process.stdout.isTTY) setTitle(nav.view.kind === "operator" ? nav.view.folder : "equipo");

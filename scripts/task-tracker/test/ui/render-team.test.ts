@@ -133,6 +133,67 @@ describe("renderTeam", () => {
   });
 });
 
+describe("renderTeam recortado al alto de la terminal", () => {
+  const folders = Array.from({ length: 12 }, (_, i) => `op${String(i).padStart(2, "0")}`);
+  const many: TeamModel = {
+    ...team,
+    rows: folders.map((folder) => ({ folder, folderless: false, missing: false, current: null, counts: { free: 1, blocked: 0 }, lastCompleted: null })),
+  };
+  const keys = { ...meta, controls: "keys" as const, multiView: "team" as const, width: 140 };
+  const footer = "[↑/↓] elegir - [Enter] abrir - [p] proyectos - [r] redibujar - [o] observar - [Ctrl+C o q] salir";
+  const strip = (s: string) => s.replace(/\x1b\[[0-9;]*m/g, "");
+
+  test("sin `rows` no cambia nada, y con `rows` de sobra tampoco", () => {
+    const full = renderTeam(many, { ...keys, selected: "op05" });
+    expect(full.split("\n").length).toBeGreaterThan(25);
+    expect(renderTeam(many, { ...keys, selected: "op05", rows: 200 })).toBe(full);
+  });
+
+  test("la salida mide a lo sumo rows - 1 líneas (el salto final deja el cursor en la última) y el pie sigue", () => {
+    for (const selected of folders) {
+      const out = renderTeam(many, { ...keys, selected, rows: 14 });
+      expect(out.endsWith("\n")).toBe(true);
+      expect(out.split("\n")).toHaveLength(14); // 13 líneas + el vacío tras el último salto
+      expect(out).toContain(footer);
+      expect(out).toContain(`› ${selected}`);
+      expect(out).toContain(`${" ".repeat(4)}libres 1`);
+    }
+  });
+
+  test("indicadores: solo abajo con la primera fila, arriba y abajo en medio, solo arriba con la última", () => {
+    // Sin SIN DUEÑO ni avisos debajo del recuadro, la última fila no deja nada oculto abajo.
+    const bare: TeamModel = { ...many, teamBacklog: { present: false, free: [], blocked: [], warnings: [] }, warnings: [] };
+    const at = (selected: string) => renderTeam(bare, { ...keys, selected, rows: 14 });
+    expect(at("op00")).not.toMatch(/↑ \d+ más/);
+    expect(at("op00")).toMatch(/↓ \d+ más/);
+    expect(at("op05")).toMatch(/↑ \d+ más/);
+    expect(at("op05")).toMatch(/↓ \d+ más/);
+    expect(at("op11")).toMatch(/↑ \d+ más/);
+    expect(at("op11")).not.toMatch(/↓ \d+ más/);
+    // Con ellos, la última fila se ve y lo de abajo queda tras el indicador.
+    expect(renderTeam(many, { ...keys, selected: "op11", rows: 14 })).toMatch(/↓ \d+ más/);
+  });
+
+  test("los indicadores van en el gris secundario y sin color no hay ANSI", () => {
+    const colored = renderTeam(many, { ...keys, selected: "op05", rows: 14, color: true });
+    expect(colored).toMatch(/\x1b\[38;5;250m↑ \d+ más\x1b\[39m/);
+    expect(strip(colored)).toMatch(/↑ \d+ más/);
+    expect(renderTeam(many, { ...keys, selected: "op05", rows: 14 })).not.toMatch(/\x1b\[/);
+  });
+
+  test("ninguna línea supera el ancho, con el recorte puesto", () => {
+    for (const width of [100, 60, 40]) {
+      for (const line of renderTeam(many, { ...keys, selected: "op05", rows: 14, width }).split("\n")) expect([...line].length).toBeLessThanOrEqual(width);
+    }
+  });
+
+  test("si el pie se parte en varias líneas (ancho chico), se conservan todas", () => {
+    const out = renderTeam(many, { ...keys, selected: "op05", rows: 16, width: 40 });
+    expect(out).toContain("[Ctrl+C o q] salir");
+    expect(out).toContain("› op05");
+  });
+});
+
 describe("render del panel de un operador en modo multi", () => {
   const model = buildModel({
     handoffText: fixture("es-anchors", "handoff.md"),

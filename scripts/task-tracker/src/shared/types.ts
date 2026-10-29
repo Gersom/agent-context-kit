@@ -220,6 +220,8 @@ export interface ProjectRow {
 export interface ProjectsRenderMeta extends Omit<RenderMeta, "projectName" | "projectDir"> {
   /** Ruta del proyecto elegido en la lista. */
   selected: string | null;
+  /** Alto de la terminal: si se indica, la pantalla se recorta a él manteniendo visible la fila elegida (ver `fitToHeight`). */
+  rows?: number;
 }
 
 /**
@@ -234,4 +236,6 @@ export interface TeamRenderMeta extends RenderMeta {
   selected: string | null;
   /** Carpeta del operador del correo de git (se marca con `(tú)`). */
   preferred: string | null;
+  /** Alto de la terminal: si se indica, la pantalla se recorta a él manteniendo visible la fila elegida (ver `fitToHeight`). */
+  rows?: number;
 }
