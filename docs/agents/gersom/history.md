@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-28 — ✅ Tarea 117 — Board: reemplazar «volver al equipo» por «equipo» y quitar el botón volver
+
+- Tecla e lleva al equipo desde las tareas de un operador y se quita la tecla volver; vistas con la misma jerarquía equipo, proyectos, tareas.
+
 ## 2026-10-28 — ✅ Tarea 112 — Mejorar la UX de la tabla de listado de proyectos del board con poco ancho
 
 - La lista de proyectos del board ya no se corta con poco ancho: con terminales anchas se muestra la tabla y con angostas una tarjeta de tres líneas por proyecto (nombre · libres · bloqueadas / ruta / operador · en curso), con una línea en blanco entre proyectos. El modo sale de los anchos reales de la tabla: ruta ≥ 24 columnas y en curso ≥ 22.

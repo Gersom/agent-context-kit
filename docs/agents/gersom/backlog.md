@@ -57,15 +57,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** Hallazgo de la revisión de la T112: no hay ningún manejo de stdout.rows en scripts/task-tracker/src. Antes la tabla gastaba una línea por proyecto; las tarjetas triplican el alto.
 - **Agregada:** 2026-10-28.
 
-### Tarea 117 — Board: reemplazar «volver al equipo» por «equipo» y quitar el botón volver
-
-- **Descripción:** En la vista de tareas de un operador, el pie ofrece «[Esc o b] volver al equipo». Cambiarlo por un destino explícito, «equipo», y eliminar la acción de volver/regresar (Esc, b y Retroceso) en el board. La navegación pasa a ser por vistas con la misma jerarquía: equipo, proyectos y tareas, y desde tareas o equipo se puede ir a proyectos (ya existe «[p] proyectos»).
-- **Decisiones/temas a definir antes de empezar:** Qué tecla va a equipo (propuesta: e) y si Esc, b y Retroceso se quitan del todo o quedan como alias; qué hacen Esc/b/Retroceso desde la raíz de un repo abierto desde la lista (hoy vuelven a la lista; ahora se usa [p]); cómo queda el pie en cada vista; qué pasa con el observador, que hoy ignora p y volver.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Pedida por el operador. Va junto con la tarea de entrar directo a las tareas del operador activo al abrir un proyecto. Jerarquía: vista equipo, vista proyectos, vista tareas; de proyectos se pasa a tareas (o a equipo si no hay operador activo), de tareas a equipo, de equipo a tareas, y de tareas o equipo a proyectos. Afecta src/ui/render.ts (pie), src/cli/keys.ts, src/cli/nav.ts, src/app.ts y la tabla de teclas del README del board.
-- **Agregada:** 2026-10-28.
-
 ### Tarea 118 — Board: al abrir un proyecto con varios operadores, entrar directo a las tareas del operador activo
 
 - **Descripción:** Hoy, en la lista de proyectos, abrir un proyecto con varios operadores muestra la vista de equipo. Debe abrir de frente la vista de tareas del operador activo (el del correo de git de ese repo). Solo si no se puede determinar el operador activo, abre la vista de equipo.
