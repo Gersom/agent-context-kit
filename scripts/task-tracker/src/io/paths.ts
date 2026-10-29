@@ -122,9 +122,9 @@ export function resolveAgentsDir(
 }
 
 /**
- * Modo multi-operador: abre la vista de equipo, o de frente el panel de `options.operator` (o de
- * `direct`, la carpeta pasada como ruta). El operador del correo de git queda como `preferred`;
- * que no figure no es un error, solo no hay fila preseleccionada.
+ * Modo multi-operador: abre de frente el panel de `options.operator` (o de `direct`, la carpeta
+ * pasada como ruta). Sin ellos, el tablero abre el panel del operador del correo de git, que queda
+ * como `preferred`; que no figure no es un error: se abre la vista de equipo.
  */
 function resolveMulti(agentsRoot: string, options: ResolveOptions, direct?: string): ResolveResult {
   const repoDir = projectDirFor(agentsRoot);

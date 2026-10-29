@@ -20,8 +20,8 @@
 //   bun run board <ruta> <operador>
 //                                 → en modo multi-operador, abre de frente el panel de ese
 //                                   operador; sin ruta, `--operator <carpeta>` (también vale con
-//                                   ruta); sin operador, la vista de equipo con el operador de
-//                                   `git config user.email` elegido
+//                                   ruta); sin operador, el panel del operador de
+//                                   `git config user.email` o, si no figura, la vista de equipo
 //
 // Cada instancia es independiente (sin lockfiles, puertos ni estado compartido): se puede
 // correr una por proyecto en paralelo.
