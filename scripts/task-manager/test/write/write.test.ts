@@ -1,7 +1,7 @@
 // Piezas puras de lo que el script escribe: idioma y etiquetas, formato de los bloques y del handoff,
 // y el contador de «Próximo número de tarea».
 
-import { describe, expect, test } from "bun:test";
+import { afterAll, describe, expect, test } from "bun:test";
 import { parseFields } from "../../../_shared/parse/blocks.ts";
 import { parseBacklog } from "../../../_shared/parse/backlog.ts";
 import { CliError } from "../../src/cli/errors.ts";
@@ -20,7 +20,16 @@ import {
 } from "../../src/write/render.ts";
 import { labelResolver } from "../../src/write/samples.ts";
 import { BACKLOG_EMPTY, BACKLOG_RICH, HANDOFF_CURRENT, HANDOFF_EMPTY, HANDOFF_IDLE, HISTORY_RICH } from "../fixtures.ts";
-import { loadDocs, makeProject } from "../helpers.ts";
+import { loadDocs, makeProject, type Project, type ProjectOptions } from "../helpers.ts";
+
+const projects: Project[] = [];
+/** Crea un proyecto temporal que se borra al terminar el archivo. */
+const tempProject = (options: ProjectOptions = {}): Project => {
+  const p = makeProject(options);
+  projects.push(p);
+  return p;
+};
+afterAll(() => projects.forEach((p) => p.cleanup()));
 
 describe("idioma", () => {
   test("reconoce español e inglés por las palabras que ya usa el archivo", () => {
@@ -189,7 +198,7 @@ describe("renderInProgress", () => {
 
   test("lo que escribe se lee con el mismo parser: tarea, plan y subsecciones por posición", () => {
     const body = renderInProgress({ ...base, plan: ["Paso 1 — a"], mode: "seguidos" });
-    const docs = loadDocs(makeProject({ folders: ["gersom"], contents: { "handoff.md": HANDOFF_IDLE.replace("Sin tarea en curso", body) } }), "gersom");
+    const docs = loadDocs(tempProject({ folders: ["gersom"], contents: { "handoff.md": HANDOFF_IDLE.replace("Sin tarea en curso", body) } }), "gersom");
     const { task, steps, subsections } = docs.handoff.parsed.inProgress;
     expect(task).toMatchObject({ number: 5, title: "Algo" });
     expect(steps.map((s) => s.text)).toEqual(["Paso 1 — a", "Documentar cierre de tarea"]);
@@ -199,7 +208,7 @@ describe("renderInProgress", () => {
 
 describe("reserveNextNumber", () => {
   function docsWith(backlog: string, handoff = HANDOFF_IDLE, history = HISTORY_RICH) {
-    const p = makeProject({ folders: ["gersom"], contents: { "backlog.md": backlog, "handoff.md": handoff, "history.md": history } });
+    const p = tempProject({ folders: ["gersom"], contents: { "backlog.md": backlog, "handoff.md": handoff, "history.md": history } });
     return loadDocs(p, "gersom");
   }
 
@@ -237,7 +246,7 @@ describe("reserveNextNumber", () => {
 
 describe("renderBacklogTask", () => {
   test("usa la palabra de header y las etiquetas de las tareas del archivo; lo que no se pasa toma los valores por defecto", () => {
-    const p = makeProject({ folders: ["gersom"], contents: { "backlog.md": BACKLOG_RICH, "handoff.md": HANDOFF_IDLE, "history.md": HISTORY_RICH } });
+    const p = tempProject({ folders: ["gersom"], contents: { "backlog.md": BACKLOG_RICH, "handoff.md": HANDOFF_IDLE, "history.md": HISTORY_RICH } });
     const docs = loadDocs(p, "gersom");
     const block = renderBacklogTask(docs, STRINGS.es, docs.backlog.parsed.free.tasks, { number: 20, title: "Nueva", description: "Algo.", date: "2026-10-07" });
     expect(block).toBe(
@@ -247,7 +256,7 @@ describe("renderBacklogTask", () => {
   });
 
   test("sin tareas de donde copiar usa la tabla del idioma, y los detalles solo si se pasan", () => {
-    const p = makeProject({ folders: ["gersom"], contents: { "backlog.md": BACKLOG_EMPTY, "handoff.md": HANDOFF_EMPTY, "history.md": "# History\n" } });
+    const p = tempProject({ folders: ["gersom"], contents: { "backlog.md": BACKLOG_EMPTY, "handoff.md": HANDOFF_EMPTY, "history.md": "# History\n" } });
     const docs = loadDocs(p, "gersom");
     const block = renderBacklogTask(docs, STRINGS.en, [], { number: 5, title: "New", description: "Something.", details: "More.", trigger: "later", date: "2026-10-07" });
     expect(block).toBe(
