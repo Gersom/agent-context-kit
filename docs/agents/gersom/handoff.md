@@ -14,7 +14,32 @@ Estado "en caliente": en qué se está ahora. **Se actualiza editando solo lo qu
 <!-- agent-context-skill:section=in-progress -->
 ## Tarea en progreso
 
-Sin tarea en curso
+Tarea 121 — Board: quitar los flags --operator, --compact, --arrows y --follow
+
+Quitar del board los flags --operator <carpeta>, --compact/--no-compact, --arrows/--no-arrows y --follow/--no-follow, con sus tests. Quedan --once, la ruta, el operador posicional y -h. Compacto, flechas y observador se cambian con las teclas c, f y o y se recuerdan en settings.json.
+
+- **Detalles:** Surgió al cerrar la T120. Afecta args.ts (resolveOptions pasa a depender solo de lo guardado), main.ts (ayuda), README del board y de la raíz, docs/architecture.md, tests de args/e2e/settings. dist/cli.js está desactualizado y se regenera aparte.
+
+### Plan
+
+- [ ] Quitar los flags de args.ts, main.ts y la ayuda; simplificar resolveOptions
+- [ ] Quitar sus tests y ajustar los e2e
+- [ ] Actualizar README del board, README raíz y docs/architecture.md
+- [ ] Verificación
+- [ ] Revisión con ʀᴇᴠɪsᴏʀ
+- [ ] Documentar cierre de tarea
+
+### Qué falta
+
+Todos los pasos del plan.
+
+### Decisiones a medio camino
+
+Decidido por el operador: se quitan los cuatro. --operator solo del board (los demás comandos siguen con el suyo); el operador sigue pudiendo ir como segundo argumento tras la ruta. El observador y las demás opciones solo se activan con teclas o con lo guardado en settings.json.
+
+### Próximo paso concreto
+
+Quitar los flags de args.ts, main.ts y la ayuda; simplificar resolveOptions
 
 <!-- agent-context-skill:section=paused -->
 ## Tareas pausadas

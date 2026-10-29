@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-28 — ✅ Tarea 120 — Revisar la cantidad de tests de la suite
+
+- Auditoría de la suite: el helper de los tests de task-manager pasa --agents y evita un git por llamada (suite de 40 s a 25 s); se consolidó watch.test.ts y se quitaron 4 e2e repetidos (1540 a 1536 tests).
+
 ## 2026-10-28 — ✅ Tarea 119 — Board: guardar preferencias (compacto, flechas, observador) en settings.json
 
 - El board guarda compacto, flechas y observador en settings.json (clave board, archivo compartido entre scripts) al pulsar c, f u o; flags simétricos que mandan en la sesión; el observador guardado solo vale sin ruta y sin --once.

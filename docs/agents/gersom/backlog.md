@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 121
+**Próximo número de tarea:** 122
 
 ---
 
@@ -47,15 +47,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador quiera hacer pública la skill, o priorice esta tarea explícitamente.
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
-
-### Tarea 120 — Revisar la cantidad de tests de la suite
-
-- **Descripción:** La suite tiene 1501 tests en 92 archivos y parece excesivo. Revisar si hay tests redundantes, demasiado acoplados al texto o de poco valor, y qué conviene podar o consolidar.
-- **Decisiones/temas a definir antes de empezar:** Criterio para podar (duplicados, acoplados al texto de la pantalla, o ya cubiertos por otro nivel); qué paquetes revisar primero (task-tracker tiene la mayoría); si se acuerda un presupuesto de tiempo de ejecución (hoy unos 40 s).
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Pedida por el operador al cerrar la T118. Cada tarea suma tests; algunos solo verifican frases exactas de la pantalla.
-- **Agregada:** 2026-10-28.
 
 <!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
