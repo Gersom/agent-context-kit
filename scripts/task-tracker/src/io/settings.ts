@@ -1,9 +1,12 @@
 // Ajustes del board guardados en disco, en `settings.json` dentro de la carpeta de config
 // (`ACSUITE_HOME`, o `~/.acsuite`). Formato:
 // `{ "version": 1, "board": { "compact": boolean, "arrows": boolean, "follow": boolean } }`.
-// Es un objeto por script: el board lee y escribe solo su clave `board` y conserva cualquier otra
-// clave o propiedad que traiga el archivo. Nada de acá lanza: los errores de disco vuelven como
-// aviso o como `ConfigError`.
+// El archivo lo comparten varios scripts: el board lee y escribe solo su clave `board` y conserva
+// cualquier otra clave o propiedad. Solo es corrupto si no es JSON o su raíz no es un objeto. Una
+// `version` ausente se acepta (al guardar se escribe 1) y una distinta de 1 se deja tal cual; un
+// `board` ausente es "sin ajustes" y uno que no es objeto se ignora con aviso (al guardar se
+// reemplaza por un objeto, respaldando antes el archivo). Nada de acá lanza: los errores de disco
+// vuelven como aviso o como `ConfigError`.
 
 import { copyFileSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -29,13 +32,13 @@ const BOARD_KEYS: (keyof BoardSettings)[] = ["compact", "arrows", "follow"];
 type Json = Record<string, unknown>;
 
 /**
- * Lo leído de `settings.json`: ausente, bueno, con contenido que no sirve, o que no se pudo leer.
- * `raw` es el objeto entero del archivo (vacío si no hay uno bueno), para conservar lo ajeno.
+ * Lo leído de `settings.json`: ausente, bueno, con `board` que no es un objeto, corrupto, o que no se
+ * pudo leer. `raw` es el objeto entero del archivo (vacío si no hay uno bueno), para conservar lo ajeno.
  */
 type Saved =
   | { state: "missing"; raw: Json; warning: null }
   | { state: "ok"; raw: Json; warning: null }
-  | { state: "corrupt" | "unreadable"; raw: Json; warning: string };
+  | { state: "badBoard" | "corrupt" | "unreadable"; raw: Json; warning: string };
 
 function isRecord(value: unknown): value is Json {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -57,13 +60,13 @@ function readSaved(file: string): Saved {
   } catch {
     return { state: "corrupt", raw: {}, warning: `${file} no es un JSON válido. Se ignora${BACKUP_NOTE}.` };
   }
-  // Solo esto invalida el archivo entero; una propiedad de `board` mala se ignora (ver `boardSettings`).
-  if (!isRecord(data) || data.version !== FORMAT_VERSION || (data.board !== undefined && !isRecord(data.board))) {
-    return {
-      state: "corrupt",
-      raw: {},
-      warning: `${file} no tiene la forma esperada ({ "version": ${FORMAT_VERSION}, "board": { "compact": …, "arrows": …, "follow": … } }). Se ignora${BACKUP_NOTE}.`,
-    };
+  // Solo esto invalida el archivo entero; `version` y `board` se miran aparte, solo para lo del board.
+  if (!isRecord(data)) {
+    return { state: "corrupt", raw: {}, warning: `${file} no tiene la forma esperada (la raíz debe ser un objeto JSON). Se ignora${BACKUP_NOTE}.` };
+  }
+  // `board` que no es un objeto no sirve, pero el resto del archivo sí: se conserva (ver `saveBoardSettings`).
+  if (data.board !== undefined && !isRecord(data.board)) {
+    return { state: "badBoard", raw: data, warning: `La clave "board" de ${file} no es un objeto. Se ignora${BACKUP_NOTE}.` };
   }
   return { state: "ok", raw: data, warning: null };
 }
@@ -81,8 +84,8 @@ function boardSettings(raw: Json): Partial<BoardSettings> {
 
 /**
  * Los ajustes guardados del board. Sin archivo, vacíos y sin aviso; con el archivo corrupto (JSON
- * ilegible, otra `version`, o `board` que no es un objeto) o ilegible, vacíos y un aviso que dice cuál
- * archivo se ignora. Una propiedad ausente o de otro tipo no viene en el resultado (se usa el defecto).
+ * ilegible o raíz que no es un objeto), con `board` que no es un objeto, o ilegible, vacíos y un aviso
+ * que dice cuál archivo se ignora. La `version` no se mira. Una propiedad ausente o de otro tipo no viene en el resultado (se usa el defecto).
  */
 export function loadBoardSettings(): { settings: Partial<BoardSettings>; warning: string | null } {
   try {
@@ -97,7 +100,8 @@ export function loadBoardSettings(): { settings: Partial<BoardSettings>; warning
  * Guarda las opciones de `patch` en `board`, fusionadas con las que ya había (las demás propiedades
  * de `board` y las demás claves del archivo se conservan tal cual). Si no cambia nada, no toca el
  * archivo. Crea la carpeta de config si falta y escribe de forma atómica (archivo temporal +
- * renombrar). Si el archivo existente estaba corrupto, antes lo copia a
+ * renombrar). Escribe `version: 1` solo si el archivo no traía `version`; una distinta se conserva.
+ * Si el archivo existente estaba corrupto o su `board` no era un objeto, antes lo copia a
  * `settings.json.<AAAAMMDD-HHMMSS>.bak`; uno ilegible por un error de disco no se pisa. Devuelve el
  * error (causa y archivo; ver `failureMessage`), o `null` si quedó guardado.
  */
@@ -119,8 +123,8 @@ export function saveBoardSettings(patch: Partial<BoardSettings>): ConfigError | 
     if (saved.state === "ok" && BOARD_KEYS.every((key) => patch[key] === undefined || board[key] === patch[key])) return null;
 
     mkdirSync(dir, { recursive: true });
-    if (saved.state === "corrupt") copyFileSync(file, backupPath(file));
-    const next = { ...saved.raw, version: FORMAT_VERSION, board: { ...board, ...patch } };
+    if (saved.state === "corrupt" || saved.state === "badBoard") copyFileSync(file, backupPath(file));
+    const next = { ...saved.raw, version: saved.raw.version ?? FORMAT_VERSION, board: { ...board, ...patch } };
     writeFileSync(temp, `${JSON.stringify(next, null, 2)}\n`);
     renameSync(temp, file);
     return null;

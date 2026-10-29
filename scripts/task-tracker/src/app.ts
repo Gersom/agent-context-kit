@@ -275,19 +275,36 @@ export function startApp({
     }
   }
 
+  // Último aviso de un fallo al guardar los ajustes, para quitarlo de los canales si un guardado posterior sale bien.
+  let settingsFailure: string | null = null;
+
   /**
-   * Guarda `patch` en `settings.json` (solo en modo interactivo). Si falla, deja el aviso donde la vista
-   * actual lo muestra y devuelve `true` (quien llama redibuja); el tablero sigue como estaba.
+   * Guarda `patch` en `settings.json` (solo en modo interactivo). Si falla, suma el aviso (sin repetirlo)
+   * a los que ya tiene la vista actual; si sale bien, quita el aviso de un fallo anterior. Devuelve `true`
+   * si el aviso cambió (quien llama redibuja); el tablero sigue como estaba.
    */
   function persist(patch: Partial<BoardSettings>): boolean {
     if (!interactive) return false;
     const error = saveBoardSettings(patch);
-    if (!error) return false;
-    const message = failureMessage("guardar", "ajustes del board", error);
-    if (observer) observerNotice = message;
-    else if (target) watcherErrors.splice(0, watcherErrors.length, message);
-    else projectsNotices = [message];
-    return true;
+    const previous = settingsFailure;
+    settingsFailure = error ? failureMessage("guardar", "ajustes del board", error) : null;
+    if (previous && previous !== settingsFailure) {
+      if (observerNotice === previous) observerNotice = null;
+      else if (observerNotice) observerNotice = observerNotice.replace(` ${previous}`, "");
+      for (const list of [watcherErrors, projectsNotices]) {
+        const at = list.indexOf(previous);
+        if (at >= 0) list.splice(at, 1);
+      }
+    }
+    if (settingsFailure) {
+      if (observer) {
+        if (!observerNotice?.includes(settingsFailure)) observerNotice = observerNotice ? `${observerNotice} ${settingsFailure}` : settingsFailure;
+      } else {
+        const list = target ? watcherErrors : projectsNotices;
+        if (!list.includes(settingsFailure)) list.push(settingsFailure);
+      }
+    }
+    return Boolean(settingsFailure) || Boolean(previous);
   }
 
   /** `o`: activa el modo observador, o lo desactiva si ya estaba activo; guarda el nuevo valor. */

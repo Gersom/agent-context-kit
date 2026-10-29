@@ -2,7 +2,7 @@
 
 import { afterAll, describe, expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import { FIXTURES, requireFixture } from "../../../_shared/test/helpers.ts";
@@ -261,5 +261,31 @@ describe("settings.json: compacto, flechas y modo observador recordados", () => 
     expect(stdout).toMatch(/^! /m);
     expect(stdout).not.toContain("más");
     expect(readFileSync(join(home, "settings.json"), "utf8")).toBe("{ roto");
+  });
+
+  test("sin TTY y sin --once, con follow guardado: no entra al observador y no escribe settings.json", async () => {
+    const text = JSON.stringify({ version: 1, board: { follow: true } });
+    const home = homeWith(text);
+    const env: Record<string, string | undefined> = { ...process.env, NO_COLOR: "1", ACSUITE_HOME: home };
+    delete env.INIT_CWD;
+    delete env.npm_config_local_prefix;
+    // Sin --once el proceso sigue vigilando: se lee hasta que pinta el tablero y se mata.
+    const proc = Bun.spawn([process.execPath, INDEX, fixture], { env, stdin: "ignore", stdout: "pipe", stderr: "ignore" });
+    let stdout = "";
+    try {
+      const decoder = new TextDecoder();
+      const deadline = Date.now() + 10_000;
+      for await (const chunk of proc.stdout) {
+        stdout += decoder.decode(chunk);
+        if (stdout.includes("ES ANCHORS") || Date.now() > deadline) break;
+      }
+    } finally {
+      proc.kill();
+      await proc.exited;
+    }
+    expect(stdout).toContain("ES ANCHORS");
+    expect(stdout).not.toContain("Esperando");
+    expect(readFileSync(join(home, "settings.json"), "utf8")).toBe(text);
+    expect(readdirSync(home).filter((name) => name.startsWith("settings.json"))).toEqual(["settings.json"]);
   });
 });

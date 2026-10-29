@@ -66,12 +66,29 @@ describe("loadBoardSettings", () => {
     expect(warning).toContain("settings.json.<AAAAMMDD-HHMMSS>.bak");
   });
 
-  test("otra version, raíz que no es un objeto o board que no es un objeto: se ignora con aviso", () => {
-    for (const content of [{ version: 2, board: { compact: true } }, { board: { compact: true } }, [1], null, { version: 1, board: "x" }, { version: 1, board: [true] }]) {
+  test("raíz que no es un objeto: se ignora con aviso", () => {
+    for (const content of [[1], null, "x", 3]) {
       writeFileSync(file, JSON.stringify(content));
       const { settings, warning } = loadBoardSettings();
       expect(settings).toEqual({});
       expect(warning).toContain("no tiene la forma esperada");
+    }
+  });
+
+  test("sin version o con otra version: no es corrupto, se lee board", () => {
+    for (const content of [{ board: { compact: true } }, { version: 2, board: { compact: true } }, { otroScript: 1, board: { compact: true } }]) {
+      writeFileSync(file, JSON.stringify(content));
+      expect(loadBoardSettings()).toEqual({ settings: { compact: true }, warning: null });
+    }
+  });
+
+  test("board que no es un objeto (null, texto, lista): se ignora con aviso", () => {
+    for (const board of [null, "x", [true]]) {
+      writeFileSync(file, JSON.stringify({ version: 1, board }));
+      const { settings, warning } = loadBoardSettings();
+      expect(settings).toEqual({});
+      expect(warning).toContain('"board"');
+      expect(warning).toContain("no es un objeto");
     }
   });
 
@@ -143,12 +160,34 @@ describe("saveBoardSettings", () => {
     expect(readFileSync(join(home, backup), "utf8")).toBe("{ roto");
   });
 
-  test("otra version: se respalda y se reescribe con la version 1", () => {
-    const text = JSON.stringify({ version: 2, board: { compact: true } });
+  test("claves de otro script sin version: se conservan y se agrega version 1, sin respaldo", () => {
+    writeFileSync(file, JSON.stringify({ otroScript: { a: 1 } }));
+    expect(saveBoardSettings({ compact: true })).toBeNull();
+    expect(written()).toEqual({ otroScript: { a: 1 }, version: 1, board: { compact: true } });
+    expect(backups()).toEqual([]);
+  });
+
+  test("otra version: se conserva tal cual, sin respaldo", () => {
+    writeFileSync(file, JSON.stringify({ version: 2, otroScript: true, board: { compact: false } }));
+    expect(saveBoardSettings({ compact: true })).toBeNull();
+    expect(written()).toEqual({ version: 2, otroScript: true, board: { compact: true } });
+    expect(backups()).toEqual([]);
+  });
+
+  test("board null: se respalda el archivo y board pasa a ser un objeto, conservando lo ajeno", () => {
+    const text = JSON.stringify({ version: 1, otroScript: 7, board: null });
     writeFileSync(file, text);
     expect(saveBoardSettings({ compact: true })).toBeNull();
-    expect(written()).toEqual({ version: 1, board: { compact: true } });
+    expect(written()).toEqual({ version: 1, otroScript: 7, board: { compact: true } });
+    expect(backups()).toHaveLength(1);
     expect(readFileSync(join(home, backups()[0]), "utf8")).toBe(text);
+  });
+
+  test("raíz que no es un objeto: se respalda y se reescribe", () => {
+    writeFileSync(file, "[1]");
+    expect(saveBoardSettings({ compact: true })).toBeNull();
+    expect(written()).toEqual({ version: 1, board: { compact: true } });
+    expect(backups()).toHaveLength(1);
   });
 
   test("dos respaldos seguidos no se pisan", () => {
