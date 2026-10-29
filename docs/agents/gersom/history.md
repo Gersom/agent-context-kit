@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-28 — ✅ Tarea 122 — docs-check: quitar el check skill-version
+
+- Se quitó el check skill-version de docs-check con sus tests (VERSION_MARKER_RE pasó a _shared/markers.ts con su propio test); placeholders y legacy-marker se quedan.
+
 ## 2026-10-28 — ✅ Tarea 121 — Board: quitar los flags --operator, --compact, --arrows y --follow
 
 - Se quitaron del board los flags --operator, --compact, --arrows y --follow (con sus --no-); los flags quitados o desconocidos dan error de uso (código 2) con la alternativa; compacto, flechas y observador se cambian con c, f y o y se recuerdan en settings.json.
