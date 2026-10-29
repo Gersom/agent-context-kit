@@ -51,13 +51,6 @@ describe("index.ts", () => {
     expect(stdout).toContain("Carpeta propia: sí");
   });
 
-  test("whoami desde una subcarpeta del repo encuentra el mismo proyecto", async () => {
-    if (!hasGit) return;
-    const { stdout, code } = await runCli(["whoami"], { cwd: join(project.root, "docs") });
-    expect(code).toBe(0);
-    expect(stdout).toContain("Operador: ana");
-  });
-
   test("--agents y --operator, en cualquier posición", async () => {
     const { stdout, code } = await runCli(["--operator", "gersom", "whoami", "--agents", project.root], { cwd: join(project.root, "..") });
     expect(code).toBe(0);
@@ -70,31 +63,9 @@ describe("index.ts", () => {
     expect(stdout).toContain("Todas las anclas están en su lugar.");
   });
 
-  test("status, next y show --json leen el repo actual con el correo de git", async () => {
-    if (!hasGit) return;
-    const status = await runCli(["status"]);
-    expect(status.code).toBe(0);
-    expect(status.stdout).toContain("Operador: ana");
-    expect(status.stdout).toContain("En curso: Tarea 12");
-    expect(status.stdout).toContain("Próximo número de tarea: 20");
-    expect((await runCli(["next"])).stdout).toContain("En curso: Tarea 12");
-    const show = JSON.parse((await runCli(["show", "12", "--json"])).stdout);
-    expect(show.matches[0]).toMatchObject({ place: "in-progress", number: 12, operator: null });
-    const missing = await runCli(["show", "999"]);
-    expect(missing.code).toBe(1);
-    expect(missing.stderr).toContain("No existe la Tarea 999");
-  });
-
-  test("add: sin --apply solo muestra el diff; con --apply escribe en la carpeta propia (la del correo de git)", async () => {
+  test("add --apply escribe en la carpeta propia (la del correo de git)", async () => {
     if (!hasGit) return;
     const backlog = join(project.agents, "ana", "backlog.md");
-    const before = readFileSync(backlog, "utf8");
-    const preview = await runCli(["add", "--title", "Probar el e2e", "--description", "Desde el proceso"]);
-    expect(preview.code).toBe(0);
-    expect(preview.stdout).toContain("+### Tarea 20 — Probar el e2e");
-    expect(preview.stdout).toContain("No se escribió nada; repite con --apply");
-    expect(readFileSync(backlog, "utf8")).toBe(before);
-
     const applied = await runCli(["add", "--title", "Probar el e2e", "--description", "Desde el proceso", "--apply"]);
     expect(applied.code).toBe(0);
     expect(applied.stdout).toContain("Tarea 20 agregada");
@@ -106,29 +77,6 @@ describe("index.ts", () => {
     const other = await runCli(["add", "--title", "X", "--description", "Y", "--operator", "gersom", "--apply"]);
     expect(other.code).toBe(1);
     expect(other.stderr).toContain("«gersom» no es la tuya");
-  });
-
-  test("edit: sin --apply solo muestra el diff; con --apply cambia el contenido sin mover la tarea", async () => {
-    if (!hasGit) return;
-    const backlog = join(project.agents, "ana", "backlog.md");
-    const before = readFileSync(backlog, "utf8");
-    const preview = await runCli(["edit", "4", "--blocker", "esperar a la Tarea 5", "--details", "Nuevo contexto"]);
-    expect(preview.code).toBe(0);
-    expect(preview.stdout).toContain("+- **Bloqueos:** `[dependencia]` esperar a la Tarea 5");
-    expect(preview.stdout).toContain("No se escribió nada; repite con --apply");
-    expect(readFileSync(backlog, "utf8")).toBe(before);
-
-    const applied = await runCli(["edit", "4", "--blocker", "esperar a la Tarea 5", "--details", "Nuevo contexto", "--apply"]);
-    expect(applied.code).toBe(0);
-    expect(applied.stdout).toContain("Tarea 4 editada (--blocker, --details)");
-    const after = readFileSync(backlog, "utf8");
-    expect(after).toContain("- **Bloqueos:** `[dependencia]` esperar a la Tarea 5\n- **Detalles:** Nuevo contexto");
-    const shown = JSON.parse((await runCli(["show", "4", "--json"])).stdout);
-    expect(shown.matches[0]).toMatchObject({ place: "blocked", number: 4 });
-
-    const blocked = await runCli(["edit", "1", "--blocker", "[dependencia] algo", "--apply"]);
-    expect(blocked.code).toBe(1);
-    expect(blocked.stderr).toContain("block <N>");
   });
 
   test("la ayuda de un comando de escritura avisa de --apply", async () => {

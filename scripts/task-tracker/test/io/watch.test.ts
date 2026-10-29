@@ -44,15 +44,15 @@ describe("watchDir", () => {
   }
 
   /**
-   * "Calienta" el watcher: escribe handoff.md en bucle hasta recibir el primer aviso (así se sabe
+   * "Calienta" el watcher: escribe `file` en bucle hasta recibir el primer aviso (así se sabe
    * que ya está enganchado), espera a que se calme y reinicia el registro de avisos.
    */
-  async function warmUp() {
+  async function warmUp(file = "handoff.md") {
     let n = 0;
     await waitFor(
       () => {
         if (calls.length > 0) return true;
-        writeFileSync(join(dir, "handoff.md"), `# calentando ${n++}\n`);
+        writeFileSync(join(dir, file), `# calentando ${n++}\n`);
         return false;
       },
       { interval: DEBOUNCE_MS * 2 },
@@ -92,8 +92,10 @@ describe("watchDir", () => {
       await warmUp();
       writeFileSync(join(dir, "otro.txt"), "x");
       writeFileSync(join(dir, "rules.md"), "x");
-      // Marcador: cuando llega su aviso, cualquier evento de los otros archivos ya se procesó,
-      // así la aserción negativa no depende de un tiempo fijo.
+      // Se espera el silencio antes del marcador: si no, el debounce agruparía todo y el aviso del
+      // marcador taparía el de un archivo ajeno.
+      await waitForQuiet();
+      expect(calls).toEqual([]);
       writeFileSync(join(dir, "handoff.md"), "# marcador\n");
       await waitFor(() => calls.length >= 1);
       await waitForQuiet();
@@ -103,10 +105,19 @@ describe("watchDir", () => {
   );
 
   test(
-    "informa el último archivo vigilado que cambió",
+    "avisa de backlog.md y de history.md, y en una ráfaga informa el último archivo que cambió",
     async () => {
       await warmUp();
-      writeFileSync(join(dir, "backlog.md"), "# Backlog\n");
+      for (const file of ["backlog.md", "history.md"]) {
+        writeFileSync(join(dir, file), `# ${file}\n`);
+        await waitFor(() => calls.length >= 1);
+        await waitForQuiet();
+        expect(calls).toEqual([file]);
+        calls.length = 0;
+      }
+      // Ráfaga dentro del debounce: un solo aviso, con el nombre del último archivo escrito.
+      writeFileSync(join(dir, "history.md"), "# ráfaga\n");
+      writeFileSync(join(dir, "backlog.md"), "# ráfaga\n");
       await waitFor(() => calls.length >= 1);
       await waitForQuiet();
       expect(calls).toEqual(["backlog.md"]);
@@ -115,47 +126,22 @@ describe("watchDir", () => {
   );
 
   test(
-    "también avisa cuando cambia history.md",
+    "con una lista de archivos, solo avisa de los indicados",
     async () => {
-      await warmUp();
-      writeFileSync(join(dir, "history.md"), "# History\n");
-      await waitFor(() => calls.length >= 1);
-      await waitForQuiet();
-      expect(calls).toEqual(["history.md"]);
-    },
-    TEST_TIMEOUT_MS,
-  );
-});
-
-describe("watchDir con una lista de archivos", () => {
-  test("solo avisa de los archivos indicados", async () => {
-    const dir = mkdtempSync(join(tmpdir(), "task-tracker-watch-files-"));
-    const calls: (string | null)[] = [];
-    const stop = watchDir(dir, (file) => calls.push(file), () => {}, DEBOUNCE_MS, ["team-backlog.md"]);
-    try {
-      // Calentar: escribir el archivo vigilado hasta recibir el primer aviso.
-      let n = 0;
-      await waitFor(
-        () => {
-          if (calls.length > 0) return true;
-          writeFileSync(join(dir, "team-backlog.md"), `# ${n++}\n`);
-          return false;
-        },
-        { interval: DEBOUNCE_MS * 2 },
-      );
-      await sleep(QUIET_MS);
-      calls.length = 0;
+      stop();
+      stop = watchDir(dir, (file) => calls.push(file), (message) => errors.push(message), DEBOUNCE_MS, ["team-backlog.md"]);
+      await warmUp("team-backlog.md");
 
       writeFileSync(join(dir, "handoff.md"), "# no vigilado\n");
-      await sleep(QUIET_MS);
+      await waitForQuiet();
       expect(calls).toEqual([]);
 
       writeFileSync(join(dir, "team-backlog.md"), "# vigilado\n");
-      await waitFor(() => calls.length > 0);
-      expect(calls[0]).toBe("team-backlog.md");
-    } finally {
-      stop();
-      rmSync(dir, { recursive: true, force: true });
-    }
-  }, TEST_TIMEOUT_MS);
+      await waitFor(() => calls.length >= 1);
+      await waitForQuiet();
+      expect(errors).toEqual([]);
+      expect(calls).toEqual(["team-backlog.md"]);
+    },
+    TEST_TIMEOUT_MS,
+  );
 });
