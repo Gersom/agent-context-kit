@@ -38,7 +38,7 @@ type Target = Omit<ResolveOk, "ok">;
  * `follow`: arranca con el modo observador activo, en su vista de espera aunque haya un `target` (solo
  * en una sesión interactiva; con `once` o sin terminal se ignora). La tecla `o` lo alterna.
  * Las teclas `c`, `f` y `o` guardan el nuevo valor en `settings.json` (solo en una sesión interactiva);
- * arrancar con una opción ya puesta, por flag o por lo guardado, no escribe nada.
+ * arrancar con una opción ya puesta por lo guardado no escribe nada.
  * `settingsWarning`: aviso de que `settings.json` no se pudo leer (ver `loadBoardSettings`), para mostrarlo.
  */
 export function startApp({
@@ -386,7 +386,7 @@ export function startApp({
       return draw({ kind: "redraw" });
     }
     // Repo multi-operador: se abre de frente el tablero del operador actual (el del correo de git),
-    // como `board <ruta> --operator X`. Si no figura, queda la vista de equipo; si no se puede, también.
+    // como `board <ruta> X`. Si no figura, queda la vista de equipo; si no se puede, también.
     if (resolved.multi?.preferred && !resolved.multi.operator) {
       const own = resolveAgentsDir(result.path, undefined, { operator: resolved.multi.preferred });
       if (own.ok) resolved = own;
@@ -411,7 +411,7 @@ export function startApp({
     if (failure) watcherErrors.push(failureMessage("guardar", basename(root), failure));
   }
   if (follow && interactive) {
-    // `--follow` solo vale en una sesión interactiva. La primera pantalla es la de espera, aunque
+    // El modo observador solo vale en una sesión interactiva. La primera pantalla es la de espera, aunque
     // haya un repo inicial: ese repo se cierra sin pintarse. Entrar así no guarda nada en settings.json.
     enterObserver(settingsWarning);
   } else {

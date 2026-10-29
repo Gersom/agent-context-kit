@@ -16,15 +16,11 @@
 //   bun run board <ruta>          → raíz del proyecto (busca docs/agents/ o agent-context/agents/)
 //                                   o la carpeta que contiene handoff.md
 //   bun run board --once          → pinta una sola vez y sale (útil para probar o en CI)
-//   bun run board --compact --no-arrows
-//                                 → arranca con los recuadros compactos y sin flechas (también
-//                                   `--no-compact`, `--arrows`, `--follow` y `--no-follow`; sin
-//                                   flag vale lo que dejaron las teclas `c`, `f` y `o` en
-//                                   `settings.json`, dentro de la carpeta de config)
+//   (sin flags de pantalla: arranca con lo que dejaron las teclas `c`, `f` y `o` en
+//   `settings.json`, dentro de la carpeta de config)
 //   bun run board <ruta> <operador>
 //                                 → en modo multi-operador, abre de frente el panel de ese
-//                                   operador; sin ruta, `--operator <carpeta>` (también vale con
-//                                   ruta); sin operador, el panel del operador de
+//                                   operador; sin operador, el panel del operador de
 //                                   `git config user.email` o, si no figura, la vista de equipo
 //
 // Cada instancia es independiente (sin lockfiles, puertos ni estado compartido): se puede

@@ -1,6 +1,6 @@
 // Modo multi-operador (ver docs/multi-operator.md de la skill): con `operators.md` en la carpeta de
 // agentes, cada operador tiene su carpeta con handoff.md, backlog.md e history.md. Acá se ubica
-// la del operador a vigilar: la indicada con `--operator` o, si no, la que corresponde al
+// la del operador a vigilar: la indicada como segundo argumento o, si no, la que corresponde al
 // correo de `git config user.email` del repo.
 
 import { spawnSync } from "node:child_process";
@@ -49,7 +49,7 @@ export function gitEmail(repoDir: string): string | null {
 export type OperatorResolution = { ok: true; folder: string } | { ok: false; error: string; choices: string[] };
 
 export interface OperatorOptions {
-  /** Carpeta indicada con `--operator`: gana sobre el correo. */
+  /** Carpeta indicada como segundo argumento: gana sobre el correo. */
   operator?: string;
   /** Correo a buscar; si no se indica se lee de git en `repoDir` (`null` = no disponible). */
   email?: string | null;

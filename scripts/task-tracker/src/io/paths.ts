@@ -70,7 +70,7 @@ function isDir(path: string): boolean {
 
 /** Cómo elegir al operador en modo multi-operador (ver `resolveOperator`). */
 export interface ResolveOptions {
-  /** Carpeta del operador, indicada con `--operator`. */
+  /** Carpeta del operador, indicada como segundo argumento. */
   operator?: string;
   /** Correo con el que buscarlo, en lugar de leer `git config user.email` (`null` = no disponible). */
   email?: string | null;

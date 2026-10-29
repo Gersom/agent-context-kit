@@ -63,9 +63,9 @@ afterAll(() => {
   rmSync(home, { recursive: true, force: true });
 });
 
-/** Corre index.ts con los argumentos dados, sin datos de entrada y sin colores. */
-async function run(args: string[]): Promise<{ stdout: string; stderr: string; code: number }> {
-  const env: Record<string, string | undefined> = { ...process.env, NO_COLOR: "1", ACSUITE_HOME: home };
+/** Corre index.ts con los argumentos dados, sin datos de entrada y sin colores. `configHome`: `ACSUITE_HOME`. */
+async function run(args: string[], configHome = home): Promise<{ stdout: string; stderr: string; code: number }> {
+  const env: Record<string, string | undefined> = { ...process.env, NO_COLOR: "1", ACSUITE_HOME: configHome };
   delete env.INIT_CWD;
   delete env.npm_config_local_prefix;
   const proc = Bun.spawn([process.execPath, INDEX, ...args], { env, stdin: "ignore", stdout: "pipe", stderr: "pipe" });
@@ -107,19 +107,19 @@ describe("index.ts en modo multi-operador", () => {
     expect(stdout.indexOf("╭─ EN PROGRESO")).toBeLessThan(stdout.indexOf("─ history.md ─╮"));
   });
 
-  test("--compact y --no-arrows: una sola tarea por recuadro y sin flechas, también en SIN DUEÑO", async () => {
-    const { stdout, code } = await run([repo, "ana", "--once", "--compact", "--no-arrows"]);
-    expect(code).toBe(0);
-    expect(stdout).not.toMatch(/^ {3}[↑↓]/m);
-    expect(stdout).toContain("• Integrar la pasarela [dependencia] · +1 más");
-    expect(stdout).toContain("· +3 más");
-    expect(stdout).toContain("Tarea 12 — Implementar el parser de anclas"); // en progreso no se compacta
-  });
-
-  test("--operator equivale al segundo argumento y no distingue mayúsculas", async () => {
-    const { stdout, code } = await run([repo, "--operator", "GERSOM", "--once"]);
-    expect(code).toBe(0);
-    expect(stdout.split("\n")[1]).toMatch(/^ {2}[A-Z0-9 ]+ · gersom {3}\S/);
+  test("compacto y sin flechas guardados: una sola tarea por recuadro y sin flechas, también en SIN DUEÑO", async () => {
+    const savedHome = mkdtempSync(join(tmpdir(), "task-tracker-multi-saved-"));
+    try {
+      writeFileSync(join(savedHome, "settings.json"), JSON.stringify({ version: 1, board: { compact: true, arrows: false } }));
+      const { stdout, code } = await run([repo, "ana", "--once"], savedHome);
+      expect(code).toBe(0);
+      expect(stdout).not.toMatch(/^ {3}[↑↓]/m);
+      expect(stdout).toContain("• Integrar la pasarela [dependencia] · +1 más");
+      expect(stdout).toContain("· +3 más");
+      expect(stdout).toContain("Tarea 12 — Implementar el parser de anclas"); // en progreso no se compacta
+    } finally {
+      rmSync(savedHome, { recursive: true, force: true });
+    }
   });
 
   test("operador que no existe o sin carpeta: código 1 con la lista de operadores", async () => {

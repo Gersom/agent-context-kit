@@ -57,14 +57,14 @@ Tablero de tareas en vivo en la terminal: la tarea en progreso, las pausadas, la
 acsuite board
 ```
 
-Uso, atajos y cómo lee los archivos: [README de `board`](./scripts/task-tracker/README.md). El board recuerda el modo compacto, las flechas y el modo observador entre ejecuciones (`settings.json` en `~/.acsuite`); un flag (`--no-compact`, `--arrows`, `--no-follow`...) manda sobre lo guardado.
+Uso, atajos y cómo lee los archivos: [README de `board`](./scripts/task-tracker/README.md). El board recuerda el modo compacto, las flechas y el modo observador entre ejecuciones (`settings.json` en `~/.acsuite`), con las teclas `c`, `f` y `o`.
 
 #### Seguir el proyecto activo de Claude
 
-Si trabajas con varias sesiones de Claude Code a la vez, el board puede cambiar solo al proyecto que marques desde Claude. Lánzalo en modo observador con `--follow`, o pulsa `o` con el board abierto:
+Si trabajas con varias sesiones de Claude Code a la vez, el board puede cambiar solo al proyecto que marques desde Claude. Pulsa `o` con el board abierto para activar el modo observador (se recuerda para la próxima vez):
 
 ```sh
-acsuite board --follow
+acsuite board
 ```
 
 Se marca desde Claude con el mod `acsuite-active-project`, con su botón `[ ● Mark this project as active ]` o con `/board`. Se instala con una línea, `/plugin install acsuite-active-project --marketplace Gersom/agent-context-suite`; los demás pasos y el detalle están en el [README del mod](./mods/acsuite-active-project/README.md), y el modo observador del board, en su [README](./scripts/task-tracker/README.md#modo-observador).

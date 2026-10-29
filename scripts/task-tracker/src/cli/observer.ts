@@ -1,4 +1,4 @@
-// Modo observador (`--follow`): decide cuándo abrir un proyecto según lo que marca el mod de Claude.
+// Modo observador (tecla `o`): decide cuándo abrir un proyecto según lo que marca el mod de Claude.
 // Puro y sin I/O: recibe lo leído de `active-project.json` y dice si hay algo nuevo que abrir.
 
 import type { ActiveProject } from "../io/active-project.ts";

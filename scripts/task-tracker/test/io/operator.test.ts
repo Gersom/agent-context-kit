@@ -58,11 +58,11 @@ describe("resolveOperator", () => {
     expect(result.ok ? "" : result.error).toContain("git config user.email");
   });
 
-  test("--operator gana sobre el correo y no distingue mayúsculas", () => {
+  test("el operador indicado gana sobre el correo y no distingue mayúsculas", () => {
     expect(resolveOperator(root, { operator: "ANA", email: "gersom@mail.com", repoDir: repoDir() })).toEqual({ ok: true, folder: "ana" });
   });
 
-  test("--operator desconocido, sin carpeta (luis) o con carpeta sin handoff.md", () => {
+  test("operador indicado desconocido, sin carpeta (luis) o con carpeta sin handoff.md", () => {
     expect(resolveOperator(root, { operator: "nadie", repoDir: repoDir() }).ok).toBe(false);
     expect(resolveOperator(root, { operator: "luis", repoDir: repoDir() }).ok).toBe(false);
     const ghost = resolveOperator(root, { operator: "fantasma", repoDir: repoDir() });

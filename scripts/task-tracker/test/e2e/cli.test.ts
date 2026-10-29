@@ -125,23 +125,15 @@ describe("index.ts sin ruta: el proyecto de la carpeta donde se lanza", () => {
     expect(stdout).not.toMatch(/\x1b\[/);
   });
 
-  test("fuera de un proyecto con un operador pedido: sigue siendo un error (código 1) que dice qué falta", async () => {
-    const root = tempProject({ git: false, docs: false });
-    const { stdout, stderr, code } = await run(["--operator", "ana", "--once"], root);
-    expect(code).toBe(1);
-    expect(stderr).toContain("No se pudo abrir el proyecto de la carpeta actual");
-    expect(stderr).toContain("No se encontró handoff.md");
-    expect(stderr).toContain("acsuite board <ruta>");
-    expect(stdout).toBe("");
-  });
-
   test("carpeta de agentes rota (operadores sin operators.md): sigue siendo un error, no una lista vacía", async () => {
     const root = tempProject({ git: false, docs: false });
     mkdirSync(join(root, "docs", "agents", "ana"), { recursive: true });
     writeFileSync(join(root, "docs", "agents", "ana", "handoff.md"), "# Handoff\n");
     const { stdout, stderr, code } = await run(["--once"], root);
     expect(code).toBe(1);
+    expect(stderr).toContain("No se pudo abrir el proyecto de la carpeta actual");
     expect(stderr).toContain("operators.md");
+    expect(stderr).toContain("acsuite board <ruta>");
     expect(stdout).toBe("");
   });
 
@@ -239,13 +231,6 @@ describe("settings.json: compacto, flechas y modo observador recordados", () => 
     expect(code).toBe(0);
     expect(stdout).toContain("más");
     expect(stdout).not.toContain("↓ ");
-  });
-
-  test("un flag manda sobre lo guardado (--no-compact, --arrows)", async () => {
-    const { stdout, code } = await run([fixture, "--once", "--no-compact", "--arrows"], undefined, homeWith(saved));
-    expect(code).toBe(0);
-    expect(stdout).not.toContain("más");
-    expect(stdout).toContain("↓ ");
   });
 
   test("sin settings.json: los defectos (completo y con flechas)", async () => {
