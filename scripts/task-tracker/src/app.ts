@@ -16,6 +16,7 @@ import { ACTIVE_PROJECT_FILE, clearActiveProject, readActiveProject } from "./io
 import { resolveAgentsDir } from "./io/paths.ts";
 import { createProjectList, defaultProjects, type ProjectsProvider, readProjectRows } from "./io/projects.ts";
 import { createSnapshotReader, RETRY_MS } from "./io/snapshot.ts";
+import { type BoardSettings, saveBoardSettings } from "./io/settings.ts";
 import { createTeamReader, ROOT_WATCHED_FILES } from "./io/team.ts";
 import { configDir, failureMessage, removeProject, samePath, saveProject } from "./io/user-config.ts";
 import { watchDir } from "./io/watch.ts";
@@ -36,6 +37,9 @@ type Target = Omit<ResolveOk, "ok">;
  * `once`: pinta una sola vez y no vigila (sin atajos de teclado).
  * `follow`: arranca con el modo observador activo, en su vista de espera aunque haya un `target` (solo
  * en una sesión interactiva; con `once` o sin terminal se ignora). La tecla `o` lo alterna.
+ * Las teclas `c`, `f` y `o` guardan el nuevo valor en `settings.json` (solo en una sesión interactiva);
+ * arrancar con una opción ya puesta, por flag o por lo guardado, no escribe nada.
+ * `settingsWarning`: aviso de que `settings.json` no se pudo leer (ver `loadBoardSettings`), para mostrarlo.
  */
 export function startApp({
   target: initialTarget,
@@ -44,6 +48,7 @@ export function startApp({
   arrows = true,
   follow = false,
   once,
+  settingsWarning = null,
 }: {
   target: Target | null;
   listProjects?: ProjectsProvider;
@@ -54,6 +59,7 @@ export function startApp({
   /** Arranca con el modo observador activo; la tecla `o` lo alterna. */
   follow?: boolean;
   once: boolean;
+  settingsWarning?: string | null;
 }): void {
   const ui = { compact, arrows };
   const watcherErrors: string[] = [];
@@ -269,18 +275,35 @@ export function startApp({
     }
   }
 
-  /** `o`: activa el modo observador, o lo desactiva si ya estaba activo. */
+  /**
+   * Guarda `patch` en `settings.json` (solo en modo interactivo). Si falla, deja el aviso donde la vista
+   * actual lo muestra y devuelve `true` (quien llama redibuja); el tablero sigue como estaba.
+   */
+  function persist(patch: Partial<BoardSettings>): boolean {
+    if (!interactive) return false;
+    const error = saveBoardSettings(patch);
+    if (!error) return false;
+    const message = failureMessage("guardar", "ajustes del board", error);
+    if (observer) observerNotice = message;
+    else if (target) watcherErrors.splice(0, watcherErrors.length, message);
+    else projectsNotices = [message];
+    return true;
+  }
+
+  /** `o`: activa el modo observador, o lo desactiva si ya estaba activo; guarda el nuevo valor. */
   function toggleObserver(): void {
     if (observer) exitObserver();
     else enterObserver();
+    if (persist({ follow: observer != null })) draw({ kind: "redraw" });
   }
 
   /**
    * Activa el modo observador: borra el `active-project.json` que haya (lo marcado antes no cuenta) y
    * vigila la carpeta de config hasta que el mod de Claude escriba uno nuevo. Mientras tanto la
    * pantalla es la de espera: se cierra el repo abierto (sin lectores ni vigilantes) y no hay tareas.
+   * `notice`: aviso con el que arranca la pantalla de espera.
    */
-  function enterObserver(): void {
+  function enterObserver(notice: string | null = null): void {
     stopObserver?.();
     // El watcher necesita la carpeta; puede no existir si nunca se guardó nada.
     try {
@@ -290,7 +313,7 @@ export function startApp({
     }
     clearActiveProject();
     observer = startObserver(Date.now());
-    observerNotice = null;
+    observerNotice = notice;
     // Un fallo del watcher se avisa en el propio observador: `watcherErrors` no sale en la lista de proyectos.
     const onObserverError = (message: string) => {
       observerNotice = message;
@@ -372,9 +395,14 @@ export function startApp({
   }
   if (follow && interactive) {
     // `--follow` solo vale en una sesión interactiva. La primera pantalla es la de espera, aunque
-    // haya un repo inicial: ese repo se cierra sin pintarse.
-    enterObserver();
+    // haya un repo inicial: ese repo se cierra sin pintarse. Entrar así no guarda nada en settings.json.
+    enterObserver(settingsWarning);
   } else {
+    // Un settings.json que no se pudo leer se avisa por el canal de la vista con que se arranca.
+    if (settingsWarning) {
+      if (initialTarget) watcherErrors.push(settingsWarning);
+      else projectsNotices.push(settingsWarning);
+    }
     draw({ kind: "start" });
     if (once) return;
     syncWatchers();
@@ -432,7 +460,7 @@ export function startApp({
           if (at >= keys.length) return;
           const key = keys[at++];
           if (key === "quit") return quit();
-          if (key === "observe") exitObserver();
+          if (key === "observe") toggleObserver();
           else if (key === "redraw") draw({ kind: "redraw" });
           continue;
         }
@@ -460,6 +488,7 @@ export function startApp({
           if (key === "compact" && !compactApplies(nav)) continue;
           if (key === "compact") ui.compact = !ui.compact;
           else ui.arrows = !ui.arrows;
+          persist(key === "compact" ? { compact: ui.compact } : { arrows: ui.arrows });
           draw({ kind: "redraw" });
         } else if (target.multi && nav) {
           const next = navReduce(nav, key, navRows);

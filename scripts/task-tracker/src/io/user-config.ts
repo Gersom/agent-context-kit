@@ -104,7 +104,7 @@ function stamp(date: Date): string {
 }
 
 /** Nombre libre para el respaldo de `file`: con sello de tiempo y, si ya existe, un número, para no pisar uno anterior. */
-function backupPath(file: string): string {
+export function backupPath(file: string): string {
   const base = `${file}.${stamp(new Date())}`;
   let candidate = `${base}.bak`;
   for (let n = 2; existsSync(candidate); n++) candidate = `${base}-${n}.bak`;
@@ -201,6 +201,6 @@ export function removeProject(path: string): ConfigError | null {
   }
 }
 
-function errorMessage(error: unknown): string {
+export function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }

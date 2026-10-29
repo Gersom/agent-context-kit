@@ -4,8 +4,9 @@
 // un agente trabaja en otra.
 //
 // Atajos (terminal interactiva): `q` o Ctrl+C salen, `r` redibuja, `c` compacta o expande los
-// recuadros (una sola tarea por recuadro, salvo en progreso y pausadas) y `f` oculta o muestra las
-// flechas del flujo. En modo multi-operador, ↑/↓ eligen operador en la vista de equipo, Enter
+// recuadros (una sola tarea por recuadro, salvo en progreso y pausadas), `f` oculta o muestra las
+// flechas del flujo y `o` activa o desactiva el modo observador; las tres se recuerdan entre
+// ejecuciones. En modo multi-operador, ↑/↓ eligen operador en la vista de equipo, Enter
 // abre su panel y `e` vuelve al equipo.
 //
 // Uso (desde la raíz de agent-context-suite):
@@ -16,7 +17,10 @@
 //                                   o la carpeta que contiene handoff.md
 //   bun run board --once          → pinta una sola vez y sale (útil para probar o en CI)
 //   bun run board --compact --no-arrows
-//                                 → arranca con los recuadros compactos y sin flechas
+//                                 → arranca con los recuadros compactos y sin flechas (también
+//                                   `--no-compact`, `--arrows`, `--follow` y `--no-follow`; sin
+//                                   flag vale lo que dejaron las teclas `c`, `f` y `o` en
+//                                   `settings.json`, dentro de la carpeta de config)
 //   bun run board <ruta> <operador>
 //                                 → en modo multi-operador, abre de frente el panel de ese
 //                                   operador; sin ruta, `--operator <carpeta>` (también vale con

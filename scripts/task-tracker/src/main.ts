@@ -5,9 +5,10 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { gitToplevel } from "../../_shared/git.ts";
 import { startApp } from "./app.ts";
-import { parseArgs } from "./cli/args.ts";
+import { parseArgs, resolveOptions } from "./cli/args.ts";
 import { printResolveError } from "./cli/resolve-error.ts";
 import { invocationDir, resolveAgentsDir } from "./io/paths.ts";
+import { loadBoardSettings } from "./io/settings.ts";
 import type { ResolveOk } from "./shared/types.ts";
 
 /** Ayuda de `acsuite board`. */
@@ -15,7 +16,7 @@ export const HELP: string[] = [
   "Seguimiento de tareas en la terminal: vigila docs/agents/ de un proyecto y se redibuja al cambiar.",
   "Sin ruta y fuera de un proyecto con documentación de la skill, abre la lista de proyectos.",
   "",
-  "Uso: acsuite board [ruta] [operador] [--operator <carpeta>] [--once] [--compact] [--no-arrows]",
+  "Uso: acsuite board [ruta] [operador] [--operator <carpeta>] [--once] [--[no-]compact] [--[no-]arrows] [--[no-]follow]",
   "",
   "  [ruta]                Raíz del proyecto, carpeta de agentes (docs/agents) o carpeta de un operador.",
   "                        Por defecto, el proyecto de la carpeta actual; si no tiene documentación,",
@@ -24,14 +25,20 @@ export const HELP: string[] = [
   "  [operador]            Con ruta, abre de frente el panel de ese operador (modo multi-operador).",
   "  --operator <carpeta>  Lo mismo, con o sin ruta.",
   "  --once                Pinta una sola vez y sale.",
-  "  --compact             Arranca con un solo recuadro por tarea.",
-  "  --no-arrows           Arranca sin las flechas del flujo.",
-  "  --follow              Modo observador: espera a que marques un proyecto con el mod de Claude (acsuite-active-project) y lo abre.",
+  "  --compact             Arranca con un solo recuadro por tarea (--no-compact: con todas).",
+  "  --no-arrows           Arranca sin las flechas del flujo (--arrows: con ellas).",
+  "  --follow              Modo observador: espera a que marques un proyecto con el mod de Claude (acsuite-active-project) y lo abre",
+  "                        (--no-follow: sin él).",
   "  -h, --help            Muestra esta ayuda.",
   "",
   "La lista de proyectos se guarda en projects.json dentro de ~/.acsuite (o de la carpeta de la variable",
   "ACSUITE_HOME): los repos abiertos de frente (sin --once) y los agregados con la tecla a. Con la tecla x",
   "se quita de la lista el proyecto elegido, tras confirmar con Enter (no se borra nada del repo).",
+  "",
+  "Las opciones compacto, flechas y modo observador se recuerdan: las teclas c, f y o las guardan en",
+  "settings.json, en esa misma carpeta, y la próxima vez se arranca con ellas. Un flag manda sobre lo guardado",
+  "(con los dos de un par, gana el último). Con una ruta o con --once no se arranca en modo observador por",
+  "lo guardado, solo por un --follow explícito.",
 ];
 
 export function main(argv: string[]): void {
@@ -39,12 +46,16 @@ export function main(argv: string[]): void {
     console.log(HELP.join("\n"));
     return;
   }
-  const { once, pathArg, operator, compact, arrows, follow } = parseArgs(argv);
+  const args = parseArgs(argv);
+  const { once, pathArg, operator } = args;
+  // Cada opción: el flag si se pasó, si no lo guardado en settings.json, si no el defecto.
+  const saved = loadBoardSettings();
+  const { compact, arrows, follow } = resolveOptions({ args, saved: saved.settings });
 
   // `null`: sin proyecto al que abrir de frente, se muestra la lista de proyectos.
   const target = pathArg != null ? resolveFromArg(pathArg, operator) : resolveFromCwd(operator);
 
-  startApp({ target, compact, arrows, follow, once });
+  startApp({ target, compact, arrows, follow, once, settingsWarning: saved.warning });
 }
 
 /** Ruta pasada por argumento: si no es válida, se informa y se sale con código 1. */

@@ -57,7 +57,7 @@ Tablero de tareas en vivo en la terminal: la tarea en progreso, las pausadas, la
 acsuite board
 ```
 
-Uso, atajos y cómo lee los archivos: [README de `board`](./scripts/task-tracker/README.md).
+Uso, atajos y cómo lee los archivos: [README de `board`](./scripts/task-tracker/README.md). El board recuerda el modo compacto, las flechas y el modo observador entre ejecuciones (`settings.json` en `~/.acsuite`); un flag (`--no-compact`, `--arrows`, `--no-follow`...) manda sobre lo guardado.
 
 #### Seguir el proyecto activo de Claude
 

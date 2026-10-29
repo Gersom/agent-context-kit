@@ -219,3 +219,47 @@ describe("index.ts sin ruta: el proyecto de la carpeta donde se lanza", () => {
     expect(stdout.startsWith("▣ TAREAS\n  ES ANCHORS   ")).toBe(true);
   });
 });
+
+describe("settings.json: compacto, flechas y modo observador recordados", () => {
+  const fixture = join(FIXTURES, "es-anchors");
+  const created: string[] = [];
+  afterAll(() => created.forEach((dir) => rmSync(dir, { recursive: true, force: true })));
+
+  /** Una carpeta de config temporal con este `settings.json` (texto tal cual). */
+  function homeWith(text: string): string {
+    const home = mkdtempSync(join(tmpdir(), "board-home-"));
+    created.push(home);
+    writeFileSync(join(home, "settings.json"), text);
+    return home;
+  }
+  const saved = JSON.stringify({ version: 1, board: { compact: true, arrows: false } });
+
+  test("--once arranca con lo guardado: compacto y sin flechas", async () => {
+    const { stdout, code } = await run([fixture, "--once"], undefined, homeWith(saved));
+    expect(code).toBe(0);
+    expect(stdout).toContain("más");
+    expect(stdout).not.toContain("↓ ");
+  });
+
+  test("un flag manda sobre lo guardado (--no-compact, --arrows)", async () => {
+    const { stdout, code } = await run([fixture, "--once", "--no-compact", "--arrows"], undefined, homeWith(saved));
+    expect(code).toBe(0);
+    expect(stdout).not.toContain("más");
+    expect(stdout).toContain("↓ ");
+  });
+
+  test("sin settings.json: los defectos (completo y con flechas)", async () => {
+    const { stdout } = await run([fixture, "--once"]);
+    expect(stdout).not.toContain("más");
+    expect(stdout).toContain("↓ ");
+  });
+
+  test("settings.json corrupto: avisa, arranca con los defectos y --once no lo toca", async () => {
+    const home = homeWith("{ roto");
+    const { stdout, code } = await run([fixture, "--once"], undefined, home);
+    expect(code).toBe(0);
+    expect(stdout).toMatch(/^! /m);
+    expect(stdout).not.toContain("más");
+    expect(readFileSync(join(home, "settings.json"), "utf8")).toBe("{ roto");
+  });
+});
