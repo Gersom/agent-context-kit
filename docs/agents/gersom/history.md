@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-28 — ✅ Tarea 116 — Board: que la vista siga la selección cuando no cabe en el alto de la terminal
+
+- Las vistas de equipo y proyectos se recortan al alto de la terminal siguiendo la fila elegida, con indicadores de líneas ocultas; pie, entrada de ruta, confirmación y avisos siempre visibles.
+
 ## 2026-10-28 — ✅ Tarea 117 — Board: reemplazar «volver al equipo» por «equipo» y quitar el botón volver
 
 - Tecla e lleva al equipo desde las tareas de un operador y se quita la tecla volver; vistas con la misma jerarquía equipo, proyectos, tareas.

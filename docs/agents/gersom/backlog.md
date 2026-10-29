@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 119
+**Próximo número de tarea:** 120
 
 ---
 
@@ -48,15 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 116 — Board: que la vista siga la selección cuando no cabe en el alto de la terminal
-
-- **Descripción:** El board redibuja todo el texto sin recortar por el alto de la terminal. Con la lista de proyectos en tarjetas (3 líneas por proyecto, T112) o con muchos proyectos, el principio se sale de la pantalla y la selección con ↑/↓ no se ve. Hacer que la vista se desplace para mantener visible la fila elegida, o recortar al alto disponible.
-- **Decisiones/temas a definir antes de empezar:** Si se recorta solo la lista de proyectos o todas las vistas; cómo se indica que hay más filas arriba o abajo; de dónde se toma el alto (process.stdout.rows) y qué hacer con --once.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Hallazgo de la revisión de la T112: no hay ningún manejo de stdout.rows en scripts/task-tracker/src. Antes la tabla gastaba una línea por proyecto; las tarjetas triplican el alto.
-- **Agregada:** 2026-10-28.
-
 ### Tarea 118 — Board: al abrir un proyecto con varios operadores, entrar directo a las tareas del operador activo
 
 - **Descripción:** Hoy, en la lista de proyectos, abrir un proyecto con varios operadores muestra la vista de equipo. Debe abrir de frente la vista de tareas del operador activo (el del correo de git de ese repo). Solo si no se puede determinar el operador activo, abre la vista de equipo.
@@ -64,6 +55,15 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
 - **Detalles:** Pedida por el operador. Jerarquía de vistas: equipo, proyectos, tareas. De proyectos se pasa a tareas si hay operador activo y a equipo solo si no se encuentra. Relacionada con la tarea de pasar de «volver al equipo» a «equipo». Afecta la apertura de un repo desde la lista (src/app.ts, src/cli/projects-keys.ts) y la resolución del operador (src/io/operator.ts).
+- **Agregada:** 2026-10-28.
+
+### Tarea 119 — Board: guardar preferencias (compacto, flechas, observador) en settings.json
+
+- **Descripción:** El board no recuerda las opciones de pantalla entre ejecuciones. Guardar compacto, flechas y modo observador en settings.json, en un objeto por script, y leerlas al arrancar.
+- **Decisiones/temas a definir antes de empezar:** Ubicación (propongo ACSUITE_HOME, por defecto ~/.acsuite, junto a la lista de proyectos); estructura con un objeto por script, p. ej. board; prioridad de los flags sobre lo guardado (hace falta poder desactivar, p. ej. --no-compact); cómo se avisa que el observador está activo desde el arranque.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Surgió al definir la T116: en la vista de tareas se deja el scroll normal y el operador compacta con c. Cada script lee y escribe solo su clave y respeta las demás.
 - **Agregada:** 2026-10-28.
 
 <!-- agent-context-skill:section=blocked -->
