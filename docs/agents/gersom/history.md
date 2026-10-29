@@ -11,6 +11,10 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-28 — ✅ Tarea 119 — Board: guardar preferencias (compacto, flechas, observador) en settings.json
+
+- El board guarda compacto, flechas y observador en settings.json (clave board, archivo compartido entre scripts) al pulsar c, f u o; flags simétricos que mandan en la sesión; el observador guardado solo vale sin ruta y sin --once.
+
 ## 2026-10-28 — ✅ Tarea 118 — Board: al abrir un proyecto con varios operadores, entrar directo a las tareas del operador activo
 
 - Al ejecutar board de frente o abrir un proyecto desde la lista, en un repo multi-operador se abre la vista de tareas del operador del correo de git; si no figura con carpeta, la vista de equipo.

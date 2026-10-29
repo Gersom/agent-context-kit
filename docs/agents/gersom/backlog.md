@@ -48,15 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 119 — Board: guardar preferencias (compacto, flechas, observador) en settings.json
-
-- **Descripción:** El board no recuerda las opciones de pantalla entre ejecuciones. Guardar compacto, flechas y modo observador en settings.json, en un objeto por script, y leerlas al arrancar.
-- **Decisiones/temas a definir antes de empezar:** Ubicación (propongo ACSUITE_HOME, por defecto ~/.acsuite, junto a la lista de proyectos); estructura con un objeto por script, p. ej. board; prioridad de los flags sobre lo guardado (hace falta poder desactivar, p. ej. --no-compact); cómo se avisa que el observador está activo desde el arranque.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Surgió al definir la T116: en la vista de tareas se deja el scroll normal y el operador compacta con c. Cada script lee y escribe solo su clave y respeta las demás.
-- **Agregada:** 2026-10-28.
-
 ### Tarea 120 — Revisar la cantidad de tests de la suite
 
 - **Descripción:** La suite tiene 1501 tests en 92 archivos y parece excesivo. Revisar si hay tests redundantes, demasiado acoplados al texto o de poco valor, y qué conviene podar o consolidar.
