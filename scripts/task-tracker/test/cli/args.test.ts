@@ -27,12 +27,36 @@ describe("parseArgs", () => {
     expect(parseArgs(["D:/repo", "ana"])).toEqual({ once: false, pathArg: "D:/repo", operator: "ana" });
   });
 
-  test("un --algo desconocido se ignora: no es ruta ni operador", () => {
-    for (const flag of ["--operator", "--compact", "--no-arrows", "--follow", "--algo"]) {
-      expect(parseArgs([flag])).toEqual({ once: false, pathArg: undefined, operator: undefined });
-      expect(parseArgs(["repo", flag, "ana"])).toEqual({ once: false, pathArg: "repo", operator: "ana" });
+  test("sin flags indebidos no hay error", () => {
+    expect(parseArgs(["repo", "ana", "--once"]).error).toBeUndefined();
+  });
+
+  test("cada flag quitado da un error que dice qué usar", () => {
+    const keys = "usa las teclas c / f; se recuerdan en settings.json";
+    const follow = "usa la tecla o; se recuerda en settings.json";
+    const expected: Record<string, string> = {
+      "--compact": keys,
+      "--no-compact": keys,
+      "--arrows": keys,
+      "--no-arrows": keys,
+      "--follow": follow,
+      "--no-follow": follow,
+      "--operator": "pásalo como segundo argumento tras la ruta: acsuite board <ruta> <operador>",
+    };
+    for (const [flag, hint] of Object.entries(expected)) {
+      expect(parseArgs([flag]).error).toBe(`Ya no existe el flag ${flag} del board: ${hint}`);
     }
-    expect(parseArgs(["--operator=ana", "repo"])).toEqual({ once: false, pathArg: "repo", operator: undefined });
+  });
+
+  test("--operator con valor (con o sin ruta) o con =: error, no toma el valor como ruta", () => {
+    for (const argv of [["--operator", "ana"], ["--operator", "ana", "repo"], ["--operator=ana", "repo"]]) {
+      expect(parseArgs(argv).error).toStartWith("Ya no existe el flag --operator del board: ");
+    }
+  });
+
+  test("un flag desconocido da error", () => {
+    expect(parseArgs(["--algo"]).error).toBe("Flag desconocido: --algo. Mira acsuite board --help.");
+    expect(parseArgs(["repo", "--once", "--algo=1"]).error).toBe("Flag desconocido: --algo. Mira acsuite board --help.");
   });
 });
 

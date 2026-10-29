@@ -41,7 +41,11 @@ export function main(argv: string[]): void {
     console.log(HELP.join("\n"));
     return;
   }
-  const { once, pathArg, operator } = parseArgs(argv);
+  const { once, pathArg, operator, error } = parseArgs(argv);
+  if (error != null) {
+    console.error(error);
+    process.exit(2);
+  }
   // Cada opción: lo guardado en settings.json o, si no hay, el defecto.
   const saved = loadBoardSettings();
   const { compact, arrows, follow } = resolveOptions({ saved: saved.settings, hasPath: pathArg != null, once });

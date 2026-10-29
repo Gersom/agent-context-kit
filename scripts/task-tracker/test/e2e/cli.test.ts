@@ -68,6 +68,13 @@ describe("index.ts", () => {
     expect(stdout).not.toContain("Ruta del proyecto");
   });
 
+  test("flag quitado (--operator): código 2 con el mensaje en stderr y nada en stdout", async () => {
+    const { stdout, stderr, code } = await run(["--operator", "ana", "--once"]);
+    expect(code).toBe(2);
+    expect(stderr).toContain("Ya no existe el flag --operator del board: pásalo como segundo argumento tras la ruta: acsuite board <ruta> <operador>");
+    expect(stdout).toBe("");
+  });
+
 });
 
 describe("index.ts sin ruta: el proyecto de la carpeta donde se lanza", () => {
