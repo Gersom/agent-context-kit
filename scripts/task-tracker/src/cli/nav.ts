@@ -26,14 +26,14 @@ export function selectable(rows: NavRow[]): string[] {
 }
 
 /**
- * Estado inicial: el panel de `operator` si se pidió uno; si no, la vista de equipo con elegido
- * el operador `preferred` (el del correo de git) o, si no figura, el primero abrible.
+ * Estado inicial: el panel de `operator` si se pidió uno; si no, el del operador activo (`preferred`,
+ * el del correo de git) cuando figura con carpeta; si no, la vista de equipo con elegido el primero abrible.
  */
 export function initialNav({ operator, preferred }: { operator?: string; preferred: string | null }, rows: NavRow[]): NavState {
   if (operator) return { view: { kind: "operator", folder: operator }, selected: operator };
   const options = selectable(rows);
-  const selected = preferred && options.includes(preferred) ? preferred : (options[0] ?? null);
-  return { view: { kind: "team" }, selected };
+  if (preferred && options.includes(preferred)) return { view: { kind: "operator", folder: preferred }, selected: preferred };
+  return { view: { kind: "team" }, selected: options[0] ?? null };
 }
 
 /** Aplica una tecla de navegación (`quit` y `redraw` no cambian el estado). */

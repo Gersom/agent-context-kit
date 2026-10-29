@@ -74,10 +74,16 @@ async function run(args: string[]): Promise<{ stdout: string; stderr: string; co
 }
 
 describe("index.ts en modo multi-operador", () => {
-  test("sin operador: vista de equipo con EQUIPO, el operador del correo de git y SIN DUEÑO", async () => {
+  test("sin operador: abre el panel del operador del correo de git; si no figura, la vista de equipo con SIN DUEÑO", async () => {
     const { stdout, code } = await run([repo, "--once"]);
     expect(code).toBe(0);
     const [title, location] = stdout.split("\n");
+    if (hasGit) {
+      expect(title).toBe("▣ TAREAS");
+      expect(location).toMatch(/^ {2}[A-Z0-9 ]+ · ana {3}\S/);
+      expect(stdout).not.toContain("EQUIPO (");
+      return;
+    }
     expect(title).toBe("▣ EQUIPO");
     expect(location).toMatch(/^ {2}[A-Z0-9 ]+ {3}\S/); // nombre del proyecto y ruta, sin operador
     expect(location).not.toContain(" · ");
@@ -86,7 +92,6 @@ describe("index.ts en modo multi-operador", () => {
     expect(stdout).toContain("╭─ SIN DUEÑO (2)");
     expect(stdout).toContain("• Integrar la pasarela [dependencia]");
     expect(stdout).not.toContain("Ctrl+C");
-    if (hasGit) expect(stdout).toContain("› ana (tú)");
   });
 
   test("con operador como segundo argumento: abre su panel, con SIN DUEÑO encima de BLOQUEADAS", async () => {

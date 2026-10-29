@@ -16,12 +16,13 @@ describe("selectable", () => {
 });
 
 describe("initialNav", () => {
-  test("sin operador: vista de equipo con el preferido elegido", () => {
-    expect(initialNav({ preferred: "gersom" }, ROWS)).toEqual(team("gersom"));
+  test("sin operador pedido: abre las tareas del operador activo (el preferido)", () => {
+    expect(initialNav({ preferred: "gersom" }, ROWS)).toEqual({ view: { kind: "operator", folder: "gersom" }, selected: "gersom" });
   });
 
-  test("preferido que no figura o sin preferido: el primero abrible; sin ninguno, null", () => {
+  test("preferido que no figura, sin carpeta o sin preferido: vista de equipo con el primero abrible; sin ninguno, null", () => {
     expect(initialNav({ preferred: "otro" }, ROWS)).toEqual(team("ana"));
+    expect(initialNav({ preferred: "luis" }, ROWS)).toEqual(team("ana"));
     expect(initialNav({ preferred: null }, ROWS)).toEqual(team("ana"));
     expect(initialNav({ preferred: null }, [{ folder: "luis", folderless: true }])).toEqual(team(null));
   });
