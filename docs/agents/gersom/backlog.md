@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 123
+**Próximo número de tarea:** 130
 
 ---
 
@@ -47,6 +47,60 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador quiera hacer pública la skill, o priorice esta tarea explícitamente.
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
+
+### Tarea 124 — Grupos: comando group-create
+
+- **Descripción:** Agregar acsuite task group-create --tasks "12,23,32" --title ... --summary ...: crea el grupo y mueve las tareas a «Tareas agrupadas». Valida 2 o más tareas, sin duplicados, que existan y estén en libres (no en curso, bloqueadas ni ya agrupadas).
+- **Decisiones/temas a definir antes de empezar:** Depende de la base de grupos (src/write/group.ts).
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Surgida del issue #2 (https://github.com/Gersom/agent-context-suite/issues/2). Diseño acordado: comandos planos con prefijo group- (acsuite task group-<acción>), sin tocar start/close/block (la tarea vuelve a libres con group-eject antes de trabajarla). Un grupo se identifica por el número de cualquier tarea que contenga. Si un grupo queda con menos de 2 tareas se desarma solo: la tarea restante pasa a libres y el grupo se elimina.
+- **Agregada:** 2026-10-31.
+
+### Tarea 125 — Grupos: comando group-eject
+
+- **Descripción:** Agregar acsuite task group-eject <N>: saca la tarea N de su grupo y la pone en «Tareas libres» como ###, con el mismo contenido. Si el grupo queda con menos de 2 tareas, se desarma.
+- **Decisiones/temas a definir antes de empezar:** Depende de la base de grupos (src/write/group.ts).
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Surgida del issue #2 (https://github.com/Gersom/agent-context-suite/issues/2). Diseño acordado: comandos planos con prefijo group- (acsuite task group-<acción>), sin tocar start/close/block (la tarea vuelve a libres con group-eject antes de trabajarla). Un grupo se identifica por el número de cualquier tarea que contenga. Si un grupo queda con menos de 2 tareas se desarma solo: la tarea restante pasa a libres y el grupo se elimina.
+- **Agregada:** 2026-10-31.
+
+### Tarea 126 — Grupos: comando group-add
+
+- **Descripción:** Agregar acsuite task group-add <N-del-grupo> <M>...: suma tareas libres a un grupo existente, identificado por el número de cualquier tarea que contenga, y actualiza el título en sus dos lugares. No toca el Resumen.
+- **Decisiones/temas a definir antes de empezar:** Depende de la base de grupos (src/write/group.ts).
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Surgida del issue #2 (https://github.com/Gersom/agent-context-suite/issues/2). Diseño acordado: comandos planos con prefijo group- (acsuite task group-<acción>), sin tocar start/close/block (la tarea vuelve a libres con group-eject antes de trabajarla). Un grupo se identifica por el número de cualquier tarea que contenga. Si un grupo queda con menos de 2 tareas se desarma solo: la tarea restante pasa a libres y el grupo se elimina.
+- **Agregada:** 2026-10-31.
+
+### Tarea 127 — Grupos: comandos group-edit y group-dissolve
+
+- **Descripción:** Agregar group-edit (cambiar el título y el Resumen de un grupo, identificado por el número de cualquiera de sus tareas) y group-dissolve (deshacer un grupo entero: todas sus tareas pasan a libres).
+- **Decisiones/temas a definir antes de empezar:** Depende de la base de grupos (src/write/group.ts).
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Surgida del issue #2 (https://github.com/Gersom/agent-context-suite/issues/2). Diseño acordado: comandos planos con prefijo group- (acsuite task group-<acción>), sin tocar start/close/block (la tarea vuelve a libres con group-eject antes de trabajarla). Un grupo se identifica por el número de cualquier tarea que contenga. Si un grupo queda con menos de 2 tareas se desarma solo: la tarea restante pasa a libres y el grupo se elimina.
+- **Agregada:** 2026-10-31.
+
+### Tarea 128 — Grupos: apuntar start, close, block y edit a group-eject
+
+- **Descripción:** Cambiar el error de start, close y block para tareas agrupadas: en vez de «hazlo a mano», indicar «sácala con acsuite task group-eject N». Hacer que edit funcione con tareas agrupadas (edita solo el texto), manteniendo el rechazo de --blocker.
+- **Decisiones/temas a definir antes de empezar:** Mejor después de group-eject, para que el mensaje apunte a un comando que ya exista.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Surgida del issue #2 (https://github.com/Gersom/agent-context-suite/issues/2). Diseño acordado: comandos planos con prefijo group- (acsuite task group-<acción>), sin tocar start/close/block (la tarea vuelve a libres con group-eject antes de trabajarla). Un grupo se identifica por el número de cualquier tarea que contenga. Si un grupo queda con menos de 2 tareas se desarma solo: la tarea restante pasa a libres y el grupo se elimina. Puntos de rechazo: start.ts:164, close.ts:301, block.ts:76, edit.ts:177.
+- **Agregada:** 2026-10-31.
+
+### Tarea 129 — Grupos: check, README y plantillas
+
+- **Descripción:** Agregar a acsuite check un aviso de grupos con una sola tarea o con el título desincronizado respecto de las tareas que contienen. Actualizar el README del task-manager (quitar la línea que dice que start rechaza las agrupadas y documentar los group-*), «Agrupamiento» en backlog.md y su plantilla en skill/template, y el límite anotado en la Tarea 34.
+- **Decisiones/temas a definir antes de empezar:** Va al final, cuando los comandos group-* ya existan.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Surgida del issue #2 (https://github.com/Gersom/agent-context-suite/issues/2). Diseño acordado: comandos planos con prefijo group- (acsuite task group-<acción>), sin tocar start/close/block (la tarea vuelve a libres con group-eject antes de trabajarla). Un grupo se identifica por el número de cualquier tarea que contenga. Si un grupo queda con menos de 2 tareas se desarma solo: la tarea restante pasa a libres y el grupo se elimina.
+- **Agregada:** 2026-10-31.
 
 <!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas

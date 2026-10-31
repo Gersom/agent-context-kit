@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-31 — ✅ Tarea 123 — Grupos: base compartida en src/write/group.ts
+
+- Base de grupos en src/write/group.ts: ejectTask, addTasks y findGroupOf, con desarme automático de grupos de menos de 2 tareas y texto de vacío propio para «Tareas agrupadas» (emptyGrouped).
+- 16 tests en test/write/group.test.ts con comparación exacta; bun test (1529) y typecheck limpios; revisada por un subagente sin bugs graves.
+- Commit 5fda6b8 (suite).
+
 ## 2026-10-28 — ✅ Tarea 122 — docs-check: quitar el check skill-version
 
 - Se quitó el check skill-version de docs-check con sus tests (VERSION_MARKER_RE pasó a _shared/markers.ts con su propio test); placeholders y legacy-marker se quedan.
