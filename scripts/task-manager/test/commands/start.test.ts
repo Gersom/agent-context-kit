@@ -227,6 +227,7 @@ describe("start <N>", () => {
       const { code, err } = await exec(["start", "14", "--apply"], p);
       expect(code).toBe(1);
       expect(err).toContain("tarea agrupada (grupo «Documentar los planes»)");
+      expect(err).toContain("acsuite task group-eject 14");
       expect(snapshot(p.root)).toEqual(before);
     });
 

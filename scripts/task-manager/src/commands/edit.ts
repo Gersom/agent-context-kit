@@ -174,7 +174,7 @@ function backlogValues(
   if (given.blocker !== undefined) {
     const blocking = classifyBlocker(given.blocker).blocked;
     if (place === "grouped" && (blocking || WHERE_BLOCKER(task))) {
-      throw new CliError("--blocker: cambiar el bloqueo de una tarea agrupada todavía no está soportado (no sé a qué sección pertenece su estado). Hazlo a mano. No se escribió nada.");
+      throw new CliError("--blocker: una tarea agrupada no se bloquea ni se desbloquea desde el grupo (no sé a qué sección pertenece su estado). Sácala con `acsuite task group-eject N` y usa `block`/`unblock` o vuelve a editarla. No se escribió nada.");
     }
     // Los tags que citan los mensajes: los del idioma de los campos de la tarea, si se reconoce.
     const language = detectLanguage(task.fields.map((field) => field.label));

@@ -163,7 +163,7 @@ function findInBacklog(ctx: CommandContext, arg: string): Source {
   if (reason) throw new CliError(`La Tarea ${target.number} ${reason}. No se escribió nada.`);
   if (location.place === "grouped") {
     throw new CliError(
-      `La Tarea ${target.number} es una tarea agrupada (grupo «${location.group}»): sacarla de «Tareas agrupadas» todavía no está soportado. Muévela a mano a «Tareas libres» y vuelve a intentarlo. No se escribió nada.`,
+      `La Tarea ${target.number} es una tarea agrupada (grupo «${location.group}»): para empezarla hay que sacarla del grupo: \`acsuite task group-eject ${target.number}\` la pasa a «Tareas libres»; vuelve a intentarlo después. No se escribió nada.`,
     );
   }
   const { free, blocked } = docs.backlog.parsed;

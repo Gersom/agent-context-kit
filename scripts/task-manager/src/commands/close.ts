@@ -5,7 +5,7 @@
 // - `handoff.md`: la tarea en curso (o, con `close <N>`, una pausada) sale y «Tarea en progreso»
 //   queda en «Sin tarea en curso».
 //   Con `close <N> --discarded` sobre una tarea que ni se empezó (está en «libres» o «bloqueadas» de
-//   backlog.md; las agrupadas no), `handoff.md` no se toca (la tarea en curso, si hay, sigue igual):
+//   backlog.md; las agrupadas no: antes `group-eject N`), `handoff.md` no se toca (la tarea en curso, si hay, sigue igual):
 //   solo se escribe la entrada ❌ y se saca su bloque del backlog. Una tarea sin empezar no se da por
 //   hecha: con `--done` es un error que manda a `start N`.
 // - `backlog.md`: si la tarea aún figura ahí (siempre, si es una tarea sin empezar), se saca; `--new "<título>"` (repetible) agrega tareas
@@ -299,7 +299,7 @@ function notClosable(docs: Docs, number: number, found: TaskLocation[] = findTas
   if (!found.length) return `No existe la Tarea ${number}. ${describeKnownNumbers(docs)}`;
   if (found.some((place) => place.place === "history")) return `La Tarea ${number} ya figura cerrada en history.md. No se escribió nada.`;
   const grouped = found.find((place) => place.place === "grouped");
-  if (grouped) return `La Tarea ${number} está en «Tareas agrupadas» (grupo «${grouped.group}»): \`close\` no cierra tareas agrupadas; sácala del grupo a mano antes. No se escribió nada.`;
+  if (grouped) return `La Tarea ${number} está en «Tareas agrupadas» (grupo «${grouped.group}»): \`close\` no cierra tareas agrupadas; sácala del grupo con \`acsuite task group-eject ${number}\` y vuelve a intentarlo. No se escribió nada.`;
   return `La Tarea ${number} figura en varios lugares (${found.map((place) => place.place).join(", ")}): una tarea vive en un solo lugar; corrígelo a mano antes de cerrarla. No se escribió nada.`;
 }
 

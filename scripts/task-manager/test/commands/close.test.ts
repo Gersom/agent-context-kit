@@ -363,6 +363,7 @@ describe("descartar una tarea sin empezar (libre o bloqueada)", () => {
     const { code, err } = await exec(DISCARD("14"), p);
     expect(code).toBe(1);
     expect(err).toContain("«Tareas agrupadas» (grupo «Documentar los planes»)");
+    expect(err).toContain("acsuite task group-eject 14");
     expect(snapshot(p.root)).toEqual(before);
   });
 

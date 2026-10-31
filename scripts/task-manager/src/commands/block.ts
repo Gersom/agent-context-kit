@@ -75,7 +75,7 @@ export const block: Command = {
     }
     if (location.place === "grouped") {
       throw new CliError(
-        `La Tarea ${target.number} es una tarea agrupada (grupo «${location.group}»): bloquear una tarea agrupada todavía no está soportado. Hazlo a mano. No se escribió nada.`,
+        `La Tarea ${target.number} es una tarea agrupada (grupo «${location.group}»): para bloquearla hay que sacarla del grupo: \`acsuite task group-eject ${target.number}\` la pasa a «Tareas libres»; vuelve a intentarlo después. No se escribió nada.`,
       );
     }
     const { free, blocked } = backlog.parsed;

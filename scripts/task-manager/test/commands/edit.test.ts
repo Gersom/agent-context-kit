@@ -293,7 +293,8 @@ describe("edit — backlog propio", () => {
       expect(backlog(p)).toContain("- **Disparador:** cuando se cierre el diseño.\n- **Bloqueos:** Ninguno.\n");
       const before = snapshot(p.root);
       const bad = await exec(["edit", "14", "--blocker", "[dependencia] x", "--apply"], p);
-      expect(bad.err).toContain("tarea agrupada todavía no está soportado");
+      expect(bad.err).toContain("una tarea agrupada no se bloquea");
+      expect(bad.err).toContain("acsuite task group-eject N");
       expect(snapshot(p.root)).toEqual(before);
     });
   });

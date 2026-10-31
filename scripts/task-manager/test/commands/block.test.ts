@@ -108,7 +108,9 @@ describe("block", () => {
       const before = snapshot(p.root);
       const run = (n: string) => exec(["block", n, "--tag", "dependency", "--reason", "x", "--apply"], p);
       expect((await run("6")).err).toContain("ya está en «bloqueadas / pospuestas» (dependencia: depende de la Tarea 11.)");
-      expect((await run("14")).err).toContain("tarea agrupada (grupo «Documentar los planes»)");
+      const grouped = (await run("14")).err;
+      expect(grouped).toContain("tarea agrupada (grupo «Documentar los planes»)");
+      expect(grouped).toContain("acsuite task group-eject 14");
       expect((await run("8")).err).toContain("está pausada");
       expect((await run("11")).err).toContain("ya está cerrada");
       expect((await run("1@ana")).err).toContain("de otro operador");
