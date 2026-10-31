@@ -11,6 +11,11 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-31 — ✅ Tarea 130 — Regla en rules.md: omitir la revisión independiente en tareas pequeñas
+
+- Regla nueva en «Reglas específicas de este proyecto» de docs/agents/rules.md, para todos los operadores: la revisión independiente se omite en tareas pequeñas (mensajes, texto o un solo archivo sin lógica nueva) y se hace con lógica nueva, varios archivos o comportamiento no cubierto por tests; tests y typecheck se corren siempre.
+- Commit 7baa1e3 (suite).
+
 ## 2026-10-31 — ✅ Tarea 129 — Grupos: check, README y plantillas
 
 - Check de grupos en acsuite check (scripts/docs-check/src/checks/groups.ts): group-too-small, group-missing-container, group-missing-reference, group-numbers-mismatch, group-title-mismatch, group-no-summary y group-header-comment.
