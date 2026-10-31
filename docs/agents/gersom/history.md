@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-31 — ✅ Tarea 126 — Grupos: comando group-add
+
+- Comando group-add <N> <M>... (--json): suma tareas libres al grupo que contiene la tarea N con addTasks, sin tocar el Resumen.
+- Helper compartido findSinglePlace y NOT_GROUPED con group-eject, nombres de lugar legibles en los errores y pickFreeTasks con verbo configurable.
+- bun test (1587) y typecheck limpios; revisado por un subagente y aplicadas sus correcciones. Commit 3d176ca (suite).
+
 ## 2026-10-31 — ✅ Tarea 125 — Grupos: comando group-eject
 
 - Comando group-eject <N> (--json): saca una tarea agrupada a «Tareas libres» con ejectTask y desarma el grupo si queda con menos de 2 tareas.
