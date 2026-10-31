@@ -19,7 +19,7 @@ import { emitWriteJson, JSON_FLAG } from "../write/json.ts";
 import { detectLanguage, NONE_RE, STRINGS } from "../write/language.ts";
 import { headerLabels } from "../write/samples.ts";
 
-const WHERE: Record<string, string> = {
+export const WHERE: Record<string, string> = {
   "in-progress": "es la tarea en curso",
   paused: "está pausada",
   history: "ya está cerrada (figura en history.md)",
