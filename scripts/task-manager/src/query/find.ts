@@ -118,6 +118,29 @@ export function parseTarget(arg: string): TaskTarget {
   return { kind: "title", query: arg.trim() };
 }
 
+// Cómo se nombra cada lugar en los mensajes de error (no las claves internas de `Place`).
+const PLACE_NAME: Record<Place, string> = {
+  free: "libres",
+  grouped: "agrupadas",
+  blocked: "bloqueadas",
+  "in-progress": "en curso",
+  paused: "pausada",
+  history: "history.md",
+};
+
+/**
+ * El lugar de la tarea `number`, que debe vivir en uno solo.
+ * @throws CliError no existe (con los números conocidos) o figura en varios lugares (el mensaje los nombra)
+ */
+export function findSinglePlace(docs: Docs, number: number): Place {
+  const found = findTask(docs, number);
+  if (!found.length) throw new CliError(`No existe la Tarea ${number}. ${describeKnownNumbers(docs)}`);
+  if (found.length > 1) {
+    throw new CliError(`La Tarea ${number} aparece en ${found.length} lugares (${found.map((l) => PLACE_NAME[l.place]).join(", ")}): una tarea vive en un solo lugar; corrígelo a mano. No se escribió nada.`);
+  }
+  return found[0].place;
+}
+
 /** Texto con los números conocidos (rango y total) y el próximo, para los errores de «no existe». */
 export function describeKnownNumbers(docs: Docs): string {
   const numbers = knownNumbers(docs);

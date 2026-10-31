@@ -10,9 +10,10 @@ import { parseBlocks } from "../../../_shared/parse/blocks.ts";
 import { commentSpans } from "../../../_shared/parse/markdown.ts";
 import type { Group, ParsedBacklog, Task } from "../../../_shared/types.ts";
 import { CliError } from "../cli/errors.ts";
+import { WHERE } from "../commands/block.ts";
 import { type Edit, insertAt, replaceRange } from "../edit/edits.ts";
 import { blockSeparator, insertBlock, removeBlock } from "../edit/layout.ts";
-import { normalizeTitle } from "../query/find.ts";
+import { normalizeTitle, type Place } from "../query/find.ts";
 import { lineAt, trimRange } from "../query/lines.ts";
 import type { Doc } from "../workspace/docs.ts";
 import { type Block, removeBlocks } from "./blocking.ts";
@@ -24,6 +25,13 @@ export const MIN_GROUP_TASKS = 2;
 
 // La lista de números va entre paréntesis al final del header de la referencia: `(Tareas 14, 15)`.
 const REFERENCE_LIST_RE = /\(([^)]*\d[^)]*)\)\s*$/;
+
+/** Dónde está una tarea que debería estar agrupada y no lo está; en curso, pausada y cerrada reutilizan las etiquetas de `block`. */
+export const NOT_GROUPED: Record<Exclude<Place, "grouped">, string> = {
+  ...(WHERE as Record<"in-progress" | "paused" | "history", string>),
+  free: "es una tarea libre, no está agrupada",
+  blocked: "está en «bloqueadas / pospuestas», no está agrupada",
+};
 
 /** Un grupo con sus dos mitades: el contenedor (sus tareas `####`) y su referencia en «Tareas libres». */
 export interface GroupAt {
@@ -51,9 +59,10 @@ export function findGroupOf(backlog: Doc<ParsedBacklog>, number: number): GroupA
 
 /**
  * Las tareas libres `numbers`, en ese orden, listas para agruparlas.
+ * @param verb cómo dice el comando lo que hace con ellas, en el mensaje «solo <verb> tareas libres»
  * @throws CliError no hay números, uno se repite, o alguno no es una tarea de «Tareas libres» (el mensaje dice dónde está)
  */
-export function pickFreeTasks(backlog: Doc<ParsedBacklog>, numbers: number[]): Task[] {
+export function pickFreeTasks(backlog: Doc<ParsedBacklog>, numbers: number[], verb = "se agrupan"): Task[] {
   if (!numbers.length) throw new CliError("Indica al menos una tarea libre. No se escribió nada.");
   const repeated = numbers.find((number, i) => numbers.indexOf(number) !== i);
   if (repeated !== undefined) throw new CliError(`La Tarea ${repeated} está repetida en la lista. No se escribió nada.`);
@@ -68,7 +77,7 @@ export function pickFreeTasks(backlog: Doc<ParsedBacklog>, numbers: number[]): T
       : blocked.some((candidate) => candidate.number === number)
         ? "está en «Tareas bloqueadas / pospuestas»"
         : "no figura en «Tareas libres» (¿en curso, pausada, cerrada o inexistente?)";
-    throw new CliError(`La Tarea ${number} ${where}: solo se agrupan tareas libres. No se escribió nada.`);
+    throw new CliError(`La Tarea ${number} ${where}: solo ${verb} tareas libres. No se escribió nada.`);
   });
 }
 
@@ -272,12 +281,13 @@ export function ejectTask(backlog: Doc<ParsedBacklog>, number: number, S: String
  * Suma tareas libres al grupo que contiene la tarea `groupNumber`: sus bloques pasan de `### Tarea N` a
  * `#### Tarea N` al final del contenedor (en el orden de `numbers`) y sus números se agregan a la
  * referencia, que queda con los del grupo en orden de aparición y luego los nuevos. No toca el `Resumen`.
+ * `S` solo lo pide `removeBlocks`: la referencia sigue en «Tareas libres», que nunca queda vacía, así que no se escribe ningún texto de `S`.
  * @throws CliError `groupNumber` no está agrupada, o `numbers` no son tareas libres distintas (ver `pickFreeTasks`)
  */
 export function addTasks(backlog: Doc<ParsedBacklog>, groupNumber: number, numbers: number[], S: Strings): Edit[] {
   const at = findGroupOf(backlog, groupNumber);
   if (!at) throw new CliError(`La Tarea ${groupNumber} no está en «Tareas agrupadas»: indica una tarea que ya pertenezca al grupo. No se escribió nada.`);
-  const tasks = pickFreeTasks(backlog, numbers);
+  const tasks = pickFreeTasks(backlog, numbers, "se suman al grupo");
   const { container, reference } = at;
   const { text } = backlog;
   const { free } = backlog.parsed;

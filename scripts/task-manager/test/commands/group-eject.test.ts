@@ -167,8 +167,8 @@ describe("group-eject", () => {
       const before = snapshot(p.root);
       const { code, err } = await exec(["group-eject", "14", "--apply"], p);
       expect(code).toBe(1);
-      expect(err).toContain("La Tarea 14 aparece en 2 lugares (");
-      expect(err).toContain("una tarea vive en un solo lugar; corrígelo a mano. No se escribió nada.");
+      expect(err).toContain("La Tarea 14 aparece en 2 lugares (pausada, agrupadas): una tarea vive en un solo lugar; corrígelo a mano. No se escribió nada.");
+      expect(err).not.toContain("paused");
       expect(snapshot(p.root)).toEqual(before);
     });
 

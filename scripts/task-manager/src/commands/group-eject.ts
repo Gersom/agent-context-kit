@@ -5,22 +5,14 @@
 
 import { CliError, UsageError } from "../cli/errors.ts";
 import type { Command } from "../cli/types.ts";
-import { describeKnownNumbers, findTask, type Place, parseTarget } from "../query/find.ts";
+import { findSinglePlace, parseTarget } from "../query/find.ts";
 import { relFile } from "../query/format.ts";
 import { requireDoc } from "../workspace/docs.ts";
 import { requireOwnFolder } from "../workspace/ownership.ts";
-import { ejectTask, findGroupOf, MIN_GROUP_TASKS } from "../write/group.ts";
+import { ejectTask, findGroupOf, MIN_GROUP_TASKS, NOT_GROUPED } from "../write/group.ts";
 import { emitWriteJson, JSON_FLAG } from "../write/json.ts";
 import { detectLanguage, STRINGS } from "../write/language.ts";
 import { headerLabels } from "../write/samples.ts";
-import { WHERE } from "./block.ts";
-
-// Dónde está una tarea que no es agrupada; en curso, pausada y cerrada reutilizan las etiquetas de `block`.
-const NOT_GROUPED: Record<Exclude<Place, "grouped">, string> = {
-  ...(WHERE as Record<"in-progress" | "paused" | "history", string>),
-  free: "es una tarea libre, no está agrupada",
-  blocked: "está en «bloqueadas / pospuestas», no está agrupada",
-};
 
 export const groupEject: Command = {
   name: "group-eject",
@@ -40,12 +32,7 @@ export const groupEject: Command = {
     const docs = ctx.docs();
     const backlog = requireDoc(docs.backlog, "backlog.md");
 
-    const found = findTask(docs, target.number);
-    if (!found.length) throw new CliError(`No existe la Tarea ${target.number}. ${describeKnownNumbers(docs)}`);
-    if (found.length > 1) {
-      throw new CliError(`La Tarea ${target.number} aparece en ${found.length} lugares (${found.map((l) => l.place).join(", ")}): una tarea vive en un solo lugar; corrígelo a mano. No se escribió nada.`);
-    }
-    const { place } = found[0];
+    const place = findSinglePlace(docs, target.number);
     if (place !== "grouped") {
       throw new CliError(`La Tarea ${target.number} ${NOT_GROUPED[place]}: solo se sacan de su grupo las tareas agrupadas. No se escribió nada.`);
     }
