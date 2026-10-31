@@ -1,4 +1,4 @@
-// Sacar una tarea de su grupo y sumarle tareas libres: ediciones exactas sobre textos en memoria
+// Formar un grupo, sacar una tarea de él y sumarle tareas libres: ediciones exactas sobre textos en memoria
 // (nunca se tocan los docs reales). Los backlogs se arman con `backlogOf` para que la entrada y el
 // resultado esperado se lean lado a lado.
 
@@ -8,7 +8,7 @@ import { normalizeEol } from "../../../_shared/parse/positions.ts";
 import type { ParsedBacklog } from "../../../_shared/types.ts";
 import { CliError } from "../../src/cli/errors.ts";
 import { applyEdits, type Edit } from "../../src/edit/edits.ts";
-import { addTasks, ejectTask, findGroupOf } from "../../src/write/group.ts";
+import { addTasks, createGroup, ejectTask, findGroupOf, groupLabels } from "../../src/write/group.ts";
 import { STRINGS } from "../../src/write/language.ts";
 import type { Doc } from "../../src/workspace/docs.ts";
 import { BACKLOG_RICH } from "../fixtures.ts";
@@ -183,5 +183,167 @@ describe("addTasks", () => {
     expectError(() => addTasks(doc, 14, [99], S), "La Tarea 99 no figura en «Tareas libres»");
     expectError(() => addTasks(doc, 14, [], S), "Indica al menos una tarea libre");
     expectError(() => addTasks(doc, 1, [18], S), "La Tarea 1 no está en «Tareas agrupadas»");
+  });
+});
+
+describe("createGroup", () => {
+  const EMPTY = "No aplica todavía — ningún grupo formado.";
+  const resumen = (title: string) => `resumen de ${title}.`;
+
+  test("con 2 tareas del medio de «libres»: salen, la referencia va al final y «agrupadas» deja de estar vacía", () => {
+    const doc = docOf(backlogOf(join(task(1), task(14), task(15), task(20)), EMPTY));
+    expect(apply(doc, createGroup(doc, [14, 15], "Planes", resumen("Planes"), S))).toBe(
+      backlogOf(join(task(1), task(20), reference("Planes", [14, 15])), container("Planes", [14, 15])),
+    );
+  });
+
+  test("con 3 tareas separadas: el contenedor las trae como `####` y la referencia lista los números", () => {
+    const doc = docOf(backlogOf(join(task(1), task(12), task(18), task(23), task(32)), EMPTY));
+    expect(apply(doc, createGroup(doc, [12, 23, 32], "Docs", resumen("Docs"), S))).toBe(
+      backlogOf(join(task(1), task(18), reference("Docs", [12, 23, 32])), container("Docs", [12, 23, 32])),
+    );
+  });
+
+  test("el orden de las tareas es el de `numbers`, no el del archivo", () => {
+    const doc = docOf(backlogOf(join(task(1), task(18), task(20)), EMPTY));
+    expect(apply(doc, createGroup(doc, [20, 1], "Planes", resumen("Planes"), S))).toBe(
+      backlogOf(join(task(18), reference("Planes", [20, 1])), container("Planes", [20, 1])),
+    );
+  });
+
+  test("si las últimas de «libres» son las quitadas, la referencia ocupa su lugar", () => {
+    const doc = docOf(backlogOf(join(task(1), task(18), task(14), task(15)), EMPTY));
+    expect(apply(doc, createGroup(doc, [15, 14], "Planes", resumen("Planes"), S))).toBe(
+      backlogOf(join(task(1), task(18), reference("Planes", [15, 14])), container("Planes", [15, 14])),
+    );
+    // también si hay quitadas más arriba, separadas de las del final
+    expect(apply(doc, createGroup(doc, [1, 15], "Planes", resumen("Planes"), S))).toBe(
+      backlogOf(join(task(18), task(14), reference("Planes", [1, 15])), container("Planes", [1, 15])),
+    );
+  });
+
+  test("agrupando todas las libres, «libres» queda solo con la referencia", () => {
+    const doc = docOf(backlogOf(join(task(1), task(18)), EMPTY));
+    expect(apply(doc, createGroup(doc, [1, 18], "Todo", resumen("Todo"), S))).toBe(backlogOf(reference("Todo", [1, 18]), container("Todo", [1, 18])));
+  });
+
+  test("con otro grupo ya formado: el contenedor va al final de «agrupadas» y la referencia al final de «libres»", () => {
+    const doc = docOf(backlogOf(join(reference("Otro", [30, 31]), task(18), task(20)), container("Otro", [30, 31])));
+    expect(apply(doc, createGroup(doc, [18, 20], "Planes", resumen("Planes"), S))).toBe(
+      backlogOf(join(reference("Otro", [30, 31]), reference("Planes", [18, 20])), join(container("Otro", [30, 31]), container("Planes", [18, 20]))),
+    );
+  });
+
+  test("con otro grupo ya formado en medio de «libres»", () => {
+    const doc = docOf(backlogOf(join(task(18), reference("Otro", [30, 31]), task(20), task(21)), container("Otro", [30, 31])));
+    expect(apply(doc, createGroup(doc, [18, 21], "Planes", resumen("Planes"), S))).toBe(
+      backlogOf(join(reference("Otro", [30, 31]), task(20), reference("Planes", [18, 21])), join(container("Otro", [30, 31]), container("Planes", [18, 21]))),
+    );
+  });
+
+  test("copia las palabras del grupo que el archivo ya tiene; sin grupos usa la tabla del idioma", () => {
+    const english = "### Group — Other (Tasks 30, 31)\n\n- **Summary:** other.";
+    const englishContainer = `### Group — Other\n\n${task(30, "####")}\n\n${task(31, "####")}`;
+    const doc = docOf(backlogOf(join(english, task(18), task(20)), englishContainer));
+    expect(groupLabels(doc, S)).toEqual({ group: "Group", summary: "Summary", tasks: "Tasks" });
+    expect(apply(doc, createGroup(doc, [18, 20], "Plans", "plans.", S))).toBe(
+      backlogOf(
+        join(english, "### Group — Plans (Tasks 18, 20)\n\n- **Summary:** plans."),
+        `${englishContainer}\n\n### Group — Plans\n\n${task(18, "####")}\n\n${task(20, "####")}`,
+      ),
+    );
+
+    const bare = docOf(backlogOf(join(task(18), task(20)), EMPTY));
+    expect(groupLabels(bare, S)).toEqual({ group: "Grupo", summary: "Resumen", tasks: "Tareas" });
+    expect(apply(bare, createGroup(bare, [18, 20], "Plans", "plans.", STRINGS.en))).toBe(
+      backlogOf("### Group — Plans (Tasks 18, 20)\n\n- **Summary:** plans.", `### Group — Plans\n\n${task(18, "####")}\n\n${task(20, "####")}`),
+    );
+  });
+
+  test("con un placeholder de «agrupadas» en otro idioma lo reemplaza", () => {
+    const doc = docOf(backlogOf(join(task(18), task(20)), "Not applicable yet."));
+    expect(apply(doc, createGroup(doc, [18, 20], "Planes", resumen("Planes"), S))).toBe(backlogOf(reference("Planes", [18, 20]), container("Planes", [18, 20])));
+  });
+
+  test("el resultado vuelve a parsearse con el grupo en sus dos lugares (BACKLOG_RICH)", () => {
+    const doc = docOf(BACKLOG_RICH);
+    const parsed = parseBacklog(apply(doc, createGroup(doc, [3, 1], "Cosas nuevas", "Un resumen.", S)));
+    expect(parsed.free.tasks.map((t) => t.number)).toEqual([18]);
+    expect(parsed.free.groups.map((g) => [g.title, g.taskNumbers])).toEqual([["Documentar los planes", [14, 15]], ["Cosas nuevas", [3, 1]]]);
+    expect(parsed.grouped.map((g) => [g.title, g.tasks.map((t) => t.number)])).toEqual([["Documentar los planes", [14, 15]], ["Cosas nuevas", [3, 1]]]);
+    expect(parsed.free.groups[1].body).toContain("- **Resumen:** Un resumen.");
+  });
+
+  test("conserva el final de línea CRLF del archivo", () => {
+    const doc = docOf(backlogOf(join(task(1), task(14), task(15)), EMPTY).replace(/\n/g, "\r\n"));
+    const expected = backlogOf(join(task(1), reference("Planes", [14, 15])), container("Planes", [14, 15]));
+    expect(apply(doc, createGroup(doc, [14, 15], "Planes", resumen("Planes"), S))).toBe(expected.replace(/\n/g, "\r\n"));
+  });
+
+  describe("errores", () => {
+    const doc = docOf(backlogOf(join(task(1), reference("Planes", [14, 15]), task(18), task(20)), container("Planes", [14, 15])));
+    const create = (numbers: number[], title = "Nuevo", summary = "Un resumen.") => () => createGroup(doc, numbers, title, summary, S);
+
+    test("menos de 2 tareas, ninguna o repetidas", () => {
+      expectError(create([1]), "Un grupo necesita al menos 2 tareas (recibí 1). No se escribió nada.");
+      expectError(create([]), "Indica al menos una tarea libre. No se escribió nada.");
+      expectError(create([18, 18]), "La Tarea 18 está repetida en la lista. No se escribió nada.");
+    });
+
+    test("tarea bloqueada, ya agrupada o inexistente", () => {
+      expectError(create([1, 6]), "La Tarea 6 está en «Tareas bloqueadas / pospuestas»: solo se agrupan tareas libres. No se escribió nada.");
+      expectError(create([1, 14]), "La Tarea 14 ya está en el grupo «Planes»");
+      expectError(create([1, 99]), "La Tarea 99 no figura en «Tareas libres»");
+    });
+
+    test("título repetido (también sin mayúsculas ni acentos), en referencias y en contenedores sin referencia", () => {
+      expectError(create([1, 18], "Planes"), "Ya hay un grupo con el título «Planes»");
+      expectError(create([1, 18], "  PLÁNES "), "Ya hay un grupo con el título «Planes»");
+      const orphan = docOf(backlogOf(join(task(1), task(18)), container("Huérfano", [14, 15])));
+      expectError(() => createGroup(orphan, [1, 18], "huerfano", "x.", S), "Ya hay un grupo con el título «Huérfano»");
+    });
+
+    test("título o resumen vacío o de varias líneas, y título que se leería como referencia", () => {
+      expectError(create([1, 18], "  "), "El título del grupo debe ser una sola línea y no estar vacío");
+      expectError(create([1, 18], "uno\ndos"), "El título del grupo debe ser una sola línea");
+      expectError(create([1, 18], "Fase (2)"), "se leería como la referencia de un grupo");
+      expectError(create([1, 18], "Nuevo", ""), "El resumen del grupo debe ser una sola frase");
+      expectError(create([1, 18], "Nuevo", "uno\ndos"), "El resumen del grupo debe ser una sola frase");
+    });
+
+    test("título con un paréntesis sin cerrar: el header no se releería con el mismo título", () => {
+      const message = "El título «%» tiene un paréntesis sin cerrar o algo que confunde al parser";
+      for (const title of ["Fase (2", "Fase (beta", "Fase (2 (3"]) expectError(create([1, 18], title), message.replace("%", title));
+      expectError(create([1, 18], "Fase (2"), "No se escribió nada.");
+      // Con los paréntesis cerrados, y sin dígitos al final, se relee igual y se escribe.
+      for (const title of ["Fase (beta)", "Fase (2) final"]) {
+        const parsed = parseBacklog(apply(doc, createGroup(doc, [1, 18], title, "Un resumen.", S)));
+        expect(parsed.free.groups.map((g) => [g.title, g.taskNumbers]).at(-1)).toEqual([title, [1, 18]]);
+      }
+    });
+
+    test("el contenedor no lleva lista de números: `Migrar (v2)` no choca con el título `Migrar`", () => {
+      const withParens = docOf(backlogOf(join(task(1), task(18)), container("Migrar (v2)", [14, 15])));
+      expectError(() => createGroup(withParens, [1, 18], "Migrar (v2)", "x.", S), "termina en una lista entre paréntesis con números");
+      const edited = apply(withParens, createGroup(withParens, [1, 18], "Migrar", "x.", S));
+      expect(edited).toBe(backlogOf(reference("Migrar", [1, 18]).replace("resumen de Migrar.", "x."), join(container("Migrar (v2)", [14, 15]), container("Migrar", [1, 18]))));
+      // Un contenedor sin paréntesis final sí choca.
+      const plain = docOf(backlogOf(join(task(1), task(18)), container("Migrar", [14, 15])));
+      expectError(() => createGroup(plain, [1, 18], "migrar", "x.", S), "Ya hay un grupo con el título «Migrar»");
+    });
+
+    test("título o resumen con `<!--` o `-->`", () => {
+      for (const title of ["Fase <!-- x", "Fase --> x", "<!-- Fase -->"]) {
+        expectError(create([1, 18], title), "El título del grupo no puede contener «<!--» ni «-->»: abrirían o cerrarían un comentario HTML. No se escribió nada.");
+      }
+      for (const summary of ["Un <!-- resumen", "Un --> resumen", "<!-- resumen -->"]) {
+        expectError(create([1, 18], "Nuevo", summary), "El resumen del grupo no puede contener «<!--» ni «-->»: abrirían o cerrarían un comentario HTML. No se escribió nada.");
+      }
+    });
+
+    test("sin la sección «Tareas agrupadas»", () => {
+      const noSection = docOf(backlogOf(join(task(1), task(18)), EMPTY).replace("<!-- agent-context-skill:section=grouped -->\n", ""));
+      expectError(() => createGroup(noSection, [1, 18], "Nuevo", "x.", S), "no tiene la sección «Tareas agrupadas»");
+    });
   });
 });

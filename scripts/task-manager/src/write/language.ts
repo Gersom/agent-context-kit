@@ -42,6 +42,11 @@ export const NONE_RE = /^(ninguno|ninguna|none|n\/a)\.?$/i;
 /** Textos que el script escribe cuando no puede copiarlos de un archivo. */
 export interface Strings {
   task: string;
+  // Las palabras de un grupo: `### <group> — título (<tasks> 14, 15)` y `- **<summary>:** frase`.
+  group: string;
+  summary: string;
+  /** Plural de `task` en la lista de la referencia de un grupo. */
+  tasks: string;
   none: string;
   emptySection: string;
   /** Lo que queda en «Tareas agrupadas» cuando no queda ningún grupo. */
@@ -89,6 +94,9 @@ export interface Strings {
 export const STRINGS: Record<Lang, Strings> = {
   es: {
     task: "Tarea",
+    group: "Grupo",
+    summary: "Resumen",
+    tasks: "Tareas",
     none: "Ninguno.",
     emptySection: "Ninguna.",
     emptyGrouped: "No aplica todavía — ningún grupo formado.",
@@ -127,6 +135,9 @@ export const STRINGS: Record<Lang, Strings> = {
   },
   en: {
     task: "Task",
+    group: "Group",
+    summary: "Summary",
+    tasks: "Tasks",
     none: "None.",
     emptySection: "None.",
     emptyGrouped: "Not applicable yet — no groups formed.",
