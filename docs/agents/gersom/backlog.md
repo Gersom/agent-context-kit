@@ -48,15 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 128 — Grupos: apuntar start, close, block y edit a group-eject
-
-- **Descripción:** Cambiar el error de start, close y block para tareas agrupadas: en vez de «hazlo a mano», indicar «sácala con acsuite task group-eject N». Hacer que edit funcione con tareas agrupadas (edita solo el texto), manteniendo el rechazo de --blocker.
-- **Decisiones/temas a definir antes de empezar:** Mejor después de group-eject, para que el mensaje apunte a un comando que ya exista.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Surgida del issue #2 (https://github.com/Gersom/agent-context-suite/issues/2). Diseño acordado: comandos planos con prefijo group- (acsuite task group-<acción>), sin tocar start/close/block (la tarea vuelve a libres con group-eject antes de trabajarla). Un grupo se identifica por el número de cualquier tarea que contenga. Si un grupo queda con menos de 2 tareas se desarma solo: la tarea restante pasa a libres y el grupo se elimina. Puntos de rechazo: start.ts:164, close.ts:301, block.ts:76, edit.ts:177.
-- **Agregada:** 2026-10-31.
-
 ### Tarea 129 — Grupos: check, README y plantillas
 
 - **Descripción:** Agregar a acsuite check un aviso de grupos con una sola tarea o con el título desincronizado respecto de las tareas que contienen. Actualizar el README del task-manager (quitar la línea que dice que start rechaza las agrupadas y documentar los group-*), «Agrupamiento» en backlog.md y su plantilla en skill/template, y el límite anotado en la Tarea 34.

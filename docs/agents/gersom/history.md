@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-31 — ✅ Tarea 128 — Grupos: apuntar start, close, block y edit a group-eject
+
+- Los errores de start, block, close y edit --blocker sobre una tarea agrupada ahora indican acsuite task group-eject N en vez de pedir moverla a mano; actualizado el comentario de cabecera de close.ts.
+- Tests de start, block, close y edit afirman que el mensaje nombra group-eject. edit sin --blocker ya funcionaba con tareas agrupadas.
+- bun test (1663) y typecheck limpios. Commit 5d4192f (suite).
+
 ## 2026-10-31 — ✅ Tarea 127 — Grupos: comandos group-edit y group-dissolve
 
 - Comandos group-edit <N> (--title, --summary, --json) y group-dissolve <N> (--json), con editGroup y dissolveGroup en src/write/group.ts.
