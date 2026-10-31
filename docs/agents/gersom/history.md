@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-31 — ✅ Tarea 127 — Grupos: comandos group-edit y group-dissolve
+
+- Comandos group-edit <N> (--title, --summary, --json) y group-dissolve <N> (--json), con editGroup y dissolveGroup en src/write/group.ts.
+- Validaciones de título compartidas con createGroup (checkGroupText, checkTitleFree, checkHeaderReads); el Resumen solo se reconoce por su etiqueta; se repara el desajuste de título entre referencia y contenedor. Límite conocido: reemplazar un Resumen borra su sublista.
+- bun test (1663) y typecheck limpios; revisado por un subagente y corregidos sus hallazgos. Commit 9d5ca02 (suite).
+
 ## 2026-10-31 — ✅ Tarea 126 — Grupos: comando group-add
 
 - Comando group-add <N> <M>... (--json): suma tareas libres al grupo que contiene la tarea N con addTasks, sin tocar el Resumen.

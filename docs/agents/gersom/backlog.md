@@ -48,15 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 127 — Grupos: comandos group-edit y group-dissolve
-
-- **Descripción:** Agregar group-edit (cambiar el título y el Resumen de un grupo, identificado por el número de cualquiera de sus tareas) y group-dissolve (deshacer un grupo entero: todas sus tareas pasan a libres).
-- **Decisiones/temas a definir antes de empezar:** Depende de la base de grupos (src/write/group.ts).
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Surgida del issue #2 (https://github.com/Gersom/agent-context-suite/issues/2). Diseño acordado: comandos planos con prefijo group- (acsuite task group-<acción>), sin tocar start/close/block (la tarea vuelve a libres con group-eject antes de trabajarla). Un grupo se identifica por el número de cualquier tarea que contenga. Si un grupo queda con menos de 2 tareas se desarma solo: la tarea restante pasa a libres y el grupo se elimina.
-- **Agregada:** 2026-10-31.
-
 ### Tarea 128 — Grupos: apuntar start, close, block y edit a group-eject
 
 - **Descripción:** Cambiar el error de start, close y block para tareas agrupadas: en vez de «hazlo a mano», indicar «sácala con acsuite task group-eject N». Hacer que edit funcione con tareas agrupadas (edita solo el texto), manteniendo el rechazo de --blocker.
