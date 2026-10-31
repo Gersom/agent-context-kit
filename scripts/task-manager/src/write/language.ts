@@ -44,6 +44,8 @@ export interface Strings {
   task: string;
   none: string;
   emptySection: string;
+  /** Lo que queda en «Tareas agrupadas» cuando no queda ningún grupo. */
+  emptyGrouped: string;
   defaultTrigger: string;
   fields: Record<FieldKind, string>;
   origin: string;
@@ -89,6 +91,7 @@ export const STRINGS: Record<Lang, Strings> = {
     task: "Tarea",
     none: "Ninguno.",
     emptySection: "Ninguna.",
+    emptyGrouped: "No aplica todavía — ningún grupo formado.",
     defaultTrigger: "cuando el operador pregunte por tareas pendientes.",
     fields: {
       description: "Descripción",
@@ -126,6 +129,7 @@ export const STRINGS: Record<Lang, Strings> = {
     task: "Task",
     none: "None.",
     emptySection: "None.",
+    emptyGrouped: "Not applicable yet — no groups formed.",
     defaultTrigger: "when the operator asks about pending tasks.",
     fields: {
       description: "Description",
