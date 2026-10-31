@@ -23,7 +23,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 
 > Numeración iniciada el 2026-09-24. Las tareas cerradas antes de esa fecha (ver `history.md`) no tienen número asignado retroactivamente.
 
-**Próximo número de tarea:** 131
+**Próximo número de tarea:** 133
 
 ---
 
@@ -47,6 +47,23 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador quiera hacer pública la skill, o priorice esta tarea explícitamente.
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
+
+### Tarea 131 — Revisar las referencias de la skill a la suite
+
+- **Descripción:** Revisar en el repo de la skill (skill/, agent-context-skill) las referencias a la suite (agent-context-suite, acsuite y sus comandos) y comprobar que siguen siendo correctas tras los cambios de la suite: comandos group-*, nombres, versiones y enlaces.
+- **Decisiones/temas a definir antes de empezar:** Qué referencias están desactualizadas y si alguna debe mencionar los comandos nuevos (la skill debe seguir sirviendo a proyectos que no usen acsuite).
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Agregada:** 2026-10-31.
+
+### Tarea 132 — README: advertir que el paquete se instala desde npm, no desde GitHub
+
+- **Descripción:** Agregar al README una advertencia de no instalar el paquete desde GitHub (el repo no incluye dist/ y no se crea el comando acsuite) sino desde npm, con el enlace https://www.npmjs.com/package/agent-context-suite.
+- **Decisiones/temas a definir antes de empezar:** Dónde va la advertencia dentro de la sección de instalación.
+- **Bloqueos:** Ninguno.
+- **Disparador:** cuando el operador pregunte por tareas pendientes.
+- **Detalles:** Parte del issue #1 (https://github.com/Gersom/agent-context-suite/issues/1): bun install -g github:Gersom/agent-context-suite instala el código fuente sin dist/ y bun deja esa copia en su caché; si ya se instaló así, se limpia con bun pm cache rm.
+- **Agregada:** 2026-10-31.
 
 <!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
