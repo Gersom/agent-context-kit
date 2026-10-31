@@ -5,6 +5,7 @@ import type { Check, CheckContext, Finding } from "../types.ts";
 import { checkAnchors } from "./anchors.ts";
 import { checkDecisionsIndex } from "./decisions.ts";
 import { checkFilesExist, checkOperatorsReadable, checkRootFiles } from "./files.ts";
+import { checkGroups } from "./groups.ts";
 import { checkCurrentTask } from "./handoff.ts";
 import { checkHistoryEntries } from "./history.ts";
 import { checkLegacyMarkers } from "./legacy-marker.ts";
@@ -26,6 +27,7 @@ export const CHECKS: Check[] = [
   checkTaskHeadings,
   checkTaskFields,
   checkBlockTags,
+  checkGroups,
   checkCurrentTask,
   checkHistoryEntries,
 ];

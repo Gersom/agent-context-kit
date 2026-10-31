@@ -1,6 +1,6 @@
 # task-manager
 
-Gestiona las tareas de un proyecto que usa la skill `agent-context-skill` editando de forma **quirúrgica** sus archivos (`handoff.md`, `backlog.md`, `history.md` y, en modo multi-operador, `team-backlog.md`), en lugar de que un agente o una persona los edite a mano. Los comandos de negocio se van sumando por etapas; hoy están la infraestructura, dos comandos de diagnóstico, los de lectura (`status`, `next`, `show`) y los de escritura que llevan una tarea por todo su ciclo de vida (`add`, `edit`, `start`, `step`, `pause`, `resume`, `block`, `unblock` y `close`, que la cierra con las Reglas 6 a 9 de `rules.md`).
+Gestiona las tareas de un proyecto que usa la skill `agent-context-skill` editando de forma **quirúrgica** sus archivos (`handoff.md`, `backlog.md`, `history.md` y, en modo multi-operador, `team-backlog.md`), en lugar de que un agente o una persona los edite a mano. Los comandos de negocio se van sumando por etapas; hoy están la infraestructura, dos comandos de diagnóstico, los de lectura (`status`, `next`, `show`) y los de escritura que llevan una tarea por todo su ciclo de vida (`add`, `edit`, `start`, `step`, `pause`, `resume`, `block`, `unblock` y `close`, que la cierra con las Reglas 6 a 9 de `rules.md`) y los de grupos de tareas del backlog (`group-create`, `group-eject`, `group-add`, `group-edit` y `group-dissolve`).
 
 Es **opcional** y es una herramienta de este repo, no parte de la skill: no se copia a los repos destino (principio 4 de [`docs/philosophy.md`](../../docs/philosophy.md)). Sin ella, los archivos se editan a mano igual.
 
@@ -34,6 +34,8 @@ bun run task block 7 --tag dependency --reason "depende de la Tarea 3" --apply
 bun run task unblock --apply                                 # desbloquea las que dependían de tareas ya cerradas
 bun run task close --done --summary "Qué se hizo y por qué" --apply   # cierra la tarea en curso
 bun run task close --discarded --reason "Por qué se descarta" --apply
+bun run task group-create --tasks 12,23 --title "..." --summary "..." --apply   # forma un grupo con las libres 12 y 23
+bun run task group-eject 12 --apply                          # saca la Tarea 12 de su grupo para poder trabajarla
 bun run task <comando> --dry-run      # muestra el diff sin escribir nada (también con --apply)
 bun run task <comando> --agents D:/proyectos/mi-app --operator ana
 ```
@@ -55,6 +57,11 @@ bun run task <comando> --agents D:/proyectos/mi-app --operator ana
 | `block <N>` `*` | Bloquea una tarea libre del backlog (`Bloqueos` + la mueve a «bloqueadas / pospuestas»). |
 | `unblock [<N>]` `*` | Desbloquea una tarea (`N`) o, sin número, las que bloqueaba una tarea ya cerrada. |
 | `close [<N>]` `*` | Cierra la tarea en curso (o la pausada `N`) como hecha (`--done`) o descartada (`--discarded`; una libre o bloqueada sin empezar solo se descarta): entrada en `history.md`, «Sin tarea en curso», bloqueadas y reporte de cierre. |
+| `group-create` `*` | Forma un grupo con tareas libres: las saca de «Tareas libres», deja allí la referencia del grupo y las pone en «Tareas agrupadas». |
+| `group-eject <N>` `*` | Saca una tarea agrupada de su grupo y la deja en «Tareas libres»; si el grupo queda con menos de 2 tareas, se desarma. |
+| `group-add <N> <M>...` `*` | Suma tareas libres a un grupo ya formado (`N` es cualquier tarea del grupo). |
+| `group-edit <N>` `*` | Cambia el título y/o el resumen del grupo de la tarea `N`. |
+| `group-dissolve <N>` `*` | Deshace el grupo de la tarea `N`: todas sus tareas vuelven a «Tareas libres». |
 
 **Flags globales** (valen para todos los comandos, antes o después de su nombre):
 
@@ -172,7 +179,7 @@ Reglas de seguridad que aplica el **núcleo** (no cada comando) a todo comando q
 - **`--apply` obligatorio.** Sin él, el comando calcula todo, verifica el resultado y muestra el diff, pero no escribe. Con `--dry-run` tampoco escribe aunque se pase `--apply`.
 - **Solo la carpeta propia.** Si la carpeta resuelta no es la del correo de `git config user.email` (otro operador, o no se pudo verificar), el comando se niega con un error claro, sin escribir ni mostrar el diff: las carpetas de otros operadores son de solo lectura. En el repo plano no hay otros operadores. **Excepción:** lo que solo cambia el `team-backlog.md` (`add --team`) es un archivo compartido y no lo exige.
 - **Todo por `planChanges`/`commitChanges`:** verificación de legibilidad (anclas y secciones), detección de cambios concurrentes, escritura atómica, CRLF/LF respetados, todo o nada entre los archivos que toca un comando.
-- **`--json`:** los comandos de escritura nuevos (`edit`, `step`, `pause`, `resume`, `block`, `unblock`, `close`) lo aceptan: en vez del diff y los mensajes imprimen `{ schema, command, applied, dryRun, pending, files: [{ file, changed, written }], ...datos del comando }`. `applied`: se escribió algún archivo; `pending`: había cambios y falta `--apply`. (`add` y `start` todavía no lo tienen.)
+- **`--json`:** los comandos de escritura nuevos (`edit`, `step`, `pause`, `resume`, `block`, `unblock`, `close` y los de grupos) lo aceptan: en vez del diff y los mensajes imprimen `{ schema, command, applied, dryRun, pending, files: [{ file, changed, written }], ...datos del comando }`. `applied`: se escribió algún archivo; `pending`: había cambios y falta `--apply`. (`add` y `start` todavía no lo tienen.)
 - **Números sin repetir:** antes de numerar, «Próximo número de tarea» tiene que ser mayor que la tarea más alta que ya existe en handoff, backlog (con grupos) e history; si no, error que lo explica (no se elige otro número por cuenta propia).
 
 ### `add`
@@ -197,7 +204,7 @@ bun run task start --team "Migrar el CI" [--plan -] [--mode ...] [--force] [--ap
 
 Empieza una tarea, **en una sola operación** sobre todos los archivos (o ninguno):
 
-- Exige que **no haya otra tarea en curso** (si la hay, error que sugiere pausarla con `pause`) y que la elegida esté en «libres». Una **bloqueada** da error salvo con `--force` (queda constancia en la salida); una **pausada** (se retoma con `resume`) o **cerrada**, error claro; una **agrupada**, error (sacarla de «Tareas agrupadas» todavía no está soportado). Repetir el mismo `start --apply` falla limpio: ya hay una tarea en curso.
+- Exige que **no haya otra tarea en curso** (si la hay, error que sugiere pausarla con `pause`) y que la elegida esté en «libres». Una **bloqueada** da error salvo con `--force` (queda constancia en la salida); una **pausada** (se retoma con `resume`) o **cerrada**, error claro; una **agrupada**, error que indica sacarla antes con `acsuite task group-eject N` (ver «Grupos»). Repetir el mismo `start --apply` falla limpio: ya hay una tarea en curso.
 - Saca su bloque de `backlog.md` sin dejar huecos ni líneas en blanco dobles; si era la última, la sección queda con «Ninguna.» (`None.` en inglés).
 - Reescribe el cuerpo de «Tarea en progreso» de `handoff.md` según su plantilla, sin tocar el resto del archivo ni las anclas: la línea `Tarea N — título` antes de la primera subsección `###`, un párrafo con la descripción, **Plan** (solo con `--plan`: una línea por paso; se agrega siempre el último paso «Documentar cierre de tarea»; con `--mode`, la línea «Modo de ejecución acordado»), **Qué falta**, **Decisiones a medio camino** (con lo que la tarea traía en «decisiones», si no era «Ninguno») y **Próximo paso concreto** (el primer paso del plan, o «Empezar la tarea.»), en ese orden. Los campos de la tarea que el handoff no tiene dónde poner (`Detalles`, `Desbloquea`...) se copian tal cual, en líneas `- **Campo:** valor` tras la descripción, para que no se pierdan al sacarla del backlog.
 - Con `--team`: la tarea sale de `team-backlog.md` (por título, o una parte única), recibe el siguiente número de tu secuencia (el contador pasa a N+1) y el handoff lleva la línea `- **Origen:** team-backlog`. Los tres archivos cambian juntos.
@@ -241,7 +248,7 @@ El inverso de `pause`: saca la tarea de «Tareas pausadas» y rearma «Tarea en 
 bun run task block <N> --tag <dependency|postponed> --reason <texto> [--json] [--apply]
 ```
 
-Bloquea una tarea **libre** de tu `backlog.md`: pone `Bloqueos` en `` `[tag]` motivo `` (si ya traía un `[Resuelto ...]` de un bloqueo anterior, queda después: el vigente va primero) y mueve su bloque al final de «Tareas bloqueadas / pospuestas». `--tag` es siempre `dependency` o `postponed` (palabras clave en inglés; `--tag dependencia` es un error de uso), y el tag que se escribe sigue el idioma del proyecto: `[dependencia]`/`[postergada]` en uno en español, `[dependency]`/`[postponed]` en uno en inglés. Sin formato nuevo: nombrar `Tarea N` en el motivo es lo que permite que `unblock` la desbloquee sola. Errores: la tarea ya está bloqueada (editar `Bloqueos` a mano), agrupada (sacarla de «Tareas agrupadas» no está soportado), pausada, en curso o cerrada. Solo opera sobre tu `backlog.md` (no sobre el `team-backlog.md`).
+Bloquea una tarea **libre** de tu `backlog.md`: pone `Bloqueos` en `` `[tag]` motivo `` (si ya traía un `[Resuelto ...]` de un bloqueo anterior, queda después: el vigente va primero) y mueve su bloque al final de «Tareas bloqueadas / pospuestas». `--tag` es siempre `dependency` o `postponed` (palabras clave en inglés; `--tag dependencia` es un error de uso), y el tag que se escribe sigue el idioma del proyecto: `[dependencia]`/`[postergada]` en uno en español, `[dependency]`/`[postponed]` en uno en inglés. Sin formato nuevo: nombrar `Tarea N` en el motivo es lo que permite que `unblock` la desbloquee sola. Errores: la tarea ya está bloqueada (editar `Bloqueos` a mano), agrupada (el error indica `acsuite task group-eject N`; ver «Grupos»), pausada, en curso o cerrada. Solo opera sobre tu `backlog.md` (no sobre el `team-backlog.md`).
 
 ### `unblock`
 
@@ -270,7 +277,7 @@ Modifica el **contenido** de una tarea y nunca su estado ni su lugar: una libre 
 | `handoff.md`, en curso o pausada | `--title`, `--description`, `--details` y las subsecciones de avance: `--missing` («Qué falta»), `--decisions` («Decisiones a medio camino»), `--next` («Próximo paso concreto»). `--blocker` y `--trigger` no aplican |
 | `history.md` | nada: es un registro de solo lectura |
 
-- **`--blocker` no cambia el estado.** La sección la decide el tag al inicio de `Bloqueos`. En una libre, un valor con tag `[dependencia]`/`[postergada]` se rechaza (usa `block`). En una bloqueada, un valor con tag se respeta (sirve para pasar de `dependencia` a `postergada`) y uno sin tag conserva el tag actual y cambia solo el motivo; dejarlo en «Ninguno» se rechaza (usa `unblock`).
+- **`--blocker` no cambia el estado.** La sección la decide el tag al inicio de `Bloqueos`. En una libre, un valor con tag `[dependencia]`/`[postergada]` se rechaza (usa `block`). En una bloqueada, un valor con tag se respeta (sirve para pasar de `dependencia` a `postergada`) y uno sin tag conserva el tag actual y cambia solo el motivo; dejarlo en «Ninguno» se rechaza (usa `unblock`). En una agrupada, `--blocker` con un tag de bloqueo (o sobre una tarea ya bloqueada) es un error: se saca antes con `group-eject N`; un texto de bloqueo sin tag como «Ninguno.» sí se edita.
 - No toca los checkboxes del plan (eso es de `step`) ni las tareas de otro operador. Una descripción en curso mezclada con campos o comentarios da error en vez de adivinar qué reemplazar.
 - El título cambia solo el texto: conserva el número, el nivel del header y la etiqueta. En las tareas con número, las referencias entre tareas van por número, así que no se rompen. En el team-backlog el título es la identidad de la tarea (no tiene número): las referencias por título quedan huérfanas, así que `edit --title` sobre una de ellas imprime un `Aviso:` recordando revisarlas.
 - Un valor que empieza con un tag `[...]` en `--description`, `--decisions`, `--details` o `--trigger` se rechaza en el backlog y el team-backlog (el parser lo leería como tag de bloqueo). En una tarea en curso, `--description`, `--missing`, `--decisions` y `--next` rechazan líneas que empiecen con `#` o con un checkbox (`- [ ]`, `- [x]`), porque crearían subsecciones o pasos del plan.
@@ -286,20 +293,98 @@ bun run task close [<N | T-N>] --discarded --reason <texto> [--new "<título>"].
 
 Cierra una tarea con las Reglas 6 a 9 de `rules.md`, **en una sola operación** sobre `handoff.md`, `history.md` y `backlog.md` (todos o ninguno). Exactamente uno de `--done` (hecha) y `--discarded` (descartada); cada uno exige su texto (`--summary` o `--reason`, que admiten `-` para stdin).
 
-- **Qué tarea:** sin número, la tarea en curso. Con `close <N>`, la tarea en curso si es la `N` o **una pausada** (su bloque sale de «Tareas pausadas»; «Tarea en progreso» no se toca). **Una tarea que nunca se empezó** (libre o bloqueada, no agrupada) solo se puede **descartar**: `close <N> --discarded --reason ...` escribe la entrada ❌ en `history.md` y saca su bloque de `backlog.md`, sin tocar `handoff.md` (la tarea en curso, si hay, queda como estaba). Con `--done` es un error: una tarea sin empezar no se da por hecha, se empieza antes con `start`. Una tarea agrupada es un error (sácala del grupo a mano). Sin tarea en curso (por ejemplo, al repetir el mismo cierre) es un error claro que no escribe nada.
+- **Qué tarea:** sin número, la tarea en curso. Con `close <N>`, la tarea en curso si es la `N` o **una pausada** (su bloque sale de «Tareas pausadas»; «Tarea en progreso» no se toca). **Una tarea que nunca se empezó** (libre o bloqueada, no agrupada) solo se puede **descartar**: `close <N> --discarded --reason ...` escribe la entrada ❌ en `history.md` y saca su bloque de `backlog.md`, sin tocar `handoff.md` (la tarea en curso, si hay, queda como estaba). Con `--done` es un error: una tarea sin empezar no se da por hecha, se empieza antes con `start`. Una tarea agrupada es un error que indica sacarla antes con `acsuite task group-eject N` (ver «Grupos»). Sin tarea en curso (por ejemplo, al repetir el mismo cierre) es un error claro que no escribe nada.
 - **`history.md` (Regla 6):** la entrada `## <fecha> — ✅|❌ Tarea N — título` va **arriba de todas** (las más nuevas primero), con la fecha de hoy. Debajo, el texto como viñetas: cada línea de `--summary` / `--reason` pasa a ser una viñeta, y las que ya empiezan con `- ` o están sangradas se conservan tal cual. Va solo lo que la plantilla de `history.md` pide (qué se hizo y por qué, o el motivo del descarte); la descripción, el plan y los demás campos de la tarea no se copian. Si `history.md` no tiene entradas, la de ejemplo de la plantilla (`[Placeholder ...]`) se reemplaza; si tampoco hay, la entrada va al final del archivo. Si la tarea ya figura en `history.md`, se niega (no duplica entradas).
 - **`Origen: team-backlog`:** si la tarea traía el campo (la tomó `start --team`), la entrada de `history.md` lo conserva como primera viñeta: `- **Origen:** team-backlog`. El `team-backlog.md` no se toca: la tarea ya salió de ahí al empezarla.
 - **`handoff.md`:** «Tarea en progreso» queda en «Sin tarea en curso» (`STRINGS.noTask`; el comentario ancla no se mueve). Se niega, sin escribir, si «Tarea en progreso» tiene algo que no reconoce (como `pause`). Si el plan tenía pasos sin marcar (sin contar «Documentar cierre de tarea»), lo avisa.
 - **`backlog.md`:**
-  - Si la tarea todavía figura ahí (en «libres» o «bloqueadas»), se saca. Si además hay que agregar tareas a «libres» en la misma operación (desbloqueadas o `--new`): con una tarea sin empezar (`close <N> --discarded`) las ediciones se calculan sin pisarse (si era el último bloque de «libres», las nuevas ocupan su lugar; si no, se borra y se agrega al final); con la tarea en curso o pausada que quedó en «libres» por un descuido, se niega y pide sacarla a mano. Una tarea que figura en «Tareas agrupadas» es un error.
+  - Si la tarea todavía figura ahí (en «libres» o «bloqueadas»), se saca. Si además hay que agregar tareas a «libres» en la misma operación (desbloqueadas o `--new`): con una tarea sin empezar (`close <N> --discarded`) las ediciones se calculan sin pisarse (si era el último bloque de «libres», las nuevas ocupan su lugar; si no, se borra y se agrega al final); con la tarea en curso o pausada que quedó en «libres» por un descuido, se niega y pide sacarla a mano. Una tarea que figura en «Tareas agrupadas» es un error (se saca con `group-eject N`).
   - `--new "<título>"` (repetible): agrega tareas nuevas al final de «Tareas libres» con los números de «Próximo número de tarea» (que pasa a N+k en la misma edición). Llevan solo el título y una descripción mínima («Surgió al cerrar la Tarea N; falta detallarla.»): para una tarea con todos sus campos, `add`.
   - **Regla 8:** revisa las bloqueadas con la misma lógica que `unblock` (módulo compartido `src/write/unblocking.ts`), contando esta tarea como cerrada: las que dependían solo de tareas cerradas pasan a «Tareas libres» con `Bloqueos` → `` `[Resuelto el <fecha>]` — era `[tag]` motivo `` (se conservan el motivo y el historial). Las de **texto libre** (o que nombran una tarea de otro operador) se listan como «Para revisar a mano» y no se tocan. Avisa si «Tareas libres» queda con más de 15 tareas (Agrupamiento en `backlog.md`); **no agrupa** automáticamente.
 - **Reporte de cierre (Regla 9):** al escribir, imprime con el formato de `rules.md` las secciones que tengan contenido: `**Tareas resueltas:**`, `**Tareas descartadas:**` (con el motivo breve: la primera línea del motivo, recortada), `**Tareas desbloqueadas:**` y `**Tareas nuevas:**`. En inglés, los títulos salen en inglés. Una tarea descartada también cuenta como cerrada para la Regla 8. Las secciones «Checks pendientes» y «Próximo paso» del reporte no las genera el script: las añade el agente si hay checks fallidos, omitidos o pendientes.
 - **`--json`:** `{ ..., task: { number, title, outcome, date, from (`current`, `paused` o `backlog`), origin }, report: { resolved, discarded, unblocked, created }, unblocked, manualReview, stillBlocked, freeTasks, warnings }`: `report` es el mismo contenido del reporte de cierre; `unblocked`, `manualReview` y `stillBlocked` traen tag, motivo y tareas mencionadas (como `unblock --json`).
 
+### Grupos
+
+Un grupo junta tareas de `backlog.md` que conviene tratar juntas (Agrupamiento en `backlog.md`). Vive en **dos lugares a la vez**: la **referencia** `### Grupo — título (Tareas N, M)` con su `- **Resumen:**` en «Tareas libres», y el **contenedor** `### Grupo — título` con un `#### Tarea N` por tarea en «Tareas agrupadas». Los cinco comandos de grupos mantienen los dos lugares de acuerdo, en una sola operación sobre `backlog.md`.
+
+El flujo:
+
+- **Crear:** `group-create` forma el grupo con tareas libres.
+- **Sumar:** `group-add` le agrega más tareas libres.
+- **Sacar para trabajar una tarea:** `start`, `close` y `block` rechazan las tareas agrupadas (el error dice `acsuite task group-eject N`). Se saca con `group-eject N`, que la deja al final de «Tareas libres», y después se trabaja como cualquier otra. `edit` sí funciona con una agrupada (salvo `--blocker` con un tag de bloqueo).
+- **Editar el grupo:** `group-edit` cambia su título o su resumen.
+- **Deshacer:** `group-dissolve` lo desarma entero. Un grupo con menos de 2 tareas se desarma solo: si `group-eject` lo deja con una, esa también vuelve a «Tareas libres».
+
+Un grupo se identifica por el **número de cualquiera de sus tareas** (`N`; `T-N` también vale). Todos aceptan `--json`, el `--apply` de siempre (sin él solo muestran el diff) y trabajan solo sobre tu propio `backlog.md`: `T-N@operador` y la carpeta de otro operador se rechazan. Los que escriben etiquetas (`group-create`, `group-eject`, `group-dissolve`, y `group-edit` si agrega un `Resumen`) usan las palabras del idioma del archivo y avisan (`Aviso:`) si no lo reconocen, como `add`.
+
+### `group-create`
+
+```sh
+bun run task group-create --tasks <N,M,...> --title <título> --summary <frase> [--json] [--apply]
+```
+
+Forma un grupo con tareas **libres**: saca sus bloques de «Tareas libres», deja allí la referencia (`### Grupo — título (Tareas N, M)` + `Resumen`) al final de la sección y pone el contenedor al final de «Tareas agrupadas», con las tareas como `#### Tarea N` y el mismo contenido que tenían.
+
+- `--tasks`: números separados por comas (`12,23,32` o `12, 23, 32`), en el orden en que quedan en el grupo; mínimo 2. `--title` (una línea, distinto al de los demás grupos) y `--summary` (una frase) admiten `-` para leer de la entrada estándar (un solo flag por ejecución). Los tres son obligatorios; no recibe argumentos.
+- Salida: `Grupo «título» creado con las Tareas N, M: pasaron de «Tareas libres» a «Tareas agrupadas» de <archivo>.`
+- Errores comunes: una tarea que no es libre (el mensaje dice dónde está: ya en otro grupo, bloqueada, o no figura en «Tareas libres»), un número repetido o menos de 2 tareas, un `--tasks` que no es una lista de números, un título ya usado por otro grupo, un título o resumen vacío o de varias líneas, con `<!--`/`-->`, o un título que termina en una lista entre paréntesis con números (se leería como referencia). En todos, no escribe nada.
+- `--json`: `group: { title, summary, tasks }`.
+
+### `group-eject`
+
+```sh
+bun run task group-eject <N> [--json] [--apply]
+```
+
+Saca la tarea agrupada `N` de su grupo: su bloque pasa de `#### Tarea N` a `### Tarea N` al final de «Tareas libres» y su número sale de la lista de la referencia. Es el paso previo a `start`, `close` o `block` sobre una tarea agrupada.
+
+- Si el grupo queda con menos de 2 tareas se desarma: la que quedaba también vuelve a «Tareas libres» y se eliminan la referencia y el contenedor (si «Tareas agrupadas» se queda sin grupos, vuelve a su texto de vacío).
+- Salida: `Tarea N sacada del grupo «título»: pasó a «Tareas libres» de <archivo>.`, más, si se desarmó, qué tareas volvieron.
+- Errores comunes: la tarea no está agrupada (el mensaje dice si es libre, bloqueada, en curso, pausada o cerrada), el número no existe (con los números conocidos), figura en más de un lugar, un argumento que no es un número, o más o menos de un argumento.
+- `--json`: `ejected`, `dissolved`, `returned` (tareas que volvieron al desarmarse) y `group: { title, tasks }` (`tasks` vacío si se desarmó).
+
+### `group-add`
+
+```sh
+bun run task group-add <N> <M>... [--json] [--apply]
+```
+
+Suma tareas libres a un grupo ya formado. `N` es cualquier tarea del grupo; las `M` pasan de `### Tarea M` en «Tareas libres» a `#### Tarea M` al final del contenedor (en el orden pedido) y sus números se agregan a la referencia. El `Resumen` no cambia.
+
+- Salida: `Tarea M sumada al grupo «título»: ahora tiene K tareas (N, ..., M).` (en plural: `Tareas M, P sumadas ...`).
+- Errores comunes: `N` no está agrupada (el mensaje dice dónde está), una `M` que no es libre (ya agrupada, bloqueada, en curso, pausada o cerrada; solo se suman tareas libres), un número repetido (también repetir `N`), falta al menos una `M`, o un argumento que no es un número.
+- Una tarea nueva no entra a un grupo con `add`: se agrega con `add` (queda en «libres») y después se suma con `group-add`.
+- `--json`: `group: { title, tasks }` (cómo queda) y `added`.
+
+### `group-edit`
+
+```sh
+bun run task group-edit <N> [--title <texto>] [--summary <texto>] [--json] [--apply]
+```
+
+Cambia el título y/o el resumen del grupo que contiene la tarea `N`. El título se reescribe en la referencia (que conserva su lista de tareas) y en el contenedor; el resumen, en la línea `Resumen` de la referencia (si no tenía, se agrega). No mueve ninguna tarea.
+
+- Hay que pasar al menos uno de `--title` y `--summary`; ambos admiten `-` para stdin y no pueden estar vacíos (no borra nada). El título es de una línea y distinto al de los demás grupos.
+- Salida: `Grupo «título» editado en <archivo>: ahora se llama «nuevo»; resumen «anterior» → «nuevo».`
+- Errores comunes: ninguno de los dos flags, un flag vacío o de varias líneas, `N` no agrupada, un título que ya usa otro grupo o que termina en una lista entre paréntesis con números, un valor igual al actual (`ya tiene el título que indicas: no hay nada que cambiar`), un header del grupo con un comentario HTML (hay que quitarlo a mano).
+- `--json`: `group: { title, tasks }` y `changed` (`title`, `summary` o ambos).
+
+### `group-dissolve`
+
+```sh
+bun run task group-dissolve <N> [--json] [--apply]
+```
+
+Deshace el grupo que contiene la tarea `N`: todas sus tareas pasan de `#### Tarea N` a `### Tarea N` al final de «Tareas libres», en el orden del contenedor, y se eliminan la referencia y el contenedor. Los demás grupos no se tocan.
+
+- Salida: `Grupo «título» deshecho: las Tareas N, M volvieron a «Tareas libres».`
+- Errores comunes: `N` no está agrupada (el mensaje dice dónde está), el número no existe, figura en más de un lugar, o un argumento que no es un número.
+- `--json`: `group: { title, tasks }` y `returned`.
+
 ### Dónde y cómo escriben
 
-- **Ubicación:** al final de la sección, justo tras el último contenido y antes de las líneas en blanco que la separan de la siguiente. **Espaciado:** el que ya usa el archivo (lo que separa a sus dos últimas tareas; una línea en blanco si no hay dos). Si la sección solo tenía el texto de vacío («Ninguna.»), un placeholder de la plantilla o la tarea anterior, el bloque lo **reemplaza**; los comentarios HTML del principio de la sección se conservan. Las tareas agrupadas no se tocan: un grupo no recibe tareas nuevas.
+- **Ubicación:** al final de la sección, justo tras el último contenido y antes de las líneas en blanco que la separan de la siguiente. **Espaciado:** el que ya usa el archivo (lo que separa a sus dos últimas tareas; una línea en blanco si no hay dos). Si la sección solo tenía el texto de vacío («Ninguna.»), un placeholder de la plantilla o la tarea anterior, el bloque lo **reemplaza**; los comentarios HTML del principio de la sección se conservan. Las tareas agrupadas no se tocan: `add` siempre deja la tarea nueva en «libres»; para meterla en un grupo, `group-add`.
 - **Idioma:** el header usa la palabra que ya usan las tareas del archivo (`Tarea`, `Task`...) y las etiquetas de campo salen de una tarea existente; si no hay de dónde copiar, una tabla mínima en **español** (por defecto) o **inglés** (si la palabra de header o las etiquetas lo son). No se inventan traducciones a otros idiomas: ante un idioma desconocido, o sin ninguna pista, escribe en español y lo avisa en la salida. Los títulos de subsección del handoff (Plan, Qué falta...) salen de la misma tabla.
 - **Finales de línea:** un archivo CRLF sigue siendo CRLF y uno LF, LF; lo escrito no reformatea nada de lo que no toca.
 
@@ -365,7 +450,7 @@ scripts/task-manager/
 │   ├── query/        # Consulta reutilizable: dónde vive una tarea, estado del operador, próximo número, formato
 │   ├── workspace/    # Ruta de agentes, operador (operators.md + correo de git), espacio de trabajo y lectura de archivos
 │   ├── edit/         # Ediciones por rango, ubicar/sacar un bloque en una sección (`layout.ts`), verificación de legibilidad, diff, escritura atómica y cambios de varios archivos
-│   └── write/        # Lo que escriben los comandos: idioma y etiquetas, formato de los bloques y del handoff, contador de número de tarea, lectura de «Tarea en progreso» (`handoff.ts`), campo `Bloqueos` (`blocking.ts`), qué desbloquear y cómo (`unblocking.ts`, lo comparten `unblock` y `close`), entrada de `history.md` (`history.ts`), bloque de una tarea nueva (`new-task.ts`), edición del contenido de una tarea sin cambiar su estado (`task-edit.ts`, la usa `edit`) y `--json` de los que escriben
+│   └── write/        # Lo que escriben los comandos: idioma y etiquetas, formato de los bloques y del handoff, contador de número de tarea, lectura de «Tarea en progreso» (`handoff.ts`), campo `Bloqueos` (`blocking.ts`), qué desbloquear y cómo (`unblocking.ts`, lo comparten `unblock` y `close`), entrada de `history.md` (`history.ts`), bloque de una tarea nueva (`new-task.ts`), edición del contenido de una tarea sin cambiar su estado (`task-edit.ts`, la usa `edit`), armado y desarmado de grupos (`group.ts`, lo comparten los `group-*`) y `--json` de los que escriben
 └── test/             # Tests de `bun test` en espejo de src/ + e2e/ (script entero); trabajan en directorios temporales
 ```
 

@@ -49,6 +49,13 @@ Cada hallazgo lleva archivo, línea (cuando aplica) y un código. **Error:** el 
 | `block-tag` | aviso | Bloqueada sin tag vigente, o libre con uno. |
 | `current-task-line` | aviso | «Tarea en progreso» con contenido pero sin la línea `Tarea N — título`. |
 | `current-no-plan` | aviso | Tarea en curso sin ningún checkbox de plan. |
+| `group-too-small` | error | Grupo con menos de 2 tareas (se desarma con `group-eject`). |
+| `group-missing-container` | error | Referencia en «Tareas libres» sin su contenedor en «Tareas agrupadas». |
+| `group-missing-reference` | error | Contenedor en «Tareas agrupadas» sin su referencia en «Tareas libres». |
+| `group-numbers-mismatch` | error | Los números de la referencia no coinciden con las tareas del contenedor. |
+| `group-title-mismatch` | error | La referencia y el contenedor del grupo tienen títulos distintos. |
+| `group-no-summary` | aviso | Referencia de grupo sin línea de Resumen. |
+| `group-header-comment` | aviso | Header de la referencia o del contenedor con un comentario HTML: los comandos `group-*` no pueden editarlo y hay que quitar el comentario a mano. |
 | `history-entry` | aviso | Header `## ` de `history.md` que no es una entrada reconocible (sin ✅ / ❌). |
 
 Las normas salen de la documentación de arquitectura de las plantillas y de las plantillas de agentes de la skill (repo agent-context-skill); ante una diferencia gana la plantilla. Los tests usan una copia congelada de esas plantillas en `test/fixtures/template/`.
@@ -65,7 +72,7 @@ scripts/docs-check/
 │   ├── lines.ts        # Recorre líneas ignorando comentarios HTML y bloques de código
 │   ├── report.ts       # Informe de texto y JSON
 │   ├── types.ts        # Finding, CheckContext
-│   └── checks/         # Un archivo por familia: files, suite-rules, legacy-marker, decisions, anchors, placeholders, tasks, handoff, history
+│   └── checks/         # Un archivo por familia: files, suite-rules, legacy-marker, decisions, anchors, placeholders, tasks, groups, handoff, history
 └── test/             # Espejo de src/ + e2e/ con proyectos reales en un directorio temporal
 ```
 
