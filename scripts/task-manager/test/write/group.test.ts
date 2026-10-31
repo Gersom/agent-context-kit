@@ -1,4 +1,4 @@
-// Formar un grupo, sacar una tarea de él y sumarle tareas libres: ediciones exactas sobre textos en memoria
+// Formar un grupo, sacar una tarea de él, sumarle tareas libres, cambiar su título o resumen y deshacerlo: ediciones exactas sobre textos en memoria
 // (nunca se tocan los docs reales). Los backlogs se arman con `backlogOf` para que la entrada y el
 // resultado esperado se lean lado a lado.
 
@@ -8,7 +8,7 @@ import { normalizeEol } from "../../../_shared/parse/positions.ts";
 import type { ParsedBacklog } from "../../../_shared/types.ts";
 import { CliError } from "../../src/cli/errors.ts";
 import { applyEdits, type Edit } from "../../src/edit/edits.ts";
-import { addTasks, createGroup, ejectTask, findGroupOf, groupLabels } from "../../src/write/group.ts";
+import { addTasks, createGroup, dissolveGroup, editGroup, ejectTask, findGroupOf, groupLabels } from "../../src/write/group.ts";
 import { STRINGS } from "../../src/write/language.ts";
 import type { Doc } from "../../src/workspace/docs.ts";
 import { BACKLOG_RICH } from "../fixtures.ts";
@@ -30,7 +30,8 @@ function expectError(fn: () => unknown, message: string): void {
 
 // Piezas: una tarea libre (`###`) o agrupada (`####`), la referencia de un grupo y su contenedor.
 const task = (n: number, level: "###" | "####" = "###") => `${level} Tarea ${n} — Título ${n}\n\n- **Descripción:** texto ${n}.`;
-const reference = (title: string, numbers: number[]) => `### Grupo — ${title} (Tareas ${numbers.join(", ")})\n\n- **Resumen:** resumen de ${title}.`;
+const referenceWith = (title: string, numbers: number[], summary: string) => `### Grupo — ${title} (Tareas ${numbers.join(", ")})\n\n- **Resumen:** ${summary}`;
+const reference = (title: string, numbers: number[]) => referenceWith(title, numbers, `resumen de ${title}.`);
 const container = (title: string, numbers: number[]) => [`### Grupo — ${title}`, ...numbers.map((n) => task(n, "####"))].join("\n\n");
 const join = (...blocks: string[]) => blocks.join("\n\n");
 
@@ -260,6 +261,20 @@ describe("createGroup", () => {
     );
   });
 
+  test("la etiqueta del resumen solo se copia de una línea de resumen, no del primer campo de la referencia", () => {
+    const withNote = (summaryLine: string) => `### Grupo — Otro (Tareas 30, 31)\n\n- **Nota:** aparte.${summaryLine}`;
+    // Sin línea de resumen en ningún grupo: la etiqueta del idioma, aunque el primer campo sea `Nota`.
+    const noSummary = docOf(backlogOf(join(withNote(""), task(18), task(20)), container("Otro", [30, 31])));
+    expect(groupLabels(noSummary, S)).toEqual({ group: "Grupo", summary: "Resumen", tasks: "Tareas" });
+    expect(groupLabels(noSummary, STRINGS.en).summary).toBe("Summary");
+    expect(apply(noSummary, createGroup(noSummary, [18, 20], "Planes", "Un resumen.", S))).toBe(
+      backlogOf(join(withNote(""), reference("Planes", [18, 20]).replace("resumen de Planes.", "Un resumen.")), join(container("Otro", [30, 31]), container("Planes", [18, 20]))),
+    );
+    // Con una línea de resumen detrás de la `Nota`, se copia su etiqueta.
+    const later = docOf(backlogOf(join(withNote("\n- **Summary:** otro."), task(18), task(20)), container("Otro", [30, 31])));
+    expect(groupLabels(later, S).summary).toBe("Summary");
+  });
+
   test("con un placeholder de «agrupadas» en otro idioma lo reemplaza", () => {
     const doc = docOf(backlogOf(join(task(18), task(20)), "Not applicable yet."));
     expect(apply(doc, createGroup(doc, [18, 20], "Planes", resumen("Planes"), S))).toBe(backlogOf(reference("Planes", [18, 20]), container("Planes", [18, 20])));
@@ -345,5 +360,321 @@ describe("createGroup", () => {
       const noSection = docOf(backlogOf(join(task(1), task(18)), EMPTY).replace("<!-- agent-context-skill:section=grouped -->\n", ""));
       expectError(() => createGroup(noSection, [1, 18], "Nuevo", "x.", S), "no tiene la sección «Tareas agrupadas»");
     });
+  });
+});
+
+describe("editGroup", () => {
+  const free = join(task(1), reference("Planes", [14, 15]), task(18));
+  const grouped = container("Planes", [14, 15]);
+  const doc = docOf(backlogOf(free, grouped));
+
+  test("solo el título: se reescribe en la referencia (con su lista) y en el contenedor; el resumen no cambia", () => {
+    expect(apply(doc, editGroup(doc, 14, { title: "Documentos" }, S))).toBe(
+      backlogOf(join(task(1), referenceWith("Documentos", [14, 15], "resumen de Planes."), task(18)), container("Documentos", [14, 15])),
+    );
+  });
+
+  test("cualquier tarea del grupo lo identifica", () => {
+    for (const number of [14, 15]) {
+      expect(apply(doc, editGroup(doc, number, { title: "Documentos" }, S))).toBe(
+        backlogOf(join(task(1), referenceWith("Documentos", [14, 15], "resumen de Planes."), task(18)), container("Documentos", [14, 15])),
+      );
+    }
+  });
+
+  test("solo el resumen: cambia el valor de la línea y conserva su etiqueta; los títulos no se tocan", () => {
+    expect(apply(doc, editGroup(doc, 15, { summary: "Un resumen nuevo." }, S))).toBe(
+      backlogOf(join(task(1), referenceWith("Planes", [14, 15], "Un resumen nuevo."), task(18)), grouped),
+    );
+    // La etiqueta es la que ya tiene la línea, no la del idioma.
+    const english = docOf(backlogOf("### Group — Plans (Tasks 14, 15)\n\n- **Summary:** old.", `### Group — Plans\n\n${task(14, "####")}\n\n${task(15, "####")}`));
+    expect(apply(english, editGroup(english, 14, { summary: "new." }, S))).toBe(
+      backlogOf("### Group — Plans (Tasks 14, 15)\n\n- **Summary:** new.", `### Group — Plans\n\n${task(14, "####")}\n\n${task(15, "####")}`),
+    );
+  });
+
+  test("título y resumen a la vez: ediciones sin solaparse y el resultado se vuelve a leer", () => {
+    const edits = editGroup(doc, 14, { title: "Documentos", summary: "Un resumen nuevo." }, S);
+    const text = apply(doc, edits);
+    expect(text).toBe(backlogOf(join(task(1), referenceWith("Documentos", [14, 15], "Un resumen nuevo."), task(18)), container("Documentos", [14, 15])));
+    const parsed = parseBacklog(text);
+    expect(parsed.free.groups.map((g) => [g.title, g.taskNumbers])).toEqual([["Documentos", [14, 15]]]);
+    expect(parsed.free.groups[0].body).toBe("- **Resumen:** Un resumen nuevo.");
+    expect(parsed.grouped.map((g) => [g.title, g.tasks.map((t) => t.number)])).toEqual([["Documentos", [14, 15]]]);
+  });
+
+  test("los espacios de los extremos se ignoran", () => {
+    expect(apply(doc, editGroup(doc, 14, { title: "  Documentos ", summary: " Nuevo. " }, S))).toBe(
+      backlogOf(join(task(1), referenceWith("Documentos", [14, 15], "Nuevo."), task(18)), container("Documentos", [14, 15])),
+    );
+  });
+
+  test("con el grupo en medio de otros dos, solo se tocan sus dos headers y su resumen", () => {
+    const three = docOf(
+      backlogOf(
+        join(reference("Uno", [30, 31]), task(1), reference("Planes", [14, 15]), reference("Tres", [40, 41])),
+        join(container("Uno", [30, 31]), container("Planes", [14, 15]), container("Tres", [40, 41])),
+      ),
+    );
+    expect(apply(three, editGroup(three, 15, { title: "Documentos", summary: "Nuevo." }, S))).toBe(
+      backlogOf(
+        join(reference("Uno", [30, 31]), task(1), referenceWith("Documentos", [14, 15], "Nuevo."), reference("Tres", [40, 41])),
+        join(container("Uno", [30, 31]), container("Documentos", [14, 15]), container("Tres", [40, 41])),
+      ),
+    );
+  });
+
+  test("conserva la palabra del grupo y el espaciado del header (`Group`, `–`, espacios antes de la lista)", () => {
+    const odd = docOf(backlogOf("### Group –  Plans   (Tasks 14, 15)  \n\n- **Summary:** old.", `### Group –  Plans\n\n${task(14, "####")}\n\n${task(15, "####")}`));
+    expect(apply(odd, editGroup(odd, 14, { title: "Docs" }, S))).toBe(
+      backlogOf("### Group –  Docs   (Tasks 14, 15)  \n\n- **Summary:** old.", `### Group –  Docs\n\n${task(14, "####")}\n\n${task(15, "####")}`),
+    );
+  });
+
+  test("un resumen de varias líneas se reemplaza entero; lo que sigue al campo queda", () => {
+    const long = docOf(backlogOf(`### Grupo — Planes (Tareas 14, 15)\n\n- **Resumen:** primera\n  continuación.\n- **Nota:** aparte.\n\n${task(18)}`, grouped));
+    expect(apply(long, editGroup(long, 14, { summary: "Una sola." }, S))).toBe(
+      backlogOf(`### Grupo — Planes (Tareas 14, 15)\n\n- **Resumen:** Una sola.\n- **Nota:** aparte.\n\n${task(18)}`, grouped),
+    );
+  });
+
+  describe("un grupo sin línea de Resumen", () => {
+    const bare = "### Grupo — Planes (Tareas 14, 15)";
+
+    test("se agrega tras el header, con la etiqueta del idioma", () => {
+      const noSummary = docOf(backlogOf(join(task(1), bare, task(18)), grouped));
+      expect(apply(noSummary, editGroup(noSummary, 14, { summary: "Nuevo." }, S))).toBe(backlogOf(join(task(1), referenceWith("Planes", [14, 15], "Nuevo."), task(18)), grouped));
+      expect(apply(noSummary, editGroup(noSummary, 14, { summary: "New." }, STRINGS.en))).toBe(
+        backlogOf(join(task(1), "### Grupo — Planes (Tareas 14, 15)\n\n- **Summary:** New.", task(18)), grouped),
+      );
+    });
+
+    test("sola en «libres» (header en la última línea de su sección), también", () => {
+      const only = docOf(backlogOf(bare, grouped));
+      expect(apply(only, editGroup(only, 15, { summary: "Nuevo." }, S))).toBe(backlogOf(referenceWith("Planes", [14, 15], "Nuevo."), grouped));
+    });
+
+    test("copia el espaciado de los demás grupos del archivo", () => {
+      const others = join(`### Group — Otro\n\n${task(30, "####")}\n\n${task(31, "####")}`, grouped);
+      const tight = docOf(backlogOf(join("### Group — Otro (Tasks 30, 31)\n- **Summary:** otro.", bare), others));
+      expect(apply(tight, editGroup(tight, 14, { summary: "Nuevo." }, S))).toBe(
+        backlogOf(join("### Group — Otro (Tasks 30, 31)\n- **Summary:** otro.", "### Grupo — Planes (Tareas 14, 15)\n- **Summary:** Nuevo."), others),
+      );
+    });
+
+    test("un campo propio que no es el resumen (`Nota`) no se pisa: se agrega el Resumen aparte", () => {
+      const withNote = docOf(backlogOf(join(task(1), `${bare}\n\n- **Nota:** y.`, task(18)), grouped));
+      expect(apply(withNote, editGroup(withNote, 14, { summary: "Nuevo." }, S))).toBe(
+        backlogOf(join(task(1), `${bare}\n\n- **Resumen:** Nuevo.\n\n- **Nota:** y.`, task(18)), grouped),
+      );
+    });
+
+    test("un `Nota` como primer campo de otro grupo no contamina la etiqueta del Resumen", () => {
+      const others = join(`### Grupo — Otro\n\n${task(30, "####")}\n\n${task(31, "####")}`, grouped);
+      const other = docOf(backlogOf(join("### Grupo — Otro (Tareas 30, 31)\n\n- **Nota:** aparte.", bare), others));
+      expect(apply(other, editGroup(other, 14, { summary: "Nuevo." }, S))).toBe(
+        backlogOf(join("### Grupo — Otro (Tareas 30, 31)\n\n- **Nota:** aparte.", referenceWith("Planes", [14, 15], "Nuevo.")), others),
+      );
+      expect(apply(other, editGroup(other, 14, { summary: "New." }, STRINGS.en))).toContain("### Grupo — Planes (Tareas 14, 15)\n\n- **Summary:** New.");
+    });
+
+    test("con título nuevo a la vez, las dos ediciones del header no se solapan", () => {
+      const noSummary = docOf(backlogOf(join(task(1), bare), grouped));
+      const text = apply(noSummary, editGroup(noSummary, 14, { title: "Docs", summary: "Nuevo." }, S));
+      expect(text).toBe(backlogOf(join(task(1), referenceWith("Docs", [14, 15], "Nuevo.")), container("Docs", [14, 15])));
+      expect(parseBacklog(text).free.groups.map((g) => [g.title, g.taskNumbers])).toEqual([["Docs", [14, 15]]]);
+    });
+  });
+
+  test("solo cambiar la capitalización del título es un cambio (el propio grupo no cuenta como repetido)", () => {
+    expect(apply(doc, editGroup(doc, 14, { title: "PLANES" }, S))).toBe(
+      backlogOf(join(task(1), referenceWith("PLANES", [14, 15], "resumen de Planes."), task(18)), container("PLANES", [14, 15])),
+    );
+  });
+
+  test("si referencia y contenedor ya difieren por un desajuste manual, el título de uno de los dos repara los dos headers", () => {
+    const mismatch = docOf(backlogOf(join(task(1), reference("Dos", [14, 15])), container("DOS", [14, 15])));
+    const fixed = backlogOf(join(task(1), reference("Dos", [14, 15])), container("Dos", [14, 15]));
+    expect(apply(mismatch, editGroup(mismatch, 14, { title: "Dos" }, S))).toBe(fixed);
+    expect(apply(mismatch, editGroup(mismatch, 14, { title: "DOS" }, S))).toBe(backlogOf(join(task(1), reference("DOS", [14, 15]).replace("resumen de DOS.", "resumen de Dos.")), container("DOS", [14, 15])));
+    const text = apply(mismatch, editGroup(mismatch, 14, { title: " Dos ", summary: "Nuevo." }, S));
+    expect(text).toBe(backlogOf(join(task(1), referenceWith("Dos", [14, 15], "Nuevo.")), container("Dos", [14, 15])));
+    // Ya reparado, no hay nada que cambiar.
+    const repaired = docOf(fixed);
+    expectError(() => editGroup(repaired, 14, { title: "Dos" }, S), "El grupo «Dos» ya tiene el título que indicas: no hay nada que cambiar.");
+  });
+
+  test("si uno de los dos valores ya es el actual, solo se escribe el otro", () => {
+    expect(apply(doc, editGroup(doc, 14, { title: "Planes", summary: "Nuevo." }, S))).toBe(apply(doc, editGroup(doc, 14, { summary: "Nuevo." }, S)));
+    expect(apply(doc, editGroup(doc, 14, { title: "Docs", summary: "resumen de Planes." }, S))).toBe(apply(doc, editGroup(doc, 14, { title: "Docs" }, S)));
+  });
+
+  test("con el fixture real (BACKLOG_RICH) el resultado vuelve a parsearse", () => {
+    const rich = docOf(BACKLOG_RICH);
+    const parsed = parseBacklog(apply(rich, editGroup(rich, 15, { title: "Planes de costos", summary: "Un resumen." }, S)));
+    expect(parsed.free.groups.map((g) => [g.title, g.taskNumbers])).toEqual([["Planes de costos", [14, 15]]]);
+    expect(parsed.free.groups[0].body).toBe("- **Resumen:** Un resumen.");
+    expect(parsed.grouped.map((g) => [g.title, g.tasks.map((t) => t.number)])).toEqual([["Planes de costos", [14, 15]]]);
+    expect(parsed.free.tasks.map((t) => t.number)).toEqual([1, 3, 18]);
+  });
+
+  test("conserva el final de línea CRLF del archivo", () => {
+    const crlf = docOf(backlogOf(free, grouped).replace(/\n/g, "\r\n"));
+    const expected = backlogOf(join(task(1), referenceWith("Documentos", [14, 15], "Nuevo."), task(18)), container("Documentos", [14, 15]));
+    const text = apply(crlf, editGroup(crlf, 14, { title: "Documentos", summary: "Nuevo." }, S));
+    expect(text).toBe(expected.replace(/\n/g, "\r\n"));
+    expect(text.replace(/\r\n/g, "")).not.toContain("\n");
+    // También al agregar la línea de resumen.
+    const noSummary = docOf(backlogOf(join(task(1), "### Grupo — Planes (Tareas 14, 15)"), grouped).replace(/\n/g, "\r\n"));
+    expect(apply(noSummary, editGroup(noSummary, 14, { summary: "Nuevo." }, S))).toBe(backlogOf(join(task(1), referenceWith("Planes", [14, 15], "Nuevo.")), grouped).replace(/\n/g, "\r\n"));
+  });
+
+  describe("errores", () => {
+    const other = docOf(backlogOf(join(reference("Otro", [30, 31]), reference("Planes", [14, 15]), task(1), task(18)), join(container("Otro", [30, 31]), container("Planes", [14, 15]))));
+    const edit = (values: { title?: string; summary?: string }) => () => editGroup(other, 14, values, S);
+
+    test("sin nada que cambiar", () => {
+      expectError(edit({}), "Indica qué cambiar del grupo: el título, el resumen o ambos. No se escribió nada.");
+    });
+
+    test("la tarea no está agrupada (libre, bloqueada, inexistente)", () => {
+      for (const number of [1, 6, 99]) expectError(() => editGroup(other, number, { title: "X" }, S), `La Tarea ${number} no está en «Tareas agrupadas»`);
+    });
+
+    test("el valor es el actual: no hay nada que cambiar", () => {
+      expectError(edit({ title: "Planes" }), "El grupo «Planes» ya tiene el título que indicas: no hay nada que cambiar. No se escribió nada.");
+      expectError(edit({ title: " Planes " }), "ya tiene el título que indicas");
+      expectError(edit({ summary: "resumen de Planes." }), "El grupo «Planes» ya tiene el resumen que indicas: no hay nada que cambiar. No se escribió nada.");
+      expectError(edit({ title: "Planes", summary: "resumen de Planes." }), "El grupo «Planes» ya tiene el título y el resumen que indicas: no hay nada que cambiar.");
+    });
+
+    test("título repetido (sin mayúsculas ni acentos), en referencias y en contenedores sin referencia", () => {
+      expectError(edit({ title: "Otro" }), "Ya hay un grupo con el título «Otro»: el título identifica al grupo y debe ser único. No se escribió nada.");
+      expectError(edit({ title: "  ÓTRO " }), "Ya hay un grupo con el título «Otro»");
+      const orphan = docOf(backlogOf(join(reference("Planes", [14, 15]), task(1)), join(container("Planes", [14, 15]), container("Huérfano", [30, 31]))));
+      expectError(() => editGroup(orphan, 14, { title: "huerfano" }, S), "Ya hay un grupo con el título «Huérfano»");
+    });
+
+    test("título o resumen vacío, de varias líneas, con comentario HTML o que se leería como referencia", () => {
+      expectError(edit({ title: "  " }), "El título del grupo debe ser una sola línea y no estar vacío");
+      expectError(edit({ title: "uno\ndos" }), "El título del grupo debe ser una sola línea");
+      expectError(edit({ summary: "" }), "El resumen del grupo debe ser una sola frase");
+      expectError(edit({ summary: "uno\ndos" }), "El resumen del grupo debe ser una sola frase");
+      expectError(edit({ title: "Fase <!-- x" }), "El título del grupo no puede contener «<!--» ni «-->»");
+      expectError(edit({ summary: "Un --> resumen" }), "El resumen del grupo no puede contener «<!--» ni «-->»");
+      expectError(edit({ title: "Fase (2)" }), "termina en una lista entre paréntesis con números");
+    });
+
+    test("título con un paréntesis sin cerrar: el header no se releería con el mismo título", () => {
+      for (const title of ["Fase (2", "Fase (beta", "Fase (2 (3"]) {
+        expectError(edit({ title }), `El título «${title}» tiene un paréntesis sin cerrar o algo que confunde al parser`);
+      }
+      for (const title of ["Fase (beta)", "Fase (2) final"]) {
+        const parsed = parseBacklog(apply(other, editGroup(other, 14, { title }, S)));
+        expect(parsed.free.groups.map((g) => [g.title, g.taskNumbers])).toEqual([["Otro", [30, 31]], [title, [14, 15]]]);
+        expect(parsed.grouped.map((g) => g.tasks.map((t) => t.number))).toEqual([[30, 31], [14, 15]]);
+      }
+    });
+
+    test("un comentario HTML en el header de la referencia o del contenedor: pide quitarlo a mano", () => {
+      const message = (header: string) => `El header del grupo (${header}) tiene un comentario HTML: quita el comentario del header a mano. No se escribió nada.`;
+      const inReference = docOf(backlogOf(join(task(1), "### Grupo — Dos (Tareas 14, 15) <!-- x -->\n\n- **Resumen:** dos."), container("Dos", [14, 15])));
+      expectError(() => editGroup(inReference, 14, { title: "Tres" }, S), message("### Grupo — Dos (Tareas 14, 15) <!-- x -->"));
+      const inContainer = docOf(backlogOf(join(task(1), reference("Dos", [14, 15])), container("Dos", [14, 15]).replace("### Grupo — Dos", "### Grupo — Dos <!-- x -->")));
+      expectError(() => editGroup(inContainer, 14, { title: "Tres" }, S), message("### Grupo — Dos <!-- x -->"));
+      // Solo el resumen no toca los headers: se escribe.
+      expect(apply(inReference, editGroup(inReference, 14, { summary: "Nuevo." }, S))).toContain("- **Resumen:** Nuevo.");
+    });
+
+    test("un contenedor sin referencia es un error", () => {
+      const orphan = docOf(backlogOf(task(1), container("Huérfano", [14, 15])));
+      expectError(() => editGroup(orphan, 14, { title: "X" }, S), "no tiene su referencia");
+    });
+  });
+});
+
+describe("dissolveGroup", () => {
+  const EMPTY = "No aplica todavía — ningún grupo formado.";
+
+  test("grupo de 2: las tareas pasan al final de «libres», en el orden del contenedor, y «agrupadas» queda vacía", () => {
+    const doc = docOf(backlogOf(join(task(1), reference("Planes", [14, 15]), task(18)), container("Planes", [14, 15])));
+    const expected = backlogOf(join(task(1), task(18), task(14), task(15)), EMPTY);
+    expect(apply(doc, dissolveGroup(doc, 14, S))).toBe(expected);
+    expect(apply(doc, dissolveGroup(doc, 15, S))).toBe(expected);
+  });
+
+  test("grupo de 3, con la referencia como último bloque de «libres»: las tareas ocupan su lugar", () => {
+    const doc = docOf(backlogOf(join(task(1), reference("Planes", [14, 15, 16])), container("Planes", [14, 15, 16])));
+    expect(apply(doc, dissolveGroup(doc, 15, S))).toBe(backlogOf(join(task(1), task(14), task(15), task(16)), EMPTY));
+  });
+
+  test("el orden es el del contenedor, no el de la lista de la referencia", () => {
+    const doc = docOf(backlogOf(join(reference("Planes", [16, 14, 15]), task(1)), container("Planes", [14, 15, 16])));
+    expect(apply(doc, dissolveGroup(doc, 16, S))).toBe(backlogOf(join(task(1), task(14), task(15), task(16)), EMPTY));
+  });
+
+  test("con otro grupo después: ese queda con su referencia y su contenedor", () => {
+    const doc = docOf(
+      backlogOf(
+        join(reference("Planes", [14, 15]), task(1), reference("Otro", [30, 31, 32])),
+        join(container("Planes", [14, 15]), container("Otro", [30, 31, 32])),
+      ),
+    );
+    expect(apply(doc, dissolveGroup(doc, 14, S))).toBe(
+      backlogOf(join(task(1), reference("Otro", [30, 31, 32]), task(14), task(15)), container("Otro", [30, 31, 32])),
+    );
+  });
+
+  test("con otro grupo antes, y la referencia al final de «libres»", () => {
+    const doc = docOf(
+      backlogOf(
+        join(reference("Otro", [30, 31]), task(1), reference("Planes", [14, 15])),
+        join(container("Otro", [30, 31]), container("Planes", [14, 15])),
+      ),
+    );
+    expect(apply(doc, dissolveGroup(doc, 15, S))).toBe(backlogOf(join(reference("Otro", [30, 31]), task(1), task(14), task(15)), container("Otro", [30, 31])));
+  });
+
+  test("con otro grupo en medio de dos más", () => {
+    const doc = docOf(
+      backlogOf(
+        join(reference("Uno", [30, 31]), reference("Planes", [14, 15]), reference("Tres", [40, 41])),
+        join(container("Uno", [30, 31]), container("Planes", [14, 15]), container("Tres", [40, 41])),
+      ),
+    );
+    expect(apply(doc, dissolveGroup(doc, 14, S))).toBe(
+      backlogOf(join(reference("Uno", [30, 31]), reference("Tres", [40, 41]), task(14), task(15)), join(container("Uno", [30, 31]), container("Tres", [40, 41]))),
+    );
+  });
+
+  test("el último grupo deja el texto de vacío del idioma", () => {
+    const doc = docOf(backlogOf(join(task(1), reference("Planes", [14, 15])), container("Planes", [14, 15])));
+    expect(apply(doc, dissolveGroup(doc, 14, STRINGS.es))).toBe(backlogOf(join(task(1), task(14), task(15)), EMPTY));
+    expect(apply(doc, dissolveGroup(doc, 14, STRINGS.en))).toBe(backlogOf(join(task(1), task(14), task(15)), "Not applicable yet — no groups formed."));
+  });
+
+  test("con el fixture real (BACKLOG_RICH) el resultado vuelve a parsearse sin grupos", () => {
+    const doc = docOf(BACKLOG_RICH);
+    const parsed = parseBacklog(apply(doc, dissolveGroup(doc, 15, S)));
+    expect(parsed.free.tasks.map((t) => t.number)).toEqual([1, 3, 18, 14, 15]);
+    expect(parsed.free.groups).toEqual([]);
+    expect(parsed.grouped).toEqual([]);
+  });
+
+  test("conserva el final de línea CRLF del archivo", () => {
+    const doc = docOf(backlogOf(join(task(1), reference("Planes", [14, 15, 16]), task(18)), container("Planes", [14, 15, 16])).replace(/\n/g, "\r\n"));
+    const text = apply(doc, dissolveGroup(doc, 15, S));
+    expect(text).toBe(backlogOf(join(task(1), task(18), task(14), task(15), task(16)), EMPTY).replace(/\n/g, "\r\n"));
+    expect(text.replace(/\r\n/g, "")).not.toContain("\n");
+  });
+
+  test("una tarea que no está agrupada (libre, bloqueada, inexistente) es un error", () => {
+    const doc = docOf(backlogOf(join(task(1), reference("Planes", [14, 15])), container("Planes", [14, 15])));
+    for (const number of [1, 6, 99]) expectError(() => dissolveGroup(doc, number, S), `La Tarea ${number} no está en «Tareas agrupadas»`);
+  });
+
+  test("un contenedor sin referencia es un error", () => {
+    const doc = docOf(backlogOf(task(1), container("Huérfano", [14, 15])));
+    expectError(() => dissolveGroup(doc, 14, S), "no tiene su referencia");
   });
 });
