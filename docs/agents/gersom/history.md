@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-31 — ✅ Tarea 124 — Grupos: comando group-create
+
+- Comando group-create (--tasks, --title, --summary, --json): createGroup en src/write/group.ts arma la referencia con su Resumen en «Tareas libres» y el contenedor en «Tareas agrupadas»; palabras Grupo/Resumen/Tareas en language.ts.
+- Valida mínimo de 2 tareas, repetidas, solo libres, título repetido, paréntesis sin cerrar y comentarios HTML. Límite conocido: un título que termina en (número) se rechaza porque el parser lo leería como lista.
+- bun test (1556) y typecheck limpios; revisado por un subagente y corregidos sus hallazgos. Commit 14a95ae (suite).
+
 ## 2026-10-31 — ✅ Tarea 123 — Grupos: base compartida en src/write/group.ts
 
 - Base de grupos en src/write/group.ts: ejectTask, addTasks y findGroupOf, con desarme automático de grupos de menos de 2 tareas y texto de vacío propio para «Tareas agrupadas» (emptyGrouped).
