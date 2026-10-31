@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-31 — ✅ Tarea 129 — Grupos: check, README y plantillas
+
+- Check de grupos en acsuite check (scripts/docs-check/src/checks/groups.ts): group-too-small, group-missing-container, group-missing-reference, group-numbers-mismatch, group-title-mismatch, group-no-summary y group-header-comment.
+- README del task-manager con los cinco comandos group-* y la sección «Grupos» (frases de «no soportado» corregidas); códigos nuevos en el README de docs-check; regla «Agrupamiento» y nota de la Tarea 34 actualizadas. La plantilla de la skill no se toca.
+- bun test (1691), typecheck y acsuite check limpios; revisado por un subagente y corregidos sus hallazgos. Commit ae915f1 (suite).
+
 ## 2026-10-31 — ✅ Tarea 128 — Grupos: apuntar start, close, block y edit a group-eject
 
 - Los errores de start, block, close y edit --blocker sobre una tarea agrupada ahora indican acsuite task group-eject N en vez de pedir moverla a mano; actualizado el comentario de cabecera de close.ts.

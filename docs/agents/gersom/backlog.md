@@ -17,7 +17,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** contexto extendido, solo si hace falta.
 - **Agregada:** fecha.
 
-**Agrupamiento (solo en "Tareas libres"):** si superan las 15 tareas (Regla 8), se evalúa agrupar 2 o más que compartan un objetivo real — el grupo entero tiene que caber en una frase de objetivo compartido, sin forzar con "y". El grupo aparece en libres como un bloque `### Grupo — título (Tareas N, M)` con un `Resumen` de una frase; el detalle de cada tarea (`#### Tarea N — título`, mismo formato) se mueve a "Tareas agrupadas", que no hace falta leer salvo para tomar una. Un grupo que queda con una sola tarea se desarma.
+**Agrupamiento (solo en "Tareas libres"):** si superan las 15 tareas (Regla 8), se evalúa agrupar 2 o más que compartan un objetivo real — el grupo entero tiene que caber en una frase de objetivo compartido, sin forzar con "y". El grupo aparece en libres como un bloque `### Grupo — título (Tareas N, M)` con un `Resumen` de una frase; el detalle de cada tarea (`#### Tarea N — título`, mismo formato) se mueve a "Tareas agrupadas", que no hace falta leer salvo para tomar una. Un grupo que queda con una sola tarea se desarma. Con el script de tareas, `acsuite task group-create`, `group-add`, `group-eject`, `group-edit` y `group-dissolve` arman y deshacen grupos (ver el README de `task-manager`); para trabajar una tarea agrupada primero se saca con `group-eject N`.
 
 **Anclas de sección:** no borres ni muevas los comentarios `<!-- agent-context-skill:section=... -->` (`free`, `blocked`, `grouped`) que preceden a cada sección: los usa el script de seguimiento de tareas de agent-context-kit.
 
@@ -36,7 +36,7 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Decisiones/temas a definir antes de empezar:** Qué fricciones se vieron al usarlos (flags largos, texto libre, `--apply`, pausar/empezar en varios pasos); si conviene fusionar o renombrar comandos; qué se mantiene por compatibilidad.
 - **Bloqueos:** Ninguno.
 - **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Surgida al usar el script en las Tareas 24 y 32. Límites conocidos: block/unblock no soportan tareas agrupadas ni team-backlog.md; add y start sin --json. Surgido al hacer la Tarea 36: `step` ya edita de forma puntual (marcar, desmarcar y reemplazar una subsección), pero no permite cambiar el texto o la nota de un paso, agregar o quitar pasos, ni reabrir uno con motivo (lo pide la Tarea 35), y admite solo una de `--falta`/`--decisiones`/`--proximo` por ejecución. Actualización (T113): `edit` ya cubre cambiar el texto de una tarea; sigue pendiente cambiar el texto de un paso del plan, agregar o quitar pasos y reabrir uno con motivo. Actualización (T115): `step` ya no tiene --falta/--decisiones/--proximo (el texto se cambia con `edit`), así que el límite de una sola de esas flags por ejecución ya no aplica. Actualización (T114): los flags de todos los comandos y el valor de --tag están en inglés, sin alias; si se reevalúan los comandos, ya no hay nombres en español que unificar.
+- **Detalles:** Surgida al usar el script en las Tareas 24 y 32. Límites conocidos: block/unblock no soportan tareas agrupadas ni team-backlog.md; add y start sin --json. Surgido al hacer la Tarea 36: `step` ya edita de forma puntual (marcar, desmarcar y reemplazar una subsección), pero no permite cambiar el texto o la nota de un paso, agregar o quitar pasos, ni reabrir uno con motivo (lo pide la Tarea 35), y admite solo una de `--falta`/`--decisiones`/`--proximo` por ejecución. Actualización (T113): `edit` ya cubre cambiar el texto de una tarea; sigue pendiente cambiar el texto de un paso del plan, agregar o quitar pasos y reabrir uno con motivo. Actualización (T115): `step` ya no tiene --falta/--decisiones/--proximo (el texto se cambia con `edit`), así que el límite de una sola de esas flags por ejecución ya no aplica. Actualización (T114): los flags de todos los comandos y el valor de --tag están en inglés, sin alias; si se reevalúan los comandos, ya no hay nombres en español que unificar. Actualización (T129): block/unblock siguen sin soportar tareas agrupadas (ahora se sacan antes con `group-eject N`) ni team-backlog.md; ya existen los comandos `group-*` para crear, sumar, sacar, editar y deshacer grupos.
 - **Agregada:** 2026-10-08.
 
 ### Tarea 4 — Deploy en skills.sh
@@ -47,15 +47,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Disparador:** cuando el operador quiera hacer pública la skill, o priorice esta tarea explícitamente.
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
-
-### Tarea 129 — Grupos: check, README y plantillas
-
-- **Descripción:** Agregar a acsuite check un aviso de grupos con una sola tarea o con el título desincronizado respecto de las tareas que contienen. Actualizar el README del task-manager (quitar la línea que dice que start rechaza las agrupadas y documentar los group-*), «Agrupamiento» en backlog.md y su plantilla en skill/template, y el límite anotado en la Tarea 34.
-- **Decisiones/temas a definir antes de empezar:** Va al final, cuando los comandos group-* ya existan.
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Surgida del issue #2 (https://github.com/Gersom/agent-context-suite/issues/2). Diseño acordado: comandos planos con prefijo group- (acsuite task group-<acción>), sin tocar start/close/block (la tarea vuelve a libres con group-eject antes de trabajarla). Un grupo se identifica por el número de cualquier tarea que contenga. Si un grupo queda con menos de 2 tareas se desarma solo: la tarea restante pasa a libres y el grupo se elimina.
-- **Agregada:** 2026-10-31.
 
 <!-- agent-context-skill:section=blocked -->
 ## Tareas bloqueadas / pospuestas
