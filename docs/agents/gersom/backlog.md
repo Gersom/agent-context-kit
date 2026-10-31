@@ -48,15 +48,6 @@ Cola de tareas pendientes: el "qué falta" a nivel proyecto. No es la tarea en c
 - **Detalles:** ninguno.
 - **Agregada:** 2026-09-24.
 
-### Tarea 125 — Grupos: comando group-eject
-
-- **Descripción:** Agregar acsuite task group-eject <N>: saca la tarea N de su grupo y la pone en «Tareas libres» como ###, con el mismo contenido. Si el grupo queda con menos de 2 tareas, se desarma.
-- **Decisiones/temas a definir antes de empezar:** Depende de la base de grupos (src/write/group.ts).
-- **Bloqueos:** Ninguno.
-- **Disparador:** cuando el operador pregunte por tareas pendientes.
-- **Detalles:** Surgida del issue #2 (https://github.com/Gersom/agent-context-suite/issues/2). Diseño acordado: comandos planos con prefijo group- (acsuite task group-<acción>), sin tocar start/close/block (la tarea vuelve a libres con group-eject antes de trabajarla). Un grupo se identifica por el número de cualquier tarea que contenga. Si un grupo queda con menos de 2 tareas se desarma solo: la tarea restante pasa a libres y el grupo se elimina.
-- **Agregada:** 2026-10-31.
-
 ### Tarea 126 — Grupos: comando group-add
 
 - **Descripción:** Agregar acsuite task group-add <N-del-grupo> <M>...: suma tareas libres a un grupo existente, identificado por el número de cualquier tarea que contenga, y actualiza el título en sus dos lugares. No toca el Resumen.

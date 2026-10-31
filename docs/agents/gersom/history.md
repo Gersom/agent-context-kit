@@ -11,6 +11,12 @@ Historial de tareas resueltas — hechas o descartadas: el "qué pasó y por qu�
 
 ---
 
+## 2026-10-31 — ✅ Tarea 125 — Grupos: comando group-eject
+
+- Comando group-eject <N> (--json): saca una tarea agrupada a «Tareas libres» con ejectTask y desarma el grupo si queda con menos de 2 tareas.
+- Errores con etiquetas en español (WHERE exportado de block.ts), rechazo de tareas en varios lugares y mensaje correcto con contenedores de una sola tarea.
+- bun test (1570) y typecheck limpios; revisado por un subagente y corregidos sus hallazgos. Commit a7cf30e (suite).
+
 ## 2026-10-31 — ✅ Tarea 124 — Grupos: comando group-create
 
 - Comando group-create (--tasks, --title, --summary, --json): createGroup en src/write/group.ts arma la referencia con su Resumen en «Tareas libres» y el contenedor en «Tareas agrupadas»; palabras Grupo/Resumen/Tareas en language.ts.
